@@ -38,6 +38,7 @@ Currently in `beta version 0.9.0.0`
 - If not enabled, `SendPayload` will be executed to enable `ps4debug`.
 - You must specify the ps4 connection `IP` in SendPayload.
 - `SendPayload` requires the `ps4debug.bin` file that conforms to the `FW` version.
+- Port is `9090` when using `GoldHEN2.0b` to `Enable BinLoader Server`, Other `Bin Loader` tool port is usually `9021`.
 
 ![sendpayload](assets/sendpayload.jpg)
 
