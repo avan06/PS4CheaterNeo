@@ -298,7 +298,7 @@ namespace PS4CheaterNeo
 
                     if (idx != OffsetBoxList.Count - 1)
                     {
-                        if (AddrSection == null) AddrSection = mainForm.sectionTool.GetSection(mainForm.sectionTool.GetSectionID((ulong)(address + baseAddress)));
+                        if (AddrSection == null || AddrSection.SID == 0) AddrSection = mainForm.sectionTool.GetSection(mainForm.sectionTool.GetSectionID((ulong)(address + baseAddress)));
                         byte[] nextAddress = PS4Tool.ReadMemory(AddrSection.PID, (ulong)(address + baseAddress), 8);
                         baseAddress = BitConverter.ToInt64(nextAddress, 0);
                         OffsetLabelList[idx].Text = baseAddress.ToString("X");

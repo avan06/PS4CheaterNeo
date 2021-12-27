@@ -9,7 +9,7 @@ namespace PS4CheaterNeo
     public class SectionTool
     {
         private readonly Mutex mutex = new Mutex();
-        public ulong totalMemorySize;
+        public ulong TotalMemorySize;
         public int PID { get; private set; }
         public ulong MemoryStart { get; private set; }
         public ulong MemoryEnd { get; private set; }
@@ -62,21 +62,21 @@ namespace PS4CheaterNeo
         {
             ProcessMap pMap = PS4Tool.GetProcessMaps(processID);
 
-            if (pMap == null || pMap.entries == null) throw new Exception(string.Format("ProcessMap({0}) is null.", processID));
+            if (pMap == null || pMap.entries == null || pMap.entries.Length == 0) throw new Exception(string.Format("ProcessMap({0}) is null.", processID));
 
             InitSectionList(pMap);
         }
 
         public void InitSectionList(ProcessMap pMap)
         {
-            if (pMap == null || pMap.entries == null) throw new Exception("Process Map is null.");
+            if (pMap == null || pMap.entries == null || pMap.entries.Length == 0) throw new Exception("Process Map is null.");
 
             mutex.WaitOne();
             try
             {
                 SectionDict = new Dictionary<int, Section>();
                 SectionList = new List<(int SID, ulong start, ulong end)>();
-                totalMemorySize = 0;
+                TotalMemorySize = 0;
                 PID = pMap.pid;
                 int sIdx = 0;
                 int protCnt = 0;
@@ -98,7 +98,7 @@ namespace PS4CheaterNeo
                         if (MemoryStart == 0 || start < MemoryStart) MemoryStart = start;
                         if (MemoryEnd == 0 || end > MemoryEnd) MemoryEnd = end;
                         if (protTmp > 0 && protTmp != entry.prot)
-                        {
+                        { //Calculate SID value: Increase the prot count and reset sIdx to zero when the prot has changed
                             protCnt++;
                             sIdx = 0;
                         }
@@ -129,7 +129,6 @@ namespace PS4CheaterNeo
 
                             start += curLength;
                             idx++;
-                            Console.WriteLine(section.ToString());
                         }
                         sIdx++;
                         protTmp = entry.prot;

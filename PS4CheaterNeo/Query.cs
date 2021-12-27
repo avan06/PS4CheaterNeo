@@ -138,7 +138,7 @@ namespace PS4CheaterNeo
                 if (MessageBox.Show("Still in the scanning, Do you want to stop scan?", "Scan", 
                     MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes) ScanWorker.CancelAsync();
             }
-            else if (ResultView.Items.Count == 0 && MessageBox.Show("search size:" + (sectionTool.totalMemorySize / (1024 * 1024)).ToString() + "MB", "First Scan",
+            else if (ResultView.Items.Count == 0 && MessageBox.Show("search size:" + (sectionTool.TotalMemorySize / (1024 * 1024)).ToString() + "MB", "First Scan",
                 MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) return;
             else
             {
@@ -255,7 +255,7 @@ namespace PS4CheaterNeo
             section.Check = e.NewValue == CheckState.Checked;
             if (section.Check)
             {
-                sectionTool.totalMemorySize += (ulong)section.Length;
+                sectionTool.TotalMemorySize += (ulong)section.Length;
                 if (AddrMinBox.Text == "") AddrMinBox.Text = section.Start.ToString("X");
                 else
                 {
@@ -269,7 +269,7 @@ namespace PS4CheaterNeo
                     if (section.Start + (ulong)section.Length > AddrMax) AddrMaxBox.Text = (section.Start + (ulong)section.Length).ToString("X");
                 }
             }
-            else sectionTool.totalMemorySize -= (ulong)section.Length;
+            else sectionTool.TotalMemorySize -= (ulong)section.Length;
 
             if (item.Checked) item.BackColor = Color.DarkSlateGray;
             else item.BackColor = Color.DarkGreen;
@@ -513,7 +513,7 @@ namespace PS4CheaterNeo
                         if (result.resultList.Count == 0) section.Check = false;
                         else hitCnt += result.resultList.Count;
                         processedMemoryLen += section.Length;
-                        ScanWorker.ReportProgress((int)(((float)processedMemoryLen / sectionTool.totalMemorySize) * 100), (tickerMajor.Elapsed, string.Format("{0}MB, Count: {1}", processedMemoryLen / (1024 * 1024), hitCnt)));
+                        ScanWorker.ReportProgress((int)(((float)processedMemoryLen / sectionTool.TotalMemorySize) * 100), (tickerMajor.Elapsed, string.Format("{0}MB, Count: {1}", processedMemoryLen / (1024 * 1024), hitCnt)));
                         semaphore.Release();
                         return (section.SID, tickerMajor.Elapsed);
                     });
