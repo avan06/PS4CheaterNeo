@@ -105,6 +105,7 @@ namespace PS4CheaterNeo
             this.ScanTypeBox.Name = "ScanTypeBox";
             this.ScanTypeBox.Size = new System.Drawing.Size(121, 20);
             this.ScanTypeBox.TabIndex = 5;
+            this.ScanTypeBox.SelectedIndexChanged += new System.EventHandler(this.ScanTypeBox_SelectedIndexChanged);
             // 
             // LockBox
             // 
@@ -181,7 +182,7 @@ namespace PS4CheaterNeo
             // RefreshPointerChecker
             // 
             this.RefreshPointerChecker.Enabled = true;
-            this.RefreshPointerChecker.Interval = 500;
+            this.RefreshPointerChecker.Interval = 1000;
             this.RefreshPointerChecker.Tick += new System.EventHandler(this.RefreshPointerChecker_Tick);
             // 
             // NewAddress

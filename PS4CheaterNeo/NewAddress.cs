@@ -38,6 +38,23 @@ namespace PS4CheaterNeo
 
             AddOffsetBtn = new Button();
             DelOffsetBtn = new Button();
+
+            AddOffsetBtn.Text = "Add Offset";
+            AddOffsetBtn.BackColor = BackColor;
+            AddOffsetBtn.ForeColor = ForeColor;
+            AddOffsetBtn.FlatStyle = FlatStyle.Flat;
+            AddOffsetBtn.Size = SaveBtn.Size;
+            AddOffsetBtn.Click -= AddOffset_Click;
+            AddOffsetBtn.Click += AddOffset_Click;
+
+            DelOffsetBtn.Text = "Del Offset";
+            DelOffsetBtn.BackColor = BackColor;
+            DelOffsetBtn.ForeColor = ForeColor;
+            DelOffsetBtn.FlatStyle = FlatStyle.Flat;
+            DelOffsetBtn.Size = CloseBtn.Size;
+            DelOffsetBtn.Click -= DelOffset_Click;
+            DelOffsetBtn.Click += DelOffset_Click;
+
             OffsetBoxList = new List<TextBox>();
             OffsetLabelList = new List<Label>();
 
@@ -142,135 +159,131 @@ namespace PS4CheaterNeo
 
         private void PointerBox_CheckedChanged(object sender, EventArgs e)
         {
-
             Point savePosition = SaveBtn.Location;
-            savePosition.Y = PointerBox.Location.Y + PointerBox.Height + 5;
-
             Point cancelPosition = CloseBtn.Location;
+            savePosition.Y = PointerBox.Location.Y + PointerBox.Height + 5;
             cancelPosition.Y = PointerBox.Location.Y + PointerBox.Height + 5;
+            IsPointer = PointerBox.Checked;
+            AddressBox.Enabled = !IsPointer;
 
-            if (PointerBox.Checked)
+            if (IsPointer)
             {
                 OffsetList = new List<long>();
-                IsPointer = true;
                 savePosition.Y += 30;
                 cancelPosition.Y += 30;
 
-                AddOffsetBtn.Text = "Add Offset";
-                AddOffsetBtn.BackColor = this.BackColor;
-                AddOffsetBtn.ForeColor = this.ForeColor;
-                AddOffsetBtn.FlatStyle = FlatStyle.Flat;
-                AddOffsetBtn.Size = SaveBtn.Size;
                 AddOffsetBtn.Location = SaveBtn.Location;
-                AddOffsetBtn.Click -= AddOffset_Click;
-                AddOffsetBtn.Click += AddOffset_Click;
-                this.Controls.Add(AddOffsetBtn);
-
-                DelOffsetBtn.Text = "Del Offset";
-                DelOffsetBtn.BackColor = this.BackColor;
-                DelOffsetBtn.ForeColor = this.ForeColor;
-                DelOffsetBtn.FlatStyle = FlatStyle.Flat;
-                DelOffsetBtn.Size = CloseBtn.Size;
                 DelOffsetBtn.Location = CloseBtn.Location;
-                DelOffsetBtn.Click -= DelOffset_Click;
-                DelOffsetBtn.Click += DelOffset_Click;
-                this.Controls.Add(DelOffsetBtn);
 
-                AddressBox.Enabled = false;
+                Controls.Add(AddOffsetBtn);
+                Controls.Add(DelOffsetBtn);
             }
             else
             {
-                IsPointer = false;
-
-                this.Controls.Remove(DelOffsetBtn);
-                this.Controls.Remove(AddOffsetBtn);
+                Controls.Remove(DelOffsetBtn);
+                Controls.Remove(AddOffsetBtn);
 
                 for (int i = 0; i < OffsetBoxList.Count; ++i)
                 {
-                    this.Controls.Remove(OffsetBoxList[i]);
-                    this.Controls.Remove(OffsetLabelList[i]);
+                    Controls.Remove(OffsetBoxList[i]);
+                    Controls.Remove(OffsetLabelList[i]);
                 }
 
                 OffsetLabelList.Clear();
                 OffsetBoxList.Clear();
-
-
-                AddressBox.Enabled = true;
             }
 
             SaveBtn.Location = savePosition;
             CloseBtn.Location = cancelPosition;
-            this.Height = savePosition.Y + SaveBtn.Height + 50;
+            Height = savePosition.Y + SaveBtn.Height + 50;
         }
 
         private void DelOffset_Click(object sender, EventArgs e)
         {
-            if (OffsetLabelList.Count == 0) return;
 
-            TextBox textBox = OffsetBoxList[OffsetLabelList.Count - 1];
-            this.Controls.Remove(textBox);
-            OffsetBoxList.RemoveAt(OffsetLabelList.Count - 1);
-
-            Label label = OffsetLabelList[OffsetLabelList.Count - 1];
-            this.Controls.Remove(label);
-            OffsetLabelList.RemoveAt(OffsetLabelList.Count - 1);
-
-            Point addOffsetPosition = AddOffsetBtn.Location;
-            addOffsetPosition.Y -= 30;
-            AddOffsetBtn.Location = addOffsetPosition;
-
-            Point delOffsetPosition = DelOffsetBtn.Location;
-            delOffsetPosition.Y -= 30;
-            DelOffsetBtn.Location = delOffsetPosition;
-
-            Point savePosition = SaveBtn.Location;
-            savePosition.Y -= 30;
-            SaveBtn.Location = savePosition;
-
-            Point cancelPosition = CloseBtn.Location;
-            cancelPosition.Y -= 30;
-            CloseBtn.Location = cancelPosition;
-
-            this.Height -= 30;
+            SetOffsetBoxs(false);
         }
 
         private void AddOffset_Click(object sender, EventArgs e)
         {
-            TextBox textBox = new TextBox();
-            textBox.Text = "0";
-            textBox.Size = AddOffsetBtn.Size;
-            textBox.Location = AddOffsetBtn.Location;
-            textBox.ForeColor = this.ForeColor;
-            textBox.BackColor = this.BackColor;
-            this.Controls.Add(textBox);
-            OffsetBoxList.Add(textBox);
+            SetOffsetBoxs(true);
+        }
 
-            Label label = new Label();
-            label.Text = "";
-            label.Size = DelOffsetBtn.Size;
-            label.Location = DelOffsetBtn.Location;
-            label.ForeColor = this.ForeColor;
-            label.BackColor = this.BackColor;
-            this.Controls.Add(label);
-            OffsetLabelList.Add(label);
+        private void SetOffsetBoxs(bool isAdd)
+        {
+            int offsetHeight = 30;
+            if (isAdd)
+            {
+                TextBox textBox = new TextBox();
+                textBox.Text = "0";
+                textBox.Size = AddOffsetBtn.Size;
+                textBox.Location = AddOffsetBtn.Location;
+                textBox.ForeColor = ForeColor;
+                textBox.BackColor = BackColor;
+
+                Label label = new Label();
+                label.Text = "";
+                label.Size = DelOffsetBtn.Size;
+                label.Location = DelOffsetBtn.Location;
+                label.ForeColor = ForeColor;
+                label.BackColor = BackColor;
+
+                Controls.Add(textBox);
+                Controls.Add(label);
+                OffsetBoxList.Add(textBox);
+                OffsetLabelList.Add(label);
+            }
+            else
+            {
+                if (OffsetLabelList.Count == 0) return;
+
+                offsetHeight *= -1;
+                TextBox textBox = OffsetBoxList[OffsetLabelList.Count - 1];
+                Label label = OffsetLabelList[OffsetLabelList.Count - 1];
+                Controls.Remove(textBox);
+                Controls.Remove(label);
+                OffsetBoxList.RemoveAt(OffsetLabelList.Count - 1);
+                OffsetLabelList.RemoveAt(OffsetLabelList.Count - 1);
+            }
 
             Point addOffsetPosition = AddOffsetBtn.Location;
-            addOffsetPosition.Y += 30;
-            AddOffsetBtn.Location = addOffsetPosition;
-
             Point delOffsetPosition = DelOffsetBtn.Location;
-            delOffsetPosition.Y += 30;
-            DelOffsetBtn.Location = delOffsetPosition;
-
             Point savePosition = SaveBtn.Location;
-            savePosition.Y += 30;
-            SaveBtn.Location = savePosition;
-
             Point cancelPosition = CloseBtn.Location;
-            cancelPosition.Y += 30;
+
+            addOffsetPosition.Y += offsetHeight;
+            delOffsetPosition.Y += offsetHeight;
+            savePosition.Y += offsetHeight;
+            cancelPosition.Y += offsetHeight;
+
+            AddOffsetBtn.Location = addOffsetPosition;
+            DelOffsetBtn.Location = delOffsetPosition;
+            SaveBtn.Location = savePosition;
             CloseBtn.Location = cancelPosition;
 
-            this.Height += 30;
+            Height += offsetHeight;
+        }
+
+        private void ScanTypeBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (IsPointer || OffsetList != null) return;
+
+            var newCheatType = (ScanType)((ComboboxItem)(ScanTypeBox.SelectedItem)).Value;
+            if (newCheatType == ScanType.String_) return;
+
+            var newValue = ScanTool.ValueStringToULong(CheatType, ValueBox.Text);
+            if (newValue == 0) return;
+
+            if (newCheatType == ScanType.Byte_ && newValue > byte.MaxValue) return;
+            else if (newCheatType == ScanType.Bytes_2 && newValue > UInt16.MaxValue) return;
+            else if (newCheatType == ScanType.Bytes_4 && newValue > UInt32.MaxValue) return;
+
+            var newText = ScanTool.ULongToString(newCheatType, newValue);
+            if (newText == "0") return;
+
+            Value = newValue;
+            CheatType = newCheatType;
+            ValueBox.Text = newText;
         }
 
         private void RefreshPointerChecker_Tick(object sender, EventArgs e)

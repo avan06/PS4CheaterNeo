@@ -31,6 +31,7 @@ namespace PS4CheaterNeo
         {
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.HexView = new Be.Windows.Forms.HexBox();
+            this.HexBox = new System.Windows.Forms.CheckBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.InfoBox = new System.Windows.Forms.TextBox();
             this.FindBtn = new System.Windows.Forms.Button();
@@ -41,7 +42,6 @@ namespace PS4CheaterNeo
             this.RefreshBtn = new System.Windows.Forms.Button();
             this.NextBtn = new System.Windows.Forms.Button();
             this.PreviousBtn = new System.Windows.Forms.Button();
-            this.HexBox = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -98,6 +98,18 @@ namespace PS4CheaterNeo
             this.HexView.VScrollBarVisible = true;
             this.HexView.ZeroBytesForeColor = System.Drawing.Color.DimGray;
             this.HexView.SelectionStartChanged += new System.EventHandler(this.HexView_SelectionStartChanged);
+            // 
+            // HexBox
+            // 
+            this.HexBox.AutoSize = true;
+            this.HexBox.Checked = true;
+            this.HexBox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.HexBox.Location = new System.Drawing.Point(3, 187);
+            this.HexBox.Name = "HexBox";
+            this.HexBox.Size = new System.Drawing.Size(43, 16);
+            this.HexBox.TabIndex = 10;
+            this.HexBox.Text = "Hex";
+            this.HexBox.UseVisualStyleBackColor = true;
             // 
             // groupBox1
             // 
@@ -232,18 +244,6 @@ namespace PS4CheaterNeo
             this.PreviousBtn.Text = "Previous";
             this.PreviousBtn.UseVisualStyleBackColor = true;
             this.PreviousBtn.Click += new System.EventHandler(this.PreviousBtn_Click);
-            // 
-            // HexBox
-            // 
-            this.HexBox.AutoSize = true;
-            this.HexBox.Checked = true;
-            this.HexBox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.HexBox.Location = new System.Drawing.Point(3, 187);
-            this.HexBox.Name = "HexBox";
-            this.HexBox.Size = new System.Drawing.Size(43, 16);
-            this.HexBox.TabIndex = 10;
-            this.HexBox.Text = "Hex";
-            this.HexBox.UseVisualStyleBackColor = true;
             // 
             // HexEditor
             // 
