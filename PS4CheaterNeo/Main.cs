@@ -87,8 +87,7 @@ namespace PS4CheaterNeo
                     "FMVer", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes) return;
                 #endregion
                 (int sid, string name, uint prot, ulong mappedAddr) preData = (0, "", 0, 0);
-                Color tmpBackColor = Color.Transparent;
-                Color tmpForeColor = Color.Transparent;
+                Color tmpBackColor = default;
                 for (int idx = 1; idx < cheatStrArr.Length; ++idx)
                 {
                     string cheatStr = cheatStrArr[idx];
@@ -111,12 +110,7 @@ namespace PS4CheaterNeo
                     int relativeOffset = isRelative ? int.Parse(cheatElements[5].Substring(1), NumberStyles.HexNumber) : -1;
 
                     Section section = sectionTool.GetSection(sid, name, prot);
-                    if (section == null && MessageBox.Show(string.Format("Your cheat file line({0}): Section({1}) is not find.", idx, sid + ((name ?? "") != "" ? "_" + name : "")),
-                        "Section ID", MessageBoxButtons.OK, MessageBoxIcon.Error) == DialogResult.OK)
-                    {
-                        ToolStripLockEnable.Checked = false;
-                        tmpForeColor = Color.Red;
-                    }
+                    if (section == null && ToolStripLockEnable.Checked) ToolStripLockEnable.Checked = false;
 
                     ulong mappedAddr = 0;
                     List<long> offsetList = null;
@@ -148,16 +142,8 @@ namespace PS4CheaterNeo
                         name = section.Name;
                         prot = section.Prot;
                     }
-                    if (!isRelative)
-                    {
-                        if (tmpBackColor != Color.SlateGray) tmpBackColor = Color.SlateGray;
-                        else tmpBackColor = Color.FromArgb(80, 80, 80);
-                    }
-                    if (cheatRow != null)
-                    {
-                        if (tmpForeColor != Color.Transparent) cheatRow.DefaultCellStyle.ForeColor = tmpForeColor;
-                        cheatRow.DefaultCellStyle.BackColor = tmpBackColor;
-                    }
+                    if (!isRelative) tmpBackColor = tmpBackColor != Color.SlateGray ? Color.SlateGray : Color.FromArgb(80, 80, 80);
+                    if (cheatRow != null) cheatRow.DefaultCellStyle.BackColor = tmpBackColor;
                     preData = (sid, name, prot, mappedAddr);
                 }
                 CheatGridView.GroupRefresh();

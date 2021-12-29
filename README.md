@@ -1,8 +1,8 @@
-# Overview
+﻿# Overview
 
 PS4CheaterNeo is a program to find game cheat codes, and it is based on [`ps4debug`](https://github.com/jogolden/ps4debug) and `.Net Framework 4.8`.
 
-Currently in `beta version 0.9.0.0`
+Currently in `beta version 0.9.1.0`
 
 ## Table of Contents
 - [Building](#building)
@@ -12,6 +12,7 @@ Currently in `beta version 0.9.0.0`
   * [Cheat window](#cheat-window)
   * [Add Address](#add-address)
   * [Query window](#query-window)
+  * [section](#section)
   * [Group ScanType](#group-scantype)
   * [Hex Editor](#hex-editor)
   * [Pointer finder](#pointer-finder)
@@ -30,7 +31,6 @@ Currently in `beta version 0.9.0.0`
 - The `cheat` window and the `query` window are separated.
 - `Hex Editor` can be opened from the `cheat` or `query` window.
 - `Pointer finder` can be executed from the `cheat` or `query` lists.
-
 
 ### SendPayload
 
@@ -84,17 +84,24 @@ Currently in `beta version 0.9.0.0`
 - Support query multiple targets, Multiple query windows can be opened at the same time.
 - In addition to query types such as `Byte, Float, Double, Hex`, etc., it also supports `Group` types.
 - Make the `section` of the suspected target more obvious.
-- The query value will skip the filtered section list when the filter checkbox is clicked.
-- The preset section filter rules is "`libSce, libc.prx, SceShell, SceLib, SceNp, SceVoice, SceFios, libkernel, SceVdec`", These rules can also be customized.
+- The query value will skip the filtered `section` list when the filter checkbox is clicked.
+- The preset `section` filter rules is `libSce, libc.prx, SceShell, SceLib, SceNp, SceVoice, SceFios, libkernel, SceVdec`, these rules can also be customized.
 
 ![query_1](assets/query_1.jpg)
 ![query_2](assets/query_2.jpg)
 ![query_3](assets/query_3.jpg)
 
 
+### section
+
+- The memory address of the PS4 game is the start position of the specific `section` plus the relative offset value.
+- The start position of `sections` is `dynamic` and will change every time you start the game or load the game save or just go through a scene in the game.
+- This program will reload the `sections` when executes the `lock` or `refresh` the cheat codes to ensure that it is correct.
+
+
 ### Group ScanType
 
-- Use `group search` when you already know the data structure of the query target.
+- Use `group search` when you already know the `data structure` of the query target.
 - Input format: [`ValueType`1:]`ValueNumber`1 [,] [`ValueType`2:]`ValueNumber`2 [,] [`ValueType`3:]`ValueNumber`3...
 - The `ValueType` can be `1`(Byte), `2`(2 Bytes), `4`(4 Bytes), `8`(8 Bytes), `F`(Float), `D`(Double), `H`(Hex) or not specified.
 - The `ValueType` is preset to 4 bytes when the value type is not specified.
@@ -102,8 +109,8 @@ Currently in `beta version 0.9.0.0`
 - The delimiter can be comma(`,`) or space(` `).
 
 > Example:  
-> Assuming the target structure is `63 00` `E7 03 00 00` `AB CD 00 00` `00 01`  
-> Group scan can be entered as `2:99 999 ? 2:256`  
+> Assuming the target `structure` is `63 00` `E7 03 00 00` `AB CD 00 00` `00 01`  
+> `Group scan` can be entered as `2:99 999 ? 2:256`  
 
 
 ### Hex Editor
@@ -114,13 +121,13 @@ Currently in `beta version 0.9.0.0`
 
 ![hexeditor](assets/hexeditor.jpg)
 
+
 ### Pointer finder
 
 - Make the `base address` of the pointer be in the `executable section` when `FastScan` is clicked.
 - If there is no result, you can try to click `NegativeOffset`.
 - The finder will skip the filtered section list when the `filter` checkbox is clicked.
-- The preset section filter rules is "`libSce, libc.prx, SceShell, SceLib, SceNp, SceVoice, SceFios, libkernel, SceVdec`", These rules can also be customized.
-
+- The preset section filter rules is `libSce, libc.prx, SceShell, SceLib, SceNp, SceVoice, SceFios, libkernel, SceVdec`, these rules can also be customized.
 
 ![pointerfinder_1](assets/pointerfinder_1.jpg)
 ![pointerfinder_2](assets/pointerfinder_2.jpg)
@@ -130,3 +137,5 @@ Currently in `beta version 0.9.0.0`
 
 [ps4debug](https://github.com/jogolden/ps4debug)  
 [PS4_Cheater](https://github.com/hurrican6/PS4_Cheater)  
+[Be.HexEditor](https://github.com/Pkcs11Admin/Be.HexEditor)  
+[GroupGridView](https://github.com/avan06/GroupGridView)  

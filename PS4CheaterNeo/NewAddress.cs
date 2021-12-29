@@ -293,7 +293,9 @@ namespace PS4CheaterNeo
 
             try
             {
-                CheatType = (ScanType)((ComboboxItem)(ScanTypeBox.SelectedItem)).Value;
+                var newCheatType = (ScanType)((ComboboxItem)(ScanTypeBox.SelectedItem)).Value;
+                var changedCheatType = CheatType != newCheatType;
+                if (changedCheatType) CheatType = newCheatType;
 
                 long baseAddress = 0;
 
@@ -322,7 +324,7 @@ namespace PS4CheaterNeo
                         byte[] data = PS4Tool.ReadMemory(BaseSection.PID, (ulong)(address + baseAddress), ScanTool.ScanTypeLengthDict[CheatType]);
                         OffsetLabelList[idx].Text = ScanTool.BytesToString(CheatType, data);
                         AddressBox.Text = (address + baseAddress).ToString("X");
-                        if (!ValueBox.Enabled)
+                        if (!ValueBox.Enabled || changedCheatType)
                         {
                             ValueBox.Enabled = true;
                             ValueBox.Text = OffsetLabelList[idx].Text;
