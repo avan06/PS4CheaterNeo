@@ -11,7 +11,7 @@ namespace PS4CheaterNeo
     {
         readonly Main mainForm;
         readonly Section section;
-        List<long> changedPosList;
+        Dictionary<long, long> changedPosDic;
         int Page;
         int PageCount;
         long Line;
@@ -22,7 +22,7 @@ namespace PS4CheaterNeo
         {
             InitializeComponent();
 
-            changedPosList = new List<long>();
+            changedPosDic = new Dictionary<long, long>();
             this.mainForm = mainForm;
             this.section = section;
             Page = baseAddr / PageSize;
@@ -131,7 +131,6 @@ D: {8}", HexView.SelectionStart + HexView.LineInfoOffset, HexView.SelectionStart
         {
             PageBox.SelectedIndex = Page;
             Line = HexView.CurrentLine - 1;
-            Column = 0;
             UpdateUi(Page, Line);
         }
 
@@ -141,13 +140,21 @@ D: {8}", HexView.SelectionStart + HexView.LineInfoOffset, HexView.SelectionStart
             if (!dynaBP.HasChanges()) return;
 
             byte[] buffer = dynaBP.Bytes.ToArray();
-
-            for (int i = 0; i < changedPosList.Count; ++i)
+            foreach (long address in changedPosDic.Keys)
             {
-                byte[] b = { buffer[changedPosList[i]] };
-                PS4Tool.WriteMemory(section.PID, (ulong)(changedPosList[i] + HexView.LineInfoOffset), b);
+                byte[] data;
+                long changedLen = changedPosDic[address];
+                if (changedLen <= 1) data = new byte[] { buffer[address] };
+                else
+                {
+                    long startPos = address;
+                    long endPos = address + changedLen;
+                    data = new byte[endPos - startPos];
+                    Array.Copy(buffer, startPos, data, 0, endPos - startPos);
+                }
+                PS4Tool.WriteMemory(section.PID, (ulong)(address + HexView.LineInfoOffset), data);
             }
-            changedPosList.Clear();
+            changedPosDic.Clear();
         }
 
         private void AddToCheatGridBtn_Click(object sender, EventArgs e)
@@ -231,10 +238,7 @@ D: {8}", HexView.SelectionStart + HexView.LineInfoOffset, HexView.SelectionStart
 
             int memSize = PageSize;
 
-            if (section.Length - PageSize * page < memSize)
-            {
-                memSize = section.Length - PageSize * page;
-            }
+            if (section.Length - PageSize * page < memSize) memSize = section.Length - PageSize * page;
 
             byte[] dst = PS4Tool.ReadMemory(section.PID, section.Start + (ulong)page * PageSize, (int)memSize);
             HexView.ByteProvider = new DynamicByteProvider(dst);
@@ -252,7 +256,8 @@ D: {8}", HexView.SelectionStart + HexView.LineInfoOffset, HexView.SelectionStart
         {
             if (HexView.SelectionStart < 0) return;
 
-            changedPosList.Add(HexView.SelectionStart);
+            if (!changedPosDic.TryGetValue(HexView.SelectionStart, out long changedLen)) changedPosDic.Add(HexView.SelectionStart, HexView.SelectionLength);
+            else if (changedLen < HexView.SelectionLength) changedPosDic[HexView.SelectionStart] = HexView.SelectionLength;
         }
     }
 }

@@ -599,16 +599,15 @@ namespace PS4CheaterNeo
             try
             {
                 SectionTool sectionTool = new SectionTool();
-                ProcessMap pMap = PS4Tool.GetProcessMaps(processName);
-                sectionTool.InitSectionList(pMap);
+                sectionTool.InitSectionList(processName);
 
                 Section gameInfoSection = sectionTool.GetSection(sectionName, sectionProt);
 
                 if (gameInfoSection == null) return;
 
-                gameID = Encoding.Default.GetString(PS4Tool.ReadMemory(pMap.pid, gameInfoSection.Start + idOffset, 16));
+                gameID = Encoding.Default.GetString(PS4Tool.ReadMemory(sectionTool.PID, gameInfoSection.Start + idOffset, 16));
                 gameID = gameID.Trim(new char[] { '\0' });
-                gameVer = Encoding.Default.GetString(PS4Tool.ReadMemory(pMap.pid, gameInfoSection.Start + versionOffset, 16));
+                gameVer = Encoding.Default.GetString(PS4Tool.ReadMemory(sectionTool.PID, gameInfoSection.Start + versionOffset, 16));
                 gameVer = gameVer.Trim(new char[] { '\0' });
             }
             catch

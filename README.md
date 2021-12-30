@@ -2,7 +2,7 @@
 
 PS4CheaterNeo is a program to find game cheat codes, and it is based on [`ps4debug`](https://github.com/jogolden/ps4debug) and `.Net Framework 4.8`.
 
-Currently in `beta version 0.9.1.0`
+Currently in `version 0.9.2.0-beta`
 
 ## Table of Contents
 - [Building](#building)

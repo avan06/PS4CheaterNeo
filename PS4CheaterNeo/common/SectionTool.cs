@@ -53,23 +53,23 @@ namespace PS4CheaterNeo
         {
             ProcessInfo processInfo = PS4Tool.GetProcessInfo(processName);
 
-            if (processInfo.pid == 0) throw new Exception(string.Format("ProcessInfo({0}) is null.", processName));
+            if (processInfo.pid == 0) throw new Exception(string.Format("{0}: ProcessInfo is null.", processName));
 
-            InitSectionList(processInfo.pid);
+            InitSectionList(processInfo.pid, processName);
         }
 
-        public void InitSectionList(int processID)
+        public void InitSectionList(int processID, string processName)
         {
             ProcessMap pMap = PS4Tool.GetProcessMaps(processID);
 
-            if (pMap == null || pMap.entries == null || pMap.entries.Length == 0) throw new Exception(string.Format("ProcessMap({0}) is null.", processID));
+            if (pMap == null || pMap.entries == null || pMap.entries.Length == 0) throw new Exception(string.Format("{0}: Process({1}) Map is null.", processName, processID));
 
-            InitSectionList(pMap);
+            InitSectionList(pMap, processID, processName);
         }
 
-        public void InitSectionList(ProcessMap pMap)
+        public void InitSectionList(ProcessMap pMap, int processID, string processName)
         {
-            if (pMap == null || pMap.entries == null || pMap.entries.Length == 0) throw new Exception("Process Map is null.");
+            if (pMap == null || pMap.entries == null || pMap.entries.Length == 0) throw new Exception(string.Format("{0}: Process({1}) Map is null.", processName, processID));
 
             mutex.WaitOne();
             try
@@ -130,6 +130,7 @@ namespace PS4CheaterNeo
                             start += curLength;
                             idx++;
                         }
+                        if (idx > 99) sIdx += idx / 100;
                         sIdx++;
                         protTmp = entry.prot;
                     }

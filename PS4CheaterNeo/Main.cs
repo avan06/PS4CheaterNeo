@@ -726,7 +726,7 @@ namespace PS4CheaterNeo
             else if (processInfo.pid > 0 && processInfo.pid == sectionTool.PID) return true; //當Process ID相同時，不再執行初始化
 
             ProcessName = processInfo.name;
-            sectionTool.InitSectionList(processInfo.pid);
+            sectionTool.InitSectionList(processInfo.pid, ProcessName);
 
             return true;
         }

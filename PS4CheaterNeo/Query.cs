@@ -68,8 +68,7 @@ namespace PS4CheaterNeo
                 ResultView.Items.Clear();
 
                 ComboboxItem process = (ComboboxItem)ProcessesBox.SelectedItem;
-                ProcessMap pMap = PS4Tool.GetProcessMaps((int)process.Value);
-                sectionTool.InitSectionList(pMap);
+                sectionTool.InitSectionList((int)process.Value, (string)process.Text);
                 mainForm.ProcessName = (string)process.Text;
 
                 List<int> keys = new List<int>(sectionTool.SectionDict.Keys);
@@ -331,6 +330,8 @@ namespace PS4CheaterNeo
 
             int startIndex = 0;
             ListView.SelectedListViewItemCollection items = SectionView.SelectedItems;
+            if (items.Count == 0) return;
+
             if (items.Count > 0 && items[items.Count - 1].Index + 1 < SectionView.Items.Count)
             {
                 startIndex = items[items.Count - 1].Index + 1;

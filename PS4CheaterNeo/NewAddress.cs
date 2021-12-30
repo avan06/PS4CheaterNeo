@@ -58,8 +58,7 @@ namespace PS4CheaterNeo
             OffsetBoxList = new List<TextBox>();
             OffsetLabelList = new List<Label>();
 
-            ProcessMap pMap = PS4Tool.GetProcessMaps(mainForm.ProcessName);
-            mainForm.sectionTool.InitSectionList(pMap);
+            mainForm.sectionTool.InitSectionList(mainForm.ProcessName);
 
             this.mainForm = mainForm;
             AddrSection = addrSection;
