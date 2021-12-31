@@ -71,7 +71,7 @@ namespace PS4CheaterNeo
             IsPointer = offsetList != null;
 
             AddressBox.Text = Address.ToString("X");
-            ScanTypeBox.SelectedIndex = ScanTypeBox.FindStringExact(CheatType.GetDescription()); //ToString().Replace("_", " "));
+            ScanTypeBox.SelectedIndex = ScanTypeBox.FindStringExact(CheatType.GetDescription());
             ValueBox.Text = Value != 0 ? ScanTool.ULongToString(CheatType, Value) : "0";
             LockBox.Checked = IsLock;
             DescriptionBox.Text = Descriptioin;
@@ -96,7 +96,7 @@ namespace PS4CheaterNeo
             foreach (ScanType filterEnum in (ScanType[])Enum.GetValues(typeof(ScanType)))
             {
                 if (filterEnum == ScanType.Group) continue;
-                string scanTypeStr = filterEnum.GetDescription();// filterEnum.ToString().Replace("_", " ");
+                string scanTypeStr = filterEnum.GetDescription();
                 ComboboxItem item = new ComboboxItem(scanTypeStr, filterEnum);
                 ScanTypeBox.Items.Add(item);
                 if (filterEnum == CheatType) ScanTypeBox.SelectedItem = item;
@@ -130,7 +130,7 @@ namespace PS4CheaterNeo
             }
             catch (Exception exception)
             {
-                MessageBox.Show(exception.Message, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show(exception.StackTrace, exception.Message, MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
 
@@ -162,10 +162,8 @@ namespace PS4CheaterNeo
             Point cancelPosition = CloseBtn.Location;
             savePosition.Y = PointerBox.Location.Y + PointerBox.Height + 5;
             cancelPosition.Y = PointerBox.Location.Y + PointerBox.Height + 5;
-            IsPointer = PointerBox.Checked;
-            AddressBox.Enabled = !IsPointer;
 
-            if (IsPointer)
+            if (PointerBox.Checked)
             {
                 OffsetList = new List<long>();
                 savePosition.Y += 30;
@@ -199,7 +197,6 @@ namespace PS4CheaterNeo
 
         private void DelOffset_Click(object sender, EventArgs e)
         {
-
             SetOffsetBoxs(false);
         }
 

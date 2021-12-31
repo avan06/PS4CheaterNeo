@@ -100,10 +100,11 @@ namespace PS4CheaterNeo
             // 
             // ToolStripMsg
             // 
+            this.ToolStripMsg.AutoToolTip = true;
             this.ToolStripMsg.BackColor = System.Drawing.Color.Transparent;
             this.ToolStripMsg.ForeColor = System.Drawing.Color.White;
             this.ToolStripMsg.Name = "ToolStripMsg";
-            this.ToolStripMsg.Size = new System.Drawing.Size(262, 17);
+            this.ToolStripMsg.Size = new System.Drawing.Size(231, 17);
             this.ToolStripMsg.Spring = true;
             this.ToolStripMsg.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 

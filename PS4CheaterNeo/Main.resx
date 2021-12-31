@@ -118,10 +118,10 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <metadata name="CheatGridMenu.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>794, 17</value>
+    <value>675, 17</value>
   </metadata>
   <metadata name="toolStrip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>136, 17</value>
+    <value>17, 17</value>
   </metadata>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="ToolStripSend.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
@@ -165,10 +165,10 @@
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
         YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAD3SURBVDhPY4CBb9++/UfG79+/F4BKEQdAmiy6TMCYJAOQ
-        bUU2AIYJGoSsER1TxYAvX74s+/Tp08N37979BvGB+ClI7OvXr2ZwA2AYWSMIP3j75X/l0df/c/a//N92
-        8hUYg9ggsRtP3/z9/v17MgPIiSCMzYD43c//P3vz8f+H96gYJAaSA6p5B3YFCMA0IWOXDU9xGgCSA6mB
+        bUU2AIYJGoSsER1TxYAvX74s+/Tp08NXr179BvGB+ClI7OvXr2ZwA2AYWSMIP3j75X/l0df/c/a//N92
+        8hUYg9ggsSsPX/z9/v17MgPIiSCMzYD43c//P3vz8f+H96gYJAaSA6p5B3YFCMA0IWOXDU9xGgCSA6mB
         ameAuwTZRdILH4Fx8LZn/5uOvwJjEBsmjmIAOkA2ABceAQa8s1z7FKtGEAbJgdRAlWMCUCIBJRZQorFY
-        8/S//OJHYAxioyQkfACUXEHJFmjT069A54IwiI1IygwMAE4iFZLHeiKgAAAAAElFTkSuQmCC
+        8/S//OJHYAxioyQkfACUXEHJFmjT069A54IwiI1IygwMAASuFWLuu51eAAAAAElFTkSuQmCC
 </value>
   </data>
   <data name="ToolStripRefreshCheat.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
@@ -209,8 +209,20 @@
         RK5CYII=
 </value>
   </data>
+  <data name="ToolStripSettings.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
+        YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAFESURBVDhPpZNNioQwEIW9wTCLWc1txIUbwUuIh3CluNAT
+        6NZLeAfdNb0UTyAjIui2Ol/oNMn8QDcTKFJWvfdSVYmevfZ9/ziO4/M8z0yZfLOMHJg73F0kFOiqQF9q
+        v5RlKb7va8Mnds9df4gYctd1kqapzPMsSZJI3/fa8ImRA+OI2OQ4jqWuawnDUIIgeJSPT6yqKo1xROiL
+        0lAHAGEcxwfZmIlxAFg4cD0VZGAXSuSUYRg0cJomaZpGG74RAQMWDlwE9JDo05QNIYoiyfNciqLQvhEB
+        AxbOtm2iBZg0w8LH2rbVZPONCJWYb7BwlmX5XQDwSwL/bcEZopk2hKeGaF8jV2SA7Lb9eY3rur6pxPDM
+        QyJnPyTVwrt+jbYI6pRInwwLwydGznmF9jIilKb2134msxChLwXKmDDXhOETI+eSPe8Gw8LHna3fN8QA
+        AAAASUVORK5CYII=
+</value>
+  </data>
   <metadata name="statusStrip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>245, 17</value>
+    <value>126, 17</value>
   </metadata>
   <metadata name="CheatGridViewDel.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
@@ -249,7 +261,7 @@
   <data name="CheatGridView.RowHeadersCollapse" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
-        wgAADsIBFShKgAAAAOZJREFUOE+tkz0OgkAQhTmBp3ETT8ApOJElJTUnoMEreAoSKsVCbSho1vlwxiw/
+        vgAADr4B6kKxwAAAAOZJREFUOE+tkz0OgkAQhTmBp3ETT8ApOJElJTUnoMEreAoSKsVCbSho1vlwxiw/
         ASNO8pLdmfdeZpYhGkfbtk6QCSpBp+BMziltGlLcCfK6rn2apj5JEh/HcQ/O5KjBgauyd6j4XBRFLyjL
         k79emgHIUYMDd2Ail9zETXPrBY/7cwLygUluYkdra2Jg3cDVcRwGGfNZ23PCEHDgokGLQcUjfSM2WBdo
         Mei4mMHhuF/EyKD7i8FnBDNZgvHCETY/4rbPqLuwukiheLBIhFxmVzkUkwvEw1Um1OS3nykMKS7+zmKo
@@ -259,7 +271,7 @@
   <data name="CheatGridView.RowHeadersExpand" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
-        wgAADsIBFShKgAAAAO1JREFUOE+tk0EOgjAQRTmBp7GJJ+AUnMglS9acgA1ewVOQsFJcqBsWbOq82jEt
+        vgAADr4B6kKxwAAAAO1JREFUOE+tk0EOgjAQRTmBp7GJJ+AUnMglS9acgA1ewVOQsFJcqBsWbOq82jEt
         VE3ESX5Cp//9tDBk8xrH0YgqUSeavHimZ7xtWbK5EdV939uyLG1RFDbPcyee6bGHB6/HnuXhY9M0Dmjb
         gz2fhkj02MODNwqRRa3wMFwccLveF6IfhNQKG46Wgnf7rVMYoCH+OoaAivvpsdWcCkB48MLAEtDxkuYw
         SgUgPQUsARMLDVDonWYB018CXlfQEFUIqdQXXmH1S1z3Gf0sfB2kEI4GiZJFcpRDmF4Ax6NM+ZDffqaw
@@ -269,40 +281,40 @@
   <data name="CheatGridView.RowHeadersSeparater" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
-        wgAADsIBFShKgAAAACVJREFUOE9j+P//P04MBEAKuxwMYxWE4VEDRg0A4VEDhoYB/xkAk07dPxsrQhUA
+        vgAADr4B6kKxwAAAACVJREFUOE9j+P//P04MBEAKuxwMYxWE4VEDRg0A4VEDhoYB/xkAk07dPxsrQhUA
         AAAASUVORK5CYII=
 </value>
   </data>
   <data name="CheatGridView.RowHeadersSeparaterEnd" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
-        wgAADsIBFShKgAAAADpJREFUOE/tzEEKADAIA0H//+moB29bau4WhsKWJiQ91amL3wbGcQM30Hrgiz46
+        vgAADr4B6kKxwAAAADpJREFUOE/tzEEKADAIA0H//+moB29bau4WhsKWJiQ91amL3wbGcQM30Hrgiz46
         MDowOjA6MDow7ikScJDZQ7uJZW8AAAAASUVORK5CYII=
 </value>
   </data>
   <data name="CheatGridView.TopLeftHeaderCollapseAll" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAL
-        EQAACxEBf2RfkQAAAElJREFUOE9jgIFv3779JwdDtUMMcHJyIgnDDUA2kViMYQC66fgwTgNANCE8Egxg
+        DQAACw0B7QfALAAAAElJREFUOE9jgIFv3779JwdDtUMMcHJyIgnDDUA2kViMYQC66fgwTgNANCE8Egxg
         CJ6DExNlACE83A0gFsMMQzGAVAzWSDlgYAAAZTTG08r/1jUAAAAASUVORK5CYII=
 </value>
   </data>
   <data name="CheatGridView.TopLeftHeaderExpandAll" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAL
-        EQAACxEBf2RfkQAAAFdJREFUOE9jgIFv3779JwdDtUMMcHJyIgnDDUA2kViMYQC66fgwTgNANCFMkgEM
+        DQAACw0B7QfALAAAAFdJREFUOE9jgIFv3779JwdDtUMMcHJyIgnDDUA2kViMYQC66fgwTgNANCFMkgEM
         wXMwxIaAASBNuDBRBiBjmCZkPMQMwIbxGkAshhmGYgCpGKyRcsDAAAD9f7shXWRX6QAAAABJRU5ErkJg
         gg==
 </value>
   </data>
   <metadata name="RefreshLock.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>365, 17</value>
+    <value>246, 17</value>
   </metadata>
   <metadata name="OpenCheatDialog.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>487, 17</value>
+    <value>368, 17</value>
   </metadata>
   <metadata name="SaveCheatDialog.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>643, 17</value>
+    <value>524, 17</value>
   </metadata>
   <metadata name="$this.TrayHeight" type="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>114</value>

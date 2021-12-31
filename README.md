@@ -2,7 +2,7 @@
 
 PS4CheaterNeo is a program to find game cheat codes, and it is based on [`ps4debug`](https://github.com/jogolden/ps4debug) and `.Net Framework 4.8`.
 
-Currently in `version 0.9.2.0-beta`
+Currently in `version 0.9.3.0-beta`
 
 ## Table of Contents
 - [Building](#building)
@@ -12,7 +12,7 @@ Currently in `version 0.9.2.0-beta`
   * [Cheat window](#cheat-window)
   * [Add Address](#add-address)
   * [Query window](#query-window)
-  * [section](#section)
+  * [Section](#section)
   * [Group ScanType](#group-scantype)
   * [Hex Editor](#hex-editor)
   * [Pointer finder](#pointer-finder)
@@ -92,7 +92,7 @@ Currently in `version 0.9.2.0-beta`
 ![query_3](assets/query_3.jpg)
 
 
-### section
+### Section
 
 - The memory address of the PS4 game is the start position of the specific `section` plus the relative offset value.
 - The start position of `sections` is `dynamic` and will change every time you start the game or load the game save or just go through a scene in the game.

@@ -22,6 +22,8 @@ namespace PS4CheaterNeo
             Button buttonOk = new Button();
             Button buttonCancel = new Button();
 
+            form.BackColor = Color.FromArgb(90, 90, 90);
+            form.ForeColor = Color.White;
             form.Text = title;
             label.Text = promptText;
             textBox.Text = value;

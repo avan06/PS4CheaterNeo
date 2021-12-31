@@ -116,7 +116,7 @@ namespace PS4CheaterNeo
             }
             catch (Exception exception)
             {
-                MessageBox.Show("SectionList init failed, " + exception.Message, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show(exception.StackTrace, exception.Message, MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
 
@@ -538,7 +538,7 @@ namespace PS4CheaterNeo
             }
             catch (Exception exception)
             {
-                MessageBox.Show(exception.Message, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show(exception.StackTrace, exception.Message, MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
 

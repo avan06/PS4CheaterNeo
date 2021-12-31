@@ -222,7 +222,7 @@ D: {8}", HexView.SelectionStart + HexView.LineInfoOffset, HexView.SelectionStart
             }
             catch (Exception exception)
             {
-                MessageBox.Show(exception.Message, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show(exception.StackTrace, exception.Message, MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
         #endregion

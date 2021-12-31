@@ -67,6 +67,8 @@ namespace PS4CheaterNeo
             this.ToolStripExpandAll = new System.Windows.Forms.ToolStripButton();
             this.ToolStripCollapseAll = new System.Windows.Forms.ToolStripButton();
             this.ToolStripLockEnable = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.ToolStripSettings = new System.Windows.Forms.ToolStripButton();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.ToolStripMsg = new System.Windows.Forms.ToolStripStatusLabel();
             this.panel1 = new System.Windows.Forms.Panel();
@@ -194,7 +196,9 @@ namespace PS4CheaterNeo
             this.ToolStripProcessInfo,
             this.ToolStripExpandAll,
             this.ToolStripCollapseAll,
-            this.ToolStripLockEnable});
+            this.ToolStripLockEnable,
+            this.toolStripSeparator3,
+            this.ToolStripSettings});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.Size = new System.Drawing.Size(800, 25);
@@ -333,6 +337,22 @@ namespace PS4CheaterNeo
             this.ToolStripLockEnable.CheckedChanged += new System.EventHandler(this.ToolStripLockEnable_CheckedChanged);
             this.ToolStripLockEnable.Click += new System.EventHandler(this.ToolStripLockEnable_Click);
             // 
+            // toolStripSeparator3
+            // 
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(6, 25);
+            // 
+            // ToolStripSettings
+            // 
+            this.ToolStripSettings.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.ToolStripSettings.Image = ((System.Drawing.Image)(resources.GetObject("ToolStripSettings.Image")));
+            this.ToolStripSettings.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.ToolStripSettings.Name = "ToolStripSettings";
+            this.ToolStripSettings.Size = new System.Drawing.Size(23, 22);
+            this.ToolStripSettings.Text = "ToolStripSettings";
+            this.ToolStripSettings.ToolTipText = "ToolStripSettings";
+            this.ToolStripSettings.Visible = false;
+            // 
             // statusStrip1
             // 
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -345,9 +365,10 @@ namespace PS4CheaterNeo
             // 
             // ToolStripMsg
             // 
+            this.ToolStripMsg.AutoToolTip = true;
             this.ToolStripMsg.ForeColor = System.Drawing.Color.White;
             this.ToolStripMsg.Name = "ToolStripMsg";
-            this.ToolStripMsg.Size = new System.Drawing.Size(785, 17);
+            this.ToolStripMsg.Size = new System.Drawing.Size(754, 17);
             this.ToolStripMsg.Spring = true;
             this.ToolStripMsg.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
@@ -571,6 +592,8 @@ namespace PS4CheaterNeo
         private System.Windows.Forms.ToolStripButton ToolStripCollapseAll;
         private System.Windows.Forms.ToolStripButton ToolStripExpandAll;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripButton ToolStripSettings;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
     }
 }
 

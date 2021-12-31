@@ -18,6 +18,7 @@ namespace PS4CheaterNeo
         public string ProcessName;
         public Main()
         {
+            if ((Properties.Settings.Default.IP ?? "") == "") Properties.Settings.Default.Upgrade(); //Need to get the settings again when the AssemblyVersion is changed
             InitializeComponent();
             Text += " " + Application.ProductVersion; //Assembly.GetExecutingAssembly().GetName().Version.ToString(); // Assembly.GetEntryAssembly().GetName().Version.ToString();
             sectionTool = new SectionTool();
@@ -152,7 +153,7 @@ namespace PS4CheaterNeo
             }
             catch (Exception exception)
             {
-                MessageBox.Show(exception.Message, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show(exception.StackTrace, exception.Message, MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
 
@@ -232,12 +233,11 @@ namespace PS4CheaterNeo
             try
             {
                 NewAddress newAddress = new NewAddress(this, null, 0, ScanType.Bytes_4, 0, false, "", false);
-                if (newAddress.ShowDialog() != DialogResult.OK)
-                    return;
+                if (newAddress.ShowDialog() != DialogResult.OK) return;
             }
             catch (Exception exception)
             {
-                MessageBox.Show(exception.Message, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show(exception.StackTrace, exception.Message, MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
 
@@ -295,12 +295,12 @@ namespace PS4CheaterNeo
                     }
                     else if (cheatRow.DefaultCellStyle.ForeColor == Color.Red) cheatRow.DefaultCellStyle.ForeColor = default;
                     preData = (section.SID, section.Name, section.Prot, mappedAddr);
-                    cheatRow.Tag = (section, mappedAddr, oldValue);
                     cheatRow.Cells[(int)ChertCol.CheatListAddress].Value = hexAddr;
                     #endregion
 
-                    byte[] newValue = PS4Tool.ReadMemory(section.PID, mappedAddr + section.Start, scanTypeLength);
-                    cheatRow.Cells[(int)ChertCol.CheatListValue].Value = ScanTool.BytesToString(scanType, newValue);
+                    byte[] newData = PS4Tool.ReadMemory(section.PID, mappedAddr + section.Start, scanTypeLength);
+                    cheatRow.Tag = (section, mappedAddr, ScanTool.BytesToULong(scanType, ref newData));
+                    cheatRow.Cells[(int)ChertCol.CheatListValue].Value = ScanTool.BytesToString(scanType, newData);
                 }
                 return true;
             });
@@ -380,40 +380,38 @@ namespace PS4CheaterNeo
                         break;
                     case (int)ChertCol.CheatListLock:
                         CheatGridView.EndEdit();
-                        editedCol = cheatRow.Cells[e.ColumnIndex].Value;
-                        //cheatList[e.RowIndex].Lock = (bool)edited_col;
+                        //editedCol = cheatRow.Cells[e.ColumnIndex].Value;
                         break;
                 }
             }
             catch (Exception exception)
             {
-                MessageBox.Show(exception.Message, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show(exception.StackTrace, exception.Message, MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
 
         private void CheatGridView_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
-            DataGridViewRow edited_row = CheatGridView.Rows[e.RowIndex];
-            object edited_col = edited_row.Cells[e.ColumnIndex].Value;
+            DataGridViewRow editedRow = CheatGridView.Rows[e.RowIndex];
+            object editedCol = editedRow.Cells[e.ColumnIndex].Value;
 
             try
             {
                 switch (e.ColumnIndex)
                 {
                     case (int)ChertCol.CheatListValue:
-                        //DataCheatOperator dataCheatOperator = (DataCheatOperator)cheatList[e.RowIndex].GetSource();
-                        //CheatOperator destOperator = cheatList[e.RowIndex].GetDestination();
-                        //dataCheatOperator.Set((string)edited_col);
-                        //destOperator.SetRuntime(dataCheatOperator);
+                        (Section section, ulong mappedAddr, ulong oldValue) = ((Section section, ulong mappedAddr, ulong oldValue))editedRow.Tag;
+                        ScanType scanType = this.ParseFromDescription<ScanType>(editedRow.Cells[(int)ChertCol.CheatListType].Value.ToString());
+                        var newValue = ScanTool.ValueStringToULong(scanType, (string)editedCol);
+                        editedRow.Tag = (section, mappedAddr, newValue);
                         break;
                     case (int)ChertCol.CheatListDesc:
-                        //cheatList[e.RowIndex].Description = (string)edited_col;
                         break;
                 }
             }
             catch (Exception exception)
             {
-                MessageBox.Show(exception.Message, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show(exception.StackTrace, exception.Message, MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
         Task<bool> refreshLockTask;
@@ -467,8 +465,8 @@ namespace PS4CheaterNeo
                         if ((bool)cheatRow.Cells[(int)ChertCol.CheatListLock].Value == false) continue;
 
                         ScanType scanType = this.ParseFromDescription<ScanType>(cheatRow.Cells[(int)ChertCol.CheatListType].Value.ToString());
-                        byte[] data = ScanTool.ValueStringToByte(scanType, cheatRow.Cells[(int)ChertCol.CheatListValue].Value.ToString());
-                        PS4Tool.WriteMemory(section.PID, mappedAddr + section.Start, data);
+                        byte[] newData = ScanTool.ValueStringToByte(scanType, cheatRow.Cells[(int)ChertCol.CheatListValue].Value.ToString());
+                        PS4Tool.WriteMemory(section.PID, mappedAddr + section.Start, newData);
                     }
                     catch
                     {
@@ -482,7 +480,7 @@ namespace PS4CheaterNeo
         #region CheatGridMenu
         private void CheatGridMenuHexEditor_Click(object sender, EventArgs e)
         {
-            if (CheatGridView.SelectedRows == null) return;
+            if (CheatGridView.SelectedRows == null || CheatGridView.SelectedRows.Count == 0) return;
 
             if (CheatGridView.SelectedRows.Count != 1) return;
 
@@ -497,7 +495,7 @@ namespace PS4CheaterNeo
 
         private void CheatGridMenuLock_Click(object sender, EventArgs e)
         {
-            if (CheatGridView.SelectedRows == null) return;
+            if (CheatGridView.SelectedRows == null || CheatGridView.SelectedRows.Count == 0) return;
 
             DataGridViewSelectedRowCollection rows = CheatGridView.SelectedRows;
             for (int i = 0; i < rows.Count; ++i) rows[i].Cells[(int)ChertCol.CheatListLock].Value = true;
@@ -505,7 +503,7 @@ namespace PS4CheaterNeo
 
         private void CheatGridMenuUnlock_Click(object sender, EventArgs e)
         {
-            if (CheatGridView.SelectedRows == null) return;
+            if (CheatGridView.SelectedRows == null || CheatGridView.SelectedRows.Count == 0) return;
 
             DataGridViewSelectedRowCollection rows = CheatGridView.SelectedRows;
             for (int i = 0; i < rows.Count; ++i) rows[i].Cells[(int)ChertCol.CheatListLock].Value = false;
@@ -513,7 +511,7 @@ namespace PS4CheaterNeo
 
         private void CheatGridMenuActive_Click(object sender, EventArgs e)
         {
-            if (CheatGridView.SelectedRows == null) return;
+            if (CheatGridView.SelectedRows == null || CheatGridView.SelectedRows.Count == 0) return;
 
             DataGridViewSelectedRowCollection rows = CheatGridView.SelectedRows;
 
@@ -529,12 +527,30 @@ namespace PS4CheaterNeo
 
         private void CheatGridMenuEdit_Click(object sender, EventArgs e)
         {
-            if (CheatGridView.SelectedRows == null) return;
-            if (CheatGridView.SelectedRows.Count != 1) return;
+            if (CheatGridView.SelectedRows == null || CheatGridView.SelectedRows.Count == 0) return;
 
             try
             {
-                DataGridViewRow cheatRow = CheatGridView.SelectedRows[0];
+                DataGridViewRow cheatRow = null;
+                if (CheatGridView.SelectedRows.Count > 1)
+                {
+                    string inputValue = "";
+                    if (InputBox.Show("Multiple Addresses Edit", "Please enter a value and write to multiple addresses", ref inputValue) != DialogResult.OK) return;
+                    DataGridViewSelectedRowCollection rows = CheatGridView.SelectedRows;
+
+                    for (int i = 0; i < rows.Count; ++i)
+                    {
+                        cheatRow = rows[i];
+                        (Section section, ulong mappedAddr, ulong oldValue) row = ((Section section, ulong mappedAddr, ulong oldValue))cheatRow.Tag;
+                        ScanType rowScanType = this.ParseFromDescription<ScanType>(cheatRow.Cells[(int)ChertCol.CheatListType].Value.ToString());
+                        byte[] rowData = ScanTool.ValueStringToByte(rowScanType, inputValue);
+                        PS4Tool.WriteMemory(row.section.PID, row.mappedAddr + row.section.Start, rowData);
+                        cheatRow.Cells[(int)ChertCol.CheatListValue].Value = ScanTool.BytesToString(rowScanType, rowData);
+                    }
+                    return;
+                }
+
+                cheatRow = CheatGridView.SelectedRows[0];
                 ScanType scanType = this.ParseFromDescription<ScanType>(cheatRow.Cells[(int)ChertCol.CheatListType].Value.ToString());
                 (Section section, ulong mappedAddr, ulong oldValue) = ((Section section, ulong mappedAddr, ulong oldValue))cheatRow.Tag;
 
@@ -562,12 +578,11 @@ namespace PS4CheaterNeo
                 }
                 else newAddress = new NewAddress(this, section, mappedAddr + section.Start, scanType, oldValue, (bool)cheatRow.Cells[(int)ChertCol.CheatListLock].Value, (string)cheatRow.Cells[(int)ChertCol.CheatListDesc].Value, true);
 
-                if (newAddress.ShowDialog() != DialogResult.OK)
-                    return;
+                if (newAddress.ShowDialog() != DialogResult.OK) return;
 
                 cheatRow.Tag = (newAddress.AddrSection, newAddress.Address - newAddress.AddrSection.Start, newAddress.Value);
                 cheatRow.Cells[(int)ChertCol.CheatListAddress].Value = (newAddress.Address).ToString("X8");
-                cheatRow.Cells[(int)ChertCol.CheatListType].Value = newAddress.CheatType.GetDescription(); //ToString().Replace("_", " ");
+                cheatRow.Cells[(int)ChertCol.CheatListType].Value = newAddress.CheatType.GetDescription();
                 cheatRow.Cells[(int)ChertCol.CheatListValue].Value = ScanTool.ULongToString(newAddress.CheatType, newAddress.Value);
                 cheatRow.Cells[(int)ChertCol.CheatListLock].Value = newAddress.IsLock;
                 cheatRow.Cells[(int)ChertCol.CheatListDesc].Value = newAddress.Descriptioin;
@@ -583,20 +598,21 @@ namespace PS4CheaterNeo
                     cheatRow.Cells[(int)ChertCol.CheatListSection].Value = string.Format("{0}|{1}|{2}|{3}|{4}|{5}", newAddress.BaseSection.SID, newAddress.BaseSection.Start.ToString("X"), newAddress.BaseSection.Name, newAddress.BaseSection.Prot.ToString("X"), newAddress.BaseSection.Offset.ToString("X"), offsetStr);
                 }
                 else cheatRow.Cells[(int)ChertCol.CheatListSection].Value = string.Format("{0}|{1}|{2}|{3}|{4}", newAddress.AddrSection.SID, newAddress.AddrSection.Start.ToString("X"), newAddress.AddrSection.Name, newAddress.AddrSection.Prot.ToString("X"), newAddress.AddrSection.Offset.ToString("X"));
+
+                byte[] data = ScanTool.ValueStringToByte(scanType, cheatRow.Cells[(int)ChertCol.CheatListValue].Value.ToString());
+                PS4Tool.WriteMemory(section.PID, mappedAddr + section.Start, data);
             }
             catch (Exception exception)
             {
-                MessageBox.Show(exception.Message, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show(exception.StackTrace, exception.Message, MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
 
         private void CheatGridMenuFindPointer_Click(object sender, EventArgs e)
         {
-            if (CheatGridView.SelectedRows == null)
-                return;
+            if (CheatGridView.SelectedRows == null || CheatGridView.SelectedRows.Count == 0) return;
 
-            if (CheatGridView.SelectedRows.Count != 1)
-                return;
+            if (CheatGridView.SelectedRows.Count != 1) return;
 
             DataGridViewSelectedRowCollection rows = CheatGridView.SelectedRows;
 
@@ -617,8 +633,7 @@ namespace PS4CheaterNeo
 
         private void CheatGridMenuDelete_Click(object sender, EventArgs e)
         {
-            if (CheatGridView.SelectedRows == null)
-                return;
+            if (CheatGridView.SelectedRows == null || CheatGridView.SelectedRows.Count == 0) return;
 
             DataGridViewSelectedRowCollection rows = CheatGridView.SelectedRows;
             for (int i = 0; i < rows.Count; ++i) CheatGridView.Rows.Remove(rows[i]);
@@ -707,7 +722,7 @@ namespace PS4CheaterNeo
             }
             catch (Exception exception)
             {
-                MessageBox.Show(exception.Message, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show(exception.StackTrace, exception.Message, MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
             return cheatRow;
         }

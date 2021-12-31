@@ -48,6 +48,7 @@ namespace PS4CheaterNeo
             this.ToolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.ResultViewFindPointer = new System.Windows.Forms.ToolStripMenuItem();
             this.SplitContainer2 = new System.Windows.Forms.SplitContainer();
+            this.SectionSearchBtn = new System.Windows.Forms.Button();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.label4 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
@@ -65,7 +66,6 @@ namespace PS4CheaterNeo
             this.SectionViewDump = new System.Windows.Forms.ToolStripMenuItem();
             this.ToolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.SectionViewCheck = new System.Windows.Forms.ToolStripMenuItem();
-            this.SectionSearchBtn = new System.Windows.Forms.Button();
             this.GetProcessesBtn = new System.Windows.Forms.Button();
             this.ProcessesBox = new System.Windows.Forms.ComboBox();
             this.FilterRuleBtn = new System.Windows.Forms.Button();
@@ -138,10 +138,11 @@ namespace PS4CheaterNeo
             // 
             // ToolStripMsg
             // 
+            this.ToolStripMsg.AutoToolTip = true;
             this.ToolStripMsg.BackColor = System.Drawing.Color.Transparent;
             this.ToolStripMsg.ForeColor = System.Drawing.Color.White;
             this.ToolStripMsg.Name = "ToolStripMsg";
-            this.ToolStripMsg.Size = new System.Drawing.Size(513, 17);
+            this.ToolStripMsg.Size = new System.Drawing.Size(482, 17);
             this.ToolStripMsg.Spring = true;
             this.ToolStripMsg.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
@@ -274,6 +275,21 @@ namespace PS4CheaterNeo
             this.SplitContainer2.Size = new System.Drawing.Size(266, 450);
             this.SplitContainer2.SplitterDistance = 255;
             this.SplitContainer2.TabIndex = 0;
+            // 
+            // SectionSearchBtn
+            // 
+            this.SectionSearchBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.SectionSearchBtn.BackColor = System.Drawing.SystemColors.Desktop;
+            this.SectionSearchBtn.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("SectionSearchBtn.BackgroundImage")));
+            this.SectionSearchBtn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.SectionSearchBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.SectionSearchBtn.ForeColor = System.Drawing.Color.White;
+            this.SectionSearchBtn.Location = new System.Drawing.Point(228, 32);
+            this.SectionSearchBtn.Name = "SectionSearchBtn";
+            this.SectionSearchBtn.Size = new System.Drawing.Size(33, 20);
+            this.SectionSearchBtn.TabIndex = 3;
+            this.SectionSearchBtn.UseVisualStyleBackColor = false;
+            this.SectionSearchBtn.Click += new System.EventHandler(this.SectionSearchBtn_Click);
             // 
             // tableLayoutPanel2
             // 
@@ -427,21 +443,6 @@ namespace PS4CheaterNeo
             this.SectionViewCheck.Size = new System.Drawing.Size(133, 22);
             this.SectionViewCheck.Text = "Check";
             this.SectionViewCheck.Click += new System.EventHandler(this.SectionViewCheck_Click);
-            // 
-            // SectionSearchBtn
-            // 
-            this.SectionSearchBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.SectionSearchBtn.BackColor = System.Drawing.SystemColors.Desktop;
-            this.SectionSearchBtn.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("SectionSearchBtn.BackgroundImage")));
-            this.SectionSearchBtn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-            this.SectionSearchBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.SectionSearchBtn.ForeColor = System.Drawing.Color.White;
-            this.SectionSearchBtn.Location = new System.Drawing.Point(228, 32);
-            this.SectionSearchBtn.Name = "SectionSearchBtn";
-            this.SectionSearchBtn.Size = new System.Drawing.Size(33, 20);
-            this.SectionSearchBtn.TabIndex = 3;
-            this.SectionSearchBtn.UseVisualStyleBackColor = false;
-            this.SectionSearchBtn.Click += new System.EventHandler(this.SectionSearchBtn_Click);
             // 
             // GetProcessesBtn
             // 
