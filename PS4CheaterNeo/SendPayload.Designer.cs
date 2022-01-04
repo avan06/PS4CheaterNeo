@@ -107,6 +107,8 @@ namespace PS4CheaterNeo
             this.ToolStripMsg.Size = new System.Drawing.Size(231, 17);
             this.ToolStripMsg.Spring = true;
             this.ToolStripMsg.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.ToolStripMsg.MouseHover += new System.EventHandler(this.ToolStripMsg_MouseHover);
+            this.ToolStripMsg.TextChanged += new System.EventHandler(this.ToolStripMsg_TextChanged);
             // 
             // OKBtn
             // 
@@ -136,13 +138,13 @@ namespace PS4CheaterNeo
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(36)))), ((int)(((byte)(36)))));
             this.ClientSize = new System.Drawing.Size(277, 113);
-            this.Controls.Add(this.VersionBox);
-            this.Controls.Add(this.OKBtn);
             this.Controls.Add(this.statusStrip1);
+            this.Controls.Add(this.VersionBox);
             this.Controls.Add(this.SendPayloadBtn);
             this.Controls.Add(this.PortBox);
             this.Controls.Add(this.IpBox);
             this.Controls.Add(this.VersionComboBox);
+            this.Controls.Add(this.OKBtn);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "SendPayload";
             this.Opacity = 0.95D;

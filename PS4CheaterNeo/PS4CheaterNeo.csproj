@@ -110,6 +110,7 @@
       <DependentUpon>Query.cs</DependentUpon>
     </Compile>
     <Compile Include="common\ScanTool.cs" />
+    <Compile Include="common\ResultList.cs" />
     <Compile Include="SendPayload.cs">
       <SubType>Form</SubType>
     </Compile>

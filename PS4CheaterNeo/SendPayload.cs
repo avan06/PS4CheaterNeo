@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
@@ -114,6 +112,23 @@ namespace PS4CheaterNeo
         private void VersionComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             VersionBox.Text = (string)VersionComboBox.SelectedItem;
+        }
+
+        private void ToolStripMsg_MouseHover(object sender, EventArgs e)
+        {
+            if ((ToolStripMsg.Text ?? "").Trim().Length == 0) return;
+
+            if (MsgBox.form == null || MsgBox.form.IsDisposed) MsgBox.Show(this, ToolStripMsg.Text);
+            else MsgBox.label.Text = ToolStripMsg.Text;
+            MsgBox.form.Refresh();
+        }
+
+        private void ToolStripMsg_TextChanged(object sender, EventArgs e)
+        {
+            if (MsgBox.form == null || MsgBox.form.IsDisposed) return;
+
+            MsgBox.label.Text = ToolStripMsg.Text;
+            MsgBox.form.Refresh();
         }
     }
 }

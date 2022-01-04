@@ -299,7 +299,7 @@ namespace PS4CheaterNeo
                     #endregion
 
                     byte[] newData = PS4Tool.ReadMemory(section.PID, mappedAddr + section.Start, scanTypeLength);
-                    cheatRow.Tag = (section, mappedAddr, ScanTool.BytesToULong(scanType, ref newData));
+                    cheatRow.Tag = (section, mappedAddr, ScanTool.BytesToULong(newData)); //mybe FIXME ref newData
                     cheatRow.Cells[(int)ChertCol.CheatListValue].Value = ScanTool.BytesToString(scanType, newData);
                 }
                 return true;

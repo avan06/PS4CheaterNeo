@@ -16,13 +16,16 @@ namespace PS4CheaterNeo
     {
         readonly Main mainForm;
         readonly SectionTool sectionTool;
-        Dictionary<int, (ScanType scanType, List<(ulong mappedAddr, ulong resultValue, byte[] resultBytes)> results, List<(ScanType scanType, int groupTypeLength, bool isAny)> groupTypes)> resultListDict;
+        ComparerTool comparerTool;
+        Dictionary<int, ResultList> resultsDict;
+        Dictionary<int, List<(uint offsetAddr, byte[] resultBytes)>> resultBytesListDict; //for ScanType:Hex、String、Group
         public Query(Main mainForm)
         {
             InitializeComponent();
             this.mainForm = mainForm;
             sectionTool = new SectionTool();
-            resultListDict = new Dictionary<int, (ScanType scanType, List<(ulong mappedAddr, ulong resultValue, byte[] resultBytes)> results, List<(ScanType scanType, int groupTypeLength, bool isAny)> groupTypes)>();
+            resultsDict = new Dictionary<int, ResultList>();
+            resultBytesListDict = new Dictionary<int, List<(uint offsetAddr, byte[] resultBytes)>>();
         }
 
         #region Event
@@ -38,6 +41,9 @@ namespace PS4CheaterNeo
         {
             if (ResultView.Items.Count > 0 && MessageBox.Show("Still in the query, Do you want to close Query?", "Query", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) e.Cancel = true;
 
+            resultsDict = null;
+            resultBytesListDict = null;
+            GC.Collect();
             Properties.Settings.Default.Save();
         }
 
@@ -122,16 +128,28 @@ namespace PS4CheaterNeo
 
         private void NewBtn_Click(object sender, EventArgs e)
         {
+            if (ScanWorker.IsBusy)
+            {
+                if (MessageBox.Show("Still in the scanning, Do you want to stop scan?", "Scan",
+                    MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes) ScanWorker.CancelAsync();
+                else return;
+            }
+
             ResultView.Items.Clear();
+            if (resultsDict != null) resultsDict.Clear();
+            if (resultBytesListDict != null) resultBytesListDict.Clear();
+            resultsDict = new Dictionary<int, ResultList>();
+            resultBytesListDict = new Dictionary<int, List<(uint offsetAddr, byte[] resultBytes)>>();
+            GC.Collect();
+
             ScanBtn.Text = "First Scan";
-            if (resultListDict != null) resultListDict.Clear();
-            resultListDict = new Dictionary<int, (ScanType scanType, List<(ulong mappedAddr, ulong resultValue, byte[] resultBytes)> results, List<(ScanType scanType, int groupTypeLength, bool isAny)> groupTypes)>();
+            ScanTypeBox.Enabled = true;
+            AlignmentBox.Enabled = true;
             NewBtn.Enabled = false;
         }
 
         private void ScanBtn_Click(object sender, EventArgs e)
         {
-
             if (ScanWorker.IsBusy)
             {
                 if (MessageBox.Show("Still in the scanning, Do you want to stop scan?", "Scan", 
@@ -155,8 +173,13 @@ namespace PS4CheaterNeo
                 var AddrMax = ulong.Parse(AddrMaxBox.Text, NumberStyles.HexNumber);
                 if (AddrMin > AddrMax && MessageBox.Show(String.Format("AddrMin({1:X}) > AddrMax({0:X})", AddrMin, AddrMax), "Scan", MessageBoxButtons.OK, MessageBoxIcon.Error) == DialogResult.OK) return;
 
+                comparerTool = new ComparerTool(scanType, compareType, value0, value1);
+
                 ScanBtn.Text = "Stop";
                 ScanWorker.RunWorkerAsync((pid, value0, value1, alignment, isFilter, scanType, compareType, AddrMin, AddrMax));
+
+                ScanTypeBox.Enabled = false;
+                AlignmentBox.Enabled = false;
                 NewBtn.Enabled = true;
             }
         }
@@ -316,10 +339,24 @@ namespace PS4CheaterNeo
             {
                 ListViewItem resultItem = ResultView.SelectedItems[0];
                 (int sid, int resultIdx) = ((int sid, int resultIdx))resultItem.Tag;
-                (ScanType scanType, List<(ulong mappedAddr, ulong resultValue, byte[] resultBytes)> results, List<(ScanType scanType, int groupTypeLength, bool isAny)> groupTypes) = resultListDict[sid];
-                (ulong mappedAddr, ulong resultValue, byte[] resultBytes) = results[resultIdx];
+                ScanType scanType = comparerTool.scanType;
                 Section section = sectionTool.GetSection(sid);
-                mainForm.AddToCheatGrid(section, mappedAddr, scanType, resultValue, false, "", false, null);
+                uint offsetAddr = 0;
+                ulong resultValue = 0;
+                byte[] resultBytes;
+                if (resultsDict.TryGetValue(sid, out ResultList results))
+                {
+                    (offsetAddr, resultBytes) = results.Read(resultIdx);
+                    resultValue = ScanTool.BytesToULong(resultBytes);
+                } 
+                else if (resultBytesListDict.TryGetValue(sid, out List<(uint offsetAddr, byte[] resultBytes)> resultBytesList))
+                {
+                    (offsetAddr, resultBytes) = resultBytesList[resultIdx];
+                    resultValue = ScanTool.BytesToULong(resultBytes);
+                    int tIdx = resultIdx % comparerTool.groupTypes.Count;
+                    (scanType, _, _) = comparerTool.groupTypes[tIdx];
+                }
+                if (offsetAddr > 0) mainForm.AddToCheatGrid(section, offsetAddr, scanType, resultValue, false, "", false, null);
             }
         }
 
@@ -388,6 +425,7 @@ namespace PS4CheaterNeo
             for (int idx = 0; idx < items.Count; ++idx) items[idx].Checked = !items[idx].Checked;
         }
         #endregion
+
         #region ResultViewMenu
         private void ResultViewAddToCheatGrid_Click(object sender, EventArgs e)
         {
@@ -398,28 +436,44 @@ namespace PS4CheaterNeo
             {
                 ListViewItem resultItem = items[i];
                 (int sid, int resultIdx) = ((int sid, int resultIdx))resultItem.Tag;
-                (ScanType scanType, List<(ulong mappedAddr, ulong resultValue, byte[] resultBytes)> results, List<(ScanType scanType, int groupTypeLength, bool isAny)> groupTypes) = resultListDict[sid];
-                (ulong mappedAddr, ulong resultValue, byte[] resultBytes) = results[resultIdx];
+                ScanType scanType = comparerTool.scanType;
                 Section section = sectionTool.GetSection(sid);
-                mainForm.AddToCheatGrid(section, mappedAddr, scanType, resultValue, false, "", false, null);
+                uint offsetAddr = 0;
+                ulong resultValue = 0;
+                byte[] resultBytes;
+                if (resultsDict.TryGetValue(sid, out ResultList results))
+                {
+                    (offsetAddr, resultBytes) = results.Read(resultIdx);
+                    resultValue = ScanTool.BytesToULong(resultBytes);
+                } 
+                else if (resultBytesListDict.TryGetValue(sid, out List<(uint offsetAddr, byte[] resultBytes)> resultBytesList))
+                {
+                    (offsetAddr, resultBytes) = resultBytesList[resultIdx];
+                    resultValue = ScanTool.BytesToULong(resultBytes);
+                    int tIdx = resultIdx % comparerTool.groupTypes.Count;
+                    (scanType, _, _) = comparerTool.groupTypes[tIdx];
+                }
+                if (offsetAddr > 0) mainForm.AddToCheatGrid(section, offsetAddr, scanType, resultValue, false, "", false, null);
             }
         }
 
         private void ResultViewHexEditor_Click(object sender, EventArgs e)
         {
             if (ResultView.SelectedItems == null) return;
-
             if (ResultView.SelectedItems.Count != 1) return;
 
             ListView.SelectedListViewItemCollection items = ResultView.SelectedItems;
 
             var resultItem = items[0];
             (int sid, int resultIdx) = ((int sid, int resultIdx))resultItem.Tag;
-            (ScanType scanType, List<(ulong mappedAddr, ulong resultValue, byte[] resultBytes)> results, List<(ScanType scanType, int groupTypeLength, bool isAny)> groupTypes) = resultListDict[sid];
-            (ulong mappedAddr, ulong resultValue, byte[] resultBytes) = results[resultIdx];
             Section section = sectionTool.GetSection(sid);
+            uint offsetAddr = 0;
+            if (resultsDict.TryGetValue(sid, out ResultList results)) (offsetAddr, _) = results.Read(resultIdx);
+            else if (resultBytesListDict.TryGetValue(sid, out List<(uint offsetAddr, byte[] resultBytes)> resultBytesList)) (offsetAddr, _) = resultBytesList[resultIdx];
 
-            HexEditor hexEdit = new HexEditor(mainForm, section, (int)mappedAddr);
+            if (offsetAddr == 0) return;
+
+            HexEditor hexEdit = new HexEditor(mainForm, section, (int)offsetAddr);
             hexEdit.Show(this);
         }
 
@@ -470,30 +524,15 @@ namespace PS4CheaterNeo
                 (int pid, string value0, string value1, bool alignment, bool isFilter, ScanType scanType, CompareType compareType, ulong AddrMin, ulong AddrMax) =
                     ((int pid, string value0, string value1, bool alignment, bool isFilter, ScanType scanType, CompareType compareType, ulong AddrMin, ulong AddrMax))e.Argument;
 
-                int scanTypeLength = 0;
-                byte[] value0Byte = null;
-                ulong value0Long = 0, value1Long = 0;
-                List<byte[]> groupValues = null;
-                List<(ScanType scanType, int groupTypeLength, bool isAny)> groupTypes = null;
-                if (scanType == ScanType.Group) (groupTypes, groupValues) = generateGroupList(value0, out scanTypeLength);
-                else if (ScanTool.ScanTypeLengthDict.TryGetValue(scanType, out scanTypeLength))
-                {
-                    value0Long = ScanTool.ValueStringToULong(scanType, value0);
-                    if (!string.IsNullOrWhiteSpace(value1)) value1Long = ScanTool.ValueStringToULong(scanType, value1);
-                }
-                else
-                {
-                    value0Byte = ScanTool.ValueStringToByte(scanType, value0); //for ScanType:Hex、String
-                    scanTypeLength = value0Byte.Length;
-                }
-
                 int hitCnt = 0;
-                int step = alignment ? scanTypeLength : 1;
+                int scanStep = (comparerTool.scanType == ScanType.Hex || comparerTool.scanType == ScanType.String_) ? 1 :
+                    alignment ? (comparerTool.scanTypeLength > 4 ? 4 : comparerTool.scanTypeLength) : 1;
                 long processedMemoryLen = 0;
                 List<int> keys = new List<int>(sectionTool.SectionDict.Keys);
                 keys.Sort();
                 ScanWorker.ReportProgress(1);
-                SemaphoreSlim semaphore = new SemaphoreSlim(2);
+                int maxThreads = 3;
+                SemaphoreSlim semaphore = new SemaphoreSlim(maxThreads);
                 Task<(int, TimeSpan)>[] tasks = new Task<(int, TimeSpan)>[keys.Count];
                 for (int sectionIdx = 0; sectionIdx < keys.Count; sectionIdx++)
                 {
@@ -502,24 +541,38 @@ namespace PS4CheaterNeo
                     Section section = sectionTool.SectionDict[keys[sectionIdx]];
                     tasks[sectionIdx] = Task.Run<(int, TimeSpan)>(() =>
                     {
+                        if (ScanWorker.CancellationPending) return (section.SID, tickerMajor.Elapsed);
                         if ((isFilter && section.IsFilter) || !section.Check || section.Start + (ulong)section.Length < AddrMin || section.Start > AddrMax) return (section.SID, tickerMajor.Elapsed);
                         semaphore.Wait();
 
-                        (ScanType scanType, List<(ulong mappedAddr, ulong resultValue, byte[] resultBytes)> resultList, List<(ScanType scanType, int groupTypeLength, bool isAny)> groupTypes) result;
+                        ResultList results = null;
+                        List<(uint offsetAddr, byte[] resultBytes)> resultBytesList = null;
 
-                        if (groupTypes == null) result = Comparer(section, scanType, compareType, scanTypeLength, step, value0Byte, value0Long, value1Long, AddrMin, AddrMax);
-                        else result = ComparerGroup(section, scanTypeLength, step, groupTypes, groupValues, AddrMin, AddrMax);
+                        if (comparerTool.groupTypes == null) results = Comparer(section, scanStep, AddrMin, AddrMax);
+                        else resultBytesList = ComparerGroup(section, scanStep, AddrMin, AddrMax);
 
-                        resultListDict[section.SID] = result;
-                        if (result.resultList.Count == 0) section.Check = false;
-                        else hitCnt += result.resultList.Count;
+                        int resultCnt = 0;
+                        if (results != null && results.Count > 0)
+                        {
+                            resultCnt = results.Count;
+                            resultsDict[section.SID] = results;
+                        }
+                        if (resultBytesList != null && resultBytesList.Count > 0)
+                        {
+                            resultCnt = resultBytesList.Count;
+                            resultBytesListDict[section.SID] = resultBytesList;
+                        }
+
+                        if (resultCnt > 0) hitCnt += resultCnt;
+                        else section.Check = false;
+
                         processedMemoryLen += section.Length;
                         ScanWorker.ReportProgress((int)(((float)processedMemoryLen / sectionTool.TotalMemorySize) * 100), (tickerMajor.Elapsed, string.Format("{0}MB, Count: {1}", processedMemoryLen / (1024 * 1024), hitCnt)));
                         semaphore.Release();
                         return (section.SID, tickerMajor.Elapsed);
                     });
                 }
-                Task<(int, TimeSpan)[]> whenTasks = Task.WhenAll(tasks);
+                Task whenTasks = Task.WhenAll(tasks);
                 whenTasks.Wait();
                 Invoke(new MethodInvoker(() => {
                     for (int sectionIdx = 0; sectionIdx < SectionView.Items.Count; ++sectionIdx)
@@ -535,6 +588,7 @@ namespace PS4CheaterNeo
 
                 ScanWorker.ReportProgress(100);
                 e.Result = pid;
+                GC.Collect();
             }
             catch (Exception exception)
             {
@@ -542,102 +596,33 @@ namespace PS4CheaterNeo
             }
         }
 
-        private (List<(ScanType scanType, int groupTypeLength, bool isAny)> groupTypes, List<byte[]> groupValues) generateGroupList(string value0, out int scanTypeLength)
+        private List<(uint offsetAddr, byte[] resultBytes)> ComparerGroup(Section section, int step, ulong AddrMin, ulong AddrMax)
         {
-            scanTypeLength = 1;
-            var groupTypes = new List<(ScanType scanType, int groupTypeLength, bool isAny)>();
-            var groupValues = new List<byte[]>();
-            var cmd = new Dictionary<string, string>();
-            value0 = value0.ToUpper().Trim();
-            value0 = Regex.Replace(value0, @" *([,:]) *", "$1"); //Remove useless whitespace
-            value0 = Regex.Replace(value0, @" +", " "); //Remove excess whitespace
-            int start = 0;
-            for (int idx = 0; idx <= value0.Length; ++idx) //Parse input value
-            {
-                if (idx == value0.Length && start < value0.Length) cmd["scanVal"] = value0.Substring(start, value0.Length - start); //Get the last scanVal
-                else if (value0[idx].Equals(':')) //Get typeKey value
-                {
-                    cmd["typeKey"] = value0.Substring(start, idx - start);
-                    start = idx + 1;
-                }
-                else if (Regex.IsMatch(value0[idx].ToString(), "[, ]")) //Get scanVal value
-                {
-                    cmd["scanVal"] = value0.Substring(start, idx - start);
-                    start = idx + 1;
-                }
-
-                
-                if (cmd.TryGetValue("scanVal", out string scanVal))
-                {
-                    ScanType scanType;
-                    cmd.TryGetValue("typeKey", out string typeKey);
-
-                    if (typeKey == "1") scanType = ScanType.Byte_;
-                    else if (typeKey == "2") scanType = ScanType.Bytes_2;
-                    else if (typeKey == "4") scanType = ScanType.Bytes_4;
-                    else if (typeKey == "8") scanType = ScanType.Bytes_8;
-                    else if (typeKey == "F") scanType = ScanType.Float_;
-                    else if (typeKey == "D") scanType = ScanType.Double_;
-                    else if (typeKey == "H") scanType = ScanType.Hex;
-                    else scanType = ScanType.Bytes_4;
-
-                    bool isAny = false;
-                    byte[] valueBytes;
-                    if (scanVal == "*" || scanVal == "?")
-                    {
-                        isAny = true;
-                        ScanTool.ScanTypeLengthDict.TryGetValue(scanType, out int anyLength);
-                        valueBytes = new byte[anyLength];
-                    }
-                    else valueBytes = ScanTool.ValueStringToByte(scanType, cmd["scanVal"]);
-
-                    if (!ScanTool.ScanTypeLengthDict.TryGetValue(scanType, out int groupTypeLength)) groupTypeLength = valueBytes.Length;
-                    else if (groupTypes.Count == 0) scanTypeLength = groupTypeLength;
-
-                    groupTypes.Add((scanType, groupTypeLength, isAny));
-                    groupValues.Add(valueBytes);
-                    cmd = new Dictionary<string, string>();
-                }
-            }
-
-            return (groupTypes, groupValues);
-        }
-        private (ScanType scanType, List<(ulong mappedAddr, ulong resultValue, byte[] resultBytes)> resultList, List<(ScanType scanType, int groupTypeLength, bool isAny)> groupTypes) ComparerGroup(
-            Section section, int scanTypeLength, int step, List<(ScanType scanType, int groupTypeLength, bool isAny)> groupTypes, List<byte[]> groupValues, ulong AddrMin, ulong AddrMax)
-        {
-            (ScanType scanType, List<(ulong mappedAddr, ulong resultValue, byte[] resultBytes)> resultList, List<(ScanType scanType, int groupTypeLength, bool isAny)> groupTypes) result;
-            if (!resultListDict.TryGetValue(section.SID, out result))
-            {
-                result.scanType = ScanType.Group;
-                result.resultList = new List<(ulong mappedAddr, ulong resultValue, byte[] resultBytes)>();
-                result.groupTypes = new List<(ScanType scanType, int groupTypeLength, bool isAny)>();
-            }
-
-            List<(ulong mappedAddr, ulong resultValue, byte[] resultBytes)> resultList = new List<(ulong mappedAddr, ulong resultValue, byte[] resultBytes)>();
+            if (!resultBytesListDict.TryGetValue(section.SID, out List<(uint offsetAddr, byte[] resultBytes)> resultBytesList)) resultBytesList = new List<(uint offsetAddr, byte[] resultBytes)>();
             if (ResultView.Items.Count == 0)
             {
-                List<(ulong mappedAddr, ulong resultValue, byte[] resultBytes)> resultNewList = new List<(ulong mappedAddr, ulong resultValue, byte[] resultBytes)>();
+                List<(uint offsetAddr, byte[] resultBytes)> resultNewList = new List<(uint offsetAddr, byte[] resultBytes)>();
                 byte[] buffer = PS4Tool.ReadMemory(section.PID, section.Start, section.Length);
-                for (int scanIdx = 0; scanIdx + scanTypeLength < buffer.LongLength; scanIdx += step)
+                for (int scanIdx = 0; scanIdx + comparerTool.scanTypeLength < buffer.LongLength; scanIdx += step)
                 {
                     if (ScanWorker.CancellationPending) break;
                     if (section.Start + (ulong)scanIdx < AddrMin || section.Start + (ulong)scanIdx > AddrMax) continue;
 
-                    int tmpIdx = scanIdx; //+ scanTypeLength;
-                    for (int gIdx = 0; gIdx < groupTypes.Count; gIdx++)
+                    int tmpIdx = scanIdx;
+                    for (int gIdx = 0; gIdx < comparerTool.groupTypes.Count; gIdx++)
                     {
-                        (ScanType scanType, int groupTypeLength, bool isAny) = groupTypes[gIdx];
+                        (ScanType scanType, int groupTypeLength, bool isAny) = comparerTool.groupTypes[gIdx];
                         if (scanIdx + groupTypeLength > buffer.LongLength)
                         {
                             resultNewList.Clear();
                             break;
                         }
-                        byte[] valueBytes = groupValues[gIdx];
+                        byte[] valueBytes = comparerTool.groupValues[gIdx];
                         byte[] newValue = new byte[groupTypeLength];
                         Buffer.BlockCopy(buffer, scanIdx, newValue, 0, groupTypeLength);
-                       if (isAny || ScanTool.Comparer(scanType, newValue, valueBytes))
+                       if (isAny || ScanTool.ComparerExact(scanType, newValue, valueBytes))
                         {
-                            resultNewList.Add(((ulong)scanIdx, 0, newValue));
+                            resultNewList.Add(((uint)scanIdx, newValue));
                             scanIdx += groupTypeLength;
                         }
                         else
@@ -647,113 +632,106 @@ namespace PS4CheaterNeo
                             break;
                         }
                     }
-                    if (resultNewList.Count > 0) result.resultList.AddRange(resultNewList);
+                    if (resultNewList.Count > 0) resultBytesList.AddRange(resultNewList);
                     resultNewList.Clear();
                 }
-                if (result.resultList.Count > 0) result.groupTypes = groupTypes;
             }
             else
             {
+                List<(uint offsetAddr, byte[] resultBytes)> resultNextBytesList = new List<(uint offsetAddr, byte[] resultBytes)>();
                 byte[] buffer = null;
-                if (result.resultList.Count >= 50) buffer = PS4Tool.ReadMemory(section.PID, section.Start, section.Length);
-                List<(ulong mappedAddr, ulong resultValue, byte[] resultBytes)> resultNewList = new List<(ulong mappedAddr, ulong resultValue, byte[] resultBytes)>();
-
-                for (int rIdx1 = 0; rIdx1 < result.resultList.Count; rIdx1++)
+                if (resultBytesList.Count >= 50) buffer = PS4Tool.ReadMemory(section.PID, section.Start, section.Length);
+                List<(uint offsetAddr, byte[] resultBytes)> resultNewList = new List<(uint offsetAddr, byte[] resultBytes)>();
+                for (int rIdx1 = 0; rIdx1 < resultBytesList.Count; rIdx1++)
                 {
                     if (ScanWorker.CancellationPending) break;
 
-                    int gIdx = rIdx1 % groupTypes.Count;
+                    int gIdx = rIdx1 % comparerTool.groupTypes.Count;
                     if (gIdx == 0 && resultNewList.Count > 0)
                     {
-                        resultList.AddRange(resultNewList);
+                        resultNextBytesList.AddRange(resultNewList);
                         resultNewList.Clear();
                     }
 
-                    (ulong mappedAddr, _, _) = result.resultList[rIdx1];
+                    (uint offsetAddr, _) = resultBytesList[rIdx1];
 
-                    if (section.Start + mappedAddr < AddrMin || section.Start + mappedAddr > AddrMax) continue;
+                    if (section.Start + offsetAddr < AddrMin || section.Start + offsetAddr > AddrMax) continue;
 
-                    (ScanType scanType, int groupTypeLength, bool isAny) = groupTypes[gIdx];
-                    byte[] valueBytes = groupValues[gIdx];
+                    (ScanType scanType, int groupTypeLength, bool isAny) = comparerTool.groupTypes[gIdx];
+                    byte[] valueBytes = comparerTool.groupValues[gIdx];
                     byte[] newValue = new byte[groupTypeLength];
-                    if (result.resultList.Count < 50) newValue = PS4Tool.ReadMemory(section.PID, mappedAddr + section.Start, groupTypeLength);
-                    else Buffer.BlockCopy(buffer, (int)mappedAddr, newValue, 0, groupTypeLength);
-                    if (isAny || ScanTool.Comparer(scanType, newValue, valueBytes)) resultNewList.Add((mappedAddr, 0, newValue));
+                    if (resultBytesList.Count < 50) newValue = PS4Tool.ReadMemory(section.PID, offsetAddr + section.Start, groupTypeLength);
+                    else Buffer.BlockCopy(buffer, (int)offsetAddr, newValue, 0, groupTypeLength);
+                    if (isAny || ScanTool.ComparerExact(scanType, newValue, valueBytes)) resultNewList.Add((offsetAddr, newValue));
                     else
                     {
                         resultNewList.Clear();
-                        rIdx1 += groupTypes.Count - gIdx - 1;
+                        rIdx1 += comparerTool.groupTypes.Count - gIdx - 1;
                     }
                 }
                 if (resultNewList.Count > 0)
                 {
-                    resultList.AddRange(resultNewList);
+                    resultNextBytesList.AddRange(resultNewList);
                     resultNewList.Clear();
                 }
-                result.resultList.Clear();
-                result.resultList = resultList;
+                resultBytesList.Clear();
+                resultBytesList = resultNextBytesList;
             }
 
-            return result;
+            return resultBytesList;
         }
 
-        private (ScanType scanType, List<(ulong mappedAddr, ulong resultValue, byte[] resultBytes)> resultList, List<(ScanType scanType, int groupTypeLength, bool isAny)> groupTypes) Comparer(
-            Section section, ScanType scanType, CompareType compareType, int scanTypeLength, int step, byte[] value0Byte, ulong value0Long, ulong value1Long, ulong AddrMin, ulong AddrMax)
+        private ResultList Comparer(Section section, int scanStep, ulong AddrMin, ulong AddrMax)
         {
-            (ScanType scanType, List<(ulong mappedAddr, ulong resultValue, byte[] resultBytes)> resultList, List<(ScanType scanType, int groupTypeLength, bool isAny)> groupTypes) result;
-            if (!resultListDict.TryGetValue(section.SID, out result))
-            {
-                result.scanType = scanType;
-                result.resultList = new List<(ulong mappedAddr, ulong resultValue, byte[] resultBytes)>();
-            }
-
+            if (!resultsDict.TryGetValue(section.SID, out ResultList results)) results = new ResultList(comparerTool.scanTypeLength, scanStep);
             if (ResultView.Items.Count == 0)
             {
                 byte[] buffer = PS4Tool.ReadMemory(section.PID, section.Start, section.Length);
-                for (int scanIdx = 0; scanIdx + scanTypeLength < buffer.LongLength; scanIdx += step)
+                for (int scanIdx = 0; scanIdx + comparerTool.scanTypeLength < buffer.LongLength; scanIdx += scanStep)
                 {
                     if (ScanWorker.CancellationPending) break;
                     if (section.Start + (ulong)scanIdx < AddrMin || section.Start + (ulong)scanIdx > AddrMax) continue;
                     
-                    byte[] newValue = new byte[scanTypeLength];
-                    Buffer.BlockCopy(buffer, scanIdx, newValue, 0, scanTypeLength);
-                    if (value0Byte == null)
+                    byte[] newValue = new byte[comparerTool.scanTypeLength];
+                    Buffer.BlockCopy(buffer, scanIdx, newValue, 0, comparerTool.scanTypeLength);
+                    if (comparerTool.value0Byte == null)
                     {
-                        ulong longValue = ScanTool.BytesToULong(scanType, ref newValue);
-                        if (ScanTool.Comparer(scanType, compareType, longValue, 0, value0Long, value1Long)) result.resultList.Add(((ulong)scanIdx, longValue, null));
+                        ulong longValue = ScanTool.BytesToULong(newValue);
+                        if (ScanTool.Comparer(comparerTool, longValue, 0)) results.Add((uint)scanIdx, newValue);
                     }
-                    else if (ScanTool.Comparer(scanType, newValue, value0Byte)) result.resultList.Add(((ulong)scanIdx, 0, value0Byte));
+                    else if (ScanTool.ComparerExact(comparerTool.scanType, newValue, comparerTool.value0Byte)) results.Add((uint)scanIdx, newValue);
                 }
             }
             else
             {
                 byte[] buffer = null;
-                List<(ulong mappedAddr, ulong resultValue, byte[] resultBytes)> resultNewList = new List<(ulong mappedAddr, ulong resultValue, byte[] resultBytes)>();
-                if (result.resultList.Count >= 50) buffer = PS4Tool.ReadMemory(section.PID, section.Start, section.Length);
+                ResultList newResults;
+                newResults = new ResultList(comparerTool.scanTypeLength, scanStep);
+                if (results.Count >= 50) buffer = PS4Tool.ReadMemory(section.PID, section.Start, section.Length);
 
-                for (int rIdx1 = 0; rIdx1 < result.resultList.Count; rIdx1++)
+                for (int rIdx = 0; rIdx < results.Count; rIdx++)
                 {
                     if (ScanWorker.CancellationPending) break;
 
-                    (ulong mappedAddr, ulong resultValue, byte[] resultBytes) = result.resultList[rIdx1];
+                    (uint offsetAddr, byte[] oldBytes) = results.Read(rIdx);
+                    if (section.Start + offsetAddr < AddrMin || section.Start + offsetAddr > AddrMax) continue;
 
-                    if (section.Start + mappedAddr < AddrMin || section.Start + mappedAddr > AddrMax) continue;
+                    ulong oldData = ScanTool.BytesToULong(oldBytes);
+                    byte[] newValue = new byte[comparerTool.scanTypeLength];
+                    if (results.Count < 50) newValue = PS4Tool.ReadMemory(section.PID, offsetAddr + section.Start, comparerTool.scanTypeLength);
+                    else Buffer.BlockCopy(buffer, (int)offsetAddr, newValue, 0, comparerTool.scanTypeLength);
 
-                    byte[] newValue = new byte[scanTypeLength];
-                    if (result.resultList.Count < 50) newValue = PS4Tool.ReadMemory(section.PID, mappedAddr + section.Start, scanTypeLength);
-                    else Buffer.BlockCopy(buffer, (int)mappedAddr, newValue, 0, scanTypeLength);
-
-                    if (value0Byte == null)
+                    ulong newData = ScanTool.BytesToULong(newValue);
+                    if (comparerTool.value0Byte == null)
                     {
-                        ulong longValue = ScanTool.BytesToULong(scanType, ref newValue);
-                        if (ScanTool.Comparer(scanType, compareType, longValue, resultValue, value0Long, value1Long)) resultNewList.Add((mappedAddr, longValue, null)); //hitCnt++;
+                        if (ScanTool.Comparer(comparerTool, newData, oldData)) newResults.Add(offsetAddr, newValue);
                     }
-                    else if (ScanTool.Comparer(scanType, newValue, value0Byte)) resultNewList.Add((mappedAddr, 0, value0Byte)); //hitCnt++;
+                    else if (ScanTool.ComparerExact(comparerTool.scanType, newValue, comparerTool.value0Byte)) newResults.Add(offsetAddr, newValue);
                 }
-                result.resultList.Clear();
-                result.resultList = resultNewList;
+                results.Clear();
+                results = newResults;
             }
-            return result;
+            return results;
         }
 
         private void ScanWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -775,54 +753,35 @@ namespace PS4CheaterNeo
             }
             if (e.Result == null) return;
             
-            if (resultListDict.Count > 0)
+            if (resultsDict.Count > 0)
             {
                 int count = 0;
                 ResultView.Items.Clear();
                 ResultView.BeginUpdate();
 
-                List<int> keys = new List<int>(resultListDict.Keys);
+                List<int> keys = new List<int>(resultsDict.Keys);
                 keys.Sort();
                 for (int sectionIdx = 0; sectionIdx < keys.Count; sectionIdx++)
                 {
                     Section section = sectionTool.SectionDict[keys[sectionIdx]];
-                    if (!resultListDict.TryGetValue(section.SID, out (ScanType scanType, List<(ulong mappedAddr, ulong resultValue, byte[] resultBytes)> results, List<(ScanType scanType, int groupTypeLength, bool isAny)> groupTypes) result)) resultListDict.TryGetValue(section.SID, out result);
+                    resultsDict.TryGetValue(section.SID, out ResultList results);
+                    if (results == null || results.Count == 0) continue;
 
                     Color backColor = default;
-                    for (int resultIdx = 0; resultIdx < result.results.Count; resultIdx++)
+                    for (results.Begin(); !results.End(); results.Next())
                     {
                         if (++count > 0x2000) break;
 
-                        string valueStr, valueHex, typeStr;
-                        (ulong mappedAddr, ulong resultValue, byte[] resultBytes) = result.results[resultIdx];
-                        if (result.scanType == ScanType.Group)
-                        {
-                            int tIdx = resultIdx % result.groupTypes.Count;
-                            if (tIdx == 0)
-                            {
-                                if (backColor != default) backColor = default;
-                                else backColor = Color.DarkSlateGray;
-                            }
-                            (ScanType scanType, int groupTypeLength, bool isAny) = result.groupTypes[tIdx];
-                            typeStr = scanType.GetDescription();
-                            valueStr = ScanTool.BytesToString(scanType, resultBytes);
-                            valueHex = ScanTool.BytesToString(scanType, resultBytes, true);
-                        }
-                        else if (resultBytes == null)
-                        {
-                            typeStr = result.scanType.GetDescription();
-                            valueStr = ScanTool.ULongToString(result.scanType, resultValue);
-                            valueHex = ScanTool.ULongToString(result.scanType, resultValue, true);
-                        }
-                        else
-                        {
-                            typeStr = result.scanType.GetDescription();
-                            valueStr = ScanTool.BytesToString(result.scanType, resultBytes);
-                            valueHex = ScanTool.BytesToString(result.scanType, resultBytes, true);
-                        }
+                        (uint offsetAddr, byte[] oldBytes) = results.Read();
+                        string typeStr, valueStr, valueHex;
+                        ulong oldValue = ScanTool.BytesToULong(oldBytes);
+                        typeStr = comparerTool.scanType.GetDescription();
+                        valueStr = ScanTool.ULongToString(comparerTool.scanType, oldValue);
+                        valueHex = ScanTool.ULongToString(comparerTool.scanType, oldValue, true);
+
                         int itemIdx = ResultView.Items.Count;
-                        ResultView.Items.Add(mappedAddr.ToString("X8"), (mappedAddr + section.Start).ToString("X8"), 0);
-                        ResultView.Items[itemIdx].Tag = (section.SID, resultIdx);
+                        ResultView.Items.Add(offsetAddr.ToString("X8"), (offsetAddr + section.Start).ToString("X8"), 0);
+                        ResultView.Items[itemIdx].Tag = (section.SID, results.Iterator);
                         ResultView.Items[itemIdx].SubItems.Add(typeStr);
                         ResultView.Items[itemIdx].SubItems.Add(valueStr);
                         ResultView.Items[itemIdx].SubItems.Add(valueHex);
@@ -834,9 +793,54 @@ namespace PS4CheaterNeo
                 ScanTypeBox_SelectedIndexChanged(sender, null);
                 ScanBtn.Text = "Next Scan";
             }
-            else
+            else if (resultBytesListDict.Count > 0)
             {
+                int count = 0;
+                ResultView.Items.Clear();
+                ResultView.BeginUpdate();
 
+                List<int> keys = new List<int>(resultBytesListDict.Keys);
+                keys.Sort();
+                for (int sectionIdx = 0; sectionIdx < keys.Count; sectionIdx++)
+                {
+                    Section section = sectionTool.SectionDict[keys[sectionIdx]];
+                    resultBytesListDict.TryGetValue(section.SID, out List<(uint offsetAddr, byte[] resultBytes)> resultBytesList);
+                    if (resultBytesList == null || resultBytesList.Count == 0) continue;
+
+                    Color backColor = default;
+                    for (int resultIdx = 0; resultIdx < resultBytesList.Count; resultIdx++)
+                    {
+                        if (++count > 0x2000) break;
+
+                        string valueStr, valueHex, typeStr;
+                        ScanType scanType = comparerTool.scanType;
+                        (uint offsetAddr, byte[] resultBytes) = resultBytesList[resultIdx];
+                        if (scanType == ScanType.Group)
+                        {
+                            int tIdx = resultIdx % comparerTool.groupTypes.Count;
+                            if (tIdx == 0)
+                            {
+                                if (backColor != default) backColor = default;
+                                else backColor = Color.DarkSlateGray;
+                            }
+                            (scanType, _, _) = comparerTool.groupTypes[tIdx];
+                        }
+                        valueStr = ScanTool.BytesToString(scanType, resultBytes);
+                        valueHex = ScanTool.BytesToString(scanType, resultBytes, true);
+
+                        int itemIdx = ResultView.Items.Count;
+                        ResultView.Items.Add(offsetAddr.ToString("X8"), (offsetAddr + section.Start).ToString("X8"), 0);
+                        ResultView.Items[itemIdx].Tag = (section.SID, resultIdx);
+                        ResultView.Items[itemIdx].SubItems.Add(scanType.GetDescription());
+                        ResultView.Items[itemIdx].SubItems.Add(valueStr);
+                        ResultView.Items[itemIdx].SubItems.Add(valueHex);
+                        ResultView.Items[itemIdx].SubItems.Add(string.Format("{0}_{1}_{2}_{3}", section.Start.ToString("X"), section.Name, section.Prot.ToString("X"), section.Offset.ToString("X")));
+                        ResultView.Items[itemIdx].BackColor = backColor;
+                    }
+                }
+                ResultView.EndUpdate();
+                ScanTypeBox_SelectedIndexChanged(sender, null);
+                ScanBtn.Text = "Next Scan";
             }
         }
 
@@ -844,7 +848,7 @@ namespace PS4CheaterNeo
         {
             System.Diagnostics.Stopwatch tickerMajor = System.Diagnostics.Stopwatch.StartNew();
             (int pid, bool alignment, bool isFilter) = ((int pid, bool alignment, bool isFilter))e.Argument;
-            if (resultListDict.Count == 0) return;
+            if (resultsDict.Count == 0 && resultBytesListDict.Count == 0) return;
 
             int hitCnt = 0;
             Invoke(new MethodInvoker(() =>
@@ -860,47 +864,85 @@ namespace PS4CheaterNeo
                 Section section = sectionTool.SectionDict[keys[sectionIdx]];
                 if ((isFilter && section.IsFilter) || !section.Check) continue;
 
-                if (!resultListDict.TryGetValue(section.SID, out (ScanType scanType, List<(ulong mappedAddr, ulong resultValue, byte[] resultBytes)> results, List<(ScanType scanType, int groupTypeLength, bool isAny)> groupTypes) result)) resultListDict.TryGetValue(section.SID, out result);
+                resultsDict.TryGetValue(section.SID, out ResultList results);
+                resultBytesListDict.TryGetValue(section.SID, out List<(uint offsetAddr, byte[] resultBytes)> resultBytesList);
 
-                ScanTool.ScanTypeLengthDict.TryGetValue(result.scanType, out int scanTypeLength);
+                ScanTool.ScanTypeLengthDict.TryGetValue(comparerTool.scanType, out int scanTypeLength);
 
                 byte[] buffer = null;
-                if (result.results.Count >= 50) buffer = PS4Tool.ReadMemory(section.PID, section.Start, section.Length);
-
-                for (int resultIdx = 0; resultIdx < result.results.Count; resultIdx++)
+                if (scanTypeLength > 0)
                 {
-                    if (++hitCnt > 0x2000) continue;
+                    if (results.Count >= 50) buffer = PS4Tool.ReadMemory(section.PID, section.Start, section.Length);
 
-                    string valueStr, valueHex;
-                    (ulong mappedAddr, ulong resultValue, byte[] resultBytes) = result.results[resultIdx];
-                    int newLen = scanTypeLength > 0 ? scanTypeLength : resultBytes.Length;
-                    byte[] newValue = new byte[newLen];
-                    if (result.results.Count < 50) newValue = PS4Tool.ReadMemory(pid, mappedAddr + section.Start, newLen);
-                    else Buffer.BlockCopy(buffer, (int)mappedAddr, newValue, 0, newLen);
-
-                    if (scanTypeLength > 0)
+                    for (results.Begin(); !results.End(); results.Next())
                     {
-                        ulong longValue = ScanTool.BytesToULong(result.scanType, ref newValue);
-                        result.results[resultIdx] = (mappedAddr, longValue, null);
-                        valueStr = ScanTool.ULongToString(result.scanType, longValue);
-                        valueHex = ScanTool.ULongToString(result.scanType, longValue, true);
-                    }
-                    else
-                    {
-                        result.results[resultIdx] = (mappedAddr, 0, newValue);
-                        valueStr = ScanTool.BytesToString(result.scanType, newValue);
-                        valueHex = ScanTool.BytesToString(result.scanType, newValue, true);
-                    }
+                        if (++hitCnt > 0x2000) continue;
 
-                    Invoke(new MethodInvoker(() => {
-                        int itemIdx = ResultView.Items.Count;
-                        ResultView.Items.Add(mappedAddr.ToString("X8"), (mappedAddr + section.Start).ToString("X8"), 0);
-                        ResultView.Items[itemIdx].Tag = (section.SID, resultIdx);
-                        ResultView.Items[itemIdx].SubItems.Add(result.scanType.GetDescription());
-                        ResultView.Items[itemIdx].SubItems.Add(valueStr);
-                        ResultView.Items[itemIdx].SubItems.Add(valueHex);
-                        ResultView.Items[itemIdx].SubItems.Add(string.Format("{0}_{1}_{2}_{3}", section.Start.ToString("X"), section.Name, section.Prot.ToString("X"), section.Offset.ToString("X")));
-                    }));
+                        (uint offsetAddr, _) = results.Read();
+                        string typeStr, valueStr, valueHex;
+
+                        int newLen = scanTypeLength;
+                        byte[] newValue = new byte[newLen];
+                        if (results.Count < 50) newValue = PS4Tool.ReadMemory(pid, offsetAddr + section.Start, newLen);
+                        else Buffer.BlockCopy(buffer, (int)offsetAddr, newValue, 0, newLen);
+
+                        results.Set(newValue);
+                        typeStr = comparerTool.scanType.GetDescription();
+                        valueStr = ScanTool.BytesToString(comparerTool.scanType, newValue);
+                        valueHex = ScanTool.BytesToString(comparerTool.scanType, newValue, true);
+
+                        Invoke(new MethodInvoker(() => {
+                            int itemIdx = ResultView.Items.Count;
+                            ResultView.Items.Add(offsetAddr.ToString("X8"), (offsetAddr + section.Start).ToString("X8"), 0);
+                            ResultView.Items[itemIdx].Tag = (section.SID, results.Iterator);
+                            ResultView.Items[itemIdx].SubItems.Add(typeStr);
+                            ResultView.Items[itemIdx].SubItems.Add(valueStr);
+                            ResultView.Items[itemIdx].SubItems.Add(valueHex);
+                            ResultView.Items[itemIdx].SubItems.Add(string.Format("{0}_{1}_{2}_{3}", section.Start.ToString("X"), section.Name, section.Prot.ToString("X"), section.Offset.ToString("X")));
+                        }));
+                    }
+                }
+                else
+                {
+                    Color backColor = default;
+                    if (resultBytesList.Count >= 50) buffer = PS4Tool.ReadMemory(section.PID, section.Start, section.Length);
+                    for (int resultIdx = 0; resultIdx < resultBytesList.Count; resultIdx++)
+                    {
+                        if (++hitCnt > 0x2000) continue;
+
+                        string valueStr, valueHex;
+                        (uint offsetAddr, byte[] resultBytes) = resultBytesList[resultIdx];
+                        int newLen = resultBytes.Length;
+                        byte[] newValue = new byte[newLen];
+                        if (resultBytesList.Count < 50) newValue = PS4Tool.ReadMemory(pid, offsetAddr + section.Start, newLen);
+                        else Buffer.BlockCopy(buffer, (int)offsetAddr, newValue, 0, newLen);
+
+                        ScanType scanType = comparerTool.scanType;
+                        resultBytesList[resultIdx] = (offsetAddr, newValue);
+                        if (scanType == ScanType.Group)
+                        {
+                            int tIdx = resultIdx % comparerTool.groupTypes.Count;
+                            if (tIdx == 0)
+                            {
+                                if (backColor != default) backColor = default;
+                                else backColor = Color.DarkSlateGray;
+                            }
+                            (scanType, _, _) = comparerTool.groupTypes[tIdx];
+                        }
+                        valueStr = ScanTool.BytesToString(scanType, resultBytes);
+                        valueHex = ScanTool.BytesToString(scanType, resultBytes, true);
+
+                        Invoke(new MethodInvoker(() => {
+                            int itemIdx = ResultView.Items.Count;
+                            ResultView.Items.Add(offsetAddr.ToString("X8"), (offsetAddr + section.Start).ToString("X8"), 0);
+                            ResultView.Items[itemIdx].Tag = (section.SID, resultIdx);
+                            ResultView.Items[itemIdx].SubItems.Add(comparerTool.scanType.GetDescription());
+                            ResultView.Items[itemIdx].SubItems.Add(valueStr);
+                            ResultView.Items[itemIdx].SubItems.Add(valueHex);
+                            ResultView.Items[itemIdx].SubItems.Add(string.Format("{0}_{1}_{2}_{3}", section.Start.ToString("X"), section.Name, section.Prot.ToString("X"), section.Offset.ToString("X")));
+                            ResultView.Items[itemIdx].BackColor = backColor;
+                        }));
+                    }
                 }
             }
             Invoke(new MethodInvoker(() => {ResultView.EndUpdate();}));
