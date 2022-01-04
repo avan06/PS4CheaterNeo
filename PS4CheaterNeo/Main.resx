@@ -165,10 +165,21 @@
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
         YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAD3SURBVDhPY4CBb9++/UfG79+/F4BKEQdAmiy6TMCYJAOQ
-        bUU2AIYJGoSsER1TxYAvX74s+/Tp08NXr179BvGB+ClI7OvXr2ZwA2AYWSMIP3j75X/l0df/c/a//N92
-        8hUYg9ggsSsPX/z9/v17MgPIiSCMzYD43c//P3vz8f+H96gYJAaSA6p5B3YFCMA0IWOXDU9xGgCSA6mB
+        bUU2AIYJGoSsER1TxYAvX74s+/Tp08MXL178BvGB+ClI7OvXr2ZwA2AYWSMIP3j75X/l0df/c/a//N92
+        8hUYg9ggsUv3n/39/v17MgPIiSCMzYD43c//P3vz8f+H96gYJAaSA6p5B3YFCMA0IWOXDU9xGgCSA6mB
         ameAuwTZRdILH4Fx8LZn/5uOvwJjEBsmjmIAOkA2ABceAQa8s1z7FKtGEAbJgdRAlWMCUCIBJRZQorFY
-        8/S//OJHYAxioyQkfACUXEHJFmjT069A54IwiI1IygwMAASuFWLuu51eAAAAAElFTkSuQmCC
+        8/S//OJHYAxioyQkfACUXEHJFmjT069A54IwiI1IygwMAN/lFUo4r8iXAAAAAElFTkSuQmCC
+</value>
+  </data>
+  <data name="ToolStripHexView.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
+        YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAERSURBVDhPpVI7CsJAFMw9bGztPENOYJlUWqTVWi+QVnID
+        BbEVBDvBE4hgYWPlLyxYbCIxKZ87SzZk40ZBH0w2+97M7NuP9SmyLOulaboToAp2qOU0cwjSeBs+qLtm
+        1JieqbMKJfCPHGrg5PT3YPGTWvMLTfZ3inisATnU0E1Ofw8YYLU6A9QKA7GfppgskCgDJIXyFhTAUWIe
+        BAHZtl0A89mBa4IqpIH4LEAeDkd0u4ayRYyD/kCaqEM0QRnIFZVYAXPkl8fIKAY0g7JYwXEc2pxioxj4
+        q4PiGsWn9gw8zzMaaA+p7hZc15Wj7/typQr0p2x6B4wxjg7KJkmStHPJ9wDZYMJ/NvnJAAEBhGaxZb0A
+        +VdUdQ6ZSKkAAAAASUVORK5CYII=
 </value>
   </data>
   <data name="ToolStripRefreshCheat.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
@@ -261,7 +272,7 @@
   <data name="CheatGridView.RowHeadersCollapse" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
-        vgAADr4B6kKxwAAAAOZJREFUOE+tkz0OgkAQhTmBp3ETT8ApOJElJTUnoMEreAoSKsVCbSho1vlwxiw/
+        vAAADrwBlbxySQAAAOZJREFUOE+tkz0OgkAQhTmBp3ETT8ApOJElJTUnoMEreAoSKsVCbSho1vlwxiw/
         ASNO8pLdmfdeZpYhGkfbtk6QCSpBp+BMziltGlLcCfK6rn2apj5JEh/HcQ/O5KjBgauyd6j4XBRFLyjL
         k79emgHIUYMDd2Ail9zETXPrBY/7cwLygUluYkdra2Jg3cDVcRwGGfNZ23PCEHDgokGLQcUjfSM2WBdo
         Mei4mMHhuF/EyKD7i8FnBDNZgvHCETY/4rbPqLuwukiheLBIhFxmVzkUkwvEw1Um1OS3nykMKS7+zmKo
@@ -271,7 +282,7 @@
   <data name="CheatGridView.RowHeadersExpand" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
-        vgAADr4B6kKxwAAAAO1JREFUOE+tk0EOgjAQRTmBp7GJJ+AUnMglS9acgA1ewVOQsFJcqBsWbOq82jEt
+        vAAADrwBlbxySQAAAO1JREFUOE+tk0EOgjAQRTmBp7GJJ+AUnMglS9acgA1ewVOQsFJcqBsWbOq82jEt
         VE3ESX5Cp//9tDBk8xrH0YgqUSeavHimZ7xtWbK5EdV939uyLG1RFDbPcyee6bGHB6/HnuXhY9M0Dmjb
         gz2fhkj02MODNwqRRa3wMFwccLveF6IfhNQKG46Wgnf7rVMYoCH+OoaAivvpsdWcCkB48MLAEtDxkuYw
         SgUgPQUsARMLDVDonWYB018CXlfQEFUIqdQXXmH1S1z3Gf0sfB2kEI4GiZJFcpRDmF4Ax6NM+ZDffqaw
@@ -281,28 +292,28 @@
   <data name="CheatGridView.RowHeadersSeparater" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
-        vgAADr4B6kKxwAAAACVJREFUOE9j+P//P04MBEAKuxwMYxWE4VEDRg0A4VEDhoYB/xkAk07dPxsrQhUA
+        vAAADrwBlbxySQAAACVJREFUOE9j+P//P04MBEAKuxwMYxWE4VEDRg0A4VEDhoYB/xkAk07dPxsrQhUA
         AAAASUVORK5CYII=
 </value>
   </data>
   <data name="CheatGridView.RowHeadersSeparaterEnd" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
-        vgAADr4B6kKxwAAAADpJREFUOE/tzEEKADAIA0H//+moB29bau4WhsKWJiQ91amL3wbGcQM30Hrgiz46
+        vAAADrwBlbxySQAAADpJREFUOE/tzEEKADAIA0H//+moB29bau4WhsKWJiQ91amL3wbGcQM30Hrgiz46
         MDowOjA6MDow7ikScJDZQ7uJZW8AAAAASUVORK5CYII=
 </value>
   </data>
   <data name="CheatGridView.TopLeftHeaderCollapseAll" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAL
-        DQAACw0B7QfALAAAAElJREFUOE9jgIFv3779JwdDtUMMcHJyIgnDDUA2kViMYQC66fgwTgNANCE8Egxg
+        DAAACwwBP0AiyAAAAElJREFUOE9jgIFv3779JwdDtUMMcHJyIgnDDUA2kViMYQC66fgwTgNANCE8Egxg
         CJ6DExNlACE83A0gFsMMQzGAVAzWSDlgYAAAZTTG08r/1jUAAAAASUVORK5CYII=
 </value>
   </data>
   <data name="CheatGridView.TopLeftHeaderExpandAll" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAL
-        DQAACw0B7QfALAAAAFdJREFUOE9jgIFv3779JwdDtUMMcHJyIgnDDUA2kViMYQC66fgwTgNANCFMkgEM
+        DAAACwwBP0AiyAAAAFdJREFUOE9jgIFv3779JwdDtUMMcHJyIgnDDUA2kViMYQC66fgwTgNANCFMkgEM
         wXMwxIaAASBNuDBRBiBjmCZkPMQMwIbxGkAshhmGYgCpGKyRcsDAAAD9f7shXWRX6QAAAABJRU5ErkJg
         gg==
 </value>

@@ -1,6 +1,7 @@
 ﻿using Be.Windows.Forms;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using static PS4CheaterNeo.SectionTool;
@@ -48,6 +49,9 @@ namespace PS4CheaterNeo
 
 
         }
+        /// <summary>
+        /// BaseAddr = HexView.SelectionStart + HexView.LineInfoOffset - (long)section.Start
+        /// </summary>
         private void HexView_SelectionStartChanged(object sender, EventArgs e)
         {
             if (HexView.SelectionStart <= 0) return;
@@ -131,6 +135,14 @@ D: {8}", HexView.SelectionStart + HexView.LineInfoOffset, HexView.SelectionStart
         {
             PageBox.SelectedIndex = Page;
             Line = HexView.CurrentLine - 1;
+
+            if (HexView.SelectionStart > 0)
+            {
+                string hex = HexView.SelectionStart.ToString("X");
+                char lastChar = hex[hex.Length - 1];
+                Column = int.Parse(lastChar.ToString(), NumberStyles.HexNumber);
+            }
+            else Column = 0;
             UpdateUi(Page, Line);
         }
 
@@ -234,6 +246,8 @@ D: {8}", HexView.SelectionStart + HexView.LineInfoOffset, HexView.SelectionStart
 
         private void UpdateUi(int page, long line)
         {
+            long ScrollVpos = 0;
+            if (HexView.ScrollVpos > 0) ScrollVpos = HexView.ScrollVpos;
             HexView.LineInfoOffset = (long)section.Start + (long)(PageSize * page);
 
             int memSize = PageSize;
@@ -241,8 +255,10 @@ D: {8}", HexView.SelectionStart + HexView.LineInfoOffset, HexView.SelectionStart
             if (section.Length - PageSize * page < memSize) memSize = section.Length - PageSize * page;
 
             byte[] dst = PS4Tool.ReadMemory(section.PID, section.Start + (ulong)page * PageSize, (int)memSize);
+            if (HexView.ByteProvider != null) HexView.ByteProvider.Changed -= ByteProvider_Changed;
             HexView.ByteProvider = new DynamicByteProvider(dst);
             HexView.ByteProvider.Changed += ByteProvider_Changed;
+            
             if (line != 0)
             {
                 HexView.SelectionStart = line * HexView.BytesPerLine + Column;
@@ -250,6 +266,7 @@ D: {8}", HexView.SelectionStart + HexView.LineInfoOffset, HexView.SelectionStart
                 if (HexView.ColumnInfoVisible) line -= 2;
 
                 HexView.ScrollByteIntoView((line + HexView.Height / (int)HexView.CharSize.Height - 1) * HexView.BytesPerLine + Column);
+                if (ScrollVpos > 0) HexView.PerformScrollToLine(ScrollVpos);
             }
         }
         private void ByteProvider_Changed(object sender, EventArgs e)

@@ -88,6 +88,7 @@ namespace PS4CheaterNeo
             this.Panel1 = new System.Windows.Forms.Panel();
             this.ScanWorker = new System.ComponentModel.BackgroundWorker();
             this.RefreshWorker = new System.ComponentModel.BackgroundWorker();
+            this.ResultViewCopyAddress = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.SplitContainer1)).BeginInit();
             this.SplitContainer1.Panel1.SuspendLayout();
             this.SplitContainer1.Panel2.SuspendLayout();
@@ -142,7 +143,7 @@ namespace PS4CheaterNeo
             this.ToolStripMsg.BackColor = System.Drawing.Color.Transparent;
             this.ToolStripMsg.ForeColor = System.Drawing.Color.White;
             this.ToolStripMsg.Name = "ToolStripMsg";
-            this.ToolStripMsg.Size = new System.Drawing.Size(482, 17);
+            this.ToolStripMsg.Size = new System.Drawing.Size(513, 17);
             this.ToolStripMsg.Spring = true;
             this.ToolStripMsg.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
@@ -197,28 +198,29 @@ namespace PS4CheaterNeo
             this.ResultViewAddToCheatGrid,
             this.ToolStripSeparator1,
             this.ResultViewHexEditor,
+            this.ResultViewCopyAddress,
             this.ResultViewDump,
             this.ToolStripSeparator2,
             this.ResultViewFindPointer});
             this.ResultViewMenu.Name = "ResultViewMenu";
-            this.ResultViewMenu.Size = new System.Drawing.Size(177, 104);
+            this.ResultViewMenu.Size = new System.Drawing.Size(181, 148);
             // 
             // ResultViewAddToCheatGrid
             // 
             this.ResultViewAddToCheatGrid.Name = "ResultViewAddToCheatGrid";
-            this.ResultViewAddToCheatGrid.Size = new System.Drawing.Size(176, 22);
+            this.ResultViewAddToCheatGrid.Size = new System.Drawing.Size(180, 22);
             this.ResultViewAddToCheatGrid.Text = "Add to Cheat Grid";
             this.ResultViewAddToCheatGrid.Click += new System.EventHandler(this.ResultViewAddToCheatGrid_Click);
             // 
             // ToolStripSeparator1
             // 
             this.ToolStripSeparator1.Name = "ToolStripSeparator1";
-            this.ToolStripSeparator1.Size = new System.Drawing.Size(173, 6);
+            this.ToolStripSeparator1.Size = new System.Drawing.Size(177, 6);
             // 
             // ResultViewHexEditor
             // 
             this.ResultViewHexEditor.Name = "ResultViewHexEditor";
-            this.ResultViewHexEditor.Size = new System.Drawing.Size(176, 22);
+            this.ResultViewHexEditor.Size = new System.Drawing.Size(180, 22);
             this.ResultViewHexEditor.Text = "Hex Editor";
             this.ResultViewHexEditor.Click += new System.EventHandler(this.ResultViewHexEditor_Click);
             // 
@@ -226,19 +228,19 @@ namespace PS4CheaterNeo
             // 
             this.ResultViewDump.Enabled = false;
             this.ResultViewDump.Name = "ResultViewDump";
-            this.ResultViewDump.Size = new System.Drawing.Size(176, 22);
+            this.ResultViewDump.Size = new System.Drawing.Size(180, 22);
             this.ResultViewDump.Text = "Dump";
             this.ResultViewDump.Click += new System.EventHandler(this.ResultViewDump_Click);
             // 
             // ToolStripSeparator2
             // 
             this.ToolStripSeparator2.Name = "ToolStripSeparator2";
-            this.ToolStripSeparator2.Size = new System.Drawing.Size(173, 6);
+            this.ToolStripSeparator2.Size = new System.Drawing.Size(177, 6);
             // 
             // ResultViewFindPointer
             // 
             this.ResultViewFindPointer.Name = "ResultViewFindPointer";
-            this.ResultViewFindPointer.Size = new System.Drawing.Size(176, 22);
+            this.ResultViewFindPointer.Size = new System.Drawing.Size(180, 22);
             this.ResultViewFindPointer.Text = "Find Pointer";
             this.ResultViewFindPointer.Click += new System.EventHandler(this.ResultViewFindPointer_Click);
             // 
@@ -720,6 +722,13 @@ namespace PS4CheaterNeo
             this.RefreshWorker.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.RefreshWorker_ProgressChanged);
             this.RefreshWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.RefreshWorker_RunWorkerCompleted);
             // 
+            // ResultViewCopyAddress
+            // 
+            this.ResultViewCopyAddress.Name = "ResultViewCopyAddress";
+            this.ResultViewCopyAddress.Size = new System.Drawing.Size(180, 22);
+            this.ResultViewCopyAddress.Text = "Copy Address";
+            this.ResultViewCopyAddress.Click += new System.EventHandler(this.ResultViewCopyAddress_Click);
+            // 
             // Query
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -815,5 +824,6 @@ namespace PS4CheaterNeo
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
+        private System.Windows.Forms.ToolStripMenuItem ResultViewCopyAddress;
     }
 }

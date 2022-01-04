@@ -477,6 +477,27 @@ namespace PS4CheaterNeo
             hexEdit.Show(this);
         }
 
+        private void ResultViewCopyAddress_Click(object sender, EventArgs e)
+        {
+            if (ResultView.SelectedItems == null || ResultView.SelectedItems.Count == 0) return;
+
+            string clipStr = "";
+            ListView.SelectedListViewItemCollection items = ResultView.SelectedItems;
+            for (int i = 0; i < items.Count; ++i)
+            {
+                ListViewItem resultItem = items[i];
+                (int sid, int resultIdx) = ((int sid, int resultIdx))resultItem.Tag;
+                Section section = sectionTool.GetSection(sid);
+                uint offsetAddr = 0;
+                if (resultsDict.TryGetValue(sid, out ResultList results)) (offsetAddr, _) = results.Read(resultIdx);
+                else if (resultBytesListDict.TryGetValue(sid, out List<(uint offsetAddr, byte[] resultBytes)> resultBytesList)) (offsetAddr, _) = resultBytesList[resultIdx];
+                if (offsetAddr == 0) continue;
+                if (clipStr.Length > 0) clipStr += " \n";
+                clipStr += (offsetAddr + section.Start).ToString("X");
+            }
+            if (clipStr.Length > 0) Clipboard.SetText(clipStr);
+        }
+
         private void ResultViewDump_Click(object sender, EventArgs e)
         {
             //if (ResultView.SelectedItems.Count == 1)
