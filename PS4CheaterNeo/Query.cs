@@ -176,7 +176,7 @@ namespace PS4CheaterNeo
                 comparerTool = new ComparerTool(scanType, compareType, value0, value1);
 
                 ScanBtn.Text = "Stop";
-                ScanWorker.RunWorkerAsync((pid, value0, value1, alignment, isFilter, scanType, compareType, AddrMin, AddrMax));
+                ScanWorker.RunWorkerAsync((pid, alignment, isFilter, AddrMin, AddrMax));
 
                 ScanTypeBox.Enabled = false;
                 AlignmentBox.Enabled = false;
@@ -542,8 +542,7 @@ namespace PS4CheaterNeo
             {
                 System.Diagnostics.Stopwatch tickerMajor = System.Diagnostics.Stopwatch.StartNew();
 
-                (int pid, string value0, string value1, bool alignment, bool isFilter, ScanType scanType, CompareType compareType, ulong AddrMin, ulong AddrMax) =
-                    ((int pid, string value0, string value1, bool alignment, bool isFilter, ScanType scanType, CompareType compareType, ulong AddrMin, ulong AddrMax))e.Argument;
+                (int pid, bool alignment, bool isFilter, ulong AddrMin, ulong AddrMax) = ((int pid, bool alignment, bool isFilter, ulong AddrMin, ulong AddrMax))e.Argument;
 
                 int hitCnt = 0;
                 int scanStep = (comparerTool.scanType == ScanType.Hex || comparerTool.scanType == ScanType.String_) ? 1 :

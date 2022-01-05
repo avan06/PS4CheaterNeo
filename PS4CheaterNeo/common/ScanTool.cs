@@ -240,16 +240,16 @@ namespace PS4CheaterNeo
                     oldUInt16 = (UInt16)oldData;
                     break;
                 case ScanType.Byte_:
-                    newByte = (byte)newData;
-                    oldByte = (byte)oldData;
+                    newByte = BitConverter.GetBytes(newData)[0];
+                    oldByte = BitConverter.GetBytes(oldData)[0];
                     break;
                 case ScanType.Double_:
-                    newDouble = Convert.ToDouble(newData);
-                    oldDouble = Convert.ToDouble(oldData);
+                    newDouble = BitConverter.ToDouble(BitConverter.GetBytes(newData), 0);
+                    oldDouble = BitConverter.ToDouble(BitConverter.GetBytes(oldData), 0);
                     break;
                 case ScanType.Float_:
-                    newFloat = Convert.ToSingle(newData);
-                    oldFloat = Convert.ToSingle(oldData);
+                    newFloat = BitConverter.ToSingle(BitConverter.GetBytes(newData), 0);
+                    oldFloat = BitConverter.ToSingle(BitConverter.GetBytes(oldData), 0);
                     break;
                 default:
                     throw new Exception("Unknown scanType type.");
