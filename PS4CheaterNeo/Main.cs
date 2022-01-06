@@ -404,6 +404,8 @@ namespace PS4CheaterNeo
                         ScanType scanType = this.ParseFromDescription<ScanType>(editedRow.Cells[(int)ChertCol.CheatListType].Value.ToString());
                         var newValue = ScanTool.ValueStringToULong(scanType, (string)editedCol);
                         editedRow.Tag = (section, offsetAddr, newValue);
+                        byte[] data = ScanTool.ValueStringToByte(scanType, editedRow.Cells[(int)ChertCol.CheatListValue].Value.ToString());
+                        PS4Tool.WriteMemory(section.PID, offsetAddr + section.Start, data);
                         break;
                     case (int)ChertCol.CheatListDesc:
                         break;
