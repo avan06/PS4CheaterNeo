@@ -153,7 +153,7 @@ namespace PS4CheaterNeo
             }
             catch (Exception exception)
             {
-                MessageBox.Show(exception.StackTrace, exception.Message, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show(exception.Message + "\n" + exception.StackTrace, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
 
@@ -237,7 +237,7 @@ namespace PS4CheaterNeo
             }
             catch (Exception exception)
             {
-                MessageBox.Show(exception.StackTrace, exception.Message, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show(exception.Message + "\n" + exception.StackTrace, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
 
@@ -386,7 +386,7 @@ namespace PS4CheaterNeo
             }
             catch (Exception exception)
             {
-                MessageBox.Show(exception.StackTrace, exception.Message, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show(exception.Message + "\n" + exception.StackTrace, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
 
@@ -413,7 +413,7 @@ namespace PS4CheaterNeo
             }
             catch (Exception exception)
             {
-                MessageBox.Show(exception.StackTrace, exception.Message, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show(exception.Message + "\n" + exception.StackTrace, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
         Task<bool> refreshLockTask;
@@ -507,8 +507,9 @@ namespace PS4CheaterNeo
                 HexEditor hexEdit = new HexEditor(this, section, (int)offsetAddr);
                 hexEdit.Show(this);
             }
-            catch (Exception)
+            catch (Exception exception)
             {
+                MessageBox.Show(exception.Message + "\n" + exception.StackTrace, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
         #endregion
@@ -640,7 +641,7 @@ namespace PS4CheaterNeo
             }
             catch (Exception exception)
             {
-                MessageBox.Show(exception.StackTrace, exception.Message, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show(exception.Message + "\n" + exception.StackTrace, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
 
@@ -774,7 +775,7 @@ namespace PS4CheaterNeo
             }
             catch (Exception exception)
             {
-                MessageBox.Show(exception.StackTrace, exception.Message, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show(exception.Message + "\n" + exception.StackTrace, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
             return cheatRow;
         }

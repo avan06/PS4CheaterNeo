@@ -49,17 +49,24 @@ namespace PS4CheaterNeo
 
         private void GetProcessesBtn_Click(object sender, EventArgs e)
         {
-            if (!PS4Tool.Connect((string)Properties.Settings.Default["IP"], out string msg)) throw new Exception(msg);
-
-            int selectedIdx = 0;
-            ProcessesBox.Items.Clear();
-            ProcessList procList = PS4Tool.GetProcessList();
-            foreach (Process process in procList.processes)
+            try
             {
-                int idx = this.ProcessesBox.Items.Add(new ComboboxItem(process.name, process.pid));
-                if (process.name == Constant.DefaultProcess) selectedIdx = idx;
+                if (!PS4Tool.Connect((string)Properties.Settings.Default["IP"], out string msg)) throw new Exception(msg);
+
+                int selectedIdx = 0;
+                ProcessesBox.Items.Clear();
+                ProcessList procList = PS4Tool.GetProcessList();
+                foreach (Process process in procList.processes)
+                {
+                    int idx = this.ProcessesBox.Items.Add(new ComboboxItem(process.name, process.pid));
+                    if (process.name == Constant.DefaultProcess) selectedIdx = idx;
+                }
+                ProcessesBox.SelectedIndex = selectedIdx;
             }
-            ProcessesBox.SelectedIndex = selectedIdx;
+            catch (Exception exception)
+            {
+                MessageBox.Show(exception.Message + "\n" + exception.StackTrace, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+            }
         }
         public int CompareSection(Section s1, Section s2)
         {
@@ -122,7 +129,7 @@ namespace PS4CheaterNeo
             }
             catch (Exception exception)
             {
-                MessageBox.Show(exception.StackTrace, exception.Message, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show(exception.Message + "\n" + exception.StackTrace, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
 
@@ -150,52 +157,66 @@ namespace PS4CheaterNeo
 
         private void ScanBtn_Click(object sender, EventArgs e)
         {
-            if (ScanWorker.IsBusy)
+            try
             {
-                if (MessageBox.Show("Still in the scanning, Do you want to stop scan?", "Scan", 
-                    MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes) ScanWorker.CancelAsync();
+                if (ScanWorker.IsBusy)
+                {
+                    if (MessageBox.Show("Still in the scanning, Do you want to stop scan?", "Scan",
+                        MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes) ScanWorker.CancelAsync();
+                }
+                else if (ResultView.Items.Count == 0 && MessageBox.Show("search size:" + (sectionTool.TotalMemorySize / (1024 * 1024)).ToString() + "MB", "First Scan",
+                    MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) return;
+                else
+                {
+                    ComboboxItem process = (ComboboxItem)ProcessesBox.SelectedItem;
+                    int pid = (int)process.Value;
+
+                    string value0 = ValueBox.Text;
+                    string value1 = Value1Box.Text;
+                    bool alignment = AlignmentBox.Checked;
+                    bool isFilter = IsFilterBox.Checked;
+                    Enum.TryParse(((ComboboxItem)(ScanTypeBox.SelectedItem)).Value.ToString(), out ScanType scanType);
+                    Enum.TryParse(CompareTypeBox.SelectedItem.ToString(), out CompareType compareType);
+
+                    var AddrMin = ulong.Parse(AddrMinBox.Text, NumberStyles.HexNumber);
+                    var AddrMax = ulong.Parse(AddrMaxBox.Text, NumberStyles.HexNumber);
+                    if (AddrMin > AddrMax && MessageBox.Show(String.Format("AddrMin({1:X}) > AddrMax({0:X})", AddrMin, AddrMax), "Scan", MessageBoxButtons.OK, MessageBoxIcon.Error) == DialogResult.OK) return;
+
+                    comparerTool = new ComparerTool(scanType, compareType, value0, value1);
+
+                    ScanBtn.Text = "Stop";
+                    ScanWorker.RunWorkerAsync((pid, alignment, isFilter, AddrMin, AddrMax));
+
+                    ScanTypeBox.Enabled = false;
+                    AlignmentBox.Enabled = false;
+                    NewBtn.Enabled = true;
+                }
             }
-            else if (ResultView.Items.Count == 0 && MessageBox.Show("search size:" + (sectionTool.TotalMemorySize / (1024 * 1024)).ToString() + "MB", "First Scan",
-                MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) return;
-            else
+            catch (Exception exception)
             {
-                ComboboxItem process = (ComboboxItem)ProcessesBox.SelectedItem;
-                int pid = (int)process.Value;
-
-                string value0 = ValueBox.Text;
-                string value1 = Value1Box.Text;
-                bool alignment = AlignmentBox.Checked;
-                bool isFilter = IsFilterBox.Checked;
-                Enum.TryParse(((ComboboxItem)(ScanTypeBox.SelectedItem)).Value.ToString(), out ScanType scanType);
-                Enum.TryParse(CompareTypeBox.SelectedItem.ToString(), out CompareType compareType);
-
-                var AddrMin = ulong.Parse(AddrMinBox.Text, NumberStyles.HexNumber);
-                var AddrMax = ulong.Parse(AddrMaxBox.Text, NumberStyles.HexNumber);
-                if (AddrMin > AddrMax && MessageBox.Show(String.Format("AddrMin({1:X}) > AddrMax({0:X})", AddrMin, AddrMax), "Scan", MessageBoxButtons.OK, MessageBoxIcon.Error) == DialogResult.OK) return;
-
-                comparerTool = new ComparerTool(scanType, compareType, value0, value1);
-
-                ScanBtn.Text = "Stop";
-                ScanWorker.RunWorkerAsync((pid, alignment, isFilter, AddrMin, AddrMax));
-
-                ScanTypeBox.Enabled = false;
-                AlignmentBox.Enabled = false;
-                NewBtn.Enabled = true;
+                MessageBox.Show(exception.Message + "\n" + exception.StackTrace, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
 
         private void RefreshBtn_Click(object sender, EventArgs e)
         {
-            ComboboxItem process = (ComboboxItem)ProcessesBox.SelectedItem;
-            int pid = (int)process.Value;
-            ProcessMap pMap = PS4Tool.GetProcessMaps(pid);
-            if (pMap.entries == null || ResultView.Items.Count == 0) return;
+            try
+            {
+                ComboboxItem process = (ComboboxItem)ProcessesBox.SelectedItem;
+                int pid = (int)process.Value;
+                ProcessMap pMap = PS4Tool.GetProcessMaps(pid);
+                if (pMap.entries == null || ResultView.Items.Count == 0) return;
 
-            bool alignment = AlignmentBox.Checked;
-            bool isFilter = IsFilterBox.Checked;
+                bool alignment = AlignmentBox.Checked;
+                bool isFilter = IsFilterBox.Checked;
 
-            if (RefreshWorker.IsBusy) return;
-            RefreshWorker.RunWorkerAsync((pid, alignment, isFilter));
+                if (RefreshWorker.IsBusy) return;
+                RefreshWorker.RunWorkerAsync((pid, alignment, isFilter));
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show(exception.Message + "\n" + exception.StackTrace, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+            }
         }
 
         private void ScanTypeBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -612,7 +633,7 @@ namespace PS4CheaterNeo
             }
             catch (Exception exception)
             {
-                MessageBox.Show(exception.StackTrace, exception.Message, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show(exception.Message + "\n" + exception.StackTrace, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
 
@@ -862,6 +883,7 @@ namespace PS4CheaterNeo
                 ScanTypeBox_SelectedIndexChanged(sender, null);
                 ScanBtn.Text = "Next Scan";
             }
+            else NewBtn_Click(sender, e);
         }
 
         private void RefreshWorker_DoWork(object sender, DoWorkEventArgs e)

@@ -167,6 +167,7 @@ D: {8}", HexView.SelectionStart + HexView.LineInfoOffset, HexView.SelectionStart
                 PS4Tool.WriteMemory(section.PID, (ulong)(address + HexView.LineInfoOffset), data);
             }
             changedPosDic.Clear();
+            HexView.ChangedPosSetFinish();
         }
 
         private void AddToCheatGridBtn_Click(object sender, EventArgs e)
@@ -234,7 +235,7 @@ D: {8}", HexView.SelectionStart + HexView.LineInfoOffset, HexView.SelectionStart
             }
             catch (Exception exception)
             {
-                MessageBox.Show(exception.StackTrace, exception.Message, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show(exception.Message + "\n" + exception.StackTrace, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
         #endregion

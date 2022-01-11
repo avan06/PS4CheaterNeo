@@ -80,12 +80,16 @@ namespace PS4CheaterNeo
             // HexView
             // 
             this.HexView.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(36)))), ((int)(((byte)(36)))));
+            this.HexView.ChangedFinishForeColor = System.Drawing.Color.LimeGreen;
             this.HexView.ColumnInfoVisible = true;
             this.HexView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.HexView.EnableAutoChangedPosSetFinish = true;
             this.HexView.EnableCut = false;
             this.HexView.EnableDelete = false;
             this.HexView.EnableOverwritePaste = true;
             this.HexView.EnablePaste = true;
+            this.HexView.EnableRetainChangedFinishPos = true;
+            this.HexView.EnableRetainChangedPos = true;
             this.HexView.Font = new System.Drawing.Font("Microsoft JhengHei UI", 9F);
             this.HexView.ForeColor = System.Drawing.Color.White;
             this.HexView.GroupSeparatorVisible = true;
