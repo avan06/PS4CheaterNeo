@@ -26,6 +26,7 @@ namespace PS4CheaterNeo
             sectionTool = new SectionTool();
             resultsDict = new Dictionary<int, ResultList>();
             resultBytesListDict = new Dictionary<int, List<(uint offsetAddr, byte[] resultBytes)>>();
+            IsFilterBox.Checked = Properties.Settings.Default.EnableFilterQuery.Value;
         }
 
         #region Event
@@ -51,7 +52,7 @@ namespace PS4CheaterNeo
         {
             try
             {
-                if (!PS4Tool.Connect((string)Properties.Settings.Default["IP"], out string msg)) throw new Exception(msg);
+                if (!PS4Tool.Connect(Properties.Settings.Default.PS4IP.Value, out string msg)) throw new Exception(msg);
 
                 int selectedIdx = 0;
                 ProcessesBox.Items.Clear();
@@ -404,11 +405,11 @@ namespace PS4CheaterNeo
 
         private void FilterRuleBtn_Click(object sender, EventArgs e)
         {
-            string sectionFilterKeys = (string)Properties.Settings.Default["SectionFilterKeys"];
+            string sectionFilterKeys = Properties.Settings.Default.SectionFilterKeys.Value;
 
             if (InputBox.Show("Section Filter", "Enter the value of the filter keys", ref sectionFilterKeys, null) != DialogResult.OK) return;
 
-            Properties.Settings.Default["SectionFilterKeys"] = sectionFilterKeys;
+            Properties.Settings.Default.SectionFilterKeys.Value = sectionFilterKeys;
         }
         #endregion
 
@@ -572,8 +573,8 @@ namespace PS4CheaterNeo
                 List<int> keys = new List<int>(sectionTool.SectionDict.Keys);
                 keys.Sort();
                 ScanWorker.ReportProgress(1);
-                int maxThreads = 3;
-                SemaphoreSlim semaphore = new SemaphoreSlim(maxThreads);
+                uint MaxQueryThreads = Properties.Settings.Default.MaxQueryThreads.Value == 0 ? 1 : Properties.Settings.Default.MaxQueryThreads.Value;
+                SemaphoreSlim semaphore = new SemaphoreSlim((int)MaxQueryThreads);
                 Task<(int, TimeSpan)>[] tasks = new Task<(int, TimeSpan)>[keys.Count];
                 for (int sectionIdx = 0; sectionIdx < keys.Count; sectionIdx++)
                 {
@@ -793,7 +794,8 @@ namespace PS4CheaterNeo
                 return;
             }
             if (e.Result == null) return;
-            
+
+            uint MaxResultShow = Properties.Settings.Default.MaxResultShow.Value == 0 ? 0x2000 : Properties.Settings.Default.MaxResultShow.Value;
             if (resultsDict.Count > 0)
             {
                 int count = 0;
@@ -811,7 +813,7 @@ namespace PS4CheaterNeo
                     Color backColor = default;
                     for (results.Begin(); !results.End(); results.Next())
                     {
-                        if (++count > 0x2000) break;
+                        if (++count > MaxResultShow) break;
 
                         (uint offsetAddr, byte[] oldBytes) = results.Read();
                         string typeStr, valueStr, valueHex;
@@ -851,7 +853,7 @@ namespace PS4CheaterNeo
                     Color backColor = default;
                     for (int resultIdx = 0; resultIdx < resultBytesList.Count; resultIdx++)
                     {
-                        if (++count > 0x2000) break;
+                        if (++count > MaxResultShow) break;
 
                         string valueStr, valueHex, typeStr;
                         ScanType scanType = comparerTool.scanType;
@@ -898,6 +900,8 @@ namespace PS4CheaterNeo
                 ResultView.Items.Clear();
                 ResultView.BeginUpdate();
             }));
+
+            uint MaxResultShow = Properties.Settings.Default.MaxResultShow.Value == 0 ? 0x2000 : Properties.Settings.Default.MaxResultShow.Value;
             List<int> keys = new List<int>(sectionTool.SectionDict.Keys);
             keys.Sort();
             for (int sectionIdx = 0; sectionIdx < keys.Count; sectionIdx++)
@@ -918,7 +922,7 @@ namespace PS4CheaterNeo
 
                     for (results.Begin(); !results.End(); results.Next())
                     {
-                        if (++hitCnt > 0x2000) continue;
+                        if (++hitCnt > MaxResultShow) continue;
 
                         (uint offsetAddr, _) = results.Read();
                         string typeStr, valueStr, valueHex;
@@ -950,7 +954,7 @@ namespace PS4CheaterNeo
                     if (resultBytesList.Count >= 50) buffer = PS4Tool.ReadMemory(section.PID, section.Start, section.Length);
                     for (int resultIdx = 0; resultIdx < resultBytesList.Count; resultIdx++)
                     {
-                        if (++hitCnt > 0x2000) continue;
+                        if (++hitCnt > MaxResultShow) continue;
 
                         string valueStr, valueHex;
                         (uint offsetAddr, byte[] resultBytes) = resultBytesList[resultIdx];

@@ -235,11 +235,11 @@ namespace PS4CheaterNeo
 
         private void FilterRuleBtn_Click(object sender, EventArgs e)
         {
-            string sectionFilterKeys = (string)Properties.Settings.Default["SectionFilterKeys"];
+            string sectionFilterKeys = Properties.Settings.Default.SectionFilterKeys.Value;
 
             if (InputBox.Show("Section Filter", "Enter the value of the filter keys", ref sectionFilterKeys, null) != DialogResult.OK) return;
 
-            Properties.Settings.Default["SectionFilterKeys"] = sectionFilterKeys;
+            Properties.Settings.Default.SectionFilterKeys.Value = sectionFilterKeys;
         }
         #endregion
 

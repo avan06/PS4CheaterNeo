@@ -44,6 +44,7 @@ namespace PS4CheaterNeo
             this.ResultViewAddToCheatGrid = new System.Windows.Forms.ToolStripMenuItem();
             this.ToolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.ResultViewHexEditor = new System.Windows.Forms.ToolStripMenuItem();
+            this.ResultViewCopyAddress = new System.Windows.Forms.ToolStripMenuItem();
             this.ResultViewDump = new System.Windows.Forms.ToolStripMenuItem();
             this.ToolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.ResultViewFindPointer = new System.Windows.Forms.ToolStripMenuItem();
@@ -88,7 +89,6 @@ namespace PS4CheaterNeo
             this.Panel1 = new System.Windows.Forms.Panel();
             this.ScanWorker = new System.ComponentModel.BackgroundWorker();
             this.RefreshWorker = new System.ComponentModel.BackgroundWorker();
-            this.ResultViewCopyAddress = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.SplitContainer1)).BeginInit();
             this.SplitContainer1.Panel1.SuspendLayout();
             this.SplitContainer1.Panel2.SuspendLayout();
@@ -203,44 +203,51 @@ namespace PS4CheaterNeo
             this.ToolStripSeparator2,
             this.ResultViewFindPointer});
             this.ResultViewMenu.Name = "ResultViewMenu";
-            this.ResultViewMenu.Size = new System.Drawing.Size(181, 148);
+            this.ResultViewMenu.Size = new System.Drawing.Size(177, 126);
             // 
             // ResultViewAddToCheatGrid
             // 
             this.ResultViewAddToCheatGrid.Name = "ResultViewAddToCheatGrid";
-            this.ResultViewAddToCheatGrid.Size = new System.Drawing.Size(180, 22);
+            this.ResultViewAddToCheatGrid.Size = new System.Drawing.Size(176, 22);
             this.ResultViewAddToCheatGrid.Text = "Add to Cheat Grid";
             this.ResultViewAddToCheatGrid.Click += new System.EventHandler(this.ResultViewAddToCheatGrid_Click);
             // 
             // ToolStripSeparator1
             // 
             this.ToolStripSeparator1.Name = "ToolStripSeparator1";
-            this.ToolStripSeparator1.Size = new System.Drawing.Size(177, 6);
+            this.ToolStripSeparator1.Size = new System.Drawing.Size(173, 6);
             // 
             // ResultViewHexEditor
             // 
             this.ResultViewHexEditor.Name = "ResultViewHexEditor";
-            this.ResultViewHexEditor.Size = new System.Drawing.Size(180, 22);
+            this.ResultViewHexEditor.Size = new System.Drawing.Size(176, 22);
             this.ResultViewHexEditor.Text = "Hex Editor";
             this.ResultViewHexEditor.Click += new System.EventHandler(this.ResultViewHexEditor_Click);
+            // 
+            // ResultViewCopyAddress
+            // 
+            this.ResultViewCopyAddress.Name = "ResultViewCopyAddress";
+            this.ResultViewCopyAddress.Size = new System.Drawing.Size(176, 22);
+            this.ResultViewCopyAddress.Text = "Copy Address";
+            this.ResultViewCopyAddress.Click += new System.EventHandler(this.ResultViewCopyAddress_Click);
             // 
             // ResultViewDump
             // 
             this.ResultViewDump.Enabled = false;
             this.ResultViewDump.Name = "ResultViewDump";
-            this.ResultViewDump.Size = new System.Drawing.Size(180, 22);
+            this.ResultViewDump.Size = new System.Drawing.Size(176, 22);
             this.ResultViewDump.Text = "Dump";
             this.ResultViewDump.Click += new System.EventHandler(this.ResultViewDump_Click);
             // 
             // ToolStripSeparator2
             // 
             this.ToolStripSeparator2.Name = "ToolStripSeparator2";
-            this.ToolStripSeparator2.Size = new System.Drawing.Size(177, 6);
+            this.ToolStripSeparator2.Size = new System.Drawing.Size(173, 6);
             // 
             // ResultViewFindPointer
             // 
             this.ResultViewFindPointer.Name = "ResultViewFindPointer";
-            this.ResultViewFindPointer.Size = new System.Drawing.Size(180, 22);
+            this.ResultViewFindPointer.Size = new System.Drawing.Size(176, 22);
             this.ResultViewFindPointer.Text = "Find Pointer";
             this.ResultViewFindPointer.Click += new System.EventHandler(this.ResultViewFindPointer_Click);
             // 
@@ -339,6 +346,7 @@ namespace PS4CheaterNeo
             | System.Windows.Forms.AnchorStyles.Right)));
             this.AddrMaxBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(36)))), ((int)(((byte)(36)))));
             this.AddrMaxBox.ForeColor = System.Drawing.Color.White;
+            this.AddrMaxBox.ImeMode = System.Windows.Forms.ImeMode.Off;
             this.AddrMaxBox.Location = new System.Drawing.Point(170, 3);
             this.AddrMaxBox.Name = "AddrMaxBox";
             this.AddrMaxBox.Size = new System.Drawing.Size(91, 22);
@@ -350,6 +358,7 @@ namespace PS4CheaterNeo
             | System.Windows.Forms.AnchorStyles.Right)));
             this.AddrMinBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(36)))), ((int)(((byte)(36)))));
             this.AddrMinBox.ForeColor = System.Drawing.Color.White;
+            this.AddrMinBox.ImeMode = System.Windows.Forms.ImeMode.Off;
             this.AddrMinBox.Location = new System.Drawing.Point(38, 3);
             this.AddrMinBox.Name = "AddrMinBox";
             this.AddrMinBox.Size = new System.Drawing.Size(91, 22);
@@ -583,6 +592,7 @@ namespace PS4CheaterNeo
             | System.Windows.Forms.AnchorStyles.Right)));
             this.ValueBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(36)))), ((int)(((byte)(36)))));
             this.ValueBox.ForeColor = System.Drawing.Color.White;
+            this.ValueBox.ImeMode = System.Windows.Forms.ImeMode.Off;
             this.ValueBox.Location = new System.Drawing.Point(52, 15);
             this.ValueBox.Name = "ValueBox";
             this.ValueBox.Size = new System.Drawing.Size(88, 22);
@@ -604,6 +614,7 @@ namespace PS4CheaterNeo
             | System.Windows.Forms.AnchorStyles.Right)));
             this.Value1Box.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(36)))), ((int)(((byte)(36)))));
             this.Value1Box.ForeColor = System.Drawing.Color.White;
+            this.Value1Box.ImeMode = System.Windows.Forms.ImeMode.Off;
             this.Value1Box.Location = new System.Drawing.Point(167, 15);
             this.Value1Box.Name = "Value1Box";
             this.Value1Box.Size = new System.Drawing.Size(90, 22);
@@ -721,13 +732,6 @@ namespace PS4CheaterNeo
             this.RefreshWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.RefreshWorker_DoWork);
             this.RefreshWorker.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.RefreshWorker_ProgressChanged);
             this.RefreshWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.RefreshWorker_RunWorkerCompleted);
-            // 
-            // ResultViewCopyAddress
-            // 
-            this.ResultViewCopyAddress.Name = "ResultViewCopyAddress";
-            this.ResultViewCopyAddress.Size = new System.Drawing.Size(180, 22);
-            this.ResultViewCopyAddress.Text = "Copy Address";
-            this.ResultViewCopyAddress.Click += new System.EventHandler(this.ResultViewCopyAddress_Click);
             // 
             // Query
             // 

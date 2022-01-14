@@ -58,6 +58,9 @@
     <Reference Include="libdebug">
       <HintPath>lib\libdebug.dll</HintPath>
     </Reference>
+    <Reference Include="OptionTabView">
+      <HintPath>lib\OptionTabView.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
@@ -95,6 +98,12 @@
     <Compile Include="NewAddress.Designer.cs">
       <DependentUpon>NewAddress.cs</DependentUpon>
     </Compile>
+    <Compile Include="Option.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Option.Designer.cs">
+      <DependentUpon>Option.cs</DependentUpon>
+    </Compile>
     <Compile Include="PointerFinder.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -126,6 +135,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="NewAddress.resx">
       <DependentUpon>NewAddress.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Option.resx">
+      <DependentUpon>Option.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="PointerFinder.resx">
       <DependentUpon>PointerFinder.cs</DependentUpon>

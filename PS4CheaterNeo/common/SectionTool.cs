@@ -148,7 +148,7 @@ namespace PS4CheaterNeo
         public bool SectionIsFilter(string name)
         {
             bool result = false;
-            string sectionFilterKeys = (string)Properties.Settings.Default["SectionFilterKeys"];
+            string sectionFilterKeys = Properties.Settings.Default.SectionFilterKeys.Value;
             sectionFilterKeys = Regex.Replace(sectionFilterKeys, " *[,;] *", "|");
 
             if (Regex.IsMatch(name, sectionFilterKeys)) result = true;

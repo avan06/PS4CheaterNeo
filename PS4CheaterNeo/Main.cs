@@ -13,12 +13,13 @@ namespace PS4CheaterNeo
 {
     public partial class Main : Form
     {
+        private Option option;
         private SendPayload sendPayload;
         public SectionTool sectionTool { get; private set; }
         public string ProcessName;
         public Main()
         {
-            if ((Properties.Settings.Default.IP ?? "") == "") Properties.Settings.Default.Upgrade(); //Need to get the settings again when the AssemblyVersion is changed
+            if ((Properties.Settings.Default.PS4IP.Value ?? "") == "") Properties.Settings.Default.Upgrade(); //Need to get the settings again when the AssemblyVersion is changed
             InitializeComponent();
             Text += " " + Application.ProductVersion; //Assembly.GetExecutingAssembly().GetName().Version.ToString(); // Assembly.GetEntryAssembly().GetName().Version.ToString();
             sectionTool = new SectionTool();
@@ -28,9 +29,10 @@ namespace PS4CheaterNeo
         {
             ProcessName = "";
             bool isConnected = false;
-            if (Properties.Settings.Default["PS4Version"] is string version && !string.IsNullOrWhiteSpace(version) &&
-                Properties.Settings.Default["IP"] is string ip && !string.IsNullOrWhiteSpace(ip) &&
-                Properties.Settings.Default["Port"] is int port && port != 0)
+            if (Properties.Settings.Default.PS4FWVersion.Value is string )
+            if (Properties.Settings.Default.PS4FWVersion.Value is string version && !string.IsNullOrWhiteSpace(version) &&
+                Properties.Settings.Default.PS4IP.Value is string ip && !string.IsNullOrWhiteSpace(ip) &&
+                Properties.Settings.Default.PS4Port.Value is uint port && port != 0)
             {
                 try {isConnected = PS4Tool.Connect(ip, out string msg, 1000);}
                 catch (Exception){}
@@ -76,7 +78,7 @@ namespace PS4CheaterNeo
                 string cheatGameVer = cheatHeaderItems[3];
                 string cheatFWVer = cheatHeaderItems[4];
                 string FMVer = Constant.Versions[0];
-                if (Properties.Settings.Default["PS4Version"] is string version && !string.IsNullOrWhiteSpace(version)) FMVer = version;
+                if (Properties.Settings.Default.PS4FWVersion.Value is string version && !string.IsNullOrWhiteSpace(version)) FMVer = version;
 
                 ScanTool.GameInfo(FMVer, out string gameID, out string gameVer);
 
@@ -169,7 +171,7 @@ namespace PS4CheaterNeo
             if (!InitSectionList(ProcessName)) return;
 
             string FMVer = Constant.Versions[0];
-            if (Properties.Settings.Default["PS4Version"] is string version && !string.IsNullOrWhiteSpace(version)) FMVer = version;
+            if (Properties.Settings.Default.PS4FWVersion.Value is string version && !string.IsNullOrWhiteSpace(version)) FMVer = version;
             ScanTool.GameInfo(FMVer, out string gameID, out string gameVer);
             string processName = ProcessName;
             string saveBuf = $"{Application.ProductVersion}|{processName}|{gameID}|{gameVer}|{FMVer}\n";
@@ -251,6 +253,13 @@ namespace PS4CheaterNeo
             CheatGridView.CollapseExpandAll(true);
         }
 
+        private void ToolStripSettings_Click(object sender, EventArgs e)
+        {
+            if (option == null || option.IsDisposed) option = new Option();
+            option.StartPosition = FormStartPosition.CenterParent;
+            option.Show();
+        }
+
         Task<bool> refreshCheatTask;
         private void ToolStripRefreshCheat_Click(object sender, EventArgs e)
         {
@@ -304,7 +313,7 @@ namespace PS4CheaterNeo
                 }
                 return true;
             });
-            }
+        }
 
         private (Section section, ulong offsetAddr, string hexAddr) RefreshSection(string[] sectionArr, ulong offsetAddr, bool isPointer, (int sid, string name, uint prot, ulong offsetAddr) preData, in Dictionary<ulong, ulong> pointerMemoryCaches)
         {

@@ -165,21 +165,21 @@
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
         YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAD3SURBVDhPY4CBb9++/UfG79+/F4BKEQdAmiy6TMCYJAOQ
-        bUU2AIYJGoSsER1TxYAvX74s+/Tp08MXL178BvGB+ClI7OvXr2ZwA2AYWSMIP3j75X/l0df/c/a//N92
-        8hUYg9ggsUv3n/39/v17MgPIiSCMzYD43c//P3vz8f+H96gYJAaSA6p5B3YFCMA0IWOXDU9xGgCSA6mB
+        bUU2AIYJGoSsER1TxYAvX74s+/Tp08Pnz5//BvGB+ClI7OvXr2ZwA2AYWSMIP3j75X/l0df/c/a//N92
+        8hUYg9ggsYv3nv79/v17MgPIiSCMzYD43c//P3vz8f+H96gYJAaSA6p5B3YFCMA0IWOXDU9xGgCSA6mB
         ameAuwTZRdILH4Fx8LZn/5uOvwJjEBsmjmIAOkA2ABceAQa8s1z7FKtGEAbJgdRAlWMCUCIBJRZQorFY
-        8/S//OJHYAxioyQkfACUXEHJFmjT069A54IwiI1IygwMAN/lFUo4r8iXAAAAAElFTkSuQmCC
+        8/S//OJHYAxioyQkfACUXEHJFmjT069A54IwiI1IygwMAM2IFT5+lOKHAAAAAElFTkSuQmCC
 </value>
   </data>
   <data name="ToolStripHexView.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
-        YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAERSURBVDhPpVI7CsJAFMw9bGztPENOYJlUWqTVWi+QVnID
-        BbEVBDvBE4hgYWPlLyxYbCIxKZ87SzZk40ZBH0w2+97M7NuP9SmyLOulaboToAp2qOU0cwjSeBs+qLtm
-        1JieqbMKJfCPHGrg5PT3YPGTWvMLTfZ3inisATnU0E1Ofw8YYLU6A9QKA7GfppgskCgDJIXyFhTAUWIe
-        BAHZtl0A89mBa4IqpIH4LEAeDkd0u4ayRYyD/kCaqEM0QRnIFZVYAXPkl8fIKAY0g7JYwXEc2pxioxj4
-        q4PiGsWn9gw8zzMaaA+p7hZc15Wj7/typQr0p2x6B4wxjg7KJkmStHPJ9wDZYMJ/NvnJAAEBhGaxZb0A
-        +VdUdQ6ZSKkAAAAASUVORK5CYII=
+        YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAERSURBVDhPpVI7DoJAFOQeNrZ2noETWEKlBa3WegFaww00
+        MbYmJnYmnsCQWNhY+QMTixWDUD53NixhYdFEXzIs+97M7NuP8SnSNO0lSeJzUAk+ahlNH5w03gZP6q5v
+        1JieqLMKBPCPHGrgZPRq3KIXteZnmuzu9GCRAuRQQzcZvRowwGp1BqjlBnw/TT5ZIFEESBLFLUiAI8XM
+        8zwyTTMH5rM9UwRlCAP+WYA8HI7oeglEixgH/YEwkYeogzQQK0qxBObILw8PrRhQDIpiCcuyaHOMtGLg
+        rw7ya+Sf2jNwHEdroDykuluwbVuMruuKlUpQn7LuHYRhyNBB0SSO43Ym+R4ga0zYzyY/GSAggFAvNow3
+        84pUbOk0L8sAAAAASUVORK5CYII=
 </value>
   </data>
   <data name="ToolStripRefreshCheat.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">

@@ -27,9 +27,7 @@ namespace PS4CheaterNeo
         public Section AddrSection { get; private set; }
         public Section BaseSection { get; private set; }
         public NewAddress(Main mainForm, Section section, ulong address, ScanType scanType, ulong value, bool cheatLock, string cheatDesc, bool isEdit) : 
-            this(mainForm, section, null, address, scanType, value, cheatLock, cheatDesc, null, isEdit)
-        {
-        }
+            this(mainForm, section, null, address, scanType, value, cheatLock, cheatDesc, null, isEdit) { }
         public NewAddress(Main mainForm, Section addrSection, Section baseSection, ulong address, ScanType scanType, ulong value, bool cheatLock, string cheatDesc, List<long> offsetList, bool isEdit)
         {
             InitializeComponent();
@@ -85,6 +83,7 @@ namespace PS4CheaterNeo
             }
             if (isEdit)
             {
+                this.Text = "EditAddress";
                 AddressBox.ReadOnly = true;
                 if (!IsPointer) PointerBox.Enabled = false;
             }

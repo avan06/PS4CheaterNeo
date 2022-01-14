@@ -47,6 +47,7 @@ namespace PS4CheaterNeo
             this.CheatGridMenuActive = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
             this.CheatGridMenuEdit = new System.Windows.Forms.ToolStripMenuItem();
+            this.CheatGridMenuCopyAddress = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
             this.CheatGridMenuFindPointer = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator8 = new System.Windows.Forms.ToolStripSeparator();
@@ -85,7 +86,6 @@ namespace PS4CheaterNeo
             this.RefreshLock = new System.Windows.Forms.Timer(this.components);
             this.OpenCheatDialog = new System.Windows.Forms.OpenFileDialog();
             this.SaveCheatDialog = new System.Windows.Forms.SaveFileDialog();
-            this.CheatGridMenuCopyAddress = new System.Windows.Forms.ToolStripMenuItem();
             this.CheatGridMenu.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
@@ -109,74 +109,81 @@ namespace PS4CheaterNeo
             this.toolStripSeparator8,
             this.CheatGridMenuDelete});
             this.CheatGridMenu.Name = "CheatGridMenu";
-            this.CheatGridMenu.Size = new System.Drawing.Size(181, 226);
+            this.CheatGridMenu.Size = new System.Drawing.Size(153, 204);
             // 
             // CheatGridMenuHexEditor
             // 
             this.CheatGridMenuHexEditor.Name = "CheatGridMenuHexEditor";
-            this.CheatGridMenuHexEditor.Size = new System.Drawing.Size(180, 22);
+            this.CheatGridMenuHexEditor.Size = new System.Drawing.Size(152, 22);
             this.CheatGridMenuHexEditor.Text = "Hex Editor";
             this.CheatGridMenuHexEditor.Click += new System.EventHandler(this.CheatGridMenuHexEditor_Click);
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(177, 6);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(149, 6);
             // 
             // CheatGridMenuLock
             // 
             this.CheatGridMenuLock.Name = "CheatGridMenuLock";
-            this.CheatGridMenuLock.Size = new System.Drawing.Size(180, 22);
+            this.CheatGridMenuLock.Size = new System.Drawing.Size(152, 22);
             this.CheatGridMenuLock.Text = "Lock";
             this.CheatGridMenuLock.Click += new System.EventHandler(this.CheatGridMenuLock_Click);
             // 
             // CheatGridMenuUnlock
             // 
             this.CheatGridMenuUnlock.Name = "CheatGridMenuUnlock";
-            this.CheatGridMenuUnlock.Size = new System.Drawing.Size(180, 22);
+            this.CheatGridMenuUnlock.Size = new System.Drawing.Size(152, 22);
             this.CheatGridMenuUnlock.Text = "Unlock";
             this.CheatGridMenuUnlock.Click += new System.EventHandler(this.CheatGridMenuUnlock_Click);
             // 
             // CheatGridMenuActive
             // 
             this.CheatGridMenuActive.Name = "CheatGridMenuActive";
-            this.CheatGridMenuActive.Size = new System.Drawing.Size(180, 22);
+            this.CheatGridMenuActive.Size = new System.Drawing.Size(152, 22);
             this.CheatGridMenuActive.Text = "Active";
             this.CheatGridMenuActive.Click += new System.EventHandler(this.CheatGridMenuActive_Click);
             // 
             // toolStripSeparator6
             // 
             this.toolStripSeparator6.Name = "toolStripSeparator6";
-            this.toolStripSeparator6.Size = new System.Drawing.Size(177, 6);
+            this.toolStripSeparator6.Size = new System.Drawing.Size(149, 6);
             // 
             // CheatGridMenuEdit
             // 
             this.CheatGridMenuEdit.Name = "CheatGridMenuEdit";
-            this.CheatGridMenuEdit.Size = new System.Drawing.Size(180, 22);
+            this.CheatGridMenuEdit.Size = new System.Drawing.Size(152, 22);
             this.CheatGridMenuEdit.Text = "Edit";
             this.CheatGridMenuEdit.Click += new System.EventHandler(this.CheatGridMenuEdit_Click);
+            // 
+            // CheatGridMenuCopyAddress
+            // 
+            this.CheatGridMenuCopyAddress.Name = "CheatGridMenuCopyAddress";
+            this.CheatGridMenuCopyAddress.Size = new System.Drawing.Size(152, 22);
+            this.CheatGridMenuCopyAddress.Text = "Copy Address";
+            this.CheatGridMenuCopyAddress.Click += new System.EventHandler(this.CheatGridMenuCopyAddress_Click);
             // 
             // toolStripSeparator7
             // 
             this.toolStripSeparator7.Name = "toolStripSeparator7";
-            this.toolStripSeparator7.Size = new System.Drawing.Size(177, 6);
+            this.toolStripSeparator7.Size = new System.Drawing.Size(149, 6);
             // 
             // CheatGridMenuFindPointer
             // 
             this.CheatGridMenuFindPointer.Name = "CheatGridMenuFindPointer";
-            this.CheatGridMenuFindPointer.Size = new System.Drawing.Size(180, 22);
+            this.CheatGridMenuFindPointer.Size = new System.Drawing.Size(152, 22);
             this.CheatGridMenuFindPointer.Text = "Find Pointer";
             this.CheatGridMenuFindPointer.Click += new System.EventHandler(this.CheatGridMenuFindPointer_Click);
             // 
             // toolStripSeparator8
             // 
             this.toolStripSeparator8.Name = "toolStripSeparator8";
-            this.toolStripSeparator8.Size = new System.Drawing.Size(177, 6);
+            this.toolStripSeparator8.Size = new System.Drawing.Size(149, 6);
             // 
             // CheatGridMenuDelete
             // 
             this.CheatGridMenuDelete.Name = "CheatGridMenuDelete";
-            this.CheatGridMenuDelete.Size = new System.Drawing.Size(180, 22);
+            this.CheatGridMenuDelete.Size = new System.Drawing.Size(152, 22);
             this.CheatGridMenuDelete.Text = "Delete";
             this.CheatGridMenuDelete.Click += new System.EventHandler(this.CheatGridMenuDelete_Click);
             // 
@@ -366,7 +373,7 @@ namespace PS4CheaterNeo
             this.ToolStripSettings.Size = new System.Drawing.Size(23, 22);
             this.ToolStripSettings.Text = "ToolStripSettings";
             this.ToolStripSettings.ToolTipText = "ToolStripSettings";
-            this.ToolStripSettings.Visible = false;
+            this.ToolStripSettings.Click += new System.EventHandler(this.ToolStripSettings_Click);
             // 
             // statusStrip1
             // 
@@ -539,13 +546,6 @@ namespace PS4CheaterNeo
             this.RefreshLock.Enabled = true;
             this.RefreshLock.Interval = 300;
             this.RefreshLock.Tick += new System.EventHandler(this.RefreshLock_Tick);
-            // 
-            // CheatGridMenuCopyAddress
-            // 
-            this.CheatGridMenuCopyAddress.Name = "CheatGridMenuCopyAddress";
-            this.CheatGridMenuCopyAddress.Size = new System.Drawing.Size(180, 22);
-            this.CheatGridMenuCopyAddress.Text = "Copy Address";
-            this.CheatGridMenuCopyAddress.Click += new System.EventHandler(this.CheatGridMenuCopyAddress_Click);
             // 
             // Main
             // 
