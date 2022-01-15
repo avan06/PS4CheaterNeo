@@ -296,8 +296,8 @@ namespace PS4CheaterNeo
             this.ToolStripHexView.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.ToolStripHexView.Name = "ToolStripHexView";
             this.ToolStripHexView.Size = new System.Drawing.Size(23, 22);
-            this.ToolStripHexView.Text = "ToolStripHexView";
-            this.ToolStripHexView.ToolTipText = "ToolStripHexView";
+            this.ToolStripHexView.Text = "HexView";
+            this.ToolStripHexView.ToolTipText = "HexView";
             this.ToolStripHexView.Click += new System.EventHandler(this.ToolStripHexView_Click);
             // 
             // ToolStripRefreshCheat
@@ -355,7 +355,7 @@ namespace PS4CheaterNeo
             this.ToolStripLockEnable.Name = "ToolStripLockEnable";
             this.ToolStripLockEnable.Size = new System.Drawing.Size(92, 22);
             this.ToolStripLockEnable.Text = "LockEnable";
-            this.ToolStripLockEnable.ToolTipText = "LockEnable";
+            this.ToolStripLockEnable.ToolTipText = "Whether to enable cheat lock";
             this.ToolStripLockEnable.CheckedChanged += new System.EventHandler(this.ToolStripLockEnable_CheckedChanged);
             this.ToolStripLockEnable.Click += new System.EventHandler(this.ToolStripLockEnable_Click);
             // 
@@ -371,8 +371,8 @@ namespace PS4CheaterNeo
             this.ToolStripSettings.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.ToolStripSettings.Name = "ToolStripSettings";
             this.ToolStripSettings.Size = new System.Drawing.Size(23, 22);
-            this.ToolStripSettings.Text = "ToolStripSettings";
-            this.ToolStripSettings.ToolTipText = "ToolStripSettings";
+            this.ToolStripSettings.Text = "Settings";
+            this.ToolStripSettings.ToolTipText = "Settings";
             this.ToolStripSettings.Click += new System.EventHandler(this.ToolStripSettings_Click);
             // 
             // statusStrip1

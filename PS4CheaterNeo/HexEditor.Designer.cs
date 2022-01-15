@@ -83,7 +83,7 @@ namespace PS4CheaterNeo
             this.HexView.ChangedFinishForeColor = System.Drawing.Color.LimeGreen;
             this.HexView.ColumnInfoVisible = true;
             this.HexView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.HexView.EnableAutoChangedPosSetFinish = true;
+            this.HexView.EnableAutoChangedPosSetFinish = false;
             this.HexView.EnableCut = false;
             this.HexView.EnableDelete = false;
             this.HexView.EnableOverwritePaste = true;

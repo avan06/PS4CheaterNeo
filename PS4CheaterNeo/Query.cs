@@ -18,7 +18,7 @@ namespace PS4CheaterNeo
         readonly SectionTool sectionTool;
         ComparerTool comparerTool;
         Dictionary<int, ResultList> resultsDict;
-        Dictionary<int, List<(uint offsetAddr, byte[] resultBytes)>> resultBytesListDict; //for ScanType:Hex、String、Group
+        Dictionary<int, List<(uint offsetAddr, byte[] resultBytes)>> resultBytesListDict; //for ScanType:Group
         public Query(Main mainForm)
         {
             InitializeComponent();
@@ -35,7 +35,7 @@ namespace PS4CheaterNeo
             foreach (ScanType filterEnum in (ScanType[])Enum.GetValues(typeof(ScanType)))
                 ScanTypeBox.Items.Add(new ComboboxItem(filterEnum.GetDescription(), filterEnum));
             ScanTypeBox.SelectedIndex = 2;
-            GetProcessesBtn.PerformClick();
+            if (Properties.Settings.Default.AutoPerformGetProcesses.Value) GetProcessesBtn.PerformClick();
         }
 
         private void Query_FormClosing(object sender, FormClosingEventArgs e)
@@ -60,7 +60,7 @@ namespace PS4CheaterNeo
                 foreach (Process process in procList.processes)
                 {
                     int idx = this.ProcessesBox.Items.Add(new ComboboxItem(process.name, process.pid));
-                    if (process.name == Constant.DefaultProcess) selectedIdx = idx;
+                    if (process.name == Properties.Settings.Default.DefaultProcess.Value) selectedIdx = idx;
                 }
                 ProcessesBox.SelectedIndex = selectedIdx;
             }
@@ -69,10 +69,7 @@ namespace PS4CheaterNeo
                 MessageBox.Show(exception.Message + "\n" + exception.StackTrace, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
-        public int CompareSection(Section s1, Section s2)
-        {
-            return s1.Start.CompareTo(s2.Start);
-        }
+        public int CompareSection(Section s1, Section s2) => s1.Start.CompareTo(s2.Start);
 
         private void ProcessesBox_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -389,18 +386,12 @@ namespace PS4CheaterNeo
 
             int startIndex = 0;
             ListView.SelectedListViewItemCollection items = SectionView.SelectedItems;
-            if (items.Count == 0) return;
-
-            if (items.Count > 0 && items[items.Count - 1].Index + 1 < SectionView.Items.Count)
-            {
-                startIndex = items[items.Count - 1].Index + 1;
-            }
+            if (items.Count > 0 && items[items.Count - 1].Index + 1 < SectionView.Items.Count) startIndex = items[items.Count - 1].Index + 1;
             ListViewItem item = SectionView.FindItemWithText(searchSectionName, true, startIndex);
-            if (item != null)
-            {
-                SectionView.Items[item.Index].Selected = true;
-                SectionView.Items[item.Index].EnsureVisible();
-            }
+            if (item == null) return;
+
+            SectionView.Items[item.Index].Selected = true;
+            SectionView.Items[item.Index].EnsureVisible();
         }
 
         private void FilterRuleBtn_Click(object sender, EventArgs e)
@@ -481,11 +472,9 @@ namespace PS4CheaterNeo
 
         private void ResultViewHexEditor_Click(object sender, EventArgs e)
         {
-            if (ResultView.SelectedItems == null) return;
-            if (ResultView.SelectedItems.Count != 1) return;
+            if (ResultView.SelectedItems == null || ResultView.SelectedItems.Count != 1) return;
 
             ListView.SelectedListViewItemCollection items = ResultView.SelectedItems;
-
             var resultItem = items[0];
             (int sid, int resultIdx) = ((int sid, int resultIdx))resultItem.Tag;
             Section section = sectionTool.GetSection(sid);
@@ -524,35 +513,24 @@ namespace PS4CheaterNeo
         {
             //if (ResultView.SelectedItems.Count == 1)
             //{
-            //    ulong address = ulong.Parse(ResultView.SelectedItems[0].
-            //        SubItems[(int)ResultCol.ResultListAddress].Text, NumberStyles.HexNumber);
-
+            //    ulong address = ulong.Parse(ResultView.SelectedItems[0].SubItems[(int)ResultCol.ResultListAddress].Text, NumberStyles.HexNumber);
             //    int sectionID = processManager.MappedSectionList.GetMappedSectionID(address);
-
             //    dump_dialog(sectionID);
             //}
         }
 
         private void ResultViewFindPointer_Click(object sender, EventArgs e)
         {
-            if (ResultView.SelectedItems == null)
-                return;
-
-            if (ResultView.SelectedItems.Count != 1)
-                return;
+            if (ResultView.SelectedItems == null || ResultView.SelectedItems.Count != 1) return;
 
             try
             {
                 ulong address = ulong.Parse(ResultView.SelectedItems[0].SubItems[(int)ResultCol.ResultListAddress].Text, NumberStyles.HexNumber);
                 ScanType scanType = this.ParseFromDescription<ScanType>(ResultView.SelectedItems[0].SubItems[(int)ResultCol.ResultListType].Text);
-
                 PointerFinder pointerFinder = new PointerFinder(mainForm, address, scanType);
                 pointerFinder.Show();
             }
-            catch
-            {
-
-            }
+            catch { }
         }
         #endregion
 
@@ -583,9 +561,13 @@ namespace PS4CheaterNeo
                     Section section = sectionTool.SectionDict[keys[sectionIdx]];
                     tasks[sectionIdx] = Task.Run<(int, TimeSpan)>(() =>
                     {
-                        if (ScanWorker.CancellationPending) return (section.SID, tickerMajor.Elapsed);
                         if ((isFilter && section.IsFilter) || !section.Check || section.Start + (ulong)section.Length < AddrMin || section.Start > AddrMax) return (section.SID, tickerMajor.Elapsed);
                         semaphore.Wait();
+                        if (ScanWorker.CancellationPending)
+                        {
+                            semaphore.Release();
+                            return (section.SID, tickerMajor.Elapsed);
+                        }
 
                         ResultList results = null;
                         List<(uint offsetAddr, byte[] resultBytes)> resultBytesList = null;
@@ -647,8 +629,8 @@ namespace PS4CheaterNeo
                 byte[] buffer = PS4Tool.ReadMemory(section.PID, section.Start, section.Length);
                 for (int scanIdx = 0; scanIdx + comparerTool.scanTypeLength < buffer.LongLength; scanIdx += step)
                 {
-                    if (ScanWorker.CancellationPending) break;
                     if (section.Start + (ulong)scanIdx < AddrMin || section.Start + (ulong)scanIdx > AddrMax) continue;
+                    if (ScanWorker.CancellationPending) break;
 
                     int tmpIdx = scanIdx;
                     for (int gIdx = 0; gIdx < comparerTool.groupTypes.Count; gIdx++)
@@ -731,9 +713,9 @@ namespace PS4CheaterNeo
                 byte[] buffer = PS4Tool.ReadMemory(section.PID, section.Start, section.Length);
                 for (int scanIdx = 0; scanIdx + comparerTool.scanTypeLength < buffer.LongLength; scanIdx += scanStep)
                 {
-                    if (ScanWorker.CancellationPending) break;
                     if (section.Start + (ulong)scanIdx < AddrMin || section.Start + (ulong)scanIdx > AddrMax) continue;
-                    
+                    if (ScanWorker.CancellationPending) break;
+
                     byte[] newValue = new byte[comparerTool.scanTypeLength];
                     Buffer.BlockCopy(buffer, scanIdx, newValue, 0, comparerTool.scanTypeLength);
                     if (comparerTool.value0Byte == null)
@@ -1005,10 +987,7 @@ namespace PS4CheaterNeo
             ToolStripMsg.Text = string.Format("Refresh elapsed:{0}s. {1}", tickerMajor.TotalSeconds, msg);
         }
 
-        private void RefreshWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-
-        }
+        private void RefreshWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) { }
         #endregion
     }
 }

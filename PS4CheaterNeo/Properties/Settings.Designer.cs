@@ -25,19 +25,7 @@ namespace PS4CheaterNeo.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("|General|SendPayload")]
-        public global::OptionTabView.Option<string> PS4FWVersion {
-            get {
-                return ((global::OptionTabView.Option<string>)(this["PS4FWVersion"]));
-            }
-            set {
-                this["PS4FWVersion"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("|General|Connect")]
+        [global::System.Configuration.DefaultSettingValueAttribute("|1_General|1_Connect|Enter PS4 IP location")]
         public global::OptionTabView.Option<string> PS4IP {
             get {
                 return ((global::OptionTabView.Option<string>)(this["PS4IP"]));
@@ -49,7 +37,7 @@ namespace PS4CheaterNeo.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("9021|General|Connect")]
+        [global::System.Configuration.DefaultSettingValueAttribute("9021|1_General|1_Connect|Enter PS4 Port")]
         public global::OptionTabView.Option<uint> PS4Port {
             get {
                 return ((global::OptionTabView.Option<uint>)(this["PS4Port"]));
@@ -61,32 +49,47 @@ namespace PS4CheaterNeo.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("libSce,libc.prx,SceShell,SceLib,SceNp,SceVoice,SceFios,libkernel,SceVdec|General|" +
-            "Filter")]
-        public global::OptionTabView.Option<string> SectionFilterKeys {
+        [global::System.Configuration.DefaultSettingValueAttribute("|1_General|1_SendPayload|Enter PS4 FW Version (Confirm the fw version only when p" +
+            "erform sendpayload)")]
+        public global::OptionTabView.Option<string> PS4FWVersion {
             get {
-                return ((global::OptionTabView.Option<string>)(this["SectionFilterKeys"]));
+                return ((global::OptionTabView.Option<string>)(this["PS4FWVersion"]));
             }
             set {
-                this["SectionFilterKeys"] = value;
+                this["PS4FWVersion"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0x2000|Query|Result")]
-        public global::OptionTabView.Option<uint> MaxResultShow {
+        [global::System.Configuration.DefaultSettingValueAttribute("True|2_Cheat|2_Cheat|Determine whether to enable verifying Section values when re" +
+            "freshing the cheat list. Default enabled")]
+        public global::OptionTabView.Option<bool> VerifySectionWhenRefresh {
             get {
-                return ((global::OptionTabView.Option<uint>)(this["MaxResultShow"]));
+                return ((global::OptionTabView.Option<bool>)(this["VerifySectionWhenRefresh"]));
             }
             set {
-                this["MaxResultShow"] = value;
+                this["VerifySectionWhenRefresh"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("3|Query|Query")]
+        [global::System.Configuration.DefaultSettingValueAttribute("True|2_Cheat|2_Cheat|Determine whether to enable verifying Section values when lo" +
+            "cking cheat items. Default enabled")]
+        public global::OptionTabView.Option<bool> VerifySectionWhenLock {
+            get {
+                return ((global::OptionTabView.Option<bool>)(this["VerifySectionWhenLock"]));
+            }
+            set {
+                this["VerifySectionWhenLock"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("3|3_Query|1_Query|Enter the number of threads to use when querying. Default is 3 " +
+            "threads")]
         public global::OptionTabView.Option<uint> MaxQueryThreads {
             get {
                 return ((global::OptionTabView.Option<uint>)(this["MaxQueryThreads"]));
@@ -98,13 +101,68 @@ namespace PS4CheaterNeo.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True|General|Filter")]
+        [global::System.Configuration.DefaultSettingValueAttribute("True|3_Query|1_Query|Determine whether to enable automatic perform get processes " +
+            "when opening the Query window. Default enabled")]
+        public global::OptionTabView.Option<bool> AutoPerformGetProcesses {
+            get {
+                return ((global::OptionTabView.Option<bool>)(this["AutoPerformGetProcesses"]));
+            }
+            set {
+                this["AutoPerformGetProcesses"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("eboot.bin|3_Query|1_Query|Set the default selected program when perform get proce" +
+            "sses. Default is eboot.bin")]
+        public global::OptionTabView.Option<string> DefaultProcess {
+            get {
+                return ((global::OptionTabView.Option<string>)(this["DefaultProcess"]));
+            }
+            set {
+                this["DefaultProcess"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True|3_Query|2_Filter|Determine whether to enable filtering when opening the quer" +
+            "y window. Default enabled")]
         public global::OptionTabView.Option<bool> EnableFilterQuery {
             get {
                 return ((global::OptionTabView.Option<bool>)(this["EnableFilterQuery"]));
             }
             set {
                 this["EnableFilterQuery"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("libSce,libc.prx,SceShell,SceLib,SceNp,SceVoice,SceFios,libkernel,SceVdec|3_Query|" +
+            "2_Filter|Enter the filter value, the filter will be set here when listing Sectio" +
+            "ns")]
+        public global::OptionTabView.Option<string> SectionFilterKeys {
+            get {
+                return ((global::OptionTabView.Option<string>)(this["SectionFilterKeys"]));
+            }
+            set {
+                this["SectionFilterKeys"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0x2000|3_Query|3_Result|Enter the maximum number of displayed query results. will" +
+            " only affect the number of results displayed in the ResultView. Default value is" +
+            " 8192")]
+        public global::OptionTabView.Option<uint> MaxResultShow {
+            get {
+                return ((global::OptionTabView.Option<uint>)(this["MaxResultShow"]));
+            }
+            set {
+                this["MaxResultShow"] = value;
             }
         }
     }

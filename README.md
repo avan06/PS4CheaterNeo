@@ -2,7 +2,7 @@
 
 PS4CheaterNeo is a program to find game cheat codes, and it is based on [`ps4debug`](https://github.com/jogolden/ps4debug) and `.Net Framework 4.8`.
 
-Currently in `version 0.9.4.0-beta`
+Currently in `version 0.9.4.1-beta`
 
 ## Table of Contents
 - [Building](#building)
@@ -137,13 +137,25 @@ Currently in `version 0.9.4.0-beta`
 
 - Added option window, you can adjust some program settings.
 
-- PS4IP: Enter PS4 IP location.
-- PS4Port: Enter PS4 Port.
-- PS4FWVersion: Enter PS4 FW Version (Confirm the fw version only when perform sendpayload).
-- SectionFilterKeys: Enter the filter value, the filter will be set here when listing Sections.
-- MaxResultShow: Enter the maximum number of displayed query results. will only affect the number of results displayed in the ResultView. Default value is 8192.
-- MaxQueryThreads: Enter the number of threads to use when querying. Default is 3 threads.
-- EnableFilterQuery: Enable filtering when opening the query window. Default enabled.
+- General
+
+> `PS4IP`: Enter PS4 IP location.  
+> `PS4Port`: Enter PS4 Port.  
+> `PS4FWVersion`: Enter PS4 FW Version (Confirm the fw version only when perform sendpayload).  
+
+- Cheat
+
+> `VerifySectionWhenRefresh`: Determine whether to enable verifying Section values when refreshing the cheat list. Default enabled.  
+> `VerifySectionWhenLock`: Determine whether to enable automatic perform get processes when opening the Query window. Default enabled.  
+
+- Query
+
+> `MaxQueryThreads`: Enter the number of threads to use when querying. Default is 3 threads.  
+> `AutoPerformGetProcesses`: Determine whether to enable automatic perform get processes when opening the Query window. Default enabled.  
+> `DefaultProcess`: Set the default selected program when perform get processes. Default is eboot.bin.  
+> `EnableFilterQuery`: Determine whether to enable filtering when opening the query window. Default enabled.  
+> `SectionFilterKeys`: Enter the filter value, the filter will be set here when listing Sections.  
+> `MaxResultShow`: Enter the maximum number of displayed query results. will only affect the number of results displayed in the ResultView. Default value is 8192.  
 
 ![option](assets/option.webp)
 

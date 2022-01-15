@@ -44,9 +44,18 @@
             this.optionTabView1.FullRowSelectLeftView = true;
             this.optionTabView1.ItemHeightLeftView = 14;
             this.optionTabView1.Location = new System.Drawing.Point(0, 0);
-            this.optionTabView1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.optionTabView1.Margin = new System.Windows.Forms.Padding(4);
             this.optionTabView1.Name = "optionTabView1";
+            this.optionTabView1.OptionLeftCollapsed = false;
+            this.optionTabView1.OptionLeftMinSize = 25;
+            this.optionTabView1.OptionRightCollapsed = false;
+            this.optionTabView1.OptionRightMinSize = 25;
             this.optionTabView1.Size = new System.Drawing.Size(548, 450);
+            this.optionTabView1.SortGroupBeforeUnderline = true;
+            this.optionTabView1.SortTreeBeforeUnderline = true;
+            this.optionTabView1.SplitterDistance = 160;
+            this.optionTabView1.SplitterIncrement = 1;
+            this.optionTabView1.SplitterWidth = 4;
             this.optionTabView1.TabIndex = 0;
             // 
             // Option

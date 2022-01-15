@@ -1,27 +1,39 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="PS4CheaterNeo.Properties" GeneratedClassName="Settings">
-  <Profiles />
-  <Settings>
-    <Setting Name="PS4FWVersion" Type="OptionTabView.Option&lt;string&gt;" Scope="User">
-      <Value Profile="(Default)">|General|SendPayload</Value>
-    </Setting>
-    <Setting Name="PS4IP" Type="OptionTabView.Option&lt;string&gt;" Scope="User">
-      <Value Profile="(Default)">|General|Connect</Value>
-    </Setting>
-    <Setting Name="PS4Port" Type="OptionTabView.Option&lt;uint&gt;" Scope="User">
-      <Value Profile="(Default)">9021|General|Connect</Value>
-    </Setting>
-    <Setting Name="SectionFilterKeys" Type="OptionTabView.Option&lt;string&gt;" Scope="User">
-      <Value Profile="(Default)">libSce,libc.prx,SceShell,SceLib,SceNp,SceVoice,SceFios,libkernel,SceVdec|General|Filter</Value>
-    </Setting>
-    <Setting Name="MaxResultShow" Type="OptionTabView.Option&lt;uint&gt;" Scope="User">
-      <Value Profile="(Default)">0x2000|Query|Result</Value>
-    </Setting>
-    <Setting Name="MaxQueryThreads" Type="OptionTabView.Option&lt;uint&gt;" Scope="User">
-      <Value Profile="(Default)">3|Query|Query</Value>
-    </Setting>
-    <Setting Name="EnableFilterQuery" Type="OptionTabView.Option&lt;bool&gt;" Scope="User">
-      <Value Profile="(Default)">True|General|Filter</Value>
-    </Setting>
-  </Settings>
+	<Profiles />
+	<Settings>
+		<Setting Name="PS4IP" Type="OptionTabView.Option&lt;string&gt;" Scope="User">
+			<Value Profile="(Default)">|1_General|1_Connect|Enter PS4 IP location</Value>
+		</Setting>
+		<Setting Name="PS4Port" Type="OptionTabView.Option&lt;uint&gt;" Scope="User">
+			<Value Profile="(Default)">9021|1_General|1_Connect|Enter PS4 Port</Value>
+		</Setting>
+		<Setting Name="PS4FWVersion" Type="OptionTabView.Option&lt;string&gt;" Scope="User">
+			<Value Profile="(Default)">|1_General|1_SendPayload|Enter PS4 FW Version (Confirm the fw version only when perform sendpayload)</Value>
+		</Setting>
+		<Setting Name="VerifySectionWhenRefresh" Type="OptionTabView.Option&lt;bool&gt;" Scope="User">
+			<Value Profile="(Default)">True|2_Cheat|2_Cheat|Determine whether to enable verifying Section values when refreshing the cheat list. Default enabled</Value>
+		</Setting>
+		<Setting Name="VerifySectionWhenLock" Type="OptionTabView.Option&lt;bool&gt;" Scope="User">
+			<Value Profile="(Default)">True|2_Cheat|2_Cheat|Determine whether to enable verifying Section values when locking cheat items. Default enabled</Value>
+		</Setting>
+		<Setting Name="MaxQueryThreads" Type="OptionTabView.Option&lt;uint&gt;" Scope="User">
+			<Value Profile="(Default)">3|3_Query|1_Query|Enter the number of threads to use when querying. Default is 3 threads</Value>
+		</Setting>
+		<Setting Name="AutoPerformGetProcesses" Type="OptionTabView.Option&lt;bool&gt;" Scope="User">
+			<Value Profile="(Default)">True|3_Query|1_Query|Determine whether to enable automatic perform get processes when opening the Query window. Default enabled</Value>
+		</Setting>
+		<Setting Name="DefaultProcess" Type="OptionTabView.Option&lt;string&gt;" Scope="User">
+			<Value Profile="(Default)">eboot.bin|3_Query|1_Query|Set the default selected program when perform get processes. Default is eboot.bin</Value>
+		</Setting>
+		<Setting Name="EnableFilterQuery" Type="OptionTabView.Option&lt;bool&gt;" Scope="User">
+			<Value Profile="(Default)">True|3_Query|2_Filter|Determine whether to enable filtering when opening the query window. Default enabled</Value>
+		</Setting>
+		<Setting Name="SectionFilterKeys" Type="OptionTabView.Option&lt;string&gt;" Scope="User">
+			<Value Profile="(Default)">libSce,libc.prx,SceShell,SceLib,SceNp,SceVoice,SceFios,libkernel,SceVdec|3_Query|2_Filter|Enter the filter value, the filter will be set here when listing Sections</Value>
+		</Setting>
+		<Setting Name="MaxResultShow" Type="OptionTabView.Option&lt;uint&gt;" Scope="User">
+			<Value Profile="(Default)">0x2000|3_Query|3_Result|Enter the maximum number of displayed query results. will only affect the number of results displayed in the ResultView. Default value is 8192</Value>
+		</Setting>
+	</Settings>
 </SettingsFile>

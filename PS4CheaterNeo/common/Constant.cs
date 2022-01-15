@@ -39,8 +39,6 @@ namespace PS4CheaterNeo
 
     partial class Constant
     {
-        public const string DefaultProcess = "eboot.bin";
-
         public static string[] Versions = new string[] {
             "9.00",
             "7.55",
@@ -116,10 +114,7 @@ namespace PS4CheaterNeo
              CompareType.BiggerThan,
              CompareType.SmallerThan,
         };
-        public static object[] SearchByHex = new object[]
-        {
-            CompareType.Exact,
-        };
+        public static object[] SearchByHex = new object[] { CompareType.Exact, };
     }
 
 }

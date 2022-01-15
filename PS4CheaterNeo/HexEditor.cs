@@ -21,6 +21,8 @@ namespace PS4CheaterNeo
 
         public HexEditor(Main mainForm, Section section, int baseAddr)
         {
+            if (section == null || section.SID == 0) throw new ArgumentNullException("Init HexEditor failed, section is null.");
+
             InitializeComponent();
 
             changedPosDic = new Dictionary<long, long>();
@@ -45,10 +47,10 @@ namespace PS4CheaterNeo
         {
             DynamicByteProvider dynaBP = HexView.ByteProvider as DynamicByteProvider;
 
-            if (dynaBP.HasChanges() && MessageBox.Show("Byte data has changes, Do you want to close HexEditor?", "HexEditor", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) e.Cancel = true;
-
-
+            if (dynaBP.HasChanges() && MessageBox.Show("Byte data has changes, Do you want to close HexEditor?", "HexEditor", 
+                MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) e.Cancel = true;
         }
+
         /// <summary>
         /// BaseAddr = HexView.SelectionStart + HexView.LineInfoOffset - (long)section.Start
         /// </summary>
@@ -96,13 +98,9 @@ namespace PS4CheaterNeo
 8: {6:X8}={6}
 F: {7}
 D: {8}", HexView.SelectionStart + HexView.LineInfoOffset, HexView.SelectionStart + HexView.LineInfoOffset - (long)section.Start, section.Start, info1, info2, info4, info8, infoF, infoD);
-            
         }
 
-        private void HexEditor_Load(object sender, EventArgs e)
-        {
-            PageBox.SelectedIndex = Page;
-        }
+        private void HexEditor_Load(object sender, EventArgs e) => PageBox.SelectedIndex = Page;
 
         private void PageBox_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -240,10 +238,7 @@ D: {8}", HexView.SelectionStart + HexView.LineInfoOffset, HexView.SelectionStart
         }
         #endregion
 
-        private int DivUP(int sum, int div)
-        {
-            return sum / div + ((sum % div != 0) ? 1 : 0);
-        }
+        private int DivUP(int sum, int div) => sum / div + ((sum % div != 0) ? 1 : 0);
 
         private void UpdateUi(int page, long line)
         {
