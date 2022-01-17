@@ -58,8 +58,8 @@
     <Reference Include="libdebug">
       <HintPath>lib\libdebug.dll</HintPath>
     </Reference>
-    <Reference Include="OptionTabView">
-      <HintPath>lib\OptionTabView.dll</HintPath>
+    <Reference Include="OptionTreeView">
+      <HintPath>lib\OptionTreeView.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />

@@ -29,12 +29,11 @@ namespace PS4CheaterNeo
         {
             ProcessName = "";
             bool isConnected = false;
-            if (Properties.Settings.Default.PS4FWVersion.Value is string )
-            if (Properties.Settings.Default.PS4FWVersion.Value is string version && !string.IsNullOrWhiteSpace(version) &&
-                Properties.Settings.Default.PS4IP.Value is string ip && !string.IsNullOrWhiteSpace(ip) &&
-                Properties.Settings.Default.PS4Port.Value is uint port && port != 0)
+            if ((Properties.Settings.Default.PS4FWVersion.Value ?? "") != "" &&
+                (Properties.Settings.Default.PS4IP.Value ?? "") != "" &&
+                Properties.Settings.Default.PS4Port.Value != 0)
             {
-                try {isConnected = PS4Tool.Connect(ip, out string msg, 1000);}
+                try {isConnected = PS4Tool.Connect(Properties.Settings.Default.PS4IP.Value, out string msg, 1000);}
                 catch (Exception){}
             }
 

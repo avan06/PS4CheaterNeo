@@ -592,9 +592,10 @@ namespace PS4CheaterNeo
             }
         }
 
-        public static (List<(ScanType scanType, int groupTypeLength, bool isAny)> groupTypes, List<byte[]> groupValues, int scanTypeLength) GenerateGroupList(string value0)
+        public static (List<(ScanType scanType, int groupTypeLength, bool isAny)> groupTypes, List<byte[]> groupValues, int groupFirstLength, int scanTypeLength) GenerateGroupList(string value0)
         {
-            int scanTypeLength = 1;
+            int scanTypeLength = 0;
+            int groupFirstLength = 1;
             var groupTypes = new List<(ScanType scanType, int groupTypeLength, bool isAny)>();
             var groupValues = new List<byte[]>();
             var cmd = new Dictionary<string, string>();
@@ -615,7 +616,6 @@ namespace PS4CheaterNeo
                     cmd["scanVal"] = value0.Substring(start, idx - start);
                     start = idx + 1;
                 }
-
 
                 if (cmd.TryGetValue("scanVal", out string scanVal))
                 {
@@ -642,15 +642,15 @@ namespace PS4CheaterNeo
                     else valueBytes = ScanTool.ValueStringToByte(scanType, cmd["scanVal"]);
 
                     if (!ScanTool.ScanTypeLengthDict.TryGetValue(scanType, out int groupTypeLength)) groupTypeLength = valueBytes.Length;
-                    else if (groupTypes.Count == 0) scanTypeLength = groupTypeLength;
-
+                    else if (groupTypes.Count == 0) groupFirstLength = groupTypeLength;
+                    scanTypeLength += groupTypeLength;
                     groupTypes.Add((scanType, groupTypeLength, isAny));
                     groupValues.Add(valueBytes);
                     cmd = new Dictionary<string, string>();
                 }
             }
 
-            return (groupTypes, groupValues, scanTypeLength);
+            return (groupTypes, groupValues, groupFirstLength, scanTypeLength);
         }
 
         /// <summary>
@@ -690,10 +690,10 @@ namespace PS4CheaterNeo
         public ScanType scanType { get; }
         public CompareType compareType { get; }
         public int scanTypeLength { get; }
+        public int groupFirstLength { get; }
+        public byte[] value0Byte { get; } //for ScanType:Hex、String
         public ulong value0Long { get; }
         public ulong value1Long { get; }
-
-        public byte[] value0Byte { get; }
         public List<byte[]> groupValues { get; }
         public List<(ScanType scanType, int groupTypeLength, bool isAny)> groupTypes { get; }
 
@@ -748,7 +748,7 @@ namespace PS4CheaterNeo
                     break;
             }
 
-            if (scanType == ScanType.Group) (groupTypes, groupValues, scanTypeLength) = ScanTool.GenerateGroupList(value0);
+            if (scanType == ScanType.Group) (groupTypes, groupValues, groupFirstLength, scanTypeLength) = ScanTool.GenerateGroupList(value0);
             else if (ScanTool.ScanTypeLengthDict.TryGetValue(scanType, out int scanTypeLength))
             {
                 this.scanTypeLength = scanTypeLength;

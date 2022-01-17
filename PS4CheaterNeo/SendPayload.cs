@@ -86,9 +86,9 @@ namespace PS4CheaterNeo
         {
 
             string defaultVer = Constant.Versions[0];
-            if (Properties.Settings.Default.PS4FWVersion.Value is string version && (version ?? "") != "") defaultVer = version;
-            if (Properties.Settings.Default.PS4IP.Value is string ip && (ip ?? "") != "") IpBox.Text = ip;
-            if (Properties.Settings.Default.PS4Port.Value is uint port && port != 0) PortBox.Text = Convert.ToString(port);
+            if ((Properties.Settings.Default.PS4FWVersion.Value ?? "") != "") defaultVer = Properties.Settings.Default.PS4FWVersion.Value;
+            if ((Properties.Settings.Default.PS4IP.Value ?? "") != "") IpBox.Text = Properties.Settings.Default.PS4IP.Value;
+            if (Properties.Settings.Default.PS4Port.Value != 0) PortBox.Text = Convert.ToString(Properties.Settings.Default.PS4Port.Value);
 
             VersionComboBox.SelectedIndex = VersionComboBox.Items.IndexOf(defaultVer);
         }
@@ -99,7 +99,7 @@ namespace PS4CheaterNeo
             {
                 if ((VersionBox.Text ?? "") != "") Properties.Settings.Default.PS4FWVersion.Value = VersionBox.Text;
                 if ((IpBox.Text ?? "") != "") Properties.Settings.Default.PS4IP.Value = IpBox.Text;
-                if ((PortBox.Text ?? "") != "") Properties.Settings.Default.PS4Port.Value = Convert.ToUInt32(PortBox.Text);
+                if ((PortBox.Text ?? "") != "") Properties.Settings.Default.PS4Port.Value = Convert.ToUInt16(PortBox.Text);
                 Properties.Settings.Default.Save();
             }
             catch (Exception exception)

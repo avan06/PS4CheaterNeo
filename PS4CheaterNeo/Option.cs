@@ -16,7 +16,7 @@ namespace PS4CheaterNeo
         {
             InitializeComponent();
 
-            optionTabView1.InitSettings(Properties.Settings.Default);
+            optionTreeView1.InitSettings(Properties.Settings.Default);
         }
     }
 }

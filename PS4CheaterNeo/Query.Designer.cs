@@ -87,8 +87,6 @@ namespace PS4CheaterNeo
             this.ScanBtn = new System.Windows.Forms.Button();
             this.CompareTypeBox = new System.Windows.Forms.ComboBox();
             this.Panel1 = new System.Windows.Forms.Panel();
-            this.ScanWorker = new System.ComponentModel.BackgroundWorker();
-            this.RefreshWorker = new System.ComponentModel.BackgroundWorker();
             ((System.ComponentModel.ISupportInitialize)(this.SplitContainer1)).BeginInit();
             this.SplitContainer1.Panel1.SuspendLayout();
             this.SplitContainer1.Panel2.SuspendLayout();
@@ -717,22 +715,6 @@ namespace PS4CheaterNeo
             this.Panel1.Size = new System.Drawing.Size(800, 450);
             this.Panel1.TabIndex = 2;
             // 
-            // ScanWorker
-            // 
-            this.ScanWorker.WorkerReportsProgress = true;
-            this.ScanWorker.WorkerSupportsCancellation = true;
-            this.ScanWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.ScanWorker_DoWork);
-            this.ScanWorker.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.ScanWorker_ProgressChanged);
-            this.ScanWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.ScanWorker_RunWorkerCompleted);
-            // 
-            // RefreshWorker
-            // 
-            this.RefreshWorker.WorkerReportsProgress = true;
-            this.RefreshWorker.WorkerSupportsCancellation = true;
-            this.RefreshWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.RefreshWorker_DoWork);
-            this.RefreshWorker.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.RefreshWorker_ProgressChanged);
-            this.RefreshWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.RefreshWorker_RunWorkerCompleted);
-            // 
             // Query
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -806,8 +788,6 @@ namespace PS4CheaterNeo
         private System.Windows.Forms.ComboBox CompareTypeBox;
         private System.Windows.Forms.Button ScanBtn;
         private System.Windows.Forms.Button RefreshBtn;
-        private System.ComponentModel.BackgroundWorker ScanWorker;
-        private System.ComponentModel.BackgroundWorker RefreshWorker;
         private System.Windows.Forms.ProgressBar ToolStripBar;
         private System.Windows.Forms.ContextMenuStrip ResultViewMenu;
         private System.Windows.Forms.ToolStripMenuItem ResultViewAddToCheatGrid;

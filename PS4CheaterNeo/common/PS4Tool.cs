@@ -99,6 +99,23 @@ namespace PS4CheaterNeo
 
         public static ProcessMap GetProcessMaps(int processID)
         {
+            //if (Properties.Settings.Default.DebugMode.Value)
+            //{
+            //    MemoryEntry[] entries = new MemoryEntry[10];
+            //    for (int idx = 0; idx < entries.Length; idx++)
+            //    {
+            //        entries[idx] = new MemoryEntry
+            //        {
+            //            name = "Debug" + idx,
+            //            start = (ulong)(idx + 1) * 1000000000,
+            //            end = (ulong)(idx + 1) * 1000000000 + 102400000,
+            //            prot = 0x5,
+            //        };
+            //    }
+            //    ProcessMap pMap = new ProcessMap(processID, entries);
+
+            //    return pMap;
+            //}
             ConnectedCheck();
             mutex.WaitOne();
             try
@@ -147,6 +164,20 @@ namespace PS4CheaterNeo
 
         public static byte[] ReadMemory(int processID, ulong address, int length)
         {
+            //if (Properties.Settings.Default.DebugMode.Value)
+            //{
+            //    int fillLen = 4;
+            //    Random rnd = new Random();
+            //    byte[] buf = new byte[length];
+            //    for (int idx = 0; idx + fillLen < length; ++idx)
+            //    {
+            //        byte[] tmpBuf = new byte[fillLen];
+            //        rnd.NextBytes(tmpBuf);
+            //        Buffer.BlockCopy(tmpBuf, 0, buf, idx, fillLen);
+            //        idx += tmpBuf.Length;
+            //    }
+            //    return buf;
+            //}
             ConnectedCheck();
             mutex.WaitOne();
             try
