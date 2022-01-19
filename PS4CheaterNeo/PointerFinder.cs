@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.IO;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using static PS4CheaterNeo.SectionTool;
 
@@ -254,6 +255,8 @@ namespace PS4CheaterNeo
             (ulong queryAddress, List<int> range) = ((ulong queryAddress, List<int> range))e.Argument;
             if (IsInitScan.Checked || pointerResults.Count > nextScanCheckNumber)
             {
+                string sectionFilterKeys = Properties.Settings.Default.SectionFilterKeys.Value;
+                sectionFilterKeys = Regex.Replace(sectionFilterKeys, " *[,;] *", "|");
                 Invoke(new MethodInvoker(() => { IsInitScan.Checked = false; }));
                 var pathAddrList = new List<((int SID, string name, uint prot, int position, ulong addr) addrM, (int SID, string name, uint prot, int position, ulong value) valueM)>();
                 var pathAddrListOrderByValue = new List<((int SID, string name, uint prot, int position, ulong addr) addrM, (int SID, string name, uint prot, int position, ulong value) valueM)>();
@@ -268,7 +271,7 @@ namespace PS4CheaterNeo
                     PointerFinderWorker.ReportProgress((int)(((float)(sectionIdx + 1) / keys.Count) * 50), (tickerMajor.Elapsed, string.Format("Section ID: {0}/{1}, read memory...", hitCnt, keys.Count)));
                     Section section = sectionTool.SectionDict[keys[sectionIdx]];
 
-                    if (IsFilterBox.Checked && sectionTool.SectionIsFilter(section.Name)) continue;
+                    if (IsFilterBox.Checked && sectionTool.SectionIsFilter(section.Name, sectionFilterKeys)) continue;
                     if (!IsFilterBox.Checked && section.Name.StartsWith("libSce")) continue;
 
                     byte[] buffer = PS4Tool.ReadMemory(section.PID, section.Start, section.Length);

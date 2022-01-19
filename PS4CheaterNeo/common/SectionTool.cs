@@ -74,6 +74,8 @@ namespace PS4CheaterNeo
             mutex.WaitOne();
             try
             {
+                string sectionFilterKeys = Properties.Settings.Default.SectionFilterKeys.Value;
+                sectionFilterKeys = Regex.Replace(sectionFilterKeys, " *[,;] *", "|");
                 SectionDict = new Dictionary<int, Section>();
                 SectionList = new List<(int SID, ulong start, ulong end)>();
                 TotalMemorySize = 0;
@@ -92,7 +94,7 @@ namespace PS4CheaterNeo
                         ulong start = entry.start;
                         ulong end = entry.end;
                         ulong length = end - start;
-                        bool isFilter = SectionIsFilter(entry.name);
+                        bool isFilter = SectionIsFilter(entry.name, sectionFilterKeys);
 
                         if ((entry.prot & 0x5) == 0x5) bufferLength = length; //Executable section
                         if (MemoryStart == 0 || start < MemoryStart) MemoryStart = start;
@@ -145,12 +147,9 @@ namespace PS4CheaterNeo
             }
         }
 
-        public bool SectionIsFilter(string name)
+        public bool SectionIsFilter(string name, string sectionFilterKeys)
         {
             bool result = false;
-            string sectionFilterKeys = Properties.Settings.Default.SectionFilterKeys.Value;
-            sectionFilterKeys = Regex.Replace(sectionFilterKeys, " *[,;] *", "|");
-
             if (Regex.IsMatch(name, sectionFilterKeys)) result = true;
 
             return result;
@@ -204,5 +203,17 @@ namespace PS4CheaterNeo
 
             return -1;
         }
+
+        public Section[] GetSectionSortByAddr()
+        {
+            List<int> keys = new List<int>(SectionDict.Keys);
+            Section[] sections = new Section[keys.Count];
+            for (int sectionIdx = 0; sectionIdx < keys.Count; sectionIdx++) sections[sectionIdx] = SectionDict[keys[sectionIdx]];
+            Array.Sort(sections, CompareSection);
+
+            return sections;
+        }
+
+        public int CompareSection(Section s1, Section s2) => s1.Start.CompareTo(s2.Start);
     }
 }

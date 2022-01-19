@@ -29,11 +29,12 @@ namespace PS4CheaterNeo
         {
             ProcessName = "";
             bool isConnected = false;
-            if ((Properties.Settings.Default.PS4FWVersion.Value ?? "") != "" &&
-                (Properties.Settings.Default.PS4IP.Value ?? "") != "" &&
-                Properties.Settings.Default.PS4Port.Value != 0)
+            string PS4FWVersion = Properties.Settings.Default.PS4FWVersion.Value ?? "";
+            string PS4IP = Properties.Settings.Default.PS4IP.Value ?? "";
+            ushort PS4Port = Properties.Settings.Default.PS4Port.Value;
+            if (PS4FWVersion != "" && PS4IP != "" && PS4Port != 0)
             {
-                try {isConnected = PS4Tool.Connect(Properties.Settings.Default.PS4IP.Value, out string msg, 1000);}
+                try {isConnected = PS4Tool.Connect(PS4IP, out string msg, 1000);}
                 catch (Exception){}
             }
 
@@ -64,17 +65,25 @@ namespace PS4CheaterNeo
                 #region cheatHeaderItems Check
                 string[] cheatHeaderItems = cheatStrArr[0].Split('|');
 
-                if (Application.ProductVersion != cheatHeaderItems[0] && MessageBox.Show(string.Format("PS4 Cheater Version({0}) is different with cheat file({1}), still load?", Application.ProductVersion, cheatHeaderItems[0]),
-                    "ProductVersion", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes) return;
-
                 ProcessName = cheatHeaderItems[1];
                 if (!InitSectionList(ProcessName)) return;
+
+                #region ParsePS4CheatFiles
+                if (cheatStrArr[0].ToUpper().Contains("ID") && cheatStrArr[0].ToUpper().Contains("VER") && cheatStrArr[0].ToUpper().Contains("FM"))
+                {
+                    ParseCheatFiles(cheatStrArr);
+                    cheatHeaderItems = cheatStrArr[0].Split('|');
+                }
+                #endregion
+
+                if (Application.ProductVersion != cheatHeaderItems[0] && MessageBox.Show(string.Format("PS4 Cheater Version({0}) is different with cheat file({1}), still load?", Application.ProductVersion, cheatHeaderItems[0]),
+                    "ProductVersion", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes) return;
 
                 string cheatGameID = cheatHeaderItems[2];
                 string cheatGameVer = cheatHeaderItems[3];
                 string cheatFWVer = cheatHeaderItems[4];
-                string FMVer = Constant.Versions[0];
-                if (Properties.Settings.Default.PS4FWVersion.Value is string version && !string.IsNullOrWhiteSpace(version)) FMVer = version;
+                string PS4FWVersion = Properties.Settings.Default.PS4FWVersion.Value ?? "";
+                string FMVer = PS4FWVersion != "" ? PS4FWVersion : Constant.Versions[0];
 
                 ScanTool.GameInfo(FMVer, out string gameID, out string gameVer);
 
@@ -152,6 +161,73 @@ namespace PS4CheaterNeo
             catch (Exception exception)
             {
                 MessageBox.Show(exception.Message + "\n" + exception.StackTrace, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+            }
+        }
+
+        /// <summary>
+        /// PS4 Cheat Files Example:
+        /// 1.5|eboot.bin|ID:CUSA99999|VER:09.99|FM:672
+        /// simple pointer|pointer|float|@7777777_3_3333333+50+0+8+1B0+64|data|float|999|1|DescForPointer|
+        /// data|2|ABCDE|4 bytes|999|0|DescForData|30ABCDE
+        /// </summary>
+        private void ParseCheatFiles(string[] cheatStrArr)
+        {
+            Section[] sections = sectionTool.GetSectionSortByAddr();
+            cheatStrArr[0] = cheatStrArr[0].Replace("ID:", "").Replace("VER:", "").Replace("FM:", "");
+            for (int idx = 1; idx < cheatStrArr.Length; ++idx)
+            {
+                string cheatStr = cheatStrArr[idx];
+
+                if (string.IsNullOrWhiteSpace(cheatStr)) continue;
+
+                string[] cheatElements = cheatStr.Split('|');
+
+                if (cheatElements.Length < 5) continue;
+
+                bool isPointer = cheatElements[0] == "simple pointer";
+                int sequence;
+                Section section;
+                string offsetAddrStr;
+                string scanTypeStr;
+                string cheatLockStr;
+                string cheatValue;
+                string cheatDesc;
+                if (isPointer)
+                {
+                    string[] pointerList = cheatElements[3].Split('+');
+                    string[] addressElements = pointerList[0].Split('_');
+                    sequence = int.Parse(addressElements[1]);
+                    offsetAddrStr = addressElements[2];
+                    section = sequence < sections.Length ? sections[sequence] : null;
+                    for (int offsetIdx = 1; offsetIdx < pointerList.Length; ++offsetIdx) offsetAddrStr += "_" + pointerList[offsetIdx];
+                    scanTypeStr = cheatElements[5];
+                    cheatValue = cheatElements[6];
+                    cheatLockStr = cheatElements[7];
+                    cheatDesc = cheatElements[8];
+                }
+                else
+                {
+                    sequence = int.Parse(cheatElements[1]);
+                    offsetAddrStr = cheatElements[2];
+                    section = sequence < sections.Length ? sections[sequence] : null;
+                    scanTypeStr = cheatElements[3];
+                    cheatValue = cheatElements[4];
+                    cheatLockStr = cheatElements[5];
+                    cheatDesc = cheatElements[6];
+                }
+                string sectionStr = string.Format("{0}|{1}|{2}|{3}|{4}",
+                   section.SID,
+                   section.Start.ToString("X"),
+                   section.Name,
+                   section.Prot.ToString("X"),
+                   section.Offset.ToString("X"));
+                cheatStrArr[idx] = string.Format("{0}|{1}|{2}|{3}|{4}|{5}\n",
+                    sectionStr,
+                    offsetAddrStr,
+                    scanTypeStr.Replace("bytes", "Bytes").Replace("float", "Float").Replace("double", "Double").Replace("string", "String").Replace("hex", "Hex"),
+                    cheatLockStr == "1",
+                    cheatValue,
+                    cheatDesc);
             }
         }
 
@@ -268,6 +344,7 @@ namespace PS4CheaterNeo
         private async Task<bool> RefreshCheatTask() => await Task.Run(() => {
             if (!InitSectionList(ProcessName)) return false;
 
+            bool VerifySectionWhenRefresh = Properties.Settings.Default.VerifySectionWhenRefresh.Value;
             System.Diagnostics.Stopwatch tickerMajor = System.Diagnostics.Stopwatch.StartNew();
             (int sid, string name, uint prot, ulong offsetAddr) preData = (0, "", 0, 0);
             Dictionary<ulong, ulong> pointerMemoryCaches = new Dictionary<ulong, ulong>();
@@ -281,7 +358,7 @@ namespace PS4CheaterNeo
                     DataGridViewRow cheatRow = CheatGridView.Rows[cIdx];
                     (Section section, ulong offsetAddr, ulong oldValue) = ((Section section, ulong offsetAddr, ulong oldValue))cheatRow.Tag;
                     #region  Refresh Section and offsetAddr
-                    if (Properties.Settings.Default.VerifySectionWhenRefresh.Value)
+                    if (VerifySectionWhenRefresh)
                     {
                         string[] sectionArr = cheatRow.Cells[(int)ChertCol.CheatListSection].Value.ToString().Split('|');
                         string hexAddr = "";
@@ -432,6 +509,7 @@ namespace PS4CheaterNeo
         private async Task<bool> RefreshLockTask() => await Task.Run(() => {
             if (!InitSectionList(ProcessName)) return false;
 
+            bool VerifySectionWhenLock = Properties.Settings.Default.VerifySectionWhenLock.Value;
             (int sid, string name, uint prot, ulong offsetAddr) preData = (0, "", 0, 0);
             Dictionary<ulong, ulong> pointerMemoryCaches = new Dictionary<ulong, ulong>();
             for (int cIdx = 0; cIdx < CheatGridView.Rows.Count; cIdx++)
@@ -446,7 +524,7 @@ namespace PS4CheaterNeo
                     }
                     (Section section, ulong offsetAddr, ulong oldValue) = ((Section section, ulong offsetAddr, ulong oldValue))cheatRow.Tag;
                     #region Refresh Section and offsetAddr
-                    if (Properties.Settings.Default.VerifySectionWhenLock.Value)
+                    if (VerifySectionWhenLock)
                     {
                         int checkOffset = 0;
                         string hexAddr;

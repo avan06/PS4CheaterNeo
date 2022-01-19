@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
 using libdebug;
 using System.Windows.Forms;
@@ -61,12 +60,13 @@ namespace PS4CheaterNeo
                 if (!PS4Tool.Connect(Properties.Settings.Default.PS4IP.Value, out string msg)) throw new Exception(msg);
 
                 int selectedIdx = 0;
+                string DefaultProcess = Properties.Settings.Default.DefaultProcess.Value;
                 ProcessesBox.Items.Clear();
                 ProcessList procList = PS4Tool.GetProcessList();
                 foreach (Process process in procList.processes)
                 {
                     int idx = ProcessesBox.Items.Add(new ComboboxItem(process.name, process.pid));
-                    if (process.name == Properties.Settings.Default.DefaultProcess.Value) selectedIdx = idx;
+                    if (process.name == DefaultProcess) selectedIdx = idx;
                 }
                 ProcessesBox.SelectedIndex = selectedIdx;
             }
@@ -75,7 +75,6 @@ namespace PS4CheaterNeo
                 MessageBox.Show(exception.Message + "\n" + exception.StackTrace, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
-        public int CompareSection(Section s1, Section s2) => s1.Start.CompareTo(s2.Start);
 
         private void ProcessesBox_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -88,10 +87,7 @@ namespace PS4CheaterNeo
                 sectionTool.InitSectionList((int)process.Value, (string)process.Text);
                 mainForm.ProcessName = (string)process.Text;
 
-                List<int> keys = new List<int>(sectionTool.SectionDict.Keys);
-                Section[] sections = new Section[keys.Count];
-                for (int sectionIdx = 0; sectionIdx < keys.Count; sectionIdx++) sections[sectionIdx] = sectionTool.SectionDict[keys[sectionIdx]];
-                Array.Sort(sections, CompareSection);
+                Section[] sections = sectionTool.GetSectionSortByAddr();
 
                 SectionView.BeginUpdate();
                 for (int sectionIdx = 0; sectionIdx < sections.Length; sectionIdx++)
@@ -206,7 +202,8 @@ namespace PS4CheaterNeo
                 List<int> sectionKeys = new List<int>(sectionTool.SectionDict.Keys);
                 sectionKeys.Sort();
                 Invoke(new MethodInvoker(() => { ToolStripBar.Value = 1; }));
-                byte MaxQueryThreads = Properties.Settings.Default.MaxQueryThreads.Value == (byte)0 ? (byte)1 : Properties.Settings.Default.MaxQueryThreads.Value;
+                byte MaxQueryThreads = Properties.Settings.Default.MaxQueryThreads.Value;
+                MaxQueryThreads = MaxQueryThreads == (byte)0 ? (byte)1 : MaxQueryThreads;
                 SemaphoreSlim semaphore = new SemaphoreSlim((int)MaxQueryThreads);
                 Task<(int, TimeSpan)>[] tasks = new Task<(int, TimeSpan)>[sectionKeys.Count];
                 for (int sectionIdx = 0; sectionIdx < sectionKeys.Count; sectionIdx++)
@@ -293,9 +290,10 @@ namespace PS4CheaterNeo
             }
             else
             {
+                byte MinResultAccessFactor = Properties.Settings.Default.MinResultAccessFactor.Value;
                 byte[] buffer = null;
                 ResultList newResults = new ResultList(comparerTool.scanTypeLength, scanStep);
-                if (results.Count >= Properties.Settings.Default.MinResultAccessFactor.Value) buffer = PS4Tool.ReadMemory(section.PID, section.Start, section.Length);
+                if (results.Count >= MinResultAccessFactor) buffer = PS4Tool.ReadMemory(section.PID, section.Start, section.Length);
 
                 for (int rIdx = 0; rIdx < results.Count; rIdx++)
                 {
@@ -306,7 +304,7 @@ namespace PS4CheaterNeo
 
                     ulong oldData = ScanTool.BytesToULong(oldBytes);
                     byte[] newValue = new byte[comparerTool.scanTypeLength];
-                    if (results.Count < Properties.Settings.Default.MinResultAccessFactor.Value) newValue = PS4Tool.ReadMemory(section.PID, offsetAddr + section.Start, comparerTool.scanTypeLength);
+                    if (results.Count < MinResultAccessFactor) newValue = PS4Tool.ReadMemory(section.PID, offsetAddr + section.Start, comparerTool.scanTypeLength);
                     else Buffer.BlockCopy(buffer, (int)offsetAddr, newValue, 0, comparerTool.scanTypeLength);
 
                     ulong newData = ScanTool.BytesToULong(newValue);
@@ -363,7 +361,8 @@ namespace PS4CheaterNeo
             {
                 byte[] buffer = null;
                 ResultList newResults = new ResultList(comparerTool.scanTypeLength, scanStep);
-                if (results.Count >= Properties.Settings.Default.MinResultAccessFactor.Value) buffer = PS4Tool.ReadMemory(section.PID, section.Start, section.Length);
+                byte MinResultAccessFactor = Properties.Settings.Default.MinResultAccessFactor.Value;
+                if (results.Count >= MinResultAccessFactor) buffer = PS4Tool.ReadMemory(section.PID, section.Start, section.Length);
                 for (int rIdx = 0; rIdx < results.Count; rIdx++)
                 {
                     if (scanSource.Token.IsCancellationRequested) break;
@@ -371,7 +370,7 @@ namespace PS4CheaterNeo
                     if (section.Start + offsetAddr < AddrMin || section.Start + offsetAddr > AddrMax) continue;
 
                     byte[] newBytes = new byte[comparerTool.scanTypeLength];
-                    if (results.Count < Properties.Settings.Default.MinResultAccessFactor.Value) newBytes = PS4Tool.ReadMemory(section.PID, offsetAddr + section.Start, comparerTool.scanTypeLength);
+                    if (results.Count < MinResultAccessFactor) newBytes = PS4Tool.ReadMemory(section.PID, offsetAddr + section.Start, comparerTool.scanTypeLength);
                     else Buffer.BlockCopy(buffer, (int)offsetAddr, newBytes, 0, comparerTool.scanTypeLength);
 
                     int scanOffset = 0;
@@ -402,7 +401,8 @@ namespace PS4CheaterNeo
             }
 
             int hitCnt = 0;
-            uint MaxResultShow = Properties.Settings.Default.MaxResultShow.Value == 0 ? 0x2000 : Properties.Settings.Default.MaxResultShow.Value;
+            uint MaxResultShow = Properties.Settings.Default.MaxResultShow.Value;
+            MaxResultShow = MaxResultShow == 0 ? 0x2000 : MaxResultShow;
             Invoke(new MethodInvoker(() =>
             {
                 ResultView.Items.Clear();
@@ -505,11 +505,14 @@ namespace PS4CheaterNeo
 
                 int hitCnt = 0;
                 int count = 0;
-                uint MaxResultShow = Properties.Settings.Default.MaxResultShow.Value == 0 ? 0x2000 : Properties.Settings.Default.MaxResultShow.Value;
+                byte MinResultAccessFactor = Properties.Settings.Default.MinResultAccessFactor.Value;
+                uint MaxResultShow = Properties.Settings.Default.MaxResultShow.Value;
+                byte MaxQueryThreads = Properties.Settings.Default.MaxQueryThreads.Value;
+                MaxResultShow = MaxResultShow == 0 ? 0x2000 : MaxResultShow;
+                MaxQueryThreads = MaxQueryThreads == (byte)0 ? (byte)1 : MaxQueryThreads;
                 Invoke(new MethodInvoker(() => { ToolStripBar.Value = 1; }));
                 List<int> sectionKeys = new List<int>(sectionTool.SectionDict.Keys);
                 sectionKeys.Sort();
-                byte MaxQueryThreads = Properties.Settings.Default.MaxQueryThreads.Value == (byte)0 ? (byte)1 : Properties.Settings.Default.MaxQueryThreads.Value;
                 SemaphoreSlim semaphore = new SemaphoreSlim((int)MaxQueryThreads);
                 Task<(int, TimeSpan)>[] tasks = new Task<(int, TimeSpan)>[sectionKeys.Count];
                 for (int sectionIdx = 0; sectionIdx < sectionKeys.Count; sectionIdx++)
@@ -526,14 +529,14 @@ namespace PS4CheaterNeo
                             return (section.SID, tickerMajor.Elapsed);
                         }
                         byte[] buffer = null;
-                        if (results.Count >= Properties.Settings.Default.MinResultAccessFactor.Value) buffer = PS4Tool.ReadMemory(section.PID, section.Start, section.Length);
+                        if (results.Count >= MinResultAccessFactor) buffer = PS4Tool.ReadMemory(section.PID, section.Start, section.Length);
 
                         for (results.Begin(); !results.End(); results.Next())
                         {
                             if (++hitCnt > MaxResultShow && MaxQueryThreads == 1) continue;
                             (uint offsetAddr, _) = results.Read();
                             byte[] newBytes = new byte[comparerTool.scanTypeLength];
-                            if (results.Count < Properties.Settings.Default.MinResultAccessFactor.Value) newBytes = PS4Tool.ReadMemory(section.PID, offsetAddr + section.Start, comparerTool.scanTypeLength);
+                            if (results.Count < MinResultAccessFactor) newBytes = PS4Tool.ReadMemory(section.PID, offsetAddr + section.Start, comparerTool.scanTypeLength);
                             else Buffer.BlockCopy(buffer, (int)offsetAddr, newBytes, 0, comparerTool.scanTypeLength);
                             results.Set(newBytes);
                         }
