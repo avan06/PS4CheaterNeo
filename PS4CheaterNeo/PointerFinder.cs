@@ -36,8 +36,10 @@ namespace PS4CheaterNeo
                 .GetProperty("DoubleBuffered", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)
                 .SetValue(PointerListView, true, null);
 
-            foreach (ScanType filterEnum in (ScanType[])Enum.GetValues(typeof(ScanType)))
+            ScanType[] scanTypes = (ScanType[])Enum.GetValues(typeof(ScanType));
+            for (int idx = 0; idx < scanTypes.Length; idx++)
             {
+                ScanType filterEnum = scanTypes[idx];
                 ScanTypeBox.Items.Add(new ComboboxItem(filterEnum.GetDescription(), filterEnum));
                 if (scanType == filterEnum) ScanTypeBox.SelectedIndex = ScanTypeBox.Items.Count - 1;
             }

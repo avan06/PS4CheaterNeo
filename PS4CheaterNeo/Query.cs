@@ -63,8 +63,9 @@ namespace PS4CheaterNeo
                 string DefaultProcess = Properties.Settings.Default.DefaultProcess.Value;
                 ProcessesBox.Items.Clear();
                 ProcessList procList = PS4Tool.GetProcessList();
-                foreach (Process process in procList.processes)
+                for (int pIdx = 0; pIdx < procList.processes.Length; pIdx++)
                 {
+                    Process process = procList.processes[pIdx];
                     int idx = ProcessesBox.Items.Add(new ComboboxItem(process.name, process.pid));
                     if (process.name == DefaultProcess) selectedIdx = idx;
                 }
@@ -300,16 +301,17 @@ namespace PS4CheaterNeo
                     if (scanSource.Token.IsCancellationRequested) break;
 
                     (uint offsetAddr, byte[] oldBytes) = results.Read(rIdx);
-                    if (section.Start + offsetAddr < AddrMin || section.Start + offsetAddr > AddrMax) continue;
+                    ulong address = section.Start + offsetAddr;
+                    if (address < AddrMin || address > AddrMax) continue;
 
                     ulong oldData = ScanTool.BytesToULong(oldBytes);
                     byte[] newValue = new byte[comparerTool.scanTypeLength];
-                    if (results.Count < MinResultAccessFactor) newValue = PS4Tool.ReadMemory(section.PID, offsetAddr + section.Start, comparerTool.scanTypeLength);
+                    if (results.Count < MinResultAccessFactor) newValue = PS4Tool.ReadMemory(section.PID, address, comparerTool.scanTypeLength);
                     else Buffer.BlockCopy(buffer, (int)offsetAddr, newValue, 0, comparerTool.scanTypeLength);
 
-                    ulong newData = ScanTool.BytesToULong(newValue);
                     if (comparerTool.value0Byte == null)
                     {
+                        ulong newData = ScanTool.BytesToULong(newValue);
                         if (ScanTool.Comparer(comparerTool, newData, oldData)) newResults.Add(offsetAddr, newValue);
                     }
                     else if (ScanTool.ComparerExact(comparerTool.scanType, newValue, comparerTool.value0Byte)) newResults.Add(offsetAddr, newValue);
@@ -684,8 +686,9 @@ namespace PS4CheaterNeo
             if (IsFilterBox.Checked)
             {
                 SectionView.BeginUpdate();
-                foreach (ListViewItem item in SectionView.Items)
+                for (int sIdx = 0; sIdx < SectionView.Items.Count; sIdx++)
                 {
+                    ListViewItem item = SectionView.Items[sIdx];
                     if ("filter".Equals(item.Tag))
                     {
                         item.Checked = false; //Ensure that MappedSectionList is not selected

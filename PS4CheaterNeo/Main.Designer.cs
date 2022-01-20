@@ -320,8 +320,8 @@ namespace PS4CheaterNeo
             this.ToolStripProcessInfo.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
             this.ToolStripProcessInfo.Font = new System.Drawing.Font("Microsoft JhengHei UI", 9F, System.Drawing.FontStyle.Bold);
             this.ToolStripProcessInfo.Name = "ToolStripProcessInfo";
-            this.ToolStripProcessInfo.Size = new System.Drawing.Size(85, 22);
-            this.ToolStripProcessInfo.Text = "ToolStripInfo";
+            this.ToolStripProcessInfo.Size = new System.Drawing.Size(131, 22);
+            this.ToolStripProcessInfo.Text = "ToolStripProcessInfo";
             this.ToolStripProcessInfo.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // ToolStripExpandAll

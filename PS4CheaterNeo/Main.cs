@@ -727,8 +727,9 @@ namespace PS4CheaterNeo
                 {
                     cheatRow.Cells[(int)ChertCol.CheatListAddress].Value = "P->" + cheatRow.Cells[(int)ChertCol.CheatListAddress].Value;
                     string offsetStr = "|";
-                    foreach (long offset in newAddress.OffsetList)
+                    for (int idx = 0; idx < newAddress.OffsetList.Count; idx++)
                     {
+                        long offset = newAddress.OffsetList[idx];
                         if (offsetStr == "|") offsetStr += (offset - (long)newAddress.BaseSection.Start).ToString("X");
                         else offsetStr += "_" + offset.ToString("X");
                     }
@@ -806,6 +807,20 @@ namespace PS4CheaterNeo
         }
         #endregion
 
+        #region Public Method
+        /// <summary>
+        /// Add the destination address to the CheatGrid
+        /// </summary>
+        /// <param name="section">section of the destination address</param>
+        /// <param name="offsetAddr">offset address of the destination section</param>
+        /// <param name="scanType">value type of the destination address</param>
+        /// <param name="oldValue">value of the destination address</param>
+        /// <param name="cheatLock">Whether to lock cheat</param>
+        /// <param name="cheatDesc">description of cheat</param>
+        /// <param name="isPointer">is it Pointer</param>
+        /// <param name="offsetList">offsets of Pointer</param>
+        /// <param name="relativeOffset">store address as a relative offset</param>
+        /// <returns>returns the cheatRow added this time, which can be used to change the row style</returns>
         public DataGridViewRow AddToCheatGrid(Section section, ulong offsetAddr, ScanType scanType, ulong oldValue, bool cheatLock, string cheatDesc, bool isPointer, List<long> offsetList, int relativeOffset=-1)
         {
             DataGridViewRow cheatRow = null;
@@ -855,8 +870,9 @@ namespace PS4CheaterNeo
                     cheatRow.Tag = pointer;
                     cheatRow.Cells[(int)ChertCol.CheatListAddress].Value = "P->" + (pointer.offsetAddr + pointer.section.Start).ToString("X");
                     string offsetStr = "|";
-                    foreach (long offset in offsetList)
+                    for (int idx = 0; idx < offsetList.Count; idx++)
                     {
+                        long offset = offsetList[idx];
                         if (offsetStr == "|") offsetStr += (offset - (long)section.Start).ToString("X");
                         else offsetStr += "_" + offset.ToString("X");
                     }
@@ -880,6 +896,15 @@ namespace PS4CheaterNeo
             return cheatRow;
         }
 
+        /// <summary>
+        /// Initialize sections that match the selection process.
+        /// 1. Show process not found in main window when pid is zero and set Tag to false.
+        /// 2. The Tag has been set to false in the previous detection, and when the process can be found, the Tag will be cleared.
+        /// 3. Confirm whether the Section dictionary is correct, when the detected Section number is less than 20.
+        /// 4. If not the above and it has been initialized before, it will not be re-initialized.
+        /// </summary>
+        /// <param name="processName">initialize Sections according to the passed process name</param>
+        /// <returns>return whether the initialization was successful</returns>
         public bool InitSectionList(string processName)
         {
             ProcessInfo processInfo = PS4Tool.GetProcessInfo(processName);
@@ -891,12 +916,18 @@ namespace PS4CheaterNeo
                 return false;
             }
             else if (ToolStripProcessInfo.Tag is bool) ToolStripProcessInfo.Tag = null; //當已查詢到ProcessInfo時，清除失敗的Tag
-            else if (processInfo.pid > 0 && processInfo.pid == sectionTool.PID) return true; //當Process ID相同時，不再執行初始化
+            else if (processInfo.pid > 0 && processInfo.pid == sectionTool.PID && sectionTool.SectionDict != null)
+            {
+                ProcessMap pMap = null;
+                if (sectionTool.SectionDict.Count < 20) pMap = PS4Tool.GetProcessMaps(processInfo.pid);
+                if (pMap == null || sectionTool.SectionDict.Count >= pMap.entries.Length) return true; //當Process ID相同時，不再執行初始化
+            }
 
             ProcessName = processInfo.name;
             sectionTool.InitSectionList(processInfo.pid, ProcessName);
 
             return true;
         }
+        #endregion
     }
 }

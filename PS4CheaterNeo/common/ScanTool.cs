@@ -672,8 +672,10 @@ namespace PS4CheaterNeo
         /// </summary>
         public static T ParseFromDescription<T>(this Form _, string description) where T : Enum
         {
-            foreach (FieldInfo field in typeof(T).GetFields())
+            FieldInfo[] fields = typeof(T).GetFields();
+            for (int idx =0; idx < fields.Length; idx++)
             {
+                FieldInfo field = fields[idx];
                 if (Attribute.GetCustomAttribute(field, typeof(DescriptionAttribute)) is DescriptionAttribute attribute)
                 {
                     if (attribute.Description == description) return (T)field.GetValue(null);

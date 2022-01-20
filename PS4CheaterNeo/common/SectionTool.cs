@@ -31,7 +31,7 @@ namespace PS4CheaterNeo
         }
 
         /// <summary>
-        /// 重新排序MemoryEntry，無name的排前，再依序比較prot、name、start
+        /// Reorder MemoryEntry, the order without name is higher, and then order by prot, name, start
         /// </summary>
         private int CompareMemoryEntry(MemoryEntry e1, MemoryEntry e2)
         {
@@ -49,6 +49,11 @@ namespace PS4CheaterNeo
             return result;
         }
 
+        /// <summary>
+        /// Initialize section list
+        /// </summary>
+        /// <param name="processName">specified process name</param>
+        /// <exception cref="Exception"></exception>
         public void InitSectionList(string processName)
         {
             ProcessInfo processInfo = PS4Tool.GetProcessInfo(processName);
@@ -58,6 +63,12 @@ namespace PS4CheaterNeo
             InitSectionList(processInfo.pid, processName);
         }
 
+        /// <summary>
+        /// Initialize section list
+        /// </summary>
+        /// <param name="processID">specified process id</param>
+        /// <param name="processName">specified process name</param>
+        /// <exception cref="Exception"></exception>
         public void InitSectionList(int processID, string processName)
         {
             ProcessMap pMap = PS4Tool.GetProcessMaps(processID);
@@ -67,6 +78,13 @@ namespace PS4CheaterNeo
             InitSectionList(pMap, processID, processName);
         }
 
+        /// <summary>
+        /// Initialize section list
+        /// </summary>
+        /// <param name="pMap">libdebug.ProcessMap</param>
+        /// <param name="processID">specified process id</param>
+        /// <param name="processName">specified process name</param>
+        /// <exception cref="Exception"></exception>
         public void InitSectionList(ProcessMap pMap, int processID, string processName)
         {
             if (pMap == null || pMap.entries == null || pMap.entries.Length == 0) throw new Exception(string.Format("{0}: Process({1}) Map is null.", processName, processID));
@@ -83,7 +101,6 @@ namespace PS4CheaterNeo
                 int sIdx = 0;
                 int protCnt = 0;
                 uint protTmp = 0;
-                ulong bufferLength = 1024 * 1024 * 128;
                 Array.Sort(pMap.entries, CompareMemoryEntry); //重新排序MemoryEntry，無name的排前，再依序比較prot、name、start
                 for (int i = 0; i < pMap.entries.Length; i++)
                 {
@@ -96,6 +113,7 @@ namespace PS4CheaterNeo
                         ulong length = end - start;
                         bool isFilter = SectionIsFilter(entry.name, sectionFilterKeys);
 
+                        ulong bufferLength = 1024 * 1024 * 128;
                         if ((entry.prot & 0x5) == 0x5) bufferLength = length; //Executable section
                         if (MemoryStart == 0 || start < MemoryStart) MemoryStart = start;
                         if (MemoryEnd == 0 || end > MemoryEnd) MemoryEnd = end;
@@ -147,6 +165,12 @@ namespace PS4CheaterNeo
             }
         }
 
+        /// <summary>
+        /// Check if section needs to be filtered
+        /// </summary>
+        /// <param name="name">specified section name</param>
+        /// <param name="sectionFilterKeys">filters for Section in regex</param>
+        /// <returns></returns>
         public bool SectionIsFilter(string name, string sectionFilterKeys)
         {
             bool result = false;
@@ -155,6 +179,12 @@ namespace PS4CheaterNeo
             return result;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="prot"></param>
+        /// <returns></returns>
         public Section GetSection(string name, uint prot)
         {
             Section section = null;
@@ -169,6 +199,11 @@ namespace PS4CheaterNeo
             return section;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sid"></param>
+        /// <returns></returns>
         public Section GetSection(int sid)
         {
             SectionDict.TryGetValue(sid, out Section section);
@@ -176,6 +211,13 @@ namespace PS4CheaterNeo
             return section;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sid"></param>
+        /// <param name="name"></param>
+        /// <param name="prot"></param>
+        /// <returns></returns>
         public Section GetSection(int sid, string name, uint prot)
         {
             Section section = GetSection(sid);
@@ -184,6 +226,11 @@ namespace PS4CheaterNeo
             return section;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="address"></param>
+        /// <returns></returns>
         public int GetSectionID(ulong address)
         {
             if (MemoryStart > address || MemoryEnd < address) return -1;
@@ -204,6 +251,10 @@ namespace PS4CheaterNeo
             return -1;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public Section[] GetSectionSortByAddr()
         {
             List<int> keys = new List<int>(SectionDict.Keys);
@@ -214,6 +265,12 @@ namespace PS4CheaterNeo
             return sections;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="s1"></param>
+        /// <param name="s2"></param>
+        /// <returns></returns>
         public int CompareSection(Section s1, Section s2) => s1.Start.CompareTo(s2.Start);
     }
 }

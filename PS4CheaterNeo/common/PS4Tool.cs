@@ -2,92 +2,108 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Windows.Forms;
 
 namespace PS4CheaterNeo
 {
     public static class PS4Tool
     {
         private static readonly Mutex mutex = new Mutex();
-        public static PS4DBG ps4;
+        private static PS4DBG ps4;
 
+        /// <summary>
+        /// Create a PS4DBG instance with the specified IP and connect with socket
+        /// </summary>
+        /// <param name="ip">specify the connection destination IP</param>
+        /// <param name="msg">message returned when connection fails</param>
+        /// <param name="connectTimeout">connect timeout of socket</param>
+        /// <param name="sendTimeout">send timeout of socket</param>
+        /// <param name="receiveTimeout">receive timeout of socket</param>
+        /// <returns>return whether the connection is successful</returns>
         public static bool Connect(string ip, out string msg, int connectTimeout = 10000, int sendTimeout = 10000, int receiveTimeout = 10000)
         {
+            mutex.WaitOne();
             msg = "";
+            bool result = false;
             try
             {
-                mutex.WaitOne();
                 ps4 = new PS4DBG(ip);
                 if (!ps4.IsConnected) ps4.Connect(connectTimeout, sendTimeout, receiveTimeout);
-                mutex.ReleaseMutex();
-                return true;
+                result = true;
             }
-            catch (Exception exception)
-            {
-                mutex.ReleaseMutex();
-                msg = exception.Message;
-                return false;
-            }
+            catch (Exception exception) { msg = exception.Message; }
+            finally { mutex.ReleaseMutex(); }
+            return result;
         }
+
+        /// <summary>
+        /// Used to check if it is connected
+        /// </summary>
+        /// <exception cref="Exception"></exception>
         public static void ConnectedCheck()
         {
-            if (PS4Tool.ps4 == null || (PS4Tool.ps4 != null && !PS4Tool.ps4.IsConnected)) throw new Exception("PS4DBG is not connected.");
+            if (ps4 == null || (ps4 != null && !ps4.IsConnected)) throw new Exception("PS4DBG is not connected.");
         }
 
+        /// <summary>
+        /// get process list
+        /// </summary>
+        /// <returns>libdebug.ProcessList</returns>
         public static ProcessList GetProcessList()
         {
-            ConnectedCheck();
             mutex.WaitOne();
-            try
-            {
-                ProcessList processList = ps4.GetProcessList();
-                mutex.ReleaseMutex();
-                return processList;
-            }
-            catch
-            {
-                mutex.ReleaseMutex();
-            }
-            return null;
+            ConnectedCheck();
+            ProcessList processList = null;
+            try { processList = ps4.GetProcessList(); }
+            catch { }
+            finally { mutex.ReleaseMutex(); }
+            return processList;
         }
 
+        /// <summary>
+        /// get the process info of the specified process ID
+        /// </summary>
+        /// <param name="processID">specified process PID</param>
+        /// <returns>libdebug.ProcessInfo</returns>
         public static ProcessInfo GetProcessInfo(int processID)
         {
-            ConnectedCheck();
             mutex.WaitOne();
-            try
-            {
-                ProcessInfo processInfo = ps4.GetProcessInfo(processID);
-                mutex.ReleaseMutex();
-                return processInfo;
-            }
-            catch
-            {
-                mutex.ReleaseMutex();
-                ProcessInfo info = new ProcessInfo();
-                return info;
-            }
+            ConnectedCheck();
+            ProcessInfo processInfo = new ProcessInfo();
+            try { processInfo = ps4.GetProcessInfo(processID); }
+            catch { }
+            finally { mutex.ReleaseMutex(); }
+            return processInfo;
         }
 
+        /// <summary>
+        /// get the process info of the specified process name
+        /// </summary>
+        /// <param name="processName">specified process name</param>
+        /// <returns>libdebug.ProcessInfo</returns>
         public static ProcessInfo GetProcessInfo(string processName)
         {
-            ConnectedCheck();
             ProcessInfo processInfo = new ProcessInfo();
             ProcessList processList = GetProcessList();
 
             if (processList == null) return processInfo;
 
-            foreach (Process process in processList.processes)
+            for (int idx = 0; idx < processList.processes.Length; idx++)
             {
-                if (process.name == processName)
-                {
-                    processInfo = GetProcessInfo(process.pid);
-                    break;
-                }
+                Process process = processList.processes[idx];
+                if (process.name != processName) continue;
+                processInfo = GetProcessInfo(process.pid);
+                break;
             }
 
             return processInfo;
         }
 
+        /// <summary>
+        /// get the process maps of the specified process name
+        /// </summary>
+        /// <param name="processName">specified process name</param>
+        /// <returns>libdebug.ProcessMap</returns>
         public static ProcessMap GetProcessMaps(string processName)
         {
             ProcessInfo processInfo = GetProcessInfo(processName);
@@ -97,6 +113,11 @@ namespace PS4CheaterNeo
             return GetProcessMaps(processInfo.pid);
         }
 
+        /// <summary>
+        /// get the process maps of the specified process ID
+        /// </summary>
+        /// <param name="processID">specified process PID</param>
+        /// <returns>libdebug.ProcessMap</returns>
         public static ProcessMap GetProcessMaps(int processID)
         {
             //if (Properties.Settings.Default.DebugMode.Value)
@@ -116,23 +137,29 @@ namespace PS4CheaterNeo
 
             //    return pMap;
             //}
-            ConnectedCheck();
             mutex.WaitOne();
-            try
-            {
-                ProcessMap processMap = ps4.GetProcessMaps(processID);
-                mutex.ReleaseMutex();
-                return processMap;
-            }
-            catch
-            {
-                mutex.ReleaseMutex();
-                return null;
-            }
+            ConnectedCheck();
+            ProcessMap processMap = null;
+            try { processMap = ps4.GetProcessMaps(processID); }
+            catch { }
+            finally { mutex.ReleaseMutex(); }
+            return processMap;
         }
 
+        /// <summary>
+        /// Read the destination address from the pointer offsetList
+        /// </summary>
+        /// <param name="processID">specified process PID</param>
+        /// <param name="baseAddress">base address for pointer</param>
+        /// <param name="baseOffsetList">base offsets for pointers</param>
+        /// <param name="pointerMemoryCaches"></param>
+        /// <returns>destination address of pointer</returns>
         public static ulong ReadTailAddress(int processID, ulong baseAddress, List<long> baseOffsetList, in Dictionary<ulong, ulong> pointerMemoryCaches)
         {
+            //long[] offsets = new long[baseOffsetList.Count + 1];
+            //offsets[0] = (long)baseAddress;
+            //for (int idx = 1; idx < offsets.Length; idx++) offsets[idx] = baseOffsetList[idx - 1];
+
             List<long> offsetList = new List<long>();
             offsetList.Add((long)(baseAddress));
             offsetList.AddRange(baseOffsetList);
@@ -140,6 +167,13 @@ namespace PS4CheaterNeo
             return ReadTailAddress(processID, offsetList, pointerMemoryCaches);
         }
 
+        /// <summary>
+        /// Read the destination address from the pointer offsetList
+        /// </summary>
+        /// <param name="processID">specified process PID</param>
+        /// <param name="offsetList">base address and base offset for pointer</param>
+        /// <param name="pointerMemoryCaches">cache the fetched destination address</param>
+        /// <returns>destination address of pointer</returns>
         public static ulong ReadTailAddress(int processID, List<long> offsetList, in Dictionary<ulong, ulong> pointerMemoryCaches)
         {
             ulong targetAddr = 0;
@@ -150,11 +184,9 @@ namespace PS4CheaterNeo
                 ulong queryAddress = (ulong)offset + headAddress;
                 if (idx != offsetList.Count - 1)
                 {
-                    if (!pointerMemoryCaches.TryGetValue(queryAddress, out headAddress))
-                    {
-                        headAddress = BitConverter.ToUInt64(ReadMemory(processID, queryAddress, 8), 0);
-                        pointerMemoryCaches.Add(queryAddress, headAddress);
-                    }
+                    if (pointerMemoryCaches.TryGetValue(queryAddress, out headAddress)) continue;
+                    headAddress = BitConverter.ToUInt64(ReadMemory(processID, queryAddress, 8), 0);
+                    pointerMemoryCaches.Add(queryAddress, headAddress);
                 }
                 else targetAddr = queryAddress;
             }
@@ -162,6 +194,13 @@ namespace PS4CheaterNeo
             return targetAddr;
         }
 
+        /// <summary>
+        /// Read the value of the address to the specified process
+        /// </summary>
+        /// <param name="processID">specified process PID</param>
+        /// <param name="address">destination address</param>
+        /// <param name="length">length of data to be read</param>
+        /// <returns>value of the specified address</returns>
         public static byte[] ReadMemory(int processID, ulong address, int length)
         {
             //if (Properties.Settings.Default.DebugMode.Value)
@@ -178,34 +217,31 @@ namespace PS4CheaterNeo
             //    }
             //    return buf;
             //}
-            ConnectedCheck();
             mutex.WaitOne();
+            ConnectedCheck();
             try
             {
                 byte[] buf = ps4.ReadMemory(processID, address, length);
-                mutex.ReleaseMutex();
                 return buf;
             }
-            catch
-            {
-                mutex.ReleaseMutex();
-            }
+            catch { }
+            finally { mutex.ReleaseMutex(); }
             return new byte[length];
         }
 
+        /// <summary>
+        /// Writes the new value of the address to the specified process
+        /// </summary>
+        /// <param name="processID">specified process PID</param>
+        /// <param name="address">destination address</param>
+        /// <param name="data">new value of destination address</param>
         public static void WriteMemory(int processID, ulong address, byte[] data)
         {
-            ConnectedCheck();
             mutex.WaitOne();
-            try
-            {
-                ps4.WriteMemory(processID, address, data);
-                mutex.ReleaseMutex();
-            }
-            catch
-            {
-                mutex.ReleaseMutex();
-            }
+            ConnectedCheck();
+            try { ps4.WriteMemory(processID, address, data); }
+            catch {}
+            finally { mutex.ReleaseMutex(); }
         }
     }
 }
