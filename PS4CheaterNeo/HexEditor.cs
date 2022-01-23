@@ -203,7 +203,7 @@ D: {8}", HexView.SelectionStart + HexView.LineInfoOffset, HexView.SelectionStart
                     scanType = ScanType.Bytes_4;
                     break;
             }
-            NewAddress newAddress = new NewAddress(mainForm, section, address, scanType, ScanTool.BytesToULong(value), false, "", false);
+            NewAddress newAddress = new NewAddress(mainForm, section, address, scanType, ScanTool.BytesToString(scanType, value), false, "", false);
             if (newAddress.ShowDialog() != DialogResult.OK)
                 return;
         }

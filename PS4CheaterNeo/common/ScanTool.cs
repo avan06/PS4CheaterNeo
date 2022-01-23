@@ -88,9 +88,9 @@ namespace PS4CheaterNeo
                     bytes = BitConverter.GetBytes(float.Parse(value));
                     break;
                 case ScanType.Hex:
+                    value = value.Replace(" ", "").Replace("-", "").Replace("_", "");
                     bytes = new byte[value.Length / 2];
-                    for (int idx = 0; idx < bytes.Length; idx++)
-                        bytes[idx] = Convert.ToByte(value.Substring(idx * 2, 2), 16);
+                    for (int idx = 0; idx < bytes.Length; idx++) bytes[idx] = Convert.ToByte(value.Substring(idx * 2, 2), 16);
                     break;
                 case ScanType.String_:
                     bytes = Encoding.Default.GetBytes(value);
@@ -619,8 +619,8 @@ namespace PS4CheaterNeo
 
                 if (cmd.TryGetValue("scanVal", out string scanVal))
                 {
-                    ScanType scanType;
                     cmd.TryGetValue("typeKey", out string typeKey);
+                    ScanType scanType;
 
                     if (typeKey == "1") scanType = ScanType.Byte_;
                     else if (typeKey == "2") scanType = ScanType.Bytes_2;
@@ -629,6 +629,33 @@ namespace PS4CheaterNeo
                     else if (typeKey == "F") scanType = ScanType.Float_;
                     else if (typeKey == "D") scanType = ScanType.Double_;
                     else if (typeKey == "H") scanType = ScanType.Hex;
+                    else if (scanVal.EndsWith("LU") || scanVal.EndsWith("UL"))
+                    {
+                        scanVal = scanVal.Remove(scanVal.Length - 2);
+                        scanType = ScanType.Bytes_8;
+                    }
+                    else if (scanVal.EndsWith("U"))
+                    {
+                        scanVal = scanVal.Remove(scanVal.Length - 1);
+                        scanType = ScanType.Bytes_8;
+                    }
+                    else if (Regex.IsMatch(scanVal, @"^[\d]+\.*F"))
+                    {
+                        scanVal = scanVal.Remove(scanVal.Length - 1);
+                        scanType = ScanType.Float_;
+                    }
+                    else if (Regex.IsMatch(scanVal, @"^[\d]+\.*D"))
+                    {
+                        scanVal = scanVal.Remove(scanVal.Length - 1);
+                        scanType = ScanType.Double_;
+                    }
+                    else if (scanVal.StartsWith("0X"))
+                    {
+                        scanVal = scanVal.Substring(2);
+                        scanType = ScanType.Hex;
+                    }
+                    else if (Regex.IsMatch(scanVal, @"[\d]+\.[\d]*")) scanType = ScanType.Float_;
+                    else if (Regex.IsMatch(scanVal, @"[A-F]+")) scanType = ScanType.Hex;
                     else scanType = ScanType.Bytes_4;
 
                     bool isAny = false;
@@ -636,12 +663,12 @@ namespace PS4CheaterNeo
                     if (scanVal == "*" || scanVal == "?")
                     {
                         isAny = true;
-                        ScanTool.ScanTypeLengthDict.TryGetValue(scanType, out int anyLength);
+                        ScanTypeLengthDict.TryGetValue(scanType, out int anyLength);
                         valueBytes = new byte[anyLength];
                     }
-                    else valueBytes = ScanTool.ValueStringToByte(scanType, cmd["scanVal"]);
+                    else valueBytes = ValueStringToByte(scanType, scanVal);
 
-                    if (!ScanTool.ScanTypeLengthDict.TryGetValue(scanType, out int groupTypeLength)) groupTypeLength = valueBytes.Length;
+                    if (!ScanTypeLengthDict.TryGetValue(scanType, out int groupTypeLength)) groupTypeLength = valueBytes.Length;
                     else if (groupTypes.Count == 0) groupFirstLength = groupTypeLength;
                     scanTypeLength += groupTypeLength;
                     groupTypes.Add((scanType, groupTypeLength, isAny));

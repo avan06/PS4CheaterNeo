@@ -410,7 +410,7 @@ namespace PS4CheaterNeo
             // SectionViewSID
             // 
             this.SectionViewSID.Text = "ID";
-            this.SectionViewSID.Width = 0;
+            this.SectionViewSID.Width = 70;
             // 
             // SectionViewOffset
             // 

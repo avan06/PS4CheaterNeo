@@ -1,6 +1,7 @@
 ﻿using libdebug;
 using System;
 using System.Collections.Generic;
+using System.Net.Sockets;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -10,24 +11,31 @@ namespace PS4CheaterNeo
     {
         private static readonly Mutex mutex = new Mutex();
         private static PS4DBG ps4;
+        private static System.Diagnostics.Stopwatch tickerMajor = System.Diagnostics.Stopwatch.StartNew();
 
         /// <summary>
         /// Create a PS4DBG instance with the specified IP and connect with socket
         /// </summary>
         /// <param name="ip">specify the connection destination IP</param>
         /// <param name="msg">message returned when connection fails</param>
-        /// <param name="connectTimeout">connect timeout of socket</param>
-        /// <param name="sendTimeout">send timeout of socket</param>
-        /// <param name="receiveTimeout">receive timeout of socket</param>
+        /// <param name="connectTimeout">connect timeout of socket in milliseconds</param>
+        /// <param name="reCreateInstance">determine whether to create a new instance if the PS4DBG object has been created</param>
+        /// <param name="sendTimeout">send timeout of socket in milliseconds</param>
+        /// <param name="receiveTimeout">receive timeout of socket in milliseconds</param>
         /// <returns>return whether the connection is successful</returns>
-        public static bool Connect(string ip, out string msg, int connectTimeout = 10000, int sendTimeout = 10000, int receiveTimeout = 10000)
+        public static bool Connect(string ip, out string msg, int connectTimeout = 10000, bool reCreateInstance = false, int sendTimeout = 10000, int receiveTimeout = 10000)
         {
             mutex.WaitOne();
             msg = "";
             bool result = false;
             try
             {
-                ps4 = new PS4DBG(ip);
+                if (ps4 != null && (!ps4.IsConnected || reCreateInstance))
+                {
+                    ps4.Disconnect();
+                    ps4 = null;
+                }
+                if (ps4 == null) ps4 = new PS4DBG(ip);
                 if (!ps4.IsConnected) ps4.Connect(connectTimeout, sendTimeout, receiveTimeout);
                 result = true;
             }
@@ -47,6 +55,8 @@ namespace PS4CheaterNeo
 
         /// <summary>
         /// get process list
+        /// Connection closed by peer when the ErrorCode of the Socket is 10054,
+        /// this situation means that ps4debug has been abnormal, ps4 may wake up from sleep, no solution.
         /// </summary>
         /// <returns>libdebug.ProcessList</returns>
         public static ProcessList GetProcessList()
@@ -55,7 +65,15 @@ namespace PS4CheaterNeo
             ConnectedCheck();
             ProcessList processList = null;
             try { processList = ps4.GetProcessList(); }
-            catch { }
+            catch (SocketException ex)
+            {
+                if (ex.ErrorCode == 10054) throw; //connection closed by peer
+                if (tickerMajor.Elapsed.TotalSeconds >= 1.5)
+                {
+                    tickerMajor = System.Diagnostics.Stopwatch.StartNew();
+                    Connect(Properties.Settings.Default.PS4IP.Value, out string msg, 1000);
+                }
+            }
             finally { mutex.ReleaseMutex(); }
             return processList;
         }
@@ -156,33 +174,29 @@ namespace PS4CheaterNeo
         /// <returns>destination address of pointer</returns>
         public static ulong ReadTailAddress(int processID, ulong baseAddress, List<long> baseOffsetList, in Dictionary<ulong, ulong> pointerMemoryCaches)
         {
-            //long[] offsets = new long[baseOffsetList.Count + 1];
-            //offsets[0] = (long)baseAddress;
-            //for (int idx = 1; idx < offsets.Length; idx++) offsets[idx] = baseOffsetList[idx - 1];
+            long[] offsets = new long[baseOffsetList.Count + 1];
+            offsets[0] = (long)baseAddress;
+            for (int idx = 1; idx < offsets.Length; idx++) offsets[idx] = baseOffsetList[idx - 1];
 
-            List<long> offsetList = new List<long>();
-            offsetList.Add((long)(baseAddress));
-            offsetList.AddRange(baseOffsetList);
-
-            return ReadTailAddress(processID, offsetList, pointerMemoryCaches);
+            return ReadTailAddress(processID, offsets, pointerMemoryCaches);
         }
 
         /// <summary>
         /// Read the destination address from the pointer offsetList
         /// </summary>
         /// <param name="processID">specified process PID</param>
-        /// <param name="offsetList">base address and base offset for pointer</param>
+        /// <param name="offsets">base address and base offset for pointer</param>
         /// <param name="pointerMemoryCaches">cache the fetched destination address</param>
         /// <returns>destination address of pointer</returns>
-        public static ulong ReadTailAddress(int processID, List<long> offsetList, in Dictionary<ulong, ulong> pointerMemoryCaches)
+        public static ulong ReadTailAddress(int processID, long[] offsets, in Dictionary<ulong, ulong> pointerMemoryCaches)
         {
             ulong targetAddr = 0;
             ulong headAddress = 0;
-            for (int idx = 0; idx < offsetList.Count; ++idx)
+            for (int idx = 0; idx < offsets.Length; ++idx)
             {
-                long offset = offsetList[idx];
+                long offset = offsets[idx];
                 ulong queryAddress = (ulong)offset + headAddress;
-                if (idx != offsetList.Count - 1)
+                if (idx != offsets.Length - 1)
                 {
                     if (pointerMemoryCaches.TryGetValue(queryAddress, out headAddress)) continue;
                     headAddress = BitConverter.ToUInt64(ReadMemory(processID, queryAddress, 8), 0);

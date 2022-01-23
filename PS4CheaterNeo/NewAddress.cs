@@ -18,7 +18,7 @@ namespace PS4CheaterNeo
         List<Label> OffsetLabelList;
 
         public ulong Address { get; private set; }
-        public ulong Value { get; private set; }
+        public string Value { get; private set; }
         public ScanType CheatType { get; private set; }
         public bool IsLock { get; private set; }
         public bool IsPointer { get; private set; }
@@ -26,9 +26,9 @@ namespace PS4CheaterNeo
         public List<long> OffsetList { get; private set; }
         public Section AddrSection { get; private set; }
         public Section BaseSection { get; private set; }
-        public NewAddress(Main mainForm, Section section, ulong address, ScanType scanType, ulong value, bool cheatLock, string cheatDesc, bool isEdit) : 
+        public NewAddress(Main mainForm, Section section, ulong address, ScanType scanType, string value, bool cheatLock, string cheatDesc, bool isEdit) : 
             this(mainForm, section, null, address, scanType, value, cheatLock, cheatDesc, null, isEdit) { }
-        public NewAddress(Main mainForm, Section addrSection, Section baseSection, ulong address, ScanType scanType, ulong value, bool cheatLock, string cheatDesc, List<long> offsetList, bool isEdit)
+        public NewAddress(Main mainForm, Section addrSection, Section baseSection, ulong address, ScanType scanType, string value, bool cheatLock, string cheatDesc, List<long> offsetList, bool isEdit)
         {
             InitializeComponent();
 
@@ -63,14 +63,14 @@ namespace PS4CheaterNeo
 
             Address = address;
             CheatType = scanType;
-            Value = value;
+            Value = (value ?? "") == "" ? "0" : value;
             IsLock = cheatLock;
             Descriptioin = cheatDesc;
             IsPointer = offsetList != null;
 
             AddressBox.Text = Address.ToString("X");
             ScanTypeBox.SelectedIndex = ScanTypeBox.FindStringExact(CheatType.GetDescription());
-            ValueBox.Text = Value != 0 ? ScanTool.ULongToString(CheatType, Value) : "0";
+            ValueBox.Text = Value;
             LockBox.Checked = IsLock;
             DescriptionBox.Text = Descriptioin;
             PointerBox.Checked = IsPointer;
@@ -117,12 +117,12 @@ namespace PS4CheaterNeo
             {
                 Address = ulong.Parse(AddressBox.Text, System.Globalization.NumberStyles.HexNumber);
                 CheatType = (ScanType)((ComboboxItem)(ScanTypeBox.SelectedItem)).Value;
-                Value = ScanTool.ValueStringToULong(CheatType, ValueBox.Text);
-                ulong valueULong = ScanTool.ValueStringToULong(CheatType, ValueBox.Text);
+                ScanTool.ValueStringToULong(CheatType, ValueBox.Text);
+                Value = ValueBox.Text;
                 IsLock = LockBox.Checked;
                 Descriptioin = DescriptionBox.Text;
 
-                if (!AddressBox.ReadOnly) mainForm.AddToCheatGrid(AddrSection, Address - AddrSection.Start, CheatType, valueULong, IsLock, Descriptioin, IsPointer, OffsetList);
+                if (!AddressBox.ReadOnly) mainForm.AddToCheatGrid(AddrSection, Address - AddrSection.Start, CheatType, Value, IsLock, Descriptioin, IsPointer, OffsetList);
 
                 DialogResult = DialogResult.OK;
                 Close();
@@ -133,10 +133,7 @@ namespace PS4CheaterNeo
             }
         }
 
-        private void CloseBtn_Click(object sender, EventArgs e)
-        {
-            Close();
-        }
+        private void CloseBtn_Click(object sender, EventArgs e) => Close();
 
         private void AddressBox_Leave(object sender, EventArgs e)
         {
@@ -194,15 +191,9 @@ namespace PS4CheaterNeo
             Height = savePosition.Y + SaveBtn.Height + 50;
         }
 
-        private void DelOffset_Click(object sender, EventArgs e)
-        {
-            SetOffsetBoxs(false);
-        }
+        private void DelOffset_Click(object sender, EventArgs e) => SetOffsetBoxs(false);
 
-        private void AddOffset_Click(object sender, EventArgs e)
-        {
-            SetOffsetBoxs(true);
-        }
+        private void AddOffset_Click(object sender, EventArgs e) => SetOffsetBoxs(true);
 
         private void SetOffsetBoxs(bool isAdd)
         {
@@ -276,7 +267,7 @@ namespace PS4CheaterNeo
             var newText = ScanTool.ULongToString(newCheatType, newValue);
             if (newText == "0") return;
 
-            Value = newValue;
+            Value = newValue.ToString();
             CheatType = newCheatType;
             ValueBox.Text = newText;
         }
@@ -327,10 +318,7 @@ namespace PS4CheaterNeo
                     }
                 }
             }
-            catch
-            {
-
-            }
+            catch {}
         }
     }
 }

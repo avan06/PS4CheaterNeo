@@ -27,17 +27,15 @@ namespace PS4CheaterNeo
             {
                 ToolStripMsg.ForeColor = Color.Red;
                 ToolStripMsg.Text = errorMsg;
+                return;
             }
-            else
-            {
-                bool isConnected = false;
-                string msg = "";
-                try { isConnected = PS4Tool.Connect(IpBox.Text, out msg, 1000); }
-                catch (Exception) {}
-                ToolStripMsg.ForeColor = Color.Red;
-                ToolStripMsg.Text = msg;
-                if (isConnected) Close();
-            }
+            bool isConnected = false;
+            string msg = "";
+            try { isConnected = PS4Tool.Connect(IpBox.Text, out msg, 1000, true); }
+            catch (Exception) { }
+            ToolStripMsg.ForeColor = Color.Red;
+            ToolStripMsg.Text = msg;
+            if (isConnected) Close();
         }
 
         private void SendPayloadBtn_Click(object sender, EventArgs e)

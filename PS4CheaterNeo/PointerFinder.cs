@@ -155,7 +155,7 @@ namespace PS4CheaterNeo
             {
                 List<long> offsetList = new List<long> { (long)baseAddress };
                 offsetList.AddRange(pointerResult.pointer.offsets);
-                NewAddress newAddress = new NewAddress(mainForm, null, section, 0, scanType, 0, false, "", offsetList, false);
+                NewAddress newAddress = new NewAddress(mainForm, null, section, 0, scanType, null, false, "", offsetList, false);
                 if (newAddress.ShowDialog() != DialogResult.OK)
                     return;
             }
@@ -227,7 +227,7 @@ namespace PS4CheaterNeo
                         msg += "_" + offset.ToString("X");
                         offsetList.Add(offset);
                     });
-                    mainForm.AddToCheatGrid(section, 0, scanType, 0, false, msg, true, offsetList);
+                    mainForm.AddToCheatGrid(section, 0, scanType, "0", false, msg, true, offsetList); //FIXME oldValue is 0
                 }
                 catch (Exception exception)
                 {

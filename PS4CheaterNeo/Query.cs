@@ -118,7 +118,7 @@ namespace PS4CheaterNeo
             }
             catch (Exception exception)
             {
-                MessageBox.Show(exception.Message + "\n" + exception.StackTrace, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                if (!exception.Message.Contains("Map is null")) MessageBox.Show(exception.Message + "\n" + exception.StackTrace, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
 
@@ -196,7 +196,7 @@ namespace PS4CheaterNeo
             try
             {
                 System.Diagnostics.Stopwatch tickerMajor = System.Diagnostics.Stopwatch.StartNew();
-                int hitCnt = 0;
+                ulong hitCnt = 0;
                 int scanStep = (comparerTool.scanType == ScanType.Hex || comparerTool.scanType == ScanType.String_) ? 1 :
                     alignment ? (comparerTool.scanTypeLength > 4 ? 4 : comparerTool.scanTypeLength) : 1;
                 long processedMemoryLen = 0;
@@ -224,7 +224,7 @@ namespace PS4CheaterNeo
 
                         if (results != null && results.Count > 0)
                         {
-                            hitCnt += results.Count;
+                            hitCnt += (ulong)results.Count;
                             resultsDict[section.SID] = results;
                         }
                         else section.Check = false;
@@ -338,10 +338,16 @@ namespace PS4CheaterNeo
                     {
                         (ScanType scanType, int groupTypeLength, bool isAny) = comparerTool.groupTypes[gIdx];
                         if (scanIdx + groupTypeLength > buffer.LongLength) break;
-                        byte[] valueBytes = comparerTool.groupValues[gIdx];
-                        byte[] newGroupBytes = new byte[groupTypeLength];
-                        Buffer.BlockCopy(buffer, scanIdx, newGroupBytes, 0, groupTypeLength);
-                        if (!isAny && !ScanTool.ComparerExact(scanType, newGroupBytes, valueBytes))
+                        bool comparer = false;
+                        if (!isAny)
+                        {
+                            byte[] valueBytes = comparerTool.groupValues[gIdx];
+                            byte[] newGroupBytes = new byte[groupTypeLength];
+                            Buffer.BlockCopy(buffer, scanIdx, newGroupBytes, 0, groupTypeLength);
+                            comparer = ScanTool.ComparerExact(scanType, newGroupBytes, valueBytes);
+                        }
+
+                        if (!isAny && !comparer)
                         {
                             if (scanIdx > firstScanIdx) scanIdx = firstScanIdx;
                             break;
@@ -713,9 +719,9 @@ namespace PS4CheaterNeo
                 Section section = sectionTool.GetSection(sid);
                 ScanType scanType = this.ParseFromDescription<ScanType>(resultItem.SubItems[(int)ResultCol.ResultListType].Text);
                 uint offsetAddr = (uint)(ulong.Parse(resultItem.SubItems[(int)ResultCol.ResultListAddress].Text, NumberStyles.HexNumber) - section.Start);
-                ulong resultValue = ScanTool.ValueStringToULong(scanType, resultItem.SubItems[(int)ResultCol.ResultListValue].Text);
+                string oldValue = resultItem.SubItems[(int)ResultCol.ResultListValue].Text;
 
-                if (offsetAddr > 0) mainForm.AddToCheatGrid(section, offsetAddr, scanType, resultValue, false, "", false, null);
+                if (offsetAddr > 0) mainForm.AddToCheatGrid(section, offsetAddr, scanType, oldValue, false, "", false, null);
             }
         }
 
@@ -792,9 +798,9 @@ namespace PS4CheaterNeo
                 Section section = sectionTool.GetSection(sid);
                 ScanType scanType = this.ParseFromDescription<ScanType>(resultItem.SubItems[(int)ResultCol.ResultListType].Text);
                 uint offsetAddr = (uint)(ulong.Parse(resultItem.SubItems[(int)ResultCol.ResultListAddress].Text, NumberStyles.HexNumber) - section.Start);
-                ulong resultValue = ScanTool.ValueStringToULong(scanType, resultItem.SubItems[(int)ResultCol.ResultListValue].Text);
+                string oldValue = resultItem.SubItems[(int)ResultCol.ResultListValue].Text;
 
-                if (offsetAddr > 0) mainForm.AddToCheatGrid(section, offsetAddr, scanType, resultValue, false, "", false, null);
+                if (offsetAddr > 0) mainForm.AddToCheatGrid(section, offsetAddr, scanType, oldValue, false, "", false, null);
             }
         }
 

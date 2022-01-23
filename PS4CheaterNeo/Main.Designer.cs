@@ -189,7 +189,7 @@ namespace PS4CheaterNeo
             // 
             // toolStrip1
             // 
-            this.toolStrip1.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.toolStrip1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(153)))), ((int)(((byte)(180)))), ((int)(((byte)(209)))));
             this.toolStrip1.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripSeparator1,
@@ -410,8 +410,9 @@ namespace PS4CheaterNeo
             this.CheatGridView.AllowUserToAddRows = false;
             this.CheatGridView.AllowUserToResizeRows = false;
             this.CheatGridView.BackgroundColor = System.Drawing.Color.DimGray;
-            this.CheatGridView.BaseRowColor = System.Drawing.Color.White;
-            this.CheatGridView.BaseRowColorEnabled = false;
+            this.CheatGridView.BaseRowColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(115)))), ((int)(((byte)(129)))));
+            this.CheatGridView.BaseRowColorEnabled = true;
+            this.CheatGridView.BaseRowColorInterleaved = true;
             this.CheatGridView.BaseRowGroupOrder = GroupGridView.GroupGridView.Order.Ascending;
             this.CheatGridView.BaseRowGroupOrderColumn = -1;
             this.CheatGridView.BaseRowSingleGroupEnabled = false;
@@ -452,11 +453,13 @@ namespace PS4CheaterNeo
             this.CheatGridView.TopLeftHeaderExpandAll = ((System.Drawing.Bitmap)(resources.GetObject("CheatGridView.TopLeftHeaderExpandAll")));
             this.CheatGridView.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.CheatGridView_CellContentClick);
             this.CheatGridView.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.CheatGridView_CellEndEdit);
+            this.CheatGridView.CellValidating += new System.Windows.Forms.DataGridViewCellValidatingEventHandler(this.CheatGridView_CellValidating);
+            this.CheatGridView.RowPostPaint += new System.Windows.Forms.DataGridViewRowPostPaintEventHandler(this.CheatGridView_RowPostPaint);
             this.CheatGridView.RowsRemoved += new System.Windows.Forms.DataGridViewRowsRemovedEventHandler(this.CheatGridView_RowsRemoved);
             // 
             // CheatGridViewDel
             // 
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
             dataGridViewCellStyle1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             dataGridViewCellStyle1.ForeColor = System.Drawing.Color.White;
             dataGridViewCellStyle1.NullValue = "Delete";
@@ -603,6 +606,13 @@ namespace PS4CheaterNeo
         private System.Windows.Forms.ToolStripButton ToolStripLockEnable;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator12;
         private System.Windows.Forms.ToolStripLabel ToolStripProcessInfo;
+        private System.Windows.Forms.ToolStripButton ToolStripCollapseAll;
+        private System.Windows.Forms.ToolStripButton ToolStripExpandAll;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripButton ToolStripSettings;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
+        private System.Windows.Forms.ToolStripButton ToolStripHexView;
+        private System.Windows.Forms.ToolStripMenuItem CheatGridMenuCopyAddress;
         private System.Windows.Forms.DataGridViewButtonColumn CheatGridViewDel;
         private System.Windows.Forms.DataGridViewTextBoxColumn CheatGridViewAddress;
         private System.Windows.Forms.DataGridViewTextBoxColumn CheatGridViewType;
@@ -611,13 +621,6 @@ namespace PS4CheaterNeo
         private System.Windows.Forms.DataGridViewTextBoxColumn CheatGridViewSection;
         private System.Windows.Forms.DataGridViewCheckBoxColumn CheatGridViewLock;
         private System.Windows.Forms.DataGridViewTextBoxColumn CheatGridViewDescription;
-        private System.Windows.Forms.ToolStripButton ToolStripCollapseAll;
-        private System.Windows.Forms.ToolStripButton ToolStripExpandAll;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
-        private System.Windows.Forms.ToolStripButton ToolStripSettings;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
-        private System.Windows.Forms.ToolStripButton ToolStripHexView;
-        private System.Windows.Forms.ToolStripMenuItem CheatGridMenuCopyAddress;
     }
 }
 

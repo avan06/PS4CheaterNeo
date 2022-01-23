@@ -2,7 +2,7 @@
 
 PS4CheaterNeo is a program to find game cheat codes, and it is based on [`ps4debug`](https://github.com/jogolden/ps4debug) and `.Net Framework 4.8`.
 
-Currently in `version 0.9.4.4-beta`
+Currently in `version 0.9.4.5-beta`
 
 
 ## Table of Contents
@@ -15,6 +15,7 @@ Currently in `version 0.9.4.4-beta`
   * [Query window](#query-window)
   * [Section](#section)
   * [Group ScanType](#group-scantype)
+  * [Group ScanType unspecified types](#group-scantype-unspecified-types)
   * [Hex Editor](#hex-editor)
   * [Pointer finder](#pointer-finder)
   * [Option](#option)
@@ -108,13 +109,26 @@ Currently in `version 0.9.4.4-beta`
 - Use `group search` when you already know the `data structure` of the query target.
 - Input format: [`ValueType`1:]`ValueNumber`1 [,] [`ValueType`2:]`ValueNumber`2 [,] [`ValueType`3:]`ValueNumber`3...
 - The `ValueType` can be `1`(Byte), `2`(2 Bytes), `4`(4 Bytes), `8`(8 Bytes), `F`(Float), `D`(Double), `H`(Hex) or not specified.
-- The `ValueType` is preset to 4 bytes when the value type is not specified.
 - The `ValueNumber` can be specified as an asterisk(`*`) or question mark(`?`) when the value is unknown.
 - The delimiter can be comma(`,`) or space(` `).
+
+
+### Group ScanType unspecified types
+
+- The type of literals in a group search can be automatically determined by its `suffix or prefix or specific characters` as follows(`case insensitive`):
+- The literal with the `u or ul, lu suffix` is of type `ulong(8 Bytes)`,
+- The literal with the `f suffix` is of type `float`,
+- The literal with the `d suffix` is of type `double`,
+- The literal with the `0x prefix` is of type `Hex(hexadecimal)`,
+- The literal contains a `decimal point (.)` character is of type `float`,
+- The literal contains `a~f characters` is of type `Hex(hexadecimal)` when not parsed as float and double,
+- Other literals of `unspecified types`, default to `uint(4 Bytes)` type.
 
 > Example:  
 > Assuming the target `structure` is `63 00` `E7 03 00 00` `AB CD 00 00` `00 01`  
 > `Group scan` can be entered as `2:99 999 ? 2:256`  
+> Assuming the target `structure` is `02 00` `AB CD` `E7 03 00 00` `01 00 00 00 00 00 00 00`
+> `Group scan` can be entered as `2:2` `2:?` `e7030000` `1u`
 
 
 ### Hex Editor
