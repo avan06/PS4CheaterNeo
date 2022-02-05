@@ -16,14 +16,15 @@ namespace PS4CheaterNeo
         readonly Main mainForm;
         readonly SectionTool sectionTool;
         ComparerTool comparerTool;
-        Dictionary<int, ResultList> resultsDict;
+        Dictionary<int, BitsDictionary> bitsDictDict;
         public Query(Main mainForm)
         {
             InitializeComponent();
             this.mainForm = mainForm;
             sectionTool = new SectionTool();
-            resultsDict = new Dictionary<int, ResultList>();
+            bitsDictDict = new Dictionary<int, BitsDictionary>();
             IsFilterBox.Checked = Properties.Settings.Default.EnableFilterQuery.Value;
+            IsFilterSizeBox.Checked = Properties.Settings.Default.EnableFilterSizeQuery.Value;
         }
 
         #region Event
@@ -43,7 +44,7 @@ namespace PS4CheaterNeo
                 return;
             }
 
-            resultsDict = null;
+            bitsDictDict = null;
             GC.Collect();
             Properties.Settings.Default.Save();
         }
@@ -94,7 +95,7 @@ namespace PS4CheaterNeo
                 for (int sectionIdx = 0; sectionIdx < sections.Length; sectionIdx++)
                 {
                     Section section = sections[sectionIdx];
-                    if (IsFilterBox.Checked && section.IsFilter) continue;
+                    if ((IsFilterBox.Checked && section.IsFilter) || (IsFilterSizeBox.Checked && section.IsFilterSize)) continue;
 
                     string start = String.Format("{0:X9}", section.Start);
                     int itemIdx = SectionView.Items.Count;
@@ -104,13 +105,21 @@ namespace PS4CheaterNeo
                     SectionView.Items[itemIdx].SubItems.Add((section.Length / 1024).ToString() + "KB");
                     SectionView.Items[itemIdx].SubItems.Add(section.SID.ToString());
                     if (section.Offset != 0) SectionView.Items[itemIdx].SubItems.Add(section.Offset.ToString("X"));
+                    else SectionView.Items[itemIdx].SubItems.Add("");
+                    SectionView.Items[itemIdx].SubItems.Add((section.Start + (ulong)section.Length).ToString("X9"));
                     if (section.IsFilter)
                     {
                         SectionView.Items[itemIdx].Tag = "filter";
                         SectionView.Items[itemIdx].ForeColor = Color.DarkGray;
                         SectionView.Items[itemIdx].BackColor = Color.DimGray;
                     }
-                    if (section.Name.StartsWith("executable")) SectionView.Items[itemIdx].ForeColor = Color.GreenYellow;
+                    else if (section.IsFilterSize)
+                    {
+                        SectionView.Items[itemIdx].Tag = "filterSize";
+                        SectionView.Items[itemIdx].ForeColor = Color.DarkCyan;
+                        SectionView.Items[itemIdx].BackColor = Color.DarkSlateGray;
+                    }
+                    else if (section.Name.StartsWith("executable")) SectionView.Items[itemIdx].ForeColor = Color.GreenYellow;
                     else if (section.Name.Contains("NoName")) SectionView.Items[itemIdx].ForeColor = Color.Red;
                     else if (Regex.IsMatch(section.Name, @"^\[\d+\]$")) SectionView.Items[itemIdx].ForeColor = Color.HotPink;
                 }
@@ -132,8 +141,8 @@ namespace PS4CheaterNeo
             }
 
             ResultView.Items.Clear();
-            if (resultsDict != null) resultsDict.Clear();
-            resultsDict = new Dictionary<int, ResultList>();
+            if (bitsDictDict != null) bitsDictDict.Clear();
+            bitsDictDict = new Dictionary<int, BitsDictionary>();
             GC.Collect();
 
             ScanBtn.Text = "First Scan";
@@ -164,6 +173,7 @@ namespace PS4CheaterNeo
                     string value1 = Value1Box.Text;
                     bool alignment = AlignmentBox.Checked;
                     bool isFilter = IsFilterBox.Checked;
+                    bool isFilterSize = IsFilterSizeBox.Checked;
                     Enum.TryParse(((ComboboxItem)(ScanTypeBox.SelectedItem)).Value.ToString(), out ScanType scanType);
                     Enum.TryParse(CompareTypeBox.SelectedItem.ToString(), out CompareType compareType);
 
@@ -176,7 +186,7 @@ namespace PS4CheaterNeo
                     ScanBtn.Text = "Stop";
                     if (scanSource != null) scanSource.Dispose();
                     scanSource = new CancellationTokenSource();
-                    scanTask = ScanTask(alignment, isFilter, AddrMin, AddrMax);
+                    scanTask = ScanTask(alignment, isFilter, isFilterSize, AddrMin, AddrMax);
                     scanTask.ContinueWith(t => TaskCompleted());
 
                     ScanTypeBox.Enabled = false;
@@ -191,7 +201,7 @@ namespace PS4CheaterNeo
         }
 
         //Invoke(new MethodInvoker(() => { }));
-        private async Task<bool> ScanTask(bool alignment, bool isFilter, ulong AddrMin, ulong AddrMax) => await Task.Run(() =>
+        private async Task<bool> ScanTask(bool alignment, bool isFilter, bool isFilterSize, ulong AddrMin, ulong AddrMax) => await Task.Run(() =>
         {
             try
             {
@@ -212,20 +222,20 @@ namespace PS4CheaterNeo
                     Section section = sectionTool.SectionDict[sectionKeys[sectionIdx]];
                     tasks[sectionIdx] = Task.Run<(int, TimeSpan)>(() =>
                     {
-                        if ((isFilter && section.IsFilter) || !section.Check || section.Start + (ulong)section.Length < AddrMin || section.Start > AddrMax) return (section.SID, tickerMajor.Elapsed);
+                        if ((isFilter && section.IsFilter) || (isFilterSize && section.IsFilterSize) || !section.Check || section.Start + (ulong)section.Length < AddrMin || section.Start > AddrMax) return (section.SID, tickerMajor.Elapsed);
                         semaphore.Wait();
                         if (scanSource.Token.IsCancellationRequested)
                         {
                             semaphore.Release();
                             return (section.SID, tickerMajor.Elapsed);
                         }
-                        ResultList results = comparerTool.groupTypes == null ? Comparer(section, scanStep, AddrMin, AddrMax) : ComparerGroup(section, scanStep, AddrMin, AddrMax);
+                        BitsDictionary bitsDict = comparerTool.groupTypes == null ? Comparer(section, scanStep, AddrMin, AddrMax) : ComparerGroup(section, scanStep, AddrMin, AddrMax);
                         semaphore.Release();
 
-                        if (results != null && results.Count > 0)
+                        if (bitsDict != null && bitsDict.Count > 0)
                         {
-                            hitCnt += (ulong)results.Count;
-                            resultsDict[section.SID] = results;
+                            hitCnt += (ulong)bitsDict.Count;
+                            this.bitsDictDict[section.SID] = bitsDict;
                         }
                         else section.Check = false;
 
@@ -254,8 +264,6 @@ namespace PS4CheaterNeo
                 }));
 
                 GC.Collect();
-
-                return true;
             }
             catch (Exception exception)
             {
@@ -268,9 +276,9 @@ namespace PS4CheaterNeo
             return true;
         });
 
-        private ResultList Comparer(Section section, int scanStep, ulong AddrMin, ulong AddrMax)
+        private BitsDictionary Comparer(Section section, int scanStep, ulong AddrMin, ulong AddrMax)
         {
-            if (!resultsDict.TryGetValue(section.SID, out ResultList results)) results = new ResultList(comparerTool.scanTypeLength, scanStep);
+            if (!bitsDictDict.TryGetValue(section.SID, out BitsDictionary bitsDict)) bitsDict = new BitsDictionary(scanStep, comparerTool.scanTypeLength);
             if (ResultView.Items.Count == 0)
             {
                 byte[] buffer = PS4Tool.ReadMemory(section.PID, section.Start, section.Length);
@@ -284,47 +292,48 @@ namespace PS4CheaterNeo
                     if (comparerTool.value0Byte == null)
                     {
                         ulong longValue = ScanTool.BytesToULong(newValue);
-                        if (ScanTool.Comparer(comparerTool, longValue, 0)) results.Add((uint)scanIdx, newValue);
+                        if (ScanTool.Comparer(comparerTool, longValue, 0)) bitsDict.Add((uint)scanIdx, newValue);
                     }
-                    else if (ScanTool.ComparerExact(comparerTool.scanType, newValue, comparerTool.value0Byte)) results.Add((uint)scanIdx, newValue);
+                    else if (ScanTool.ComparerExact(comparerTool.scanType, newValue, comparerTool.value0Byte)) bitsDict.Add((uint)scanIdx, newValue);
                 }
             }
             else
             {
                 byte MinResultAccessFactor = Properties.Settings.Default.MinResultAccessFactor.Value;
                 byte[] buffer = null;
-                ResultList newResults = new ResultList(comparerTool.scanTypeLength, scanStep);
-                if (results.Count >= MinResultAccessFactor) buffer = PS4Tool.ReadMemory(section.PID, section.Start, section.Length);
+                BitsDictionary newBitsDict = new BitsDictionary(scanStep, comparerTool.scanTypeLength);
+                if (bitsDict.Count >= MinResultAccessFactor) buffer = PS4Tool.ReadMemory(section.PID, section.Start, section.Length);
 
-                for (int rIdx = 0; rIdx < results.Count; rIdx++)
+                bitsDict.Begin();
+                for (int idx = 0; idx < bitsDict.Count; idx++)
                 {
                     if (scanSource.Token.IsCancellationRequested) break;
 
-                    (uint offsetAddr, byte[] oldBytes) = results.Read(rIdx);
+                    (uint offsetAddr, byte[] oldBytes) = bitsDict.Get();
                     ulong address = section.Start + offsetAddr;
                     if (address < AddrMin || address > AddrMax) continue;
 
                     ulong oldData = ScanTool.BytesToULong(oldBytes);
                     byte[] newValue = new byte[comparerTool.scanTypeLength];
-                    if (results.Count < MinResultAccessFactor) newValue = PS4Tool.ReadMemory(section.PID, address, comparerTool.scanTypeLength);
+                    if (bitsDict.Count < MinResultAccessFactor) newValue = PS4Tool.ReadMemory(section.PID, address, comparerTool.scanTypeLength);
                     else Buffer.BlockCopy(buffer, (int)offsetAddr, newValue, 0, comparerTool.scanTypeLength);
 
                     if (comparerTool.value0Byte == null)
                     {
                         ulong newData = ScanTool.BytesToULong(newValue);
-                        if (ScanTool.Comparer(comparerTool, newData, oldData)) newResults.Add(offsetAddr, newValue);
+                        if (ScanTool.Comparer(comparerTool, newData, oldData)) newBitsDict.Add(offsetAddr, newValue);
                     }
-                    else if (ScanTool.ComparerExact(comparerTool.scanType, newValue, comparerTool.value0Byte)) newResults.Add(offsetAddr, newValue);
+                    else if (ScanTool.ComparerExact(comparerTool.scanType, newValue, comparerTool.value0Byte)) newBitsDict.Add(offsetAddr, newValue);
                 }
-                results.Clear();
-                results = newResults;
+                bitsDict.Clear();
+                bitsDict = newBitsDict;
             }
-            return results;
+            return bitsDict;
         }
 
-        private ResultList ComparerGroup(Section section, int scanStep, ulong AddrMin, ulong AddrMax)
+        private BitsDictionary ComparerGroup(Section section, int scanStep, ulong AddrMin, ulong AddrMax)
         {
-            if (!resultsDict.TryGetValue(section.SID, out ResultList results)) results = new ResultList(comparerTool.scanTypeLength, scanStep);
+            if (!bitsDictDict.TryGetValue(section.SID, out BitsDictionary bitsDict)) bitsDict = new BitsDictionary(scanStep, comparerTool.scanTypeLength);
             if (ResultView.Items.Count == 0)
             {
                 byte[] buffer = PS4Tool.ReadMemory(section.PID, section.Start, section.Length);
@@ -358,7 +367,7 @@ namespace PS4CheaterNeo
                             {
                                 byte[] newBytes = new byte[comparerTool.scanTypeLength];
                                 Buffer.BlockCopy(buffer, firstScanIdx, newBytes, 0, comparerTool.scanTypeLength);
-                                results.Add((uint)firstScanIdx, newBytes);
+                                bitsDict.Add((uint)firstScanIdx, newBytes);
                             }
                             scanIdx += groupTypeLength;
                         }
@@ -368,17 +377,19 @@ namespace PS4CheaterNeo
             else
             {
                 byte[] buffer = null;
-                ResultList newResults = new ResultList(comparerTool.scanTypeLength, scanStep);
+                BitsDictionary newBitsDict = new BitsDictionary(scanStep, comparerTool.scanTypeLength);
                 byte MinResultAccessFactor = Properties.Settings.Default.MinResultAccessFactor.Value;
-                if (results.Count >= MinResultAccessFactor) buffer = PS4Tool.ReadMemory(section.PID, section.Start, section.Length);
-                for (int rIdx = 0; rIdx < results.Count; rIdx++)
+                if (bitsDict.Count >= MinResultAccessFactor) buffer = PS4Tool.ReadMemory(section.PID, section.Start, section.Length);
+
+                bitsDict.Begin();
+                for (int idx = 0; idx < bitsDict.Count; idx++)
                 {
                     if (scanSource.Token.IsCancellationRequested) break;
-                    (uint offsetAddr, _) = results.Read(rIdx);
+                    (uint offsetAddr, _) = bitsDict.Get();
                     if (section.Start + offsetAddr < AddrMin || section.Start + offsetAddr > AddrMax) continue;
 
                     byte[] newBytes = new byte[comparerTool.scanTypeLength];
-                    if (results.Count < MinResultAccessFactor) newBytes = PS4Tool.ReadMemory(section.PID, offsetAddr + section.Start, comparerTool.scanTypeLength);
+                    if (bitsDict.Count < MinResultAccessFactor) newBytes = PS4Tool.ReadMemory(section.PID, offsetAddr + section.Start, comparerTool.scanTypeLength);
                     else Buffer.BlockCopy(buffer, (int)offsetAddr, newBytes, 0, comparerTool.scanTypeLength);
 
                     int scanOffset = 0;
@@ -389,20 +400,20 @@ namespace PS4CheaterNeo
                         byte[] newGroupBytes = new byte[groupTypeLength];
                         Buffer.BlockCopy(newBytes, scanOffset, newGroupBytes, 0, groupTypeLength);
                         if (!isAny && !ScanTool.ComparerExact(scanType, newGroupBytes, valueBytes)) break;
-                        else if (gIdx == comparerTool.groupTypes.Count - 1) newResults.Add(offsetAddr, newBytes);
+                        else if (gIdx == comparerTool.groupTypes.Count - 1) newBitsDict.Add(offsetAddr, newBytes);
                         scanOffset += groupTypeLength;
                     }
                 }
-                results.Clear();
-                results = newResults;
+                bitsDict.Clear();
+                bitsDict = newBitsDict;
             }
 
-            return results;
+            return bitsDict;
         }
 
         private void TaskCompleted()
         {
-            if (resultsDict.Count <= 0)
+            if (bitsDictDict.Count <= 0)
             {
                 Invoke(new MethodInvoker(() => { NewBtn.PerformClick(); }));
                 return;
@@ -416,20 +427,21 @@ namespace PS4CheaterNeo
                 ResultView.Items.Clear();
                 ResultView.BeginUpdate();
             }));
-            List<int> sectionKeys = new List<int>(resultsDict.Keys);
+            List<int> sectionKeys = new List<int>(bitsDictDict.Keys);
             sectionKeys.Sort();
             Color backColor = default;
             for (int sectionIdx = 0; sectionIdx < sectionKeys.Count; sectionIdx++)
             {
                 Section section = sectionTool.SectionDict[sectionKeys[sectionIdx]];
-                resultsDict.TryGetValue(section.SID, out ResultList results);
-                if (results == null || results.Count == 0) continue;
+                bitsDictDict.TryGetValue(section.SID, out BitsDictionary bitsDict);
+                if (bitsDict == null || bitsDict.Count == 0) continue;
 
-                for (results.Begin(); !results.End(); results.Next())
+                bitsDict.Begin();
+                for (int idx = 0; idx < bitsDict.Count; idx++)
                 {
                     if (++hitCnt > MaxResultShow) break;
 
-                    (uint offsetAddr, byte[] oldBytes) = results.Read();
+                    (uint offsetAddr, byte[] oldBytes) = bitsDict.Get();
 
                     if (comparerTool.scanType != ScanType.Group)
                     {
@@ -440,7 +452,7 @@ namespace PS4CheaterNeo
                         Invoke(new MethodInvoker(() => {
                             int itemIdx = ResultView.Items.Count;
                             ResultView.Items.Add(offsetAddr.ToString("X8"), (offsetAddr + section.Start).ToString("X8"), 0);
-                            ResultView.Items[itemIdx].Tag = (section.SID, results.Iterator);
+                            ResultView.Items[itemIdx].Tag = (section.SID, bitsDict.Index);
                             ResultView.Items[itemIdx].SubItems.Add(typeStr);
                             ResultView.Items[itemIdx].SubItems.Add(valueStr);
                             ResultView.Items[itemIdx].SubItems.Add(valueHex);
@@ -463,7 +475,7 @@ namespace PS4CheaterNeo
                         Invoke(new MethodInvoker(() => {
                             int groupIdx = ResultView.Items.Count;
                             ResultView.Items.Add(offsetAddr.ToString("X8"), (offsetAddr + section.Start + (uint)scanOffset).ToString("X8"), 0);
-                            ResultView.Items[groupIdx].Tag = (section.SID, results.Iterator);
+                            ResultView.Items[groupIdx].Tag = (section.SID, bitsDict.Index);
                             ResultView.Items[groupIdx].SubItems.Add(typeStr);
                             ResultView.Items[groupIdx].SubItems.Add(valueStr);
                             ResultView.Items[groupIdx].SubItems.Add(valueHex);
@@ -495,7 +507,7 @@ namespace PS4CheaterNeo
 
                 if (refreshSource != null) refreshSource.Dispose();
                 refreshSource = new CancellationTokenSource();
-                refreshTask = RefreshTask(IsFilterBox.Checked);
+                refreshTask = RefreshTask(IsFilterBox.Checked, IsFilterSizeBox.Checked);
                 refreshTask.ContinueWith(t => TaskCompleted());
             }
             catch (Exception exception)
@@ -505,11 +517,11 @@ namespace PS4CheaterNeo
         }
 
         //Invoke(new MethodInvoker(() => { }));
-        private async Task<bool> RefreshTask(bool isFilter) => await Task.Run(() => {
+        private async Task<bool> RefreshTask(bool isFilter, bool isFilterSize) => await Task.Run(() => {
             try
             {
                 System.Diagnostics.Stopwatch tickerMajor = System.Diagnostics.Stopwatch.StartNew();
-                if (resultsDict.Count == 0) return false;
+                if (bitsDictDict.Count == 0) return false;
 
                 int hitCnt = 0;
                 int count = 0;
@@ -528,8 +540,8 @@ namespace PS4CheaterNeo
                     Section section = sectionTool.SectionDict[sectionKeys[sectionIdx]];
                     tasks[sectionIdx] = Task.Run<(int, TimeSpan)>(() =>
                     {
-                        if ((isFilter && section.IsFilter) || !section.Check) return (section.SID, tickerMajor.Elapsed);
-                        resultsDict.TryGetValue(section.SID, out ResultList results);
+                        if ((isFilter && section.IsFilter) || (isFilterSize && section.IsFilterSize) ||!section.Check) return (section.SID, tickerMajor.Elapsed);
+                        bitsDictDict.TryGetValue(section.SID, out BitsDictionary bitsDict);
                         semaphore.Wait();
                         if (refreshSource.Token.IsCancellationRequested)
                         {
@@ -537,16 +549,17 @@ namespace PS4CheaterNeo
                             return (section.SID, tickerMajor.Elapsed);
                         }
                         byte[] buffer = null;
-                        if (results.Count >= MinResultAccessFactor) buffer = PS4Tool.ReadMemory(section.PID, section.Start, section.Length);
+                        if (bitsDict.Count >= MinResultAccessFactor) buffer = PS4Tool.ReadMemory(section.PID, section.Start, section.Length);
 
-                        for (results.Begin(); !results.End(); results.Next())
+                        bitsDict.Begin();
+                        for (int idx = 0; idx < bitsDict.Count; idx++)
                         {
                             if (++hitCnt > MaxResultShow && MaxQueryThreads == 1) continue;
-                            (uint offsetAddr, _) = results.Read();
+                            (uint offsetAddr, _) = bitsDict.Get();
                             byte[] newBytes = new byte[comparerTool.scanTypeLength];
-                            if (results.Count < MinResultAccessFactor) newBytes = PS4Tool.ReadMemory(section.PID, offsetAddr + section.Start, comparerTool.scanTypeLength);
+                            if (bitsDict.Count < MinResultAccessFactor) newBytes = PS4Tool.ReadMemory(section.PID, offsetAddr + section.Start, comparerTool.scanTypeLength);
                             else Buffer.BlockCopy(buffer, (int)offsetAddr, newBytes, 0, comparerTool.scanTypeLength);
-                            results.Set(newBytes);
+                            bitsDict.Set(newBytes);
                         }
                         semaphore.Release();
                         Invoke(new MethodInvoker(() => {
@@ -562,6 +575,8 @@ namespace PS4CheaterNeo
                     ToolStripBar.Value = 100;
                     ToolStripMsg.Text = string.Format("Refresh elapsed:{0}s. {1}", tickerMajor.Elapsed.TotalSeconds, string.Format("Count: {0}", hitCnt));
                 }));
+
+                GC.Collect();
             }
             catch (Exception exception)
             {
@@ -684,29 +699,53 @@ namespace PS4CheaterNeo
             }
         }
 
-        private void IsFilterBox_CheckedChanged(object sender, EventArgs e)
+        private void IsFilterSizeBox_CheckedChanged(object sender, EventArgs e)
         {
             int idx = ProcessesBox.SelectedIndex;
             if (idx == -1) return;
 
-            if (IsFilterBox.Checked)
+            if (!IsFilterSizeBox.Checked)
+            {
+                ProcessesBox.SelectedIndex = 0;
+                ProcessesBox.SelectedIndex = idx;
+            }
+            else
             {
                 SectionView.BeginUpdate();
                 for (int sIdx = 0; sIdx < SectionView.Items.Count; sIdx++)
                 {
                     ListViewItem item = SectionView.Items[sIdx];
-                    if ("filter".Equals(item.Tag))
-                    {
-                        item.Checked = false; //Ensure that MappedSectionList is not selected
-                        item.Remove();
-                    }
+                    if (!"filterSize".Equals(item.Tag)) continue;
+                    item.Checked = false; //Ensure that MappedSectionList is not selected
+                    item.Remove();
+                    --sIdx;
                 }
                 SectionView.EndUpdate();
             }
-            else
+        }
+
+        private void IsFilterBox_CheckedChanged(object sender, EventArgs e)
+        {
+            int idx = ProcessesBox.SelectedIndex;
+            if (idx == -1) return;
+
+            if (!IsFilterBox.Checked)
             {
                 ProcessesBox.SelectedIndex = 0;
                 ProcessesBox.SelectedIndex = idx;
+            }
+            else
+            {
+                SectionView.BeginUpdate();
+                for (int sIdx = 0; sIdx < SectionView.Items.Count; sIdx++)
+                {
+                    ListViewItem item = SectionView.Items[sIdx];
+                    if (!"filter".Equals(item.Tag)) continue;
+                    item.Checked = false; //Ensure that MappedSectionList is not selected
+                    item.Remove();
+                    --sIdx;
+                }
+                SectionView.EndUpdate();
             }
         }
 

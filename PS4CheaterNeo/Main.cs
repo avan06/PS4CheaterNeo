@@ -422,15 +422,9 @@ namespace PS4CheaterNeo
             }
         }
 
-        private void ToolStripExpandAll_Click(object sender, EventArgs e)
-        {
-            CheatGridView.CollapseExpandAll(false);
-        }
+        private void ToolStripExpandAll_Click(object sender, EventArgs e) => CheatGridView.CollapseExpandAll(false);
 
-        private void ToolStripCollapseAll_Click(object sender, EventArgs e)
-        {
-            CheatGridView.CollapseExpandAll(true);
-        }
+        private void ToolStripCollapseAll_Click(object sender, EventArgs e) => CheatGridView.CollapseExpandAll(true);
 
         private void ToolStripSettings_Click(object sender, EventArgs e)
         {
@@ -625,11 +619,17 @@ namespace PS4CheaterNeo
             }
             if (!ToolStripLockEnable.Checked || CheatGridView.Rows.Count == 0 || (refreshLockTask != null && !refreshLockTask.IsCompleted)) return;
 
+            if (refreshLockTask != null) refreshLockTask.Dispose();
+
             refreshLockTask = RefreshLockTask();
         }
 
         private async Task<bool> RefreshLockTask() => await Task.Run(() => {
-            if (!InitSectionList(ProcessName)) return false;
+            if (DateTime.Now.Second % 5 == 0 && DateTime.Now.Millisecond < 500)
+            {
+                if (!InitSectionList(ProcessName)) return false;
+            }
+            
 
             bool VerifySectionWhenLock = Properties.Settings.Default.VerifySectionWhenLock.Value;
             (int sid, string name, uint prot, ulong offsetAddr) preData = (0, "", 0, 0);

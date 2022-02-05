@@ -38,5 +38,11 @@
     <Setting Name="MaxResultShow" Type="OptionTreeView.Option&lt;uint&gt;" Scope="User">
       <Value Profile="(Default)">0x2000|3_Query|3_Result|Enter the maximum number of displayed query results. will only affect the number of results displayed in the ResultView. Default value is 8192</Value>
     </Setting>
+    <Setting Name="SectionFilterSize" Type="OptionTreeView.Option&lt;uint&gt;" Scope="User">
+      <Value Profile="(Default)">204800|3_Query|2_Filter|Filter out when section size is less than this value(unit is bytes)</Value>
+    </Setting>
+    <Setting Name="EnableFilterSizeQuery" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
+      <Value Profile="(Default)">False|3_Query|2_Filter|Determine whether to enable filtering Sections by size when opening the query window. Default disabled</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

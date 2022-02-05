@@ -180,5 +180,31 @@ namespace PS4CheaterNeo.Properties {
                 this["MaxResultShow"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("204800|3_Query|2_Filter|Filter out when section size is less than this value(unit" +
+            " is bytes)")]
+        public global::OptionTreeView.Option<uint> SectionFilterSize {
+            get {
+                return ((global::OptionTreeView.Option<uint>)(this["SectionFilterSize"]));
+            }
+            set {
+                this["SectionFilterSize"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False|3_Query|2_Filter|Determine whether to enable filtering Sections by size whe" +
+            "n opening the query window. Default disabled")]
+        public global::OptionTreeView.Option<bool> EnableFilterSizeQuery {
+            get {
+                return ((global::OptionTreeView.Option<bool>)(this["EnableFilterSizeQuery"]));
+            }
+            set {
+                this["EnableFilterSizeQuery"] = value;
+            }
+        }
     }
 }

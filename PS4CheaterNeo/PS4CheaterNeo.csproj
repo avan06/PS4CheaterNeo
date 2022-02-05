@@ -78,6 +78,7 @@
     <Compile Include="common\ComboboxItem.cs" />
     <Compile Include="common\Constant.cs" />
     <Compile Include="common\PS4Tool.cs" />
+    <Compile Include="common\BitsDictionary.cs" />
     <Compile Include="common\SectionTool.cs" />
     <Compile Include="HexEditor.cs">
       <SubType>Form</SubType>
@@ -141,6 +142,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="PointerFinder.resx">
       <DependentUpon>PointerFinder.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

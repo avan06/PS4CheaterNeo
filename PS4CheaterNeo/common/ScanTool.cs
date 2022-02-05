@@ -712,6 +712,28 @@ namespace PS4CheaterNeo
 
             throw new ArgumentException("ParseFromDescription Not found.", string.Format("{0}({1})", nameof(description), description));
         }
+
+        /// <summary>
+        /// formats a 64bit "Unsigned" value to its equivalent binary value
+        /// https://stackoverflow.com/a/6986104
+        /// https://stackoverflow.com/a/57755224
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public static string ToBinary(this UInt64 input)
+        {
+            //UInt32 low = (UInt32)(input & 0xFFFFFFFF);
+            //UInt32 high = (UInt32)(input & 0xFFFFFFFF00000000 >> 32);
+            //return $"{Convert.ToString(high, 2).PadLeft(32, '0')}{Convert.ToString(low, 2).PadLeft(32, '0')}";
+            if (input == 0) return "".PadLeft(64, '0');
+            StringBuilder b = new StringBuilder();
+            while (input != 0)
+            {
+                b.Insert(0, ((input & 1) == 1) ? '1' : '0');
+                input >>= 1;
+            }
+            return b.ToString().PadLeft(64, '0');
+        }
     }
 
     public class ComparerTool

@@ -26,8 +26,9 @@ namespace PS4CheaterNeo
             public uint Prot;
             public ulong Offset;
             public bool IsFilter;
+            public bool IsFilterSize;
 
-            public override string ToString() => $"{Start:X},{(float)Length / 1024} KB,{Name},{Prot:X},{Offset:X},{IsFilter},{Check},{PID},{SID}";
+            public override string ToString() => $"{Start:X},{(float)Length / 1024} KB,{Name},{Prot:X},{Offset:X},{IsFilter},{IsFilterSize},{Check},{PID},{SID}";
         }
 
         /// <summary>
@@ -42,7 +43,7 @@ namespace PS4CheaterNeo
             result = e1.prot.CompareTo(e2.prot);
             if (result != 0) return result;
 
-            result = e1.name.CompareTo(e2.name);
+            result = ((e1.name == "executable" ? " " : "") + e1.name).CompareTo((e2.name == "executable" ? " " : "") + e2.name);
             if (result != 0) return result;
 
             result = e1.start.CompareTo(e2.start);
@@ -93,6 +94,7 @@ namespace PS4CheaterNeo
             try
             {
                 string sectionFilterKeys = Properties.Settings.Default.SectionFilterKeys.Value;
+                uint sectionFilterSize = Properties.Settings.Default.SectionFilterSize.Value;
                 sectionFilterKeys = Regex.Replace(sectionFilterKeys, " *[,;] *", "|");
                 SectionDict = new Dictionary<int, Section>();
                 SectionList = new List<(int SID, ulong start, ulong end)>();
@@ -143,6 +145,7 @@ namespace PS4CheaterNeo
                             section.Prot = entry.prot;
                             section.Offset = entry.offset;
                             if (isFilter) section.IsFilter = true;
+                            else if (section.Length < sectionFilterSize) section.IsFilterSize = true;
 
                             SectionDict.Add(section.SID, section);
                             SectionList.Add((section.SID, start, start + curLength));
@@ -180,7 +183,7 @@ namespace PS4CheaterNeo
         }
 
         /// <summary>
-        /// 
+        /// find Section with name, prot as unique keys
         /// </summary>
         /// <param name="name"></param>
         /// <param name="prot"></param>
@@ -200,7 +203,7 @@ namespace PS4CheaterNeo
         }
 
         /// <summary>
-        /// 
+        /// find Section with sid as unique keys
         /// </summary>
         /// <param name="sid"></param>
         /// <returns></returns>
@@ -212,7 +215,7 @@ namespace PS4CheaterNeo
         }
 
         /// <summary>
-        /// 
+        /// find Section with sid, name, prot as unique keys
         /// </summary>
         /// <param name="sid"></param>
         /// <param name="name"></param>
@@ -227,10 +230,10 @@ namespace PS4CheaterNeo
         }
 
         /// <summary>
-        /// 
+        /// get its section SID by address
         /// </summary>
-        /// <param name="address"></param>
-        /// <returns></returns>
+        /// <param name="address">query address</param>
+        /// <returns>section SID</returns>
         public int GetSectionID(ulong address)
         {
             if (MemoryStart > address || MemoryEnd < address) return -1;
@@ -243,18 +246,18 @@ namespace PS4CheaterNeo
             {
                 middle = (low + high) / 2;
                 (int SID, ulong start, ulong end) = SectionList[middle];
-                if (address >= end) low = middle + 1;   //查找数组后部分  
-                else if (address < start) high = middle - 1;  //查找数组前半部分  
-                else return SID;  //找到用户要查找的数字，返回下标  
+                if (address >= end) low = middle + 1;   //find the second half of the array
+                else if (address < start) high = middle - 1;  //find the first half of the array
+                else return SID;  //return SID of the specified address
             }
 
             return -1;
         }
 
         /// <summary>
-        /// 
+        /// get Sections sorted by address
         /// </summary>
-        /// <returns></returns>
+        /// <returns>section array</returns>
         public Section[] GetSectionSortByAddr()
         {
             List<int> keys = new List<int>(SectionDict.Keys);
@@ -266,11 +269,38 @@ namespace PS4CheaterNeo
         }
 
         /// <summary>
-        /// 
+        /// get Sections sorted by address and return the position of the given SID
         /// </summary>
-        /// <param name="s1"></param>
-        /// <param name="s2"></param>
-        /// <returns></returns>
+        /// <param name="SID">find the position of the SID</param>
+        /// <param name="idx">position index of the SID</param>
+        /// <param name="SIDs">get only specified SIDs, is optional</param>
+        /// <returns>section array</returns>
+        public Section[] GetSectionSortByAddr(int SID, out int idx, List<int> SIDs = null)
+        {
+            idx = -1;
+            Section[] sections = null;
+            if (SIDs == null || SIDs.Count == 0) sections = GetSectionSortByAddr();
+            else
+            {
+                sections = new Section[SIDs.Count];
+                for (int sIdx = 0; sIdx < SIDs.Count; sIdx++) sections[sIdx] = SectionDict[SIDs[sIdx]];
+                Array.Sort(sections, CompareSection);
+            }
+
+            for (int sectionIdx = 0; sectionIdx < sections.Length; sectionIdx++)
+            {
+                Section section = sections[sectionIdx];
+                if (section.SID != SID) continue;
+                idx = sectionIdx;
+                break;
+            }
+
+            return sections;
+        }
+
+        /// <summary>
+        /// sort by start address
+        /// </summary>
         public int CompareSection(Section s1, Section s2) => s1.Start.CompareTo(s2.Start);
     }
 }

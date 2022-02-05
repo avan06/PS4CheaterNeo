@@ -547,7 +547,7 @@ namespace PS4CheaterNeo
             // RefreshLock
             // 
             this.RefreshLock.Enabled = true;
-            this.RefreshLock.Interval = 300;
+            this.RefreshLock.Interval = 500;
             this.RefreshLock.Tick += new System.EventHandler(this.RefreshLock_Tick);
             // 
             // Main
