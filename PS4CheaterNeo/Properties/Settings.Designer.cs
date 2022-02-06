@@ -127,21 +127,6 @@ namespace PS4CheaterNeo.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("50|3_Query|1_Query|Access value directly by address when the number of query resu" +
-            "lts for the same Section is less than this factor, used to control whether to re" +
-            "ad Section data completely, or directly access the value by address. Default val" +
-            "ue is 50")]
-        public global::OptionTreeView.Option<byte> MinResultAccessFactor {
-            get {
-                return ((global::OptionTreeView.Option<byte>)(this["MinResultAccessFactor"]));
-            }
-            set {
-                this["MinResultAccessFactor"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True|3_Query|2_Filter|Determine whether to enable filtering Sections when opening" +
             " the query window. Default enabled")]
         public global::OptionTreeView.Option<bool> EnableFilterQuery {

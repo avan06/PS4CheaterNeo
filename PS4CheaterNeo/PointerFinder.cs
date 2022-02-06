@@ -286,7 +286,7 @@ namespace PS4CheaterNeo
                     Invoke(new MethodInvoker(() => { IsInitScan.Checked = false; }));
                     long processedMemoryLen = 0;
                     int readCnt = 0;
-                    int minLength = 50 * 1024 * 1024;
+                    int minLength = 50 * 1024 * 1024; //set the minimum read size in bytes
 
                     List<Pointer> addrValueList = new List<Pointer>();
                     Section[] sections = sectionTool.GetSectionSortByAddr();
@@ -307,14 +307,14 @@ namespace PS4CheaterNeo
 
                         if (isContinue)
                         {
-                            if (rangeIdx.start == -1) continue;
-                            else
+                            if (rangeIdx.start == -1) continue; //start and end index unchanged when not scanning
+                            else //start performing a scan when the start index is set
                             {
                                 checkSection = sections[rangeIdx.end];
                                 isContinuePerform = true;
                             }
                         }
-                        if (rangeIdx.start == -1)
+                        if (rangeIdx.start == -1) //set start and end index when not set
                         {
                             rangeIdx.start = sectionIdx;
                             rangeIdx.end = sectionIdx;
@@ -322,10 +322,10 @@ namespace PS4CheaterNeo
 
                         Section firstSection = sections[rangeIdx.start];
                         ulong bufferSize = checkSection.Start + (ulong)checkSection.Length - firstSection.Start;
-                        if (bufferSize > int.MaxValue) isPerform = true;
+                        if (bufferSize > int.MaxValue) isPerform = true; //check the size of the scan to be executed, whether the scan size has been reached the upper limit
 
                         if (isContinuePerform || isPerform || bufferSize >= (ulong)minLength || (sectionIdx == sections.Length - 1 && rangeIdx.start != -1))
-                        {
+                        { //start scanning
                             if (!isContinuePerform && !isPerform) rangeIdx.end = sectionIdx;
                             Section lastSection = sections[rangeIdx.end];
                             if (isPerform) bufferSize = lastSection.Start + (ulong)lastSection.Length - firstSection.Start;
@@ -372,14 +372,14 @@ namespace PS4CheaterNeo
                             semaphore.Dispose();
                             whenTasks.Dispose();
 
-                            if (!isPerform) rangeIdx = (-1, -1);
+                            if (!isPerform) rangeIdx = (-1, -1); //initialize start and end index for non-isPerform scan
                             else
                             {
                                 rangeIdx.start = sectionIdx;
                                 rangeIdx.end = sectionIdx;
                             }
                         }
-                        else
+                        else //update end index
                         {
                             rangeIdx.end = sectionIdx;
                             continue;

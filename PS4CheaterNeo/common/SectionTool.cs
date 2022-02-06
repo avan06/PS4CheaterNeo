@@ -258,9 +258,10 @@ namespace PS4CheaterNeo
         /// get Sections sorted by address
         /// </summary>
         /// <returns>section array</returns>
-        public Section[] GetSectionSortByAddr()
+        public Section[] GetSectionSortByAddr(IEnumerable<int> collection = null)
         {
-            List<int> keys = new List<int>(SectionDict.Keys);
+            if (collection == null) collection = SectionDict.Keys;
+            List<int> keys = new List<int>(collection);
             Section[] sections = new Section[keys.Count];
             for (int sectionIdx = 0; sectionIdx < keys.Count; sectionIdx++) sections[sectionIdx] = SectionDict[keys[sectionIdx]];
             Array.Sort(sections, CompareSection);

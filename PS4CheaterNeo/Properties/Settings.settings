@@ -26,9 +26,6 @@
     <Setting Name="MaxQueryThreads" Type="OptionTreeView.Option&lt;byte&gt;" Scope="User">
       <Value Profile="(Default)">3|3_Query|1_Query|Enter the number of threads to use when querying. Default is 3 threads</Value>
     </Setting>
-    <Setting Name="MinResultAccessFactor" Type="OptionTreeView.Option&lt;byte&gt;" Scope="User">
-      <Value Profile="(Default)">50|3_Query|1_Query|Access value directly by address when the number of query results for the same Section is less than this factor, used to control whether to read Section data completely, or directly access the value by address. Default value is 50</Value>
-    </Setting>
     <Setting Name="EnableFilterQuery" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
       <Value Profile="(Default)">True|3_Query|2_Filter|Determine whether to enable filtering Sections when opening the query window. Default enabled</Value>
     </Setting>
