@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 
 namespace PS4CheaterNeo
@@ -313,6 +314,94 @@ namespace PS4CheaterNeo
             state.Add = (0, 0, 0, 0, 0, bufferBits[0], bufferDatas[0]);
         }
 
+        #region TEST
+        /// <summary>
+        /// experimental feature with very low throughput
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        public void Add<T>(UInt32 key, T value)
+        {
+            byte[] data = GetBytes<T>(value);
+            Add(key, data);
+        }
+
+        /// <summary>
+        /// experimental feature with very low throughput
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="newValue"></param>
+        public void Set<T>(T newValue)
+        {
+            byte[] data = GetBytes<T>(newValue);
+            Set(data);
+        }
+
+        /// <summary>
+        /// experimental feature with very low throughput
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        public (uint key, T value) GetValue<T>(int index = -1) where T : struct
+        {
+            (uint key, byte[] data) = Get(index);
+            T value = FromBytes<T>(data);
+            return (key, value);
+        }
+
+        /// <summary>
+        /// convert a structure to a byte array
+        /// https://stackoverflow.com/a/35717498
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public byte[] GetBytes<T>(T value)
+        {
+            int size = Marshal.SizeOf(value);
+            // Both managed and unmanaged buffers required.
+            byte[] bytes = new byte[size];
+            GCHandle handle = default;
+            try
+            {
+                handle = GCHandle.Alloc(bytes, GCHandleType.Pinned);
+                Marshal.StructureToPtr<T>(value, handle.AddrOfPinnedObject(), false);
+            }
+            finally
+            {
+                if (handle.IsAllocated) handle.Free();
+            }
+
+            return bytes;
+        }
+
+        /// <summary>
+        /// convert a structure to a byte array
+        /// https://stackoverflow.com/a/35717498
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="bytes"></param>
+        /// <returns></returns>
+        public T FromBytes<T>(byte[] bytes) where T : struct
+        {
+            T value = default;
+            GCHandle handle = default;
+            try
+            {
+                handle = GCHandle.Alloc(bytes, GCHandleType.Pinned);
+                value = Marshal.PtrToStructure<T>(handle.AddrOfPinnedObject());
+            }
+            finally
+            {
+                if (handle.IsAllocated) handle.Free();
+            }
+
+            return value;
+        }
+        #endregion
+
         #region Bit Method
         /// <summary>
         /// ~0UL / 3
@@ -541,7 +630,7 @@ namespace PS4CheaterNeo
 
         public bool Contains(object key) => ContainsKey(Convert.ToUInt32(key));
 
-        public void Add(object key, object value) => Add(Convert.ToUInt32(key), (byte[])value);
+        public void Add(object key, object value) => Add(Convert.ToUInt32(key), value);
 
         IDictionaryEnumerator IDictionary.GetEnumerator() => new BitsDictionaryEnumerator(GetEnumerator());
         struct BitsDictionaryEnumerator : IDictionaryEnumerator

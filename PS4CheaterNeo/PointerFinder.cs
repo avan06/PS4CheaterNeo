@@ -21,7 +21,7 @@ namespace PS4CheaterNeo
         List<int> range;
         Dictionary<int, List<Pointer>> addrPointerDict;
         Dictionary<int, List<Pointer>> valuePointerDict;
-        List<((int SID, uint position, List<long> offsets) pointer, List<Pointer> pathAddress)> pointerResults;
+        List<((int AddrSID, uint AddrPos, List<long> Offsets) pointer, List<Pointer> pathAddress)> pointerResults;
 
         List<ListViewItem> pointerItems;
         public PointerFinder(Main mainForm, ulong address, ScanType scanType)
@@ -30,7 +30,7 @@ namespace PS4CheaterNeo
             this.mainForm = mainForm;
             sectionTool = new SectionTool();
             processName = mainForm.ProcessName;
-            pointerResults = new List<((int SID, uint position, List<long> offsets) pointer, List<Pointer> pathAddress)>();
+            pointerResults = new List<((int AddrSID, uint AddrPos, List<long> Offsets) pointer, List<Pointer> pathAddress)>();
             AddressBox.Text = address.ToString("X");
             PointerListView
                 .GetType()
@@ -55,7 +55,7 @@ namespace PS4CheaterNeo
             {
                 if (MessageBox.Show("Still in the pointer scanning, Do you want to close PointerFinder?", "PointerFinder", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                 {
-                    if (pointerSource != null) pointerSource.Cancel();
+                    if (pointerSource != null) try { pointerSource.Cancel(); } catch (Exception) { } 
                 }
                 else e.Cancel = true;
             }
@@ -205,13 +205,13 @@ namespace PS4CheaterNeo
             var pointerResult = pointerResults[idx];
 
             ScanType scanType = (ScanType)((ComboboxItem)(ScanTypeBox.SelectedItem)).Value;
-            Section section = sectionTool.GetSection(pointerResult.pointer.SID);
-            ulong baseAddress = section.Start + (ulong)pointerResult.pointer.position;
+            Section section = sectionTool.GetSection(pointerResult.pointer.AddrSID);
+            ulong baseAddress = section.Start + (ulong)pointerResult.pointer.AddrPos;
 
             try
             {
                 List<long> offsetList = new List<long> { (long)baseAddress };
-                offsetList.AddRange(pointerResult.pointer.offsets);
+                offsetList.AddRange(pointerResult.pointer.Offsets);
                 NewAddress newAddress = new NewAddress(mainForm, null, section, 0, scanType, null, false, "", offsetList, false);
                 if (newAddress.ShowDialog() != DialogResult.OK)
                     return;
@@ -271,6 +271,78 @@ namespace PS4CheaterNeo
             }
         }
 
+        private void NewBtn_Click(object sender, EventArgs e)
+        {
+            if (pointerTask != null && !pointerTask.IsCompleted)
+            {
+                if (MessageBox.Show("Still in the pointer scanning, Do you want to stop scan?", "PointerFinder", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                {
+                    pointerSource.Cancel();
+                    GC.Collect();
+                }
+                else return;
+            }
+            ProgBar.Value = 0;
+            pointerResults.Clear();
+            IsInitScan.Checked = true;
+            ScanBtn.Text = "First Scan";
+            GC.Collect();
+        }
+
+        private void PointerListViewAddToCheatGrid_Click(object sender, EventArgs e)
+        {
+            if (PointerListView.SelectedItems.Count == 0) return;
+
+            ScanType scanType = (ScanType)((ComboboxItem)(ScanTypeBox.SelectedItem)).Value;
+            ListView.SelectedListViewItemCollection items = PointerListView.SelectedItems;
+            for (int itemIdx = 0; itemIdx < items.Count; ++itemIdx)
+            {
+                try
+                {
+                    ListViewItem resultItem = items[itemIdx];
+                    int idx = (int)resultItem.Tag;
+
+                    var pointerResult = pointerResults[idx];
+
+                    Section section = sectionTool.GetSection(pointerResult.pointer.AddrSID);
+                    ulong baseAddress = section.Start + (ulong)pointerResult.pointer.AddrPos;
+                    string msg = pointerResult.pointer.AddrPos.ToString("X");
+                    List<long> offsetList = new List<long> { (long)baseAddress };
+                    pointerResult.pointer.Offsets.ForEach(offset => {
+                        msg += "_" + offset.ToString("X");
+                        offsetList.Add(offset);
+                    });
+                    mainForm.AddToCheatGrid(section, 0, scanType, "0", false, msg, true, offsetList); //FIXME oldValue is 0
+                }
+                catch (Exception exception)
+                {
+                    MessageBox.Show(exception.Message + "\n" + exception.StackTrace, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                }
+            }
+        }
+
+        private void FilterRuleBtn_Click(object sender, EventArgs e)
+        {
+            string sectionFilterKeys = Properties.Settings.Default.SectionFilterKeys.Value;
+
+            if (InputBox.Show("Section Filter", "Enter the value of the filter keys", ref sectionFilterKeys, null) != DialogResult.OK) return;
+
+            Properties.Settings.Default.SectionFilterKeys.Value = sectionFilterKeys;
+        }
+
+        private void FilterSizeRuleBtn_Click(object sender, EventArgs e)
+        {
+            uint sectionFilterSize = Properties.Settings.Default.SectionFilterSize.Value;
+            string sectionFilterSizeStr = sectionFilterSize.ToString();
+
+            if (InputBox.Show("Section Filter", "Enter the value of the filter keys", ref sectionFilterSizeStr, null) != DialogResult.OK) return;
+
+            Properties.Settings.Default.SectionFilterSize.Value = uint.Parse(sectionFilterSizeStr);
+        }
+        #endregion
+
+
+        #region Task
         //Invoke(new MethodInvoker(() => { }));
         private async Task<bool> ScanTask(int nextScanCheckNumber, System.Diagnostics.Stopwatch tickerMajor) => await Task.Run(() =>
         {
@@ -279,17 +351,24 @@ namespace PS4CheaterNeo
                 #region InitPathAddrs
                 if (IsInitScan.Checked || pointerResults.Count > nextScanCheckNumber)
                 {
-                    Mutex mutex = new Mutex();
-                    string sectionFilterKeys = Properties.Settings.Default.SectionFilterKeys.Value;
-                    uint sectionFilterSize = Properties.Settings.Default.SectionFilterSize.Value;
-                    sectionFilterKeys = Regex.Replace(sectionFilterKeys, " *[,;] *", "|");
                     Invoke(new MethodInvoker(() => { IsInitScan.Checked = false; }));
+
+                    Mutex mutex = new Mutex();
+                    byte MaxQueryThreads = Properties.Settings.Default.MaxQueryThreads.Value;
+                    MaxQueryThreads = MaxQueryThreads == (byte)0 ? (byte)1 : MaxQueryThreads;
+                    string SectionFilterKeys = Properties.Settings.Default.SectionFilterKeys.Value;
+                    uint SectionFilterSize = Properties.Settings.Default.SectionFilterSize.Value;
+                    uint QueryBufferSize = Properties.Settings.Default.QueryBufferSize.Value;
+                    SectionFilterKeys = Regex.Replace(SectionFilterKeys, " *[,;] *", "|");
+                    
                     long processedMemoryLen = 0;
                     int readCnt = 0;
-                    int minLength = 50 * 1024 * 1024; //set the minimum read size in bytes
+                    ulong minLength = QueryBufferSize * 1024 * 1024; //set the minimum read size in bytes
 
                     List<Pointer> addrValueList = new List<Pointer>();
                     Section[] sections = sectionTool.GetSectionSortByAddr();
+                    SemaphoreSlim semaphore = new SemaphoreSlim(MaxQueryThreads);
+                    List<Task<bool>> tasks = new List<Task<bool>>();
 
                     bool isFilter = IsFilterBox.Checked;
                     bool isFilterSize = IsFilterSizeBox.Checked;
@@ -302,8 +381,8 @@ namespace PS4CheaterNeo
                         bool isContinuePerform = false;
                         Section checkSection = sections[sectionIdx];
                         if (!isFilter && checkSection.Name.StartsWith("libSce")) isContinue = true;
-                        if (isFilter && sectionTool.SectionIsFilter(checkSection.Name, sectionFilterKeys)) isContinue = true;
-                        if (isFilterSize && checkSection.Length < sectionFilterSize) isContinue = true;
+                        if (isFilter && sectionTool.SectionIsFilter(checkSection.Name, SectionFilterKeys)) isContinue = true;
+                        if (isFilterSize && checkSection.Length < SectionFilterSize) isContinue = true;
 
                         if (isContinue)
                         {
@@ -322,69 +401,70 @@ namespace PS4CheaterNeo
 
                         Section firstSection = sections[rangeIdx.start];
                         ulong bufferSize = checkSection.Start + (ulong)checkSection.Length - firstSection.Start;
-                        if (bufferSize > int.MaxValue) isPerform = true; //check the size of the scan to be executed, whether the scan size has been reached the upper limit
+                        if (bufferSize >= int.MaxValue) isPerform = true; //check the size of the scan to be executed, whether the scan size has been reached the upper limit
 
-                        if (isContinuePerform || isPerform || bufferSize >= (ulong)minLength || (sectionIdx == sections.Length - 1 && rangeIdx.start != -1))
-                        { //start scanning
-                            if (!isContinuePerform && !isPerform) rangeIdx.end = sectionIdx;
-                            Section lastSection = sections[rangeIdx.end];
+                        if (!isContinuePerform && !isPerform && bufferSize < minLength && (sectionIdx != sections.Length - 1 || rangeIdx.start == -1))
+                        {
+                            rangeIdx.end = sectionIdx;  //update end index
+                            continue;
+                        }
+                        //start scanning
+                        if (!isContinuePerform && !isPerform) rangeIdx.end = sectionIdx;
+                        var readCnt_ = readCnt;
+                        var rangeIdx_ = rangeIdx;
+                        tasks.Add(Task.Run<bool>(() =>
+                        {
+                            semaphore.Wait();
+                            pointerSource.Token.ThrowIfCancellationRequested();
+
+                            Section lastSection = sections[rangeIdx_.end];
                             if (isPerform) bufferSize = lastSection.Start + (ulong)lastSection.Length - firstSection.Start;
                             byte[] buffer = PS4Tool.ReadMemory(firstSection.PID, firstSection.Start, (int)bufferSize);
                             processedMemoryLen += buffer.Length;
                             Invoke(new MethodInvoker(() =>
                             {
-                                ProgBar.Value = (int)(((float)(readCnt) / sections.Length) * 50);
-                                ToolStripMsg.Text = string.Format("Scan elapsed:{0}s. Current: {1}/{2}, read memory...{3}MB", tickerMajor.Elapsed.TotalSeconds, readCnt, sections.Length, processedMemoryLen / (1024 * 1024));
+                                ProgBar.Value = (int)(((float)(readCnt_) / sections.Length) * 50);
+                                ToolStripMsg.Text = string.Format("Scan elapsed:{0}s. Current: {1}/{2}, read memory...{3}MB", tickerMajor.Elapsed.TotalSeconds, readCnt_, sections.Length, processedMemoryLen / (1024 * 1024));
                             }));
-                            SemaphoreSlim semaphore = new SemaphoreSlim(3);
-                            List<Task<bool>> tasks = new List<Task<bool>>();
-                            for (int idx = rangeIdx.start; idx <= rangeIdx.end; idx++)
+                            for (int idx = rangeIdx_.start; idx <= rangeIdx_.end; idx++)
                             {
                                 Section addrSection = sections[idx];
                                 int scanOffset = (int)(addrSection.Start - firstSection.Start);
-                                tasks.Add(Task.Run<bool>(() =>
+
+                                List<Pointer> pointers = new List<Pointer>();
+                                Section valueSection = null;
+                                for (int scanIdx = scanOffset; scanIdx + 8 < scanOffset + addrSection.Length; scanIdx += 8)
                                 {
-                                    semaphore.Wait();
-                                    List<Pointer> pointers = new List<Pointer>();
-                                    Section valueSection = null;
-                                    for (int scanIdx = scanOffset; scanIdx + 8 < scanOffset + addrSection.Length; scanIdx += 8)
-                                    {
-                                        pointerSource.Token.ThrowIfCancellationRequested();
-                                        int valueSID = 0;
-                                        ulong mappedValue = BitConverter.ToUInt64(buffer, scanIdx);
-                                        if (mappedValue > 0 && valueSection != null && mappedValue >= valueSection.Start && mappedValue <= (valueSection.Start + (ulong)valueSection.Length)) valueSID = valueSection.SID;
-                                        else valueSID = sectionTool.GetSectionID(mappedValue);
-                                        if (valueSID == -1) continue;
+                                    pointerSource.Token.ThrowIfCancellationRequested();
+                                    int valueSID = 0;
+                                    ulong mappedValue = BitConverter.ToUInt64(buffer, scanIdx);
+                                    if (mappedValue > 0 && valueSection != null && mappedValue >= valueSection.Start && mappedValue <= (valueSection.Start + (ulong)valueSection.Length)) valueSID = valueSection.SID;
+                                    else valueSID = sectionTool.GetSectionID(mappedValue);
+                                    if (valueSID == -1) continue;
 
-                                        valueSection = sectionTool.GetSection(valueSID);
-                                        int startOffset = scanIdx - scanOffset;
-                                        pointers.Add(new Pointer(addrSection.SID, (uint)startOffset, valueSID, (uint)(mappedValue - valueSection.Start)));
-                                    }
-                                    mutex.WaitOne();
-                                    addrValueList.AddRange(pointers);
-                                    mutex.ReleaseMutex();
-                                    semaphore.Release();
-                                    return true;
-                                }));
+                                    valueSection = sectionTool.GetSection(valueSID);
+                                    int startOffset = scanIdx - scanOffset;
+                                    pointers.Add(new Pointer(addrSection.SID, (uint)startOffset, valueSID, (uint)(mappedValue - valueSection.Start)));
+                                }
+                                mutex.WaitOne();
+                                addrValueList.AddRange(pointers);
+                                mutex.ReleaseMutex();
                             }
-                            Task whenTasks = Task.WhenAll(tasks);
-                            whenTasks.Wait();
-                            semaphore.Dispose();
-                            whenTasks.Dispose();
+                            semaphore.Release();
+                            return true;
+                        }));
 
-                            if (!isPerform) rangeIdx = (-1, -1); //initialize start and end index for non-isPerform scan
-                            else
-                            {
-                                rangeIdx.start = sectionIdx;
-                                rangeIdx.end = sectionIdx;
-                            }
-                        }
-                        else //update end index
+                        if (!isPerform) rangeIdx = (-1, -1); //initialize start and end index for non-isPerform scan
+                        else
                         {
+                            rangeIdx.start = sectionIdx;
                             rangeIdx.end = sectionIdx;
-                            continue;
                         }
                     }
+                    Task whenTasks = Task.WhenAll(tasks);
+                    whenTasks.Wait();
+                    semaphore.Dispose();
+                    whenTasks.Dispose();
                     GC.Collect();
                     if (addrValueList != null && addrValueList.Count > 0)
                     {
@@ -475,7 +555,7 @@ namespace PS4CheaterNeo
             else
             {
                 Dictionary<ulong, ulong> pointerMemoryCaches = new Dictionary<ulong, ulong>();
-                var newPointerResults = new List<((int SID, uint position, List<long> offsets) pointer, List<Pointer> pathAddress)>();
+                var newPointerResults = new List<((int AddrSID, uint AddrPos, List<long> Offsets) pointer, List<Pointer> pathAddress)>();
                 for (int pIdx = 0; pIdx < pointerResults.Count; ++pIdx)
                 {
                     pointerSource.Token.ThrowIfCancellationRequested();
@@ -493,7 +573,7 @@ namespace PS4CheaterNeo
                     if (tailAddress != queryAddress) continue;
 
                     newPointerResults.Add(pointerResult);
-                    if (newPointerResults.Count < 20000 && pointerResult.pointer.offsets.Count > 0) AddPointerListViewItem(newPointerResults.Count - 1, pointerResult.pathAddress, pointerResult.pointer.offsets);
+                    if (newPointerResults.Count < 20000 && pointerResult.pointer.Offsets.Count > 0) AddPointerListViewItem(newPointerResults.Count - 1, pointerResult.pathAddress, pointerResult.pointer.Offsets);
                 }
 
                 if (newPointerResults.Count > 0 ||
@@ -507,98 +587,15 @@ namespace PS4CheaterNeo
             return true;
         }
 
-        private bool TaskCompleted(System.Diagnostics.Stopwatch tickerMajor)
-        {
-            tickerMajor.Stop();
-            Invoke(new MethodInvoker(() => {
-                ProgBar.Value = 100;
-                ToolStripMsg.Text = string.Format("Scan elapsed:{0}s. Query pointer end, find:{1}", tickerMajor.Elapsed.TotalSeconds, pointerItems.Count);
-                if (pointerItems.Count > 0)
-                {
-                    PointerListView.Items.AddRange(pointerItems.ToArray());
-                    pointerItems.Clear();
-                    ScanBtn.Text = "Next Scan";
-                }
-                else if (pointerResults.Count == 0) ScanBtn.Text = "First Scan";
-                else if (pointerResults.Count > 0) ScanBtn.Text = "Next Scan";
-            }));
-            if (pointerSource != null) pointerSource.Dispose();
-            if (pointerTask != null) pointerTask.Dispose();
-            GC.Collect();
-            return true;
-        }
-
-        private void NewBtn_Click(object sender, EventArgs e)
-        {
-            if (pointerTask != null && !pointerTask.IsCompleted)
-            {
-                if (MessageBox.Show("Still in the pointer scanning, Do you want to stop scan?", "PointerFinder", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
-                {
-                    pointerSource.Cancel();
-                    GC.Collect();
-                }
-                else return;
-            }
-            ProgBar.Value = 0;
-            pointerResults.Clear();
-            IsInitScan.Checked = true;
-            ScanBtn.Text = "First Scan";
-            GC.Collect();
-        }
-
-        private void PointerListViewAddToCheatGrid_Click(object sender, EventArgs e)
-        {
-            if (PointerListView.SelectedItems.Count == 0) return;
-
-            ScanType scanType = (ScanType)((ComboboxItem)(ScanTypeBox.SelectedItem)).Value;
-            ListView.SelectedListViewItemCollection items = PointerListView.SelectedItems;
-            for (int itemIdx = 0; itemIdx < items.Count; ++itemIdx)
-            {
-                try
-                {
-                    ListViewItem resultItem = items[itemIdx];
-                    int idx = (int)resultItem.Tag;
-
-                    var pointerResult = pointerResults[idx];
-
-                    Section section = sectionTool.GetSection(pointerResult.pointer.SID);
-                    ulong baseAddress = section.Start + (ulong)pointerResult.pointer.position;
-                    string msg = pointerResult.pointer.position.ToString("X");
-                    List<long> offsetList = new List<long> { (long)baseAddress };
-                    pointerResult.pointer.offsets.ForEach(offset => {
-                        msg += "_" + offset.ToString("X");
-                        offsetList.Add(offset);
-                    });
-                    mainForm.AddToCheatGrid(section, 0, scanType, "0", false, msg, true, offsetList); //FIXME oldValue is 0
-                }
-                catch (Exception exception)
-                {
-                    MessageBox.Show(exception.Message + "\n" + exception.StackTrace, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
-                }
-            }
-        }
-
-        private void FilterRuleBtn_Click(object sender, EventArgs e)
-        {
-            string sectionFilterKeys = Properties.Settings.Default.SectionFilterKeys.Value;
-
-            if (InputBox.Show("Section Filter", "Enter the value of the filter keys", ref sectionFilterKeys, null) != DialogResult.OK) return;
-
-            Properties.Settings.Default.SectionFilterKeys.Value = sectionFilterKeys;
-        }
-
-        private void FilterSizeRuleBtn_Click(object sender, EventArgs e)
-        {
-            uint sectionFilterSize = Properties.Settings.Default.SectionFilterSize.Value;
-            string sectionFilterSizeStr = sectionFilterSize.ToString();
-
-            if (InputBox.Show("Section Filter", "Enter the value of the filter keys", ref sectionFilterSizeStr, null) != DialogResult.OK) return;
-
-            Properties.Settings.Default.SectionFilterSize.Value = uint.Parse(sectionFilterSizeStr);
-        }
-        #endregion
-
-        #region Worker
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="queryPointer"></param>
+        /// <param name="range"></param>
+        /// <param name="tickerMajor"></param>
+        /// <param name="level"></param>
+        /// <param name="pathOffset"></param>
+        /// <param name="pathAddress"></param>
         private void QueryPointerFirst(Pointer queryPointer, List<int> range, System.Diagnostics.Stopwatch tickerMajor, int level = 0, List<long> pathOffset = null, List<Pointer> pathAddress = null)
         {
             pointerSource.Token.ThrowIfCancellationRequested();
@@ -683,13 +680,13 @@ namespace PS4CheaterNeo
 
             uint pointerPosition = pathAddress[pathOffset.Count - 1].AddrPos;
 
-            ((int SID, uint position, List<long> offsets) pointer, List<Pointer> pathAddress) pointerResult = ((addrSection.SID, pointerPosition, new List<long>()), new List<Pointer>(pathAddress));
+            ((int AddrSID, uint AddrPos, List<long> Offsets) pointer, List<Pointer> pathAddress) pointerResult = ((addrSection.SID, pointerPosition, new List<long>()), new List<Pointer>(pathAddress));
 
-            for (int i = pathOffset.Count - 1; i >= 0; --i) pointerResult.pointer.offsets.Add(pathOffset[i]);
+            for (int i = pathOffset.Count - 1; i >= 0; --i) pointerResult.pointer.Offsets.Add(pathOffset[i]);
 
             pointerResults.Add(pointerResult);
 
-            if (pointerResults.Count < 20000 && pathOffset.Count > 0) AddPointerListViewItem1(pointerResults.Count - 1, pathAddress, pathOffset);
+            if (pointerResults.Count < 20000 && pathOffset.Count > 0) AddPointerListViewItem(pointerResults.Count - 1, pathAddress, pathOffset);
             if (pointerResults.Count % 1024 == 0)
             {
                 Invoke(new MethodInvoker(() =>
@@ -699,26 +696,25 @@ namespace PS4CheaterNeo
             }
         }
 
-        private void AddPointerListViewItem1(int idx, List<Pointer> pathAddress, List<long> pathOffset)
+        private bool TaskCompleted(System.Diagnostics.Stopwatch tickerMajor)
         {
-            int itemIdx = PointerListView.Items.Count;
-            Pointer pointer = pathAddress[pathAddress.Count - 1];
-            Section section = sectionTool.GetSection(pointer.AddrSID);
-            string sectionStr = $"{section.Start.ToString("X9")}-{section.Name}-{section.Prot.ToString("X")}-{section.Length / 1024}KB";
-
-            ListViewItem item = new ListViewItem((pointer.AddrPos + section.Start).ToString("X"), 0); //Base Address
-            item.Tag = idx;
-            item.SubItems.Add(sectionStr); //Base Section
-            for (int i = 0; i < pathOffset.Count; ++i) item.SubItems.Add(pathOffset[i].ToString("X"));
-            pointerItems.Add(item);
-            Invoke(new MethodInvoker(() =>
-            {
-                if (pointerItems.Count % 100 == 0)
+            tickerMajor.Stop();
+            Invoke(new MethodInvoker(() => {
+                ProgBar.Value = 100;
+                ToolStripMsg.Text = string.Format("Scan elapsed:{0}s. Query pointer end, find:{1}", tickerMajor.Elapsed.TotalSeconds, pointerItems.Count);
+                if (pointerItems.Count > 0)
                 {
                     PointerListView.Items.AddRange(pointerItems.ToArray());
                     pointerItems.Clear();
+                    ScanBtn.Text = "Next Scan";
                 }
+                else if (pointerResults.Count == 0) ScanBtn.Text = "First Scan";
+                else if (pointerResults.Count > 0) ScanBtn.Text = "Next Scan";
             }));
+            if (pointerSource != null) pointerSource.Dispose();
+            if (pointerTask != null) pointerTask.Dispose();
+            GC.Collect();
+            return true;
         }
 
         private void AddPointerListViewItem(int idx, List<Pointer> pathAddress, List<long> pathOffset)
@@ -743,6 +739,11 @@ namespace PS4CheaterNeo
             }));
         }
 
+        /// <summary>
+        /// get all pointers with the same address as the input from the list of value Pointers
+        /// </summary>
+        /// <param name="addrPointer"></param>
+        /// <returns>pointers with the same address as the input</returns>
         private List<Pointer> GetPointerListByValue(Pointer addrPointer)
         {
             List<Pointer> resultPointers = new List<Pointer>();
@@ -771,6 +772,14 @@ namespace PS4CheaterNeo
             return resultPointers;
         }
 
+        /// <summary>
+        /// get the index of the closest address as the input address from the address pointer list(sorted by address)
+        /// </summary>
+        /// <param name="addrPointerList">list of address pointers with the same SID as the query address(sorted by address)</param>
+        /// <param name="addrPos">query address position</param>
+        /// <param name="low">minimum index of list</param>
+        /// <param name="high">maximum index of the list</param>
+        /// <returns>index of the closest address from the address pointer list</returns>
         private int BinarySearchByAddress(List<Pointer> addrPointerList, uint addrPos, int low, int high)
         {
             int mid = (low + high) / 2;
@@ -791,6 +800,12 @@ namespace PS4CheaterNeo
             }
         }
 
+        /// <summary>
+        /// get the index of the same address as the input address from the value pointer list(sorted by value)
+        /// </summary>
+        /// <param name="valuePointerList">list of value pointers with the same SID as the query address(sorted by value)</param>
+        /// <param name="addrPos">query address position</param>
+        /// <returns>index of the same address from the value pointer list</returns>
         private int BinarySearchByValue(List<Pointer> valuePointerList, ulong addrPos)
         {
             int low = 0;
@@ -808,43 +823,51 @@ namespace PS4CheaterNeo
             return -1;
         }
 
-        private ulong ReadTailAddressByPathListValue(((int SID, uint position, List<long> offsets) pointer, List<Pointer> pathAddress) pointerResult)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="pointerResult"></param>
+        /// <returns></returns>
+        private ulong ReadTailAddressByPathListValue(((int AddrSID, uint AddrPos, List<long> Offsets) pointer, List<Pointer> pathAddress) pointerResult)
         {
             ulong targetAddr = 0;
-            Section section = sectionTool.GetSection(pointerResult.pointer.SID);
-            if (section == null) return targetAddr;
-            if (!addrPointerDict.TryGetValue(section.SID, out List<Pointer> addrPointerList)) return targetAddr;
+            Section addrSection = sectionTool.GetSection(pointerResult.pointer.AddrSID);
+            if (addrSection == null) return targetAddr;
+            if (!addrPointerDict.TryGetValue(addrSection.SID, out List<Pointer> addrPointerList)) return targetAddr;
 
             List<long> offsetList = new List<long>();
-            offsetList.Add((long)(section.Start + pointerResult.pointer.position));
-            offsetList.AddRange(pointerResult.pointer.offsets);
+            offsetList.Add((long)pointerResult.pointer.AddrPos); //offsetList.Add((long)(addrSection.Start + pointerResult.pointer.position));
+            offsetList.AddRange(pointerResult.pointer.Offsets);
 
-
-            ulong headAddress = 0;
+            ulong headAddrPos = 0;
             for (int idx = 0; idx < offsetList.Count; ++idx)
             {
                 long offset = offsetList[idx];
                 if (idx != offsetList.Count - 1)
                 {
-                    int pathAddrIdx = BinarySearchByAddress(addrPointerList, (uint)((ulong)offset + headAddress - section.Start), 0, addrPointerList.Count - 1);
+                    int pathAddrIdx = BinarySearchByAddress(addrPointerList, (uint)((ulong)offset + headAddrPos), 0, addrPointerList.Count - 1); //BinarySearchByAddress(addrPointerList, (uint)((ulong)offset + headAddrPos - addrSection.Start), 0, addrPointerList.Count - 1);
                     if (pathAddrIdx == -1) break;
 
                     Pointer pointer = addrPointerList[pathAddrIdx];
-                    Section valueSection = sectionTool.GetSection(pointer.ValueSID);
-                    headAddress = pointer.ValuePos + valueSection.Start;
+                    if (pointer.ValueSID != addrSection.SID)
+                    { //FIXME Check
+                        if (!addrPointerDict.TryGetValue(pointer.ValueSID, out addrPointerList)) break;
+                        addrSection = sectionTool.GetSection(pointer.ValueSID);
+                    }
+                    headAddrPos = pointer.ValuePos;// + addrSection.Start;
                 }
-                else targetAddr = (ulong)offset + headAddress;
+                else targetAddr = (ulong)offset + headAddrPos;
             }
 
-            return targetAddr;
+            return targetAddr + addrSection.Start;
         }
 
-        private ulong ReadTailAddress(((int SID, uint position, List<long> offsets) pointer, List<Pointer> pathAddress) pointerResult, in Dictionary<ulong, ulong> pointerMemoryCaches)
+        private ulong ReadTailAddress(((int AddrSID, uint AddrPos, List<long> Offsets) pointer, List<Pointer> pathAddress) pointerResult, in Dictionary<ulong, ulong> pointerMemoryCaches)
         {
-            Section section = sectionTool.GetSection(pointerResult.pointer.SID);
+            Section section = sectionTool.GetSection(pointerResult.pointer.AddrSID);
             if (section == null) return 0;
 
-            var targetAddr = PS4Tool.ReadTailAddress(section.PID, section.Start + pointerResult.pointer.position, pointerResult.pointer.offsets, pointerMemoryCaches);
+            var targetAddr = PS4Tool.ReadTailAddress(section.PID, section.Start + pointerResult.pointer.AddrPos, pointerResult.pointer.Offsets, pointerMemoryCaches);
             return targetAddr;
         }
         #endregion

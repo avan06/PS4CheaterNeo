@@ -2,7 +2,7 @@
 
 PS4CheaterNeo is a program to find game cheat codes, and it is based on [`ps4debug`](https://github.com/jogolden/ps4debug) and `.Net Framework 4.8`.
 
-Currently in `version 0.9.4.9-beta`
+Currently in `version 0.9.4.10-beta`
 
 
 ## Table of Contents
@@ -175,6 +175,7 @@ Currently in `version 0.9.4.9-beta`
 > `EnableFilterQuery`: Determine whether to enable filtering Sections when opening the query window, `Default enabled`.  
 > `SectionFilterKeys`: Enter the filter value, the filter will be set here when listing Sections.  
 > `MaxResultShow`: Enter the maximum number of displayed query results. will only affect the number of results displayed in the ResultView, `Default value is 8192`.  
+> `QueryBufferSize`: Set the minimum buffer size (in MB) in querying and pointerFinder, enter 0 to not use buffer, Setting this value to 0 is better when the total number of Sections in the game is low. If the game has more than a thousand Sections, Buffer must be set.  
 
 ![option](assets/option.webp)
 

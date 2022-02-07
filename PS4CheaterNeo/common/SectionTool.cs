@@ -93,9 +93,9 @@ namespace PS4CheaterNeo
             mutex.WaitOne();
             try
             {
-                string sectionFilterKeys = Properties.Settings.Default.SectionFilterKeys.Value;
-                uint sectionFilterSize = Properties.Settings.Default.SectionFilterSize.Value;
-                sectionFilterKeys = Regex.Replace(sectionFilterKeys, " *[,;] *", "|");
+                string SectionFilterKeys = Properties.Settings.Default.SectionFilterKeys.Value;
+                uint SectionFilterSize = Properties.Settings.Default.SectionFilterSize.Value;
+                SectionFilterKeys = Regex.Replace(SectionFilterKeys, " *[,;] *", "|");
                 SectionDict = new Dictionary<int, Section>();
                 SectionList = new List<(int SID, ulong start, ulong end)>();
                 TotalMemorySize = 0;
@@ -113,7 +113,7 @@ namespace PS4CheaterNeo
                         ulong start = entry.start;
                         ulong end = entry.end;
                         ulong length = end - start;
-                        bool isFilter = SectionIsFilter(entry.name, sectionFilterKeys);
+                        bool isFilter = SectionIsFilter(entry.name, SectionFilterKeys);
 
                         ulong bufferLength = 1024 * 1024 * 128;
                         if ((entry.prot & 0x5) == 0x5) bufferLength = length; //Executable section
@@ -145,7 +145,7 @@ namespace PS4CheaterNeo
                             section.Prot = entry.prot;
                             section.Offset = entry.offset;
                             if (isFilter) section.IsFilter = true;
-                            else if (section.Length < sectionFilterSize) section.IsFilterSize = true;
+                            else if (section.Length < SectionFilterSize) section.IsFilterSize = true;
 
                             SectionDict.Add(section.SID, section);
                             SectionList.Add((section.SID, start, start + curLength));
@@ -254,9 +254,11 @@ namespace PS4CheaterNeo
             return -1;
         }
 
+
         /// <summary>
         /// get Sections sorted by address
         /// </summary>
+        /// <param name="collection">get only Sections of the specified SID, is optional</param>
         /// <returns>section array</returns>
         public Section[] GetSectionSortByAddr(IEnumerable<int> collection = null)
         {
@@ -274,19 +276,12 @@ namespace PS4CheaterNeo
         /// </summary>
         /// <param name="SID">find the position of the SID</param>
         /// <param name="idx">position index of the SID</param>
-        /// <param name="SIDs">get only specified SIDs, is optional</param>
+        /// <param name="collection">get only Sections of the specified SID, is optional</param>
         /// <returns>section array</returns>
-        public Section[] GetSectionSortByAddr(int SID, out int idx, List<int> SIDs = null)
+        public Section[] GetSectionSortByAddr(int SID, out int idx, IEnumerable<int> collection = null)
         {
             idx = -1;
-            Section[] sections = null;
-            if (SIDs == null || SIDs.Count == 0) sections = GetSectionSortByAddr();
-            else
-            {
-                sections = new Section[SIDs.Count];
-                for (int sIdx = 0; sIdx < SIDs.Count; sIdx++) sections[sIdx] = SectionDict[SIDs[sIdx]];
-                Array.Sort(sections, CompareSection);
-            }
+            Section[] sections = GetSectionSortByAddr(collection);
 
             for (int sectionIdx = 0; sectionIdx < sections.Length; sectionIdx++)
             {

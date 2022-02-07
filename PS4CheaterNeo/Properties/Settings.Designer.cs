@@ -191,5 +191,17 @@ namespace PS4CheaterNeo.Properties {
                 this["EnableFilterSizeQuery"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute(@"50|3_Query|1_Query|Set the minimum buffer size (in MB) in querying and pointerFinder, enter 0 to not use buffer, setting this value to 0 is better when the total number of Sections in the game is low. If the game has more than a thousand Sections, Buffer must be set")]
+        public global::OptionTreeView.Option<uint> QueryBufferSize {
+            get {
+                return ((global::OptionTreeView.Option<uint>)(this["QueryBufferSize"]));
+            }
+            set {
+                this["QueryBufferSize"] = value;
+            }
+        }
     }
 }
