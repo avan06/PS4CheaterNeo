@@ -79,7 +79,7 @@ namespace PS4CheaterNeo
             this.CheatGridViewAddress = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.CheatGridViewType = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.CheatGridViewActive = new System.Windows.Forms.DataGridViewButtonColumn();
-            this.CheatGridViewValue = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.CheatGridViewValue = new GroupGridView.DataGridViewUpDownColumn();
             this.CheatGridViewSection = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.CheatGridViewLock = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.CheatGridViewDescription = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -617,7 +617,7 @@ namespace PS4CheaterNeo
         private System.Windows.Forms.DataGridViewTextBoxColumn CheatGridViewAddress;
         private System.Windows.Forms.DataGridViewTextBoxColumn CheatGridViewType;
         private System.Windows.Forms.DataGridViewButtonColumn CheatGridViewActive;
-        private System.Windows.Forms.DataGridViewTextBoxColumn CheatGridViewValue;
+        private GroupGridView.DataGridViewUpDownColumn CheatGridViewValue;
         private System.Windows.Forms.DataGridViewTextBoxColumn CheatGridViewSection;
         private System.Windows.Forms.DataGridViewCheckBoxColumn CheatGridViewLock;
         private System.Windows.Forms.DataGridViewTextBoxColumn CheatGridViewDescription;
