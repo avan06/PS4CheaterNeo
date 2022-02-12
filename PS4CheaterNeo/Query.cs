@@ -44,6 +44,7 @@ namespace PS4CheaterNeo
                 return;
             }
 
+            PS4Tool.DetachDebugger();
             bitsDictDict = null;
             GC.Collect();
             Properties.Settings.Default.Save();
@@ -59,6 +60,8 @@ namespace PS4CheaterNeo
                 //    return;
                 //}
                 if (!PS4Tool.Connect(Properties.Settings.Default.PS4IP.Value, out string msg)) throw new Exception(msg);
+
+                PS4Tool.DetachDebugger();
 
                 int selectedIdx = 0;
                 string DefaultProcess = Properties.Settings.Default.DefaultProcess.Value;
@@ -917,6 +920,18 @@ namespace PS4CheaterNeo
             if (InputBox.Show("Section Filter", "Enter the value of the filter keys", ref SectionFilterKeys, null) != DialogResult.OK) return;
 
             Properties.Settings.Default.SectionFilterKeys.Value = SectionFilterKeys;
+        }
+
+        private void RunBtn_Click(object sender, EventArgs e)
+        {
+            ComboboxItem process = (ComboboxItem)ProcessesBox.SelectedItem;
+            PS4Tool.AttachDebugger((int)process.Value, (string)process.Text, false);
+        }
+
+        private void PauseBtn_Click(object sender, EventArgs e)
+        {
+            ComboboxItem process = (ComboboxItem)ProcessesBox.SelectedItem;
+            PS4Tool.AttachDebugger((int)process.Value, (string)process.Text, true);
         }
         #endregion
 

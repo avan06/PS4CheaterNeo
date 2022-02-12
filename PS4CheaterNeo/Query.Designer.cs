@@ -49,6 +49,8 @@ namespace PS4CheaterNeo
             this.ToolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.ResultViewFindPointer = new System.Windows.Forms.ToolStripMenuItem();
             this.SplitContainer2 = new System.Windows.Forms.SplitContainer();
+            this.PauseBtn = new System.Windows.Forms.Button();
+            this.RunBtn = new System.Windows.Forms.Button();
             this.SectionSearchBtn = new System.Windows.Forms.Button();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.label4 = new System.Windows.Forms.Label();
@@ -62,6 +64,7 @@ namespace PS4CheaterNeo
             this.SectionViewLength = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.SectionViewSID = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.SectionViewOffset = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.SectionViewEnd = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.SectionViewMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.SectionViewHexEditor = new System.Windows.Forms.ToolStripMenuItem();
             this.SectionViewDump = new System.Windows.Forms.ToolStripMenuItem();
@@ -88,7 +91,6 @@ namespace PS4CheaterNeo
             this.ScanBtn = new System.Windows.Forms.Button();
             this.CompareTypeBox = new System.Windows.Forms.ComboBox();
             this.Panel1 = new System.Windows.Forms.Panel();
-            this.SectionViewEnd = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             ((System.ComponentModel.ISupportInitialize)(this.SplitContainer1)).BeginInit();
             this.SplitContainer1.Panel1.SuspendLayout();
             this.SplitContainer1.Panel2.SuspendLayout();
@@ -262,6 +264,8 @@ namespace PS4CheaterNeo
             // 
             // SplitContainer2.Panel1
             // 
+            this.SplitContainer2.Panel1.Controls.Add(this.PauseBtn);
+            this.SplitContainer2.Panel1.Controls.Add(this.RunBtn);
             this.SplitContainer2.Panel1.Controls.Add(this.SectionSearchBtn);
             this.SplitContainer2.Panel1.Controls.Add(this.tableLayoutPanel2);
             this.SplitContainer2.Panel1.Controls.Add(this.SectionView);
@@ -286,6 +290,37 @@ namespace PS4CheaterNeo
             this.SplitContainer2.SplitterDistance = 255;
             this.SplitContainer2.TabIndex = 0;
             // 
+            // PauseBtn
+            // 
+            this.PauseBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(36)))), ((int)(((byte)(36)))));
+            this.PauseBtn.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("PauseBtn.BackgroundImage")));
+            this.PauseBtn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.PauseBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.PauseBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.PauseBtn.ForeColor = System.Drawing.Color.White;
+            this.PauseBtn.Location = new System.Drawing.Point(212, 28);
+            this.PauseBtn.Name = "PauseBtn";
+            this.PauseBtn.Size = new System.Drawing.Size(20, 20);
+            this.PauseBtn.TabIndex = 31;
+            this.PauseBtn.UseVisualStyleBackColor = false;
+            this.PauseBtn.Click += new System.EventHandler(this.PauseBtn_Click);
+            // 
+            // RunBtn
+            // 
+            this.RunBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(36)))), ((int)(((byte)(36)))));
+            this.RunBtn.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("RunBtn.BackgroundImage")));
+            this.RunBtn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.RunBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.RunBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.RunBtn.ForeColor = System.Drawing.Color.White;
+            this.RunBtn.Location = new System.Drawing.Point(231, 28);
+            this.RunBtn.Name = "RunBtn";
+            this.RunBtn.Size = new System.Drawing.Size(20, 20);
+            this.RunBtn.TabIndex = 32;
+            this.RunBtn.TextAlign = System.Drawing.ContentAlignment.TopLeft;
+            this.RunBtn.UseVisualStyleBackColor = false;
+            this.RunBtn.Click += new System.EventHandler(this.RunBtn_Click);
+            // 
             // SectionSearchBtn
             // 
             this.SectionSearchBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -294,7 +329,7 @@ namespace PS4CheaterNeo
             this.SectionSearchBtn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             this.SectionSearchBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.SectionSearchBtn.ForeColor = System.Drawing.Color.White;
-            this.SectionSearchBtn.Location = new System.Drawing.Point(251, 32);
+            this.SectionSearchBtn.Location = new System.Drawing.Point(250, 28);
             this.SectionSearchBtn.Name = "SectionSearchBtn";
             this.SectionSearchBtn.Size = new System.Drawing.Size(33, 20);
             this.SectionSearchBtn.TabIndex = 3;
@@ -383,9 +418,9 @@ namespace PS4CheaterNeo
             this.SectionView.ContextMenuStrip = this.SectionViewMenu;
             this.SectionView.ForeColor = System.Drawing.Color.White;
             this.SectionView.HideSelection = false;
-            this.SectionView.Location = new System.Drawing.Point(3, 58);
+            this.SectionView.Location = new System.Drawing.Point(3, 53);
             this.SectionView.Name = "SectionView";
-            this.SectionView.Size = new System.Drawing.Size(283, 164);
+            this.SectionView.Size = new System.Drawing.Size(283, 169);
             this.SectionView.TabIndex = 2;
             this.SectionView.UseCompatibleStateImageBehavior = false;
             this.SectionView.View = System.Windows.Forms.View.Details;
@@ -419,6 +454,10 @@ namespace PS4CheaterNeo
             // SectionViewOffset
             // 
             this.SectionViewOffset.Text = "Offset";
+            // 
+            // SectionViewEnd
+            // 
+            this.SectionViewEnd.Text = "End";
             // 
             // SectionViewMenu
             // 
@@ -466,7 +505,7 @@ namespace PS4CheaterNeo
             this.GetProcessesBtn.ForeColor = System.Drawing.Color.White;
             this.GetProcessesBtn.Location = new System.Drawing.Point(3, 3);
             this.GetProcessesBtn.Name = "GetProcessesBtn";
-            this.GetProcessesBtn.Size = new System.Drawing.Size(280, 23);
+            this.GetProcessesBtn.Size = new System.Drawing.Size(280, 20);
             this.GetProcessesBtn.TabIndex = 1;
             this.GetProcessesBtn.Text = "Refresh Processes";
             this.GetProcessesBtn.UseVisualStyleBackColor = false;
@@ -481,9 +520,9 @@ namespace PS4CheaterNeo
             this.ProcessesBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.ProcessesBox.ForeColor = System.Drawing.Color.White;
             this.ProcessesBox.FormattingEnabled = true;
-            this.ProcessesBox.Location = new System.Drawing.Point(3, 32);
+            this.ProcessesBox.Location = new System.Drawing.Point(3, 28);
             this.ProcessesBox.Name = "ProcessesBox";
-            this.ProcessesBox.Size = new System.Drawing.Size(244, 20);
+            this.ProcessesBox.Size = new System.Drawing.Size(207, 20);
             this.ProcessesBox.TabIndex = 0;
             this.ProcessesBox.SelectedIndexChanged += new System.EventHandler(this.ProcessesBox_SelectedIndexChanged);
             // 
@@ -732,10 +771,6 @@ namespace PS4CheaterNeo
             this.Panel1.Size = new System.Drawing.Size(800, 450);
             this.Panel1.TabIndex = 2;
             // 
-            // SectionViewEnd
-            // 
-            this.SectionViewEnd.Text = "End";
-            // 
             // Query
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -832,5 +867,7 @@ namespace PS4CheaterNeo
         private System.Windows.Forms.ToolStripMenuItem ResultViewCopyAddress;
         private System.Windows.Forms.CheckBox IsFilterSizeBox;
         private System.Windows.Forms.ColumnHeader SectionViewEnd;
+        private System.Windows.Forms.Button PauseBtn;
+        private System.Windows.Forms.Button RunBtn;
     }
 }

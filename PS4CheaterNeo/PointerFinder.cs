@@ -357,14 +357,14 @@ namespace PS4CheaterNeo
         /// <summary>
         /// foreach all sections and take out all addresses and values, then get the list sorted by address and list by value respectively
         /// </summary>
-        /// <param name="nextScanCheckNumber"></param>
+        /// <param name="nextScanCheckNumber">necessary to obtain the latest AddrValueList again when the number of results exceeds this value</param>
         /// <param name="tickerMajor">calculate execution time</param>
         /// <returns></returns>
         private async Task<bool> ScanTask(int nextScanCheckNumber, System.Diagnostics.Stopwatch tickerMajor) => await Task.Run(() =>
         {
             try
             {
-                #region InitPathAddrs
+                #region InitAddrValueList
                 if (addrPointerDict == null || addrPointerDict.Count == 0 || IsInitScan.Checked || pointerResults.Count > nextScanCheckNumber)
                 {
                     Invoke(new MethodInvoker(() => { IsInitScan.Checked = false; }));
@@ -482,62 +482,61 @@ namespace PS4CheaterNeo
                     semaphore.Dispose();
                     whenTasks.Dispose();
                     GC.Collect();
-                    if (addrValueList != null && addrValueList.Count > 0)
+                    if (addrValueList == null || addrValueList.Count <= 0) return true;
+
+                    if (addrPointerDict != null) addrPointerDict.Clear();
+                    if (valuePointerDict != null) valuePointerDict.Clear();
+                    addrPointerDict = new Dictionary<int, List<Pointer>>();
+                    valuePointerDict = new Dictionary<int, List<Pointer>>();
+
+                    int tmpAddrSID = 0;
+                    List<Pointer> addrPointerList = null;
+                    addrValueList.Sort((p1, p2) => p1.AddrSID.CompareTo(p2.AddrSID));
+                    for (int idx = 0; idx < addrValueList.Count; idx++)
                     {
-                        if (addrPointerDict != null) addrPointerDict.Clear();
-                        if (valuePointerDict != null) valuePointerDict.Clear();
-                        addrPointerDict = new Dictionary<int, List<Pointer>>();
-                        valuePointerDict = new Dictionary<int, List<Pointer>>();
-
-                        int tmpAddrSID = 0;
-                        List<Pointer> addrPointerList = null;
-                        addrValueList.Sort((p1, p2) => p1.AddrSID.CompareTo(p2.AddrSID));
-                        for (int idx = 0; idx < addrValueList.Count; idx++)
+                        Pointer pointer = addrValueList[idx];
+                        if (tmpAddrSID == 0 || tmpAddrSID != pointer.AddrSID)
                         {
-                            Pointer pointer = addrValueList[idx];
-                            if (tmpAddrSID == 0 || tmpAddrSID != pointer.AddrSID)
+                            if (addrPointerList != null)
                             {
-                                if (addrPointerList != null)
-                                {
-                                    addrPointerList.Sort((p1, p2) => p1.AddrPos.CompareTo(p2.AddrPos));
-                                    addrPointerDict[tmpAddrSID] = addrPointerList;
-                                }
-                                if (!addrPointerDict.TryGetValue(pointer.AddrSID, out addrPointerList)) addrPointerList = new List<Pointer>();
+                                addrPointerList.Sort((p1, p2) => p1.AddrPos.CompareTo(p2.AddrPos));
+                                addrPointerDict[tmpAddrSID] = addrPointerList;
                             }
-                            addrPointerList.Add(pointer);
-                            tmpAddrSID = pointer.AddrSID;
+                            if (!addrPointerDict.TryGetValue(pointer.AddrSID, out addrPointerList)) addrPointerList = new List<Pointer>();
                         }
-                        if (addrPointerList != null && !addrPointerDict.ContainsKey(tmpAddrSID))
-                        {
-                            addrPointerList.Sort((p1, p2) => p1.AddrPos.CompareTo(p2.AddrPos));
-                            addrPointerDict[tmpAddrSID] = addrPointerList;
-                        }
-
-                        int tmpValueSID = 0;
-                        List<Pointer> valuePointerList = null;
-                        addrValueList.Sort((p1, p2) => p1.ValueSID.CompareTo(p2.ValueSID));
-                        for (int idx = 0; idx < addrValueList.Count; idx++)
-                        {
-                            Pointer pointer = addrValueList[idx];
-                            if (tmpValueSID == 0 || tmpValueSID != pointer.ValueSID)
-                            {
-                                if (valuePointerList != null)
-                                {
-                                    valuePointerList.Sort((p1, p2) => p1.ValuePos.CompareTo(p2.ValuePos));
-                                    valuePointerDict[tmpValueSID] = valuePointerList;
-                                }
-                                if (!valuePointerDict.TryGetValue(pointer.ValueSID, out valuePointerList)) valuePointerList = new List<Pointer>();
-                            }
-                            valuePointerList.Add(pointer);
-                            tmpValueSID = pointer.ValueSID;
-                        }
-                        if (valuePointerList != null && !valuePointerDict.ContainsKey(tmpValueSID))
-                        {
-                            valuePointerList.Sort((p1, p2) => p1.ValuePos.CompareTo(p2.ValuePos));
-                            valuePointerDict[tmpValueSID] = valuePointerList;
-                        }
-                        addrValueList = null;
+                        addrPointerList.Add(pointer);
+                        tmpAddrSID = pointer.AddrSID;
                     }
+                    if (addrPointerList != null && !addrPointerDict.ContainsKey(tmpAddrSID))
+                    {
+                        addrPointerList.Sort((p1, p2) => p1.AddrPos.CompareTo(p2.AddrPos));
+                        addrPointerDict[tmpAddrSID] = addrPointerList;
+                    }
+
+                    int tmpValueSID = 0;
+                    List<Pointer> valuePointerList = null;
+                    addrValueList.Sort((p1, p2) => p1.ValueSID.CompareTo(p2.ValueSID));
+                    for (int idx = 0; idx < addrValueList.Count; idx++)
+                    {
+                        Pointer pointer = addrValueList[idx];
+                        if (tmpValueSID == 0 || tmpValueSID != pointer.ValueSID)
+                        {
+                            if (valuePointerList != null)
+                            {
+                                valuePointerList.Sort((p1, p2) => p1.ValuePos.CompareTo(p2.ValuePos));
+                                valuePointerDict[tmpValueSID] = valuePointerList;
+                            }
+                            if (!valuePointerDict.TryGetValue(pointer.ValueSID, out valuePointerList)) valuePointerList = new List<Pointer>();
+                        }
+                        valuePointerList.Add(pointer);
+                        tmpValueSID = pointer.ValueSID;
+                    }
+                    if (valuePointerList != null && !valuePointerDict.ContainsKey(tmpValueSID))
+                    {
+                        valuePointerList.Sort((p1, p2) => p1.ValuePos.CompareTo(p2.ValuePos));
+                        valuePointerDict[tmpValueSID] = valuePointerList;
+                    }
+                    addrValueList = null;
                     GC.Collect();
                 }
                 #endregion

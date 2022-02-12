@@ -47,8 +47,9 @@ namespace PS4CheaterNeo
             CheatGridView.EnableHeadersVisualStyles = false;
         }
 
-        private void MenuExit_Click(object sender, EventArgs e) => Close();
+        private void Main_FormClosing(object sender, FormClosingEventArgs e) => PS4Tool.DetachDebugger();
 
+        #region ToolStrip
         private void ToolStripSend_Click(object sender, EventArgs e)
         {
             if (sendPayload == null || sendPayload.IsDisposed) sendPayload = new SendPayload();
@@ -178,6 +179,7 @@ namespace PS4CheaterNeo
         /// data|2|ABCDE|4 bytes|999|0|DescForData|30ABCDE
         /// @batchcode|data|0|0|code||offset:0x7777777 value:0x0123456789ABCDEF reset:0x0123456789ABCDEF size:8;offset:0xAABBCC value:0x0123456789 reset:0x0123456789 size:5|0|DescForBatchcode
         /// </summary>
+        /// <param name="cheatStrArr"></param>
         private void ParseCheatFiles(ref string[] cheatStrArr)
         {
             Section[] sections = sectionTool.GetSectionSortByAddr();
@@ -433,7 +435,44 @@ namespace PS4CheaterNeo
             option.Show();
         }
 
-        Task<bool> refreshCheatTask;
+        private void ToolStripHexView_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                Section section;
+                ulong offsetAddr;
+
+                string inputValue = "";
+
+                if (CheatGridView.SelectedRows.Count == 1)
+                {
+                    DataGridViewSelectedRowCollection rows = CheatGridView.SelectedRows;
+                    var cheatRow = rows[0];
+                    (section, offsetAddr) = ((Section section, ulong offsetAddr))cheatRow.Tag;
+                    inputValue = (section.Start + offsetAddr).ToString("X");
+                }
+
+                if (InputBox.Show("Hex View", "Please enter the memory address(hex) you want to view", ref inputValue) != DialogResult.OK) return;
+
+                if ((ProcessName ?? "") == "") throw new Exception("No Process currently");
+                if (!InitSectionList(ProcessName)) throw new Exception(String.Format("Process({0}): InitSectionList failed", ProcessName));
+
+                ulong address = ulong.Parse(inputValue, NumberStyles.HexNumber);
+                int sid = sectionTool.GetSectionID(address);
+                if (sid == -1) return;
+
+                section = sectionTool.GetSection(sid);
+                offsetAddr = address - section.Start;
+
+                HexEditor hexEdit = new HexEditor(this, section, (int)offsetAddr);
+                hexEdit.Show(this);
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show(exception.Message + "\n" + exception.StackTrace, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+            }
+        }
+
         private void ToolStripRefreshCheat_Click(object sender, EventArgs e)
         {
             if (CheatGridView.Rows.Count == 0 || (refreshCheatTask != null && !refreshCheatTask.IsCompleted)) return;
@@ -441,7 +480,10 @@ namespace PS4CheaterNeo
             refreshCheatTask = RefreshCheatTask();
             ToolStripMsg.Text = string.Format("{0:000}%, Refresh Cheat finished.", 100);
         }
+        #endregion
 
+        #region Task
+        Task<bool> refreshCheatTask;
         private async Task<bool> RefreshCheatTask() => await Task.Run(() => {
             if (!InitSectionList(ProcessName, true)) return false;
 
@@ -533,6 +575,93 @@ namespace PS4CheaterNeo
             return (section, offsetAddr, hexAddr);
         }
 
+        Task<bool> refreshLockTask;
+        private void RefreshLock_Tick(object sender, EventArgs e)
+        {
+            if (!(ToolStripProcessInfo.Tag is bool) && ProcessName != (string)ToolStripProcessInfo.Tag)
+            {
+                ToolStripProcessInfo.Tag = ProcessName;
+                ToolStripProcessInfo.Text = "Current Processes: " + (ProcessName == "" ? "Empty" : ProcessName);
+            }
+            if (!ToolStripLockEnable.Checked || CheatGridView.Rows.Count == 0 || (refreshLockTask != null && !refreshLockTask.IsCompleted)) return;
+
+            if (refreshLockTask != null) refreshLockTask.Dispose();
+
+            refreshLockTask = RefreshLockTask();
+        }
+
+        private async Task<bool> RefreshLockTask() => await Task.Run(() => {
+            if (DateTime.Now.Second % 5 == 0 && DateTime.Now.Millisecond < 500)
+            {
+                if (!InitSectionList(ProcessName)) return false;
+            }
+
+
+            bool VerifySectionWhenLock = Properties.Settings.Default.VerifySectionWhenLock.Value;
+            (int sid, string name, uint prot, ulong offsetAddr) preData = (0, "", 0, 0);
+            Dictionary<ulong, ulong> pointerMemoryCaches = new Dictionary<ulong, ulong>();
+            for (int cIdx = 0; cIdx < CheatGridView.Rows.Count; cIdx++)
+            {
+                try
+                {
+                    DataGridViewRow cheatRow = CheatGridView.Rows[cIdx];
+                    if ((bool)cheatRow.Cells[(int)ChertCol.CheatListLock].Value == false)
+                    {
+                        preData = (0, "", 0, 0);
+                        continue;
+                    }
+                    (Section section, ulong offsetAddr) = ((Section section, ulong offsetAddr))cheatRow.Tag;
+                    #region Refresh Section and offsetAddr
+                    if (VerifySectionWhenLock)
+                    {
+                        int checkOffset = 0;
+                        string hexAddr;
+                        bool isPointer = cheatRow.Cells[(int)ChertCol.CheatListAddress].Value.ToString().StartsWith("P->");
+                        string[] sectionArr = cheatRow.Cells[(int)ChertCol.CheatListSection].Value.ToString().Split('|');
+                        if (sectionArr[0].StartsWith("+") && preData.sid == 0)
+                        {
+                            for (int idx = cIdx - 1; idx >= 0; idx--)
+                            {
+                                DataGridViewRow checkRow = CheatGridView.Rows[idx];
+                                string[] checkSArr = checkRow.Cells[(int)ChertCol.CheatListSection].Value.ToString().Split('|');
+                                if (checkSArr[0].StartsWith("+"))
+                                {
+                                    checkOffset += int.Parse(sectionArr[0].Substring(1), NumberStyles.HexNumber);
+                                    continue;
+                                }
+
+                                (Section section, ulong offsetAddr) checkCheat = ((Section section, ulong offsetAddr))checkRow.Tag;
+                                bool checkPointer = checkRow.Cells[(int)ChertCol.CheatListAddress].Value.ToString().StartsWith("P->");
+                                (Section section, ulong offsetAddr, string hexAddr) checkSection = RefreshSection(checkSArr, checkCheat.offsetAddr, checkPointer, preData, pointerMemoryCaches);
+                                preData = (checkSection.section.SID, checkSection.section.Name, checkSection.section.Prot, checkSection.offsetAddr + (ulong)checkOffset);
+                                break;
+                            }
+                        }
+                        (section, offsetAddr, hexAddr) = RefreshSection(sectionArr, offsetAddr, isPointer, preData, pointerMemoryCaches);
+                        if (section == null)
+                        {
+                            ToolStripMsg.Text = string.Format("RefreshLock Failed...CheatGrid({0}), section: {1}, offsetAddr: {2:X}", cIdx, string.Join("-", sectionArr), offsetAddr);
+                            cheatRow.DefaultCellStyle.ForeColor = Color.Red;
+                            preData = (0, "", 0, 0);
+                            continue;
+                        }
+                        else if (cheatRow.DefaultCellStyle.ForeColor == Color.Red) cheatRow.DefaultCellStyle.ForeColor = default;
+                        preData = (section.SID, section.Name, section.Prot, offsetAddr);
+                        cheatRow.Tag = (section, offsetAddr);
+                        cheatRow.Cells[(int)ChertCol.CheatListAddress].Value = hexAddr;
+                    }
+                    #endregion
+                    ScanType scanType = this.ParseFromDescription<ScanType>(cheatRow.Cells[(int)ChertCol.CheatListType].Value.ToString());
+                    byte[] newData = ScanTool.ValueStringToByte(scanType, cheatRow.Cells[(int)ChertCol.CheatListValue].Value.ToString());
+                    PS4Tool.WriteMemory(section.PID, offsetAddr + section.Start, newData);
+                }
+                catch { preData = (0, "", 0, 0); }
+            }
+            return true;
+        });
+        #endregion
+
+        #region CheatGridView
         private void CheatGridView_RowPostPaint(object sender, DataGridViewRowPostPaintEventArgs e)
         {
             var format = new StringFormat() { Alignment = StringAlignment.Near, LineAlignment = StringAlignment.Near };
@@ -608,129 +737,8 @@ namespace PS4CheaterNeo
                 MessageBox.Show(exception.Message + "\n" + exception.StackTrace, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
+        #endregion
 
-        Task<bool> refreshLockTask;
-        private void RefreshLock_Tick(object sender, EventArgs e)
-        {
-            if (!(ToolStripProcessInfo.Tag is bool) && ProcessName != (string)ToolStripProcessInfo.Tag)
-            {
-                ToolStripProcessInfo.Tag = ProcessName;
-                ToolStripProcessInfo.Text = "Current Processes: " + (ProcessName == "" ? "Empty" : ProcessName);
-            }
-            if (!ToolStripLockEnable.Checked || CheatGridView.Rows.Count == 0 || (refreshLockTask != null && !refreshLockTask.IsCompleted)) return;
-
-            if (refreshLockTask != null) refreshLockTask.Dispose();
-
-            refreshLockTask = RefreshLockTask();
-        }
-
-        private async Task<bool> RefreshLockTask() => await Task.Run(() => {
-            if (DateTime.Now.Second % 5 == 0 && DateTime.Now.Millisecond < 500)
-            {
-                if (!InitSectionList(ProcessName)) return false;
-            }
-            
-
-            bool VerifySectionWhenLock = Properties.Settings.Default.VerifySectionWhenLock.Value;
-            (int sid, string name, uint prot, ulong offsetAddr) preData = (0, "", 0, 0);
-            Dictionary<ulong, ulong> pointerMemoryCaches = new Dictionary<ulong, ulong>();
-            for (int cIdx = 0; cIdx < CheatGridView.Rows.Count; cIdx++)
-            {
-                try
-                {
-                    DataGridViewRow cheatRow = CheatGridView.Rows[cIdx];
-                    if ((bool)cheatRow.Cells[(int)ChertCol.CheatListLock].Value == false)
-                    {
-                        preData = (0, "", 0, 0);
-                        continue;
-                    }
-                    (Section section, ulong offsetAddr) = ((Section section, ulong offsetAddr))cheatRow.Tag;
-                    #region Refresh Section and offsetAddr
-                    if (VerifySectionWhenLock)
-                    {
-                        int checkOffset = 0;
-                        string hexAddr;
-                        bool isPointer = cheatRow.Cells[(int)ChertCol.CheatListAddress].Value.ToString().StartsWith("P->");
-                        string[] sectionArr = cheatRow.Cells[(int)ChertCol.CheatListSection].Value.ToString().Split('|');
-                        if (sectionArr[0].StartsWith("+") && preData.sid == 0)
-                        {
-                            for (int idx = cIdx - 1; idx >= 0; idx--)
-                            {
-                                DataGridViewRow checkRow = CheatGridView.Rows[idx];
-                                string[] checkSArr = checkRow.Cells[(int)ChertCol.CheatListSection].Value.ToString().Split('|');
-                                if (checkSArr[0].StartsWith("+"))
-                                {
-                                    checkOffset += int.Parse(sectionArr[0].Substring(1), NumberStyles.HexNumber);
-                                    continue;
-                                }
-
-                                (Section section, ulong offsetAddr) checkCheat = ((Section section, ulong offsetAddr))checkRow.Tag;
-                                bool checkPointer = checkRow.Cells[(int)ChertCol.CheatListAddress].Value.ToString().StartsWith("P->");
-                                (Section section, ulong offsetAddr, string hexAddr) checkSection = RefreshSection(checkSArr, checkCheat.offsetAddr, checkPointer, preData, pointerMemoryCaches);
-                                preData = (checkSection.section.SID, checkSection.section.Name, checkSection.section.Prot, checkSection.offsetAddr + (ulong)checkOffset);
-                                break;
-                            }
-                        }
-                        (section, offsetAddr, hexAddr) = RefreshSection(sectionArr, offsetAddr, isPointer, preData, pointerMemoryCaches);
-                        if (section == null)
-                        {
-                            ToolStripMsg.Text = string.Format("RefreshLock Failed...CheatGrid({0}), section: {1}, offsetAddr: {2:X}", cIdx, string.Join("-", sectionArr), offsetAddr);
-                            cheatRow.DefaultCellStyle.ForeColor = Color.Red;
-                            preData = (0, "", 0, 0);
-                            continue;
-                        }
-                        else if (cheatRow.DefaultCellStyle.ForeColor == Color.Red) cheatRow.DefaultCellStyle.ForeColor = default;
-                        preData = (section.SID, section.Name, section.Prot, offsetAddr);
-                        cheatRow.Tag = (section, offsetAddr);
-                        cheatRow.Cells[(int)ChertCol.CheatListAddress].Value = hexAddr;
-                    }
-                    #endregion
-                    ScanType scanType = this.ParseFromDescription<ScanType>(cheatRow.Cells[(int)ChertCol.CheatListType].Value.ToString());
-                    byte[] newData = ScanTool.ValueStringToByte(scanType, cheatRow.Cells[(int)ChertCol.CheatListValue].Value.ToString());
-                    PS4Tool.WriteMemory(section.PID, offsetAddr + section.Start, newData);
-                }
-                catch { preData = (0, "", 0, 0); }
-            }
-            return true;
-        });
-
-        private void ToolStripHexView_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                Section section;
-                ulong offsetAddr;
-
-                string inputValue = "";
-
-                if (CheatGridView.SelectedRows.Count == 1)
-                {
-                    DataGridViewSelectedRowCollection rows = CheatGridView.SelectedRows;
-                    var cheatRow = rows[0];
-                    (section, offsetAddr) = ((Section section, ulong offsetAddr))cheatRow.Tag;
-                    inputValue = (section.Start + offsetAddr).ToString("X");
-                }
-
-                if (InputBox.Show("Hex View", "Please enter the memory address(hex) you want to view", ref inputValue) != DialogResult.OK) return;
-
-                if ((ProcessName ?? "") == "") throw new Exception("No Process currently");
-                if (!InitSectionList(ProcessName)) throw new Exception(String.Format("Process({0}): InitSectionList failed", ProcessName));
-
-                ulong address = ulong.Parse(inputValue, NumberStyles.HexNumber);
-                int sid = sectionTool.GetSectionID(address);
-                if (sid == -1) return;
-
-                section = sectionTool.GetSection(sid);
-                offsetAddr = address - section.Start;
-
-                HexEditor hexEdit = new HexEditor(this, section, (int)offsetAddr);
-                hexEdit.Show(this);
-            }
-            catch (Exception exception)
-            {
-                MessageBox.Show(exception.Message + "\n" + exception.StackTrace, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
-            }
-        }
         #endregion
 
         #region CheatGridMenu
@@ -1028,10 +1036,11 @@ namespace PS4CheaterNeo
         /// Initialize sections that match the selection process.
         /// 1. Show process not found in main window when pid is zero and set Tag to false.
         /// 2. The Tag has been set to false in the previous detection, and when the process can be found, the Tag will be cleared.
-        /// 3. Confirm whether the Section dictionary is correct, when the detected Section number is less than 20.
+        /// 3. Confirm whether the Section dictionary is correct, when the detected Section count is less than 20.
         /// 4. If not the above and it has been initialized before, it will not be re-initialized.
         /// </summary>
         /// <param name="processName">initialize Sections according to the passed process name</param>
+        /// <param name="force">force initialization even if Section dictionary already has data</param>
         /// <returns>return whether the initialization was successful</returns>
         public bool InitSectionList(string processName, bool force = false)
         {

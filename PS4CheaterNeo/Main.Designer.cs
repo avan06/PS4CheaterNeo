@@ -560,6 +560,7 @@ namespace PS4CheaterNeo
             this.Name = "Main";
             this.Opacity = 0.95D;
             this.Text = "PS4 Cheater Neo";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Main_FormClosing);
             this.Shown += new System.EventHandler(this.Main_Shown);
             this.CheatGridMenu.ResumeLayout(false);
             this.toolStrip1.ResumeLayout(false);

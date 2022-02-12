@@ -36,8 +36,8 @@ namespace PS4CheaterNeo
                     ps4 = null;
                 }
                 if (ps4 == null) ps4 = new PS4DBG(ip);
-                if (!ps4.IsConnected) ps4.Connect(connectTimeout, sendTimeout, receiveTimeout);
-                result = true;
+
+                result = ps4.IsConnected ? true : ps4.Connect(connectTimeout, sendTimeout, receiveTimeout);
             }
             catch (Exception exception) { msg = exception.Message; }
             finally { mutex.ReleaseMutex(); }
@@ -257,5 +257,56 @@ namespace PS4CheaterNeo
             catch {}
             finally { mutex.ReleaseMutex(); }
         }
+
+        private static ProcessStatus processStatus;
+
+        /// <summary>
+        /// specify the process to perform PS4DBG's AttachDebugger
+        /// </summary>
+        /// <param name="processID">process ID</param>
+        /// <param name="processName">process name</param>
+        /// <param name="isPause">pause or resume process</param>
+        public static void AttachDebugger(int processID, string processName, bool isPause)
+        {
+            ProcessStatus newStatus = isPause ? ProcessStatus.Pause : ProcessStatus.Run;
+            if (ps4.IsDebugging)
+            {
+                if (processStatus != newStatus)
+                {
+                    processStatus = newStatus;
+                    if (isPause) ps4.ProcessStop();
+                    else ps4.ProcessResume();
+                }
+            }
+            else if (MessageBox.Show("This feature requires Attach ps4 Debugging, continue?", "Attach", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) return;
+            else
+            {
+                try
+                {
+                    mutex.WaitOne();
+                    ps4.AttachDebugger(processID, null);
+                    ps4.Notify(222, "attached to " + processName);
+                    processStatus = ProcessStatus.Pause;
+                }
+                finally { mutex.ReleaseMutex(); }
+            }
+        }
+
+        /// <summary>
+        /// perform PS4DBG's DetachDebugger
+        /// </summary>
+        public static void DetachDebugger()
+        {
+            if (!ps4.IsDebugging) return;
+
+            ps4.DetachDebugger();
+        }
+    }
+
+    public enum ProcessStatus
+    {
+        None,
+        Run,
+        Pause,
     }
 }
