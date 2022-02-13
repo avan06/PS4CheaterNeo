@@ -61,8 +61,6 @@ namespace PS4CheaterNeo
                 //}
                 if (!PS4Tool.Connect(Properties.Settings.Default.PS4IP.Value, out string msg)) throw new Exception(msg);
 
-                PS4Tool.DetachDebugger();
-
                 int selectedIdx = 0;
                 string DefaultProcess = Properties.Settings.Default.DefaultProcess.Value;
                 ProcessesBox.Items.Clear();
@@ -922,16 +920,18 @@ namespace PS4CheaterNeo
             Properties.Settings.Default.SectionFilterKeys.Value = SectionFilterKeys;
         }
 
-        private void RunBtn_Click(object sender, EventArgs e)
+        private void ResumeBtn_Click(object sender, EventArgs e)
         {
+            processStatus = ProcessStatus.Resume;
             ComboboxItem process = (ComboboxItem)ProcessesBox.SelectedItem;
-            PS4Tool.AttachDebugger((int)process.Value, (string)process.Text, false);
+            PS4Tool.AttachDebugger((int)process.Value, (string)process.Text, processStatus);
         }
 
         private void PauseBtn_Click(object sender, EventArgs e)
         {
+            processStatus = ProcessStatus.Pause;
             ComboboxItem process = (ComboboxItem)ProcessesBox.SelectedItem;
-            PS4Tool.AttachDebugger((int)process.Value, (string)process.Text, true);
+            PS4Tool.AttachDebugger((int)process.Value, (string)process.Text, processStatus);
         }
         #endregion
 
@@ -1045,6 +1045,49 @@ namespace PS4CheaterNeo
                 pointerFinder.Show();
             }
             catch { }
+        }
+        #endregion
+
+        #region SlowMotion
+        int slowMotionInterval = 200;
+        ProcessStatus processStatus;
+        Task<bool> slowMotionTask;
+        private void SlowMotionTimer_Tick(object sender, EventArgs e)
+        {
+            if (processStatus == ProcessStatus.Pause) return;
+            if (slowMotionTask != null && !slowMotionTask.IsCompleted) return;
+            if (slowMotionTask != null) slowMotionTask.Dispose();
+
+            slowMotionTask = SlowMotionTask();
+            if (DateTime.Now.Second % 10 == 0) GC.Collect();
+        }
+        private async Task<bool> SlowMotionTask() => await Task.Run(() =>
+        {
+            Invoke(new MethodInvoker(() => { PauseBtn.PerformClick(); }));
+            Thread.Sleep(slowMotionInterval);
+            Invoke(new MethodInvoker(() => { ResumeBtn.PerformClick(); }));
+            Thread.Sleep(slowMotionInterval > 200 ? 200 : slowMotionInterval);
+
+            return true;
+        });
+
+        private void SlowMotionBox_CheckedChanged(object sender, EventArgs e)
+        {
+            if (SlowMotionBox.Checked)
+            {
+                string intervalStr = "200";
+                if (InputBox.Show("SlowMotion", "Enter the SlowMotion interval (in milliseconds, larger intervals will be slower)", ref intervalStr, null) != DialogResult.OK) return;
+                if (!int.TryParse(intervalStr, out slowMotionInterval)) slowMotionInterval = 200;
+                if (slowMotionInterval < 100) slowMotionInterval = 100;
+                SlowMotionTimer.Interval = 100;
+                SlowMotionTimer.Enabled = true;
+            }
+            else
+            {
+                SlowMotionTimer.Enabled = false;
+                ResumeBtn.PerformClick();
+            }
+
         }
         #endregion
     }

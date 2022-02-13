@@ -47,8 +47,6 @@ namespace PS4CheaterNeo
             CheatGridView.EnableHeadersVisualStyles = false;
         }
 
-        private void Main_FormClosing(object sender, FormClosingEventArgs e) => PS4Tool.DetachDebugger();
-
         #region ToolStrip
         private void ToolStripSend_Click(object sender, EventArgs e)
         {

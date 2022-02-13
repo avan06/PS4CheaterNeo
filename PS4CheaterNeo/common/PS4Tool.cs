@@ -266,19 +266,19 @@ namespace PS4CheaterNeo
         /// <param name="processID">process ID</param>
         /// <param name="processName">process name</param>
         /// <param name="isPause">pause or resume process</param>
-        public static void AttachDebugger(int processID, string processName, bool isPause)
+        public static void AttachDebugger(int processID, string processName, ProcessStatus newStatus)
         {
-            ProcessStatus newStatus = isPause ? ProcessStatus.Pause : ProcessStatus.Run;
-            if (ps4.IsDebugging)
+            if (ps4.IsConnected && ps4.IsDebugging)
             {
                 if (processStatus != newStatus)
                 {
                     processStatus = newStatus;
-                    if (isPause) ps4.ProcessStop();
+                    if (newStatus == ProcessStatus.Pause) ps4.ProcessStop();
                     else ps4.ProcessResume();
                 }
             }
-            else if (MessageBox.Show("This feature requires Attach ps4 Debugging, continue?", "Attach", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) return;
+            else if (MessageBox.Show("This experimental feature requires Attach ps4 Debugging\n\n" +
+                "be sure to close this window before closing the game, otherwise the PS4 will crash, continue?", "Attach warning", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) return;
             else
             {
                 try
@@ -294,19 +294,20 @@ namespace PS4CheaterNeo
 
         /// <summary>
         /// perform PS4DBG's DetachDebugger
+        /// After performing AttachDebugger, close the PS4 program, and then perform PS4DBG.DetachDebugger will cause the PS4 to crash
         /// </summary>
         public static void DetachDebugger()
         {
             if (!ps4.IsDebugging) return;
 
-            ps4.DetachDebugger();
+            ps4.TryDetachDebugger();
         }
     }
 
     public enum ProcessStatus
     {
         None,
-        Run,
+        Resume,
         Pause,
     }
 }

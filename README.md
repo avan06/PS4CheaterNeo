@@ -2,7 +2,7 @@
 
 PS4CheaterNeo is a program to find game cheat codes, and it is based on [`ps4debug`](https://github.com/jogolden/ps4debug) and `.Net Framework 4.8`.
 
-Currently in `version 0.9.5.1-beta`
+Currently in `version 0.9.5.2-beta`
 
 
 ## Table of Contents
@@ -13,6 +13,7 @@ Currently in `version 0.9.5.1-beta`
   * [Cheat window](#cheat-window)
   * [Add Address](#add-address)
   * [Query window](#query-window)
+  * [Experimental feature in Query window](#experimental-feature-slowmotion-and-pause-in-query-window)
   * [Section](#section)
   * [Group ScanType](#group-scantype)
   * [Group ScanType unspecified types](#group-scantype-unspecified-types)
@@ -67,8 +68,19 @@ Currently in `version 0.9.5.1-beta`
 ### Cheat window
 
 - The cheat list can be loaded with cheats file, and the cheat value can be `edited` and `locked`.
-- The cheat list has a group expandable/collapsable mechanism, and the cheat description with the same beginning will be set to the same group.
+- The cheat list has a `group expandable/collapsable` mechanism, and the `cheat description with the same beginning` will be set to the same group.
+- The cheat list will show row number.
+- Support using `keyboard up, down or mouse wheel` to adjust value when modifying cheat Value.
 - You can add the address to the `Cheat List` from the `Query window` or `Hex Editor`, and can also be added manually.
+- You can copy the memory address from the cheat or query list.
+- You can also open the `Hex editor` in the main window and manually enter the address.
+- The value of `multiple addresses` can be edited at the same time, select the multiple cheats and right-click to perform the edit.
+- In addition to loading the cheats file saved by this program, it also supports loading cheats files of other versions, the format is as follows:
+
+> 1.5|eboot.bin|ID:CUSA99999|VER:09.99|FM:672  
+> `data`|2|ABCDE|4 bytes|999|0|DescForData|30ABCDE  
+> `simple pointer`|pointer|float|@7777777_3_3333333+50+0+8+1B0+64|data|float|999|1|DescForPointer|  
+> `@batchcode`|data|0|0|code||offset:0x7777777 value:0x0123456789ABCDEF size:8;offset:0xAABBCC value:0x0123456789 size:5|0|DescForBatchcode  
 
 ![cheat_1](assets/cheat_1.webp)
 ![cheat_2](assets/cheat_2.webp)
@@ -95,6 +107,16 @@ Currently in `version 0.9.5.1-beta`
 ![query_1](assets/query_1.webp)
 ![query_2](assets/query_2.webp)
 ![query_3](assets/query_3.webp)
+
+
+### Experimental feature SlowMotion and Pause in Query window
+
+- It's an `experimental feature` requires `Attach ps4 Debugging`, after Attach ps4 Debugging,
+- Be sure to `close query window before closing the game`, otherwise the PS4 will `crash`.
+- Be sure to `close query window before closing the game`, otherwise the PS4 will `crash`.
+- Be sure to `close query window before closing the game`, otherwise the PS4 will `crash`.
+- 
+- Performing `SlowMotion` will require Enter the `SlowMotion interval` (in `milliseconds`, larger intervals will be slower)
 
 
 ### Section
@@ -127,8 +149,8 @@ Currently in `version 0.9.5.1-beta`
 > Example:  
 > Assuming the target `structure` is `63 00` `E7 03 00 00` `AB CD 00 00` `00 01`  
 > `Group scan` can be entered as `2:99 999 ? 2:256`  
-> Assuming the target `structure` is `02 00` `AB CD` `E7 03 00 00` `01 00 00 00 00 00 00 00`
-> `Group scan` can be entered as `2:2` `2:?` `e7030000` `1u`
+> Assuming the target `structure` is `02 00` `AB CD` `E7 03 00 00` `01 00 00 00 00 00 00 00`  
+> `Group scan` can be entered as `2:2` `2:?` `e7030000` `1u`  
 
 
 ### Hex Editor
@@ -136,6 +158,8 @@ Currently in `version 0.9.5.1-beta`
 - Display the detailed information values of the address value of the current cursor position.
 - Make address values greater than zero more obvious.
 - You can add the address to the `Cheat List` from the current cursor position.
+- The current scroll position will not be changed when refreshing the Hex editor.
+- Turns red when an address value is modified, and green after committing.
 
 ![hexeditor](assets/hexeditor.webp)
 
