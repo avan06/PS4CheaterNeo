@@ -1,10 +1,12 @@
-﻿using libdebug;
+﻿using GroupGridView;
+using libdebug;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static PS4CheaterNeo.SectionTool;
@@ -24,6 +26,7 @@ namespace PS4CheaterNeo
             Text += " " + Application.ProductVersion; //Assembly.GetExecutingAssembly().GetName().Version.ToString(); // Assembly.GetEntryAssembly().GetName().Version.ToString();
             sectionTool = new SectionTool();
         }
+
         #region Event
         private void Main_Shown(object sender, EventArgs e)
         {
@@ -734,6 +737,36 @@ namespace PS4CheaterNeo
             {
                 MessageBox.Show(exception.Message + "\n" + exception.StackTrace, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
+        }
+
+        private void CheatGridView_EditingControlShowing(object sender, DataGridViewEditingControlShowingEventArgs e)
+        {
+            bool CheatCellDirtyValueCommit = Properties.Settings.Default.CheatCellDirtyValueCommit.Value;
+            if (!CheatCellDirtyValueCommit) return;
+
+            DataGridViewUpDownEditingControl upDownControl = CheatGridView.EditingControl as DataGridViewUpDownEditingControl;
+            if (upDownControl == null) return;
+
+            upDownControl.UpDown -= UpDownControl_UpDown;
+            upDownControl.UpDown += UpDownControl_UpDown;
+        }
+
+        private void UpDownControl_UpDown(object sender, DataGridViewUpDownCellEventArgs e)
+        {
+            bool CheatCellDirtyValueCommit = Properties.Settings.Default.CheatCellDirtyValueCommit.Value;
+            if (!CheatCellDirtyValueCommit) return;
+
+            if (CheatGridView.CurrentCell == null || e.RowIndex < 0 || e.ColumnIndex != (int)ChertCol.CheatListValue) return;
+
+            if (!Regex.IsMatch(e.Text, @"^-?[0-9][0-9,\.]*$")) return;
+
+            DataGridViewRow cheatRow = CheatGridView.Rows[e.RowIndex];
+
+            (Section section, ulong offsetAddr) = ((Section section, ulong offsetAddr))cheatRow.Tag;
+            ScanType scanType = this.ParseFromDescription<ScanType>(cheatRow.Cells[(int)ChertCol.CheatListType].Value.ToString());
+
+            byte[] newData = ScanTool.ValueStringToByte(scanType, e.Text);
+            PS4Tool.WriteMemory(section.PID, offsetAddr + section.Start, newData);
         }
         #endregion
 

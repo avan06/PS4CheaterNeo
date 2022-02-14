@@ -62,8 +62,8 @@ namespace PS4CheaterNeo.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True|2_Cheat|2_Cheat|Determine whether to enable verifying Section values when lo" +
-            "cking cheat items. Default enabled")]
+        [global::System.Configuration.DefaultSettingValueAttribute("True|2_Cheat|Cheat|Determine whether to enable verifying Section values when lock" +
+            "ing cheat items. Default enabled")]
         public global::OptionTreeView.Option<bool> VerifySectionWhenLock {
             get {
                 return ((global::OptionTreeView.Option<bool>)(this["VerifySectionWhenLock"]));
@@ -75,8 +75,8 @@ namespace PS4CheaterNeo.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True|2_Cheat|2_Cheat|Determine whether to enable verifying Section values when re" +
-            "freshing the cheat list. Default enabled")]
+        [global::System.Configuration.DefaultSettingValueAttribute("True|2_Cheat|Cheat|Determine whether to enable verifying Section values when refr" +
+            "eshing the cheat list. Default enabled")]
         public global::OptionTreeView.Option<bool> VerifySectionWhenRefresh {
             get {
                 return ((global::OptionTreeView.Option<bool>)(this["VerifySectionWhenRefresh"]));
@@ -201,6 +201,19 @@ namespace PS4CheaterNeo.Properties {
             }
             set {
                 this["QueryBufferSize"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True|2_Cheat|Cheat|Determine whether to automatically write to PS4 when editing c" +
+            "heat values in UpDown")]
+        public global::OptionTreeView.Option<bool> CheatCellDirtyValueCommit {
+            get {
+                return ((global::OptionTreeView.Option<bool>)(this["CheatCellDirtyValueCommit"]));
+            }
+            set {
+                this["CheatCellDirtyValueCommit"] = value;
             }
         }
     }

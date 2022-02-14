@@ -12,10 +12,10 @@
       <Value Profile="(Default)">|1_General|1_SendPayload|Enter PS4 FW Version (Confirm the fw version only when perform sendpayload)</Value>
     </Setting>
     <Setting Name="VerifySectionWhenLock" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
-      <Value Profile="(Default)">True|2_Cheat|2_Cheat|Determine whether to enable verifying Section values when locking cheat items. Default enabled</Value>
+      <Value Profile="(Default)">True|2_Cheat|Cheat|Determine whether to enable verifying Section values when locking cheat items. Default enabled</Value>
     </Setting>
     <Setting Name="VerifySectionWhenRefresh" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
-      <Value Profile="(Default)">True|2_Cheat|2_Cheat|Determine whether to enable verifying Section values when refreshing the cheat list. Default enabled</Value>
+      <Value Profile="(Default)">True|2_Cheat|Cheat|Determine whether to enable verifying Section values when refreshing the cheat list. Default enabled</Value>
     </Setting>
     <Setting Name="AutoPerformGetProcesses" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
       <Value Profile="(Default)">True|3_Query|1_Query|Determine whether to enable automatic perform get processes when opening the Query window. Default enabled</Value>
@@ -43,6 +43,9 @@
     </Setting>
     <Setting Name="QueryBufferSize" Type="OptionTreeView.Option&lt;uint&gt;" Scope="User">
       <Value Profile="(Default)">50|3_Query|1_Query|Set the minimum buffer size (in MB) in querying and pointerFinder, enter 0 to not use buffer, setting this value to 0 is better when the total number of Sections in the game is low. If the game has more than a thousand Sections, Buffer must be set</Value>
+    </Setting>
+    <Setting Name="CheatCellDirtyValueCommit" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
+      <Value Profile="(Default)">True|2_Cheat|Cheat|Determine whether to automatically write to PS4 when editing cheat values in UpDown</Value>
     </Setting>
   </Settings>
 </SettingsFile>

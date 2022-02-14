@@ -454,6 +454,7 @@ namespace PS4CheaterNeo
             this.CheatGridView.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.CheatGridView_CellContentClick);
             this.CheatGridView.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.CheatGridView_CellEndEdit);
             this.CheatGridView.CellValidating += new System.Windows.Forms.DataGridViewCellValidatingEventHandler(this.CheatGridView_CellValidating);
+            this.CheatGridView.EditingControlShowing += new System.Windows.Forms.DataGridViewEditingControlShowingEventHandler(this.CheatGridView_EditingControlShowing);
             this.CheatGridView.RowPostPaint += new System.Windows.Forms.DataGridViewRowPostPaintEventHandler(this.CheatGridView_RowPostPaint);
             this.CheatGridView.RowsRemoved += new System.Windows.Forms.DataGridViewRowsRemovedEventHandler(this.CheatGridView_RowsRemoved);
             // 
@@ -510,7 +511,6 @@ namespace PS4CheaterNeo
             this.CheatGridViewValue.DefaultCellStyle = dataGridViewCellStyle5;
             this.CheatGridViewValue.HeaderText = "Value";
             this.CheatGridViewValue.Name = "CheatGridViewValue";
-            this.CheatGridViewValue.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             // 
             // CheatGridViewSection
             // 

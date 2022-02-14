@@ -2,7 +2,7 @@
 
 PS4CheaterNeo is a program to find game cheat codes, and it is based on [`ps4debug`](https://github.com/jogolden/ps4debug) and `.Net Framework 4.8`.
 
-Currently in `version 0.9.5.2-beta`
+Currently in `version 0.9.5.3-beta`
 
 
 ## Table of Contents
@@ -44,7 +44,7 @@ Currently in `version 0.9.5.2-beta`
 - If not enabled, `SendPayload` will be executed to enable `ps4debug`.
 - You must specify the ps4 connection `IP` in SendPayload.
 - `SendPayload` requires the `ps4debug.bin` file that conforms to the `FW` version.
-- Port is `9090` when using `GoldHEN2.0b` to `Enable BinLoader Server`, Other `Bin Loader` tool port is usually `9021`.
+- Port is `9090` when using `GoldHEN2.x` to `Enable BinLoader Server`, Other `Bin Loader` tool port is usually `9021`.
 
 ![sendpayload](assets/sendpayload.webp)
 
@@ -101,7 +101,8 @@ Currently in `version 0.9.5.2-beta`
 - Support query multiple targets, Multiple query windows can be opened at the same time.
 - In addition to query types such as `Byte, Float, Double, Hex`, etc., it also supports `Group` types.
 - Make the `section` of the suspected target more obvious.
-- The query value will skip the filtered `section` list when the filter checkbox is clicked.
+- The `section` list whose length is less than `SectionFilterSize` (default is 200K, can be modified in Option) will be filtered when the `FilterSize` checkbox is clicked.
+- The query value will skip the filtered `section` list when the `Filter` checkbox is clicked.
 - The preset `section` filter rules is `libSce, libc.prx, SceShell, SceLib, SceNp, SceVoice, SceFios, libkernel, SceVdec`, these rules can also be customized.
 
 ![query_1](assets/query_1.webp)
@@ -117,6 +118,8 @@ Currently in `version 0.9.5.2-beta`
 - Be sure to `close query window before closing the game`, otherwise the PS4 will `crash`.
 - 
 - Performing `SlowMotion` will require Enter the `SlowMotion interval` (in `milliseconds`, larger intervals will be slower)
+
+![query_3](assets/slowmotion.webp)
 
 
 ### Section
@@ -187,6 +190,7 @@ Currently in `version 0.9.5.2-beta`
 
 - Cheat
 
+> `CheatCellDirtyValueCommit`: Determine whether to automatically write to PS4 when editing cheat values in UpDown, `Default enabled`.  
 > `VerifySectionWhenLock`: Determine whether to enable verifying Section values when locking cheat items, `Default enabled`.  
 > `VerifySectionWhenRefresh`: Determine whether to enable verifying Section values when refreshing the cheat list, `Default enabled`.  
 
@@ -198,6 +202,7 @@ Currently in `version 0.9.5.2-beta`
 > `MinResultAccessFactor`: Access value directly by address when the number of query results for the same Section is less than this factor, Used to control whether to read Section data completely, or directly access the value by address, `Default value is 50`.  
 > `EnableFilterQuery`: Determine whether to enable filtering Sections when opening the query window, `Default enabled`.  
 > `SectionFilterKeys`: Enter the filter value, the filter will be set here when listing Sections.  
+> `SectionFilterSize`: Filter out when section size is less than this value(unit is bytes), `Default is 204,800`.  
 > `MaxResultShow`: Enter the maximum number of displayed query results. will only affect the number of results displayed in the ResultView, `Default value is 8192`.  
 > `QueryBufferSize`: Set the minimum buffer size (in MB) in querying and pointerFinder, enter 0 to not use buffer, Setting this value to 0 is better when the total number of Sections in the game is low. If the game has more than a thousand Sections, Buffer must be set.  
 
