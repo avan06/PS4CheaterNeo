@@ -919,7 +919,6 @@ namespace PS4CheaterNeo
 
             Properties.Settings.Default.SectionFilterKeys.Value = SectionFilterKeys;
         }
-
         private void ResumeBtn_Click(object sender, EventArgs e)
         {
             processStatus = ProcessStatus.Resume;
@@ -1065,6 +1064,7 @@ namespace PS4CheaterNeo
         {
             Invoke(new MethodInvoker(() => { PauseBtn.PerformClick(); }));
             Thread.Sleep(slowMotionInterval);
+
             Invoke(new MethodInvoker(() => { ResumeBtn.PerformClick(); }));
             Thread.Sleep(slowMotionInterval > 200 ? 200 : slowMotionInterval);
 
@@ -1076,7 +1076,13 @@ namespace PS4CheaterNeo
             if (SlowMotionBox.Checked)
             {
                 string intervalStr = "200";
-                if (InputBox.Show("SlowMotion", "Enter the SlowMotion interval (in milliseconds, larger intervals will be slower)", ref intervalStr, null) != DialogResult.OK) return;
+                ComboboxItem process = (ComboboxItem)ProcessesBox.SelectedItem;
+                if (InputBox.Show("SlowMotion", "Enter the SlowMotion interval (in milliseconds, larger intervals will be slower)", ref intervalStr, null) != DialogResult.OK ||
+                    !PS4Tool.AttachDebugger((int)process.Value, (string)process.Text, processStatus))
+                {
+                    SlowMotionBox.Checked = false;
+                    return;
+                }
                 if (!int.TryParse(intervalStr, out slowMotionInterval)) slowMotionInterval = 200;
                 if (slowMotionInterval < 100) slowMotionInterval = 100;
                 SlowMotionTimer.Interval = 100;
@@ -1084,6 +1090,8 @@ namespace PS4CheaterNeo
             }
             else
             {
+                if (!SlowMotionTimer.Enabled) return;
+
                 SlowMotionTimer.Enabled = false;
                 ResumeBtn.PerformClick();
             }

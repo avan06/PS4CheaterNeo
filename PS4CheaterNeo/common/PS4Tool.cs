@@ -266,7 +266,7 @@ namespace PS4CheaterNeo
         /// <param name="processID">process ID</param>
         /// <param name="processName">process name</param>
         /// <param name="isPause">pause or resume process</param>
-        public static void AttachDebugger(int processID, string processName, ProcessStatus newStatus)
+        public static bool AttachDebugger(int processID, string processName, ProcessStatus newStatus)
         {
             if (ps4.IsConnected && ps4.IsDebugging)
             {
@@ -278,7 +278,7 @@ namespace PS4CheaterNeo
                 }
             }
             else if (MessageBox.Show("This experimental feature requires Attach ps4 Debugging\n\n" +
-                "be sure to close this window before closing the game, otherwise the PS4 will crash, continue?", "Attach warning", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) return;
+                "be sure to close this window before closing the game, otherwise the PS4 will crash, continue?", "Attach warning", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) return false;
             else
             {
                 try
@@ -288,8 +288,10 @@ namespace PS4CheaterNeo
                     ps4.Notify(222, "attached to " + processName);
                     processStatus = ProcessStatus.Pause;
                 }
+                catch { return false; }
                 finally { mutex.ReleaseMutex(); }
             }
+            return true;
         }
 
         /// <summary>
