@@ -16,13 +16,13 @@ namespace PS4CheaterNeo
         readonly Main mainForm;
         readonly SectionTool sectionTool;
         ComparerTool comparerTool;
-        Dictionary<int, BitsDictionary> bitsDictDict;
+        Dictionary<uint, BitsDictionary> bitsDictDict;
         public Query(Main mainForm)
         {
             InitializeComponent();
             this.mainForm = mainForm;
             sectionTool = new SectionTool();
-            bitsDictDict = new Dictionary<int, BitsDictionary>();
+            bitsDictDict = new Dictionary<uint, BitsDictionary>();
             IsFilterBox.Checked = Properties.Settings.Default.EnableFilterQuery.Value;
             IsFilterSizeBox.Checked = Properties.Settings.Default.EnableFilterSizeQuery.Value;
         }
@@ -143,7 +143,7 @@ namespace PS4CheaterNeo
 
             ResultView.Items.Clear();
             if (bitsDictDict != null) bitsDictDict.Clear();
-            bitsDictDict = new Dictionary<int, BitsDictionary>();
+            bitsDictDict = new Dictionary<uint, BitsDictionary>();
             GC.Collect();
 
             ScanBtn.Text = "First Scan";
@@ -324,7 +324,7 @@ namespace PS4CheaterNeo
                         ListViewItem sectionItem = SectionView.Items[sectionIdx];
                         if (!sectionItem.Checked) continue;
 
-                        int sid = int.Parse(sectionItem.SubItems[(int)SectionCol.SectionViewSID].Text);
+                        uint sid = uint.Parse(sectionItem.SubItems[(int)SectionCol.SectionViewSID].Text);
                         Section section = sectionTool.GetSection(sid);
                         if (section.Check == false) sectionItem.Checked = false;
                     }
@@ -493,7 +493,7 @@ namespace PS4CheaterNeo
                 ResultView.Items.Clear();
                 ResultView.BeginUpdate();
             }));
-            List<int> sectionKeys = new List<int>(bitsDictDict.Keys);
+            List<uint> sectionKeys = new List<uint>(bitsDictDict.Keys);
             sectionKeys.Sort();
             Color backColor = default;
             for (int sectionIdx = 0; sectionIdx < sectionKeys.Count; sectionIdx++)
@@ -793,7 +793,7 @@ namespace PS4CheaterNeo
         {
             ListViewItem item = SectionView.Items[e.Index];
             int pid = sectionTool.PID;
-            int sid = int.Parse(item.SubItems[(int)SectionCol.SectionViewSID].Text);
+            uint sid = uint.Parse(item.SubItems[(int)SectionCol.SectionViewSID].Text);
             int idx = int.Parse(item.Name);
             Section section = sectionTool.SectionDict[sid];
 
@@ -886,7 +886,7 @@ namespace PS4CheaterNeo
             if (ResultView.SelectedItems.Count == 1)
             {
                 ListViewItem resultItem = ResultView.SelectedItems[0];
-                (int sid, _) = ((int sid, int resultIdx))resultItem.Tag;
+                (uint sid, _) = ((uint sid, int resultIdx))resultItem.Tag;
                 Section section = sectionTool.GetSection(sid);
                 ScanType scanType = this.ParseFromDescription<ScanType>(resultItem.SubItems[(int)ResultCol.ResultListType].Text);
                 uint offsetAddr = (uint)(ulong.Parse(resultItem.SubItems[(int)ResultCol.ResultListAddress].Text, NumberStyles.HexNumber) - section.Start);
@@ -941,7 +941,7 @@ namespace PS4CheaterNeo
             if (items.Count == 0) return;
 
             var sectionItem = items[0];
-            int sid = int.Parse(sectionItem.SubItems[(int)SectionCol.SectionViewSID].Text);
+            uint sid = uint.Parse(sectionItem.SubItems[(int)SectionCol.SectionViewSID].Text);
             Section section = sectionTool.GetSection(sid);
 
             HexEditor hexEdit = new HexEditor(mainForm, section, 0);
@@ -978,7 +978,7 @@ namespace PS4CheaterNeo
             for (int i = 0; i < items.Count; ++i)
             {
                 ListViewItem resultItem = items[i];
-                (int sid, _) = ((int sid, int resultIdx))resultItem.Tag;
+                (uint sid, _) = ((uint sid, int resultIdx))resultItem.Tag;
                 Section section = sectionTool.GetSection(sid);
                 ScanType scanType = this.ParseFromDescription<ScanType>(resultItem.SubItems[(int)ResultCol.ResultListType].Text);
                 uint offsetAddr = (uint)(ulong.Parse(resultItem.SubItems[(int)ResultCol.ResultListAddress].Text, NumberStyles.HexNumber) - section.Start);
@@ -994,7 +994,7 @@ namespace PS4CheaterNeo
 
             ListView.SelectedListViewItemCollection items = ResultView.SelectedItems;
             var resultItem = items[0];
-            (int sid, _) = ((int sid, int resultIdx))resultItem.Tag;
+            (uint sid, _) = ((uint sid, int resultIdx))resultItem.Tag;
             Section section = sectionTool.GetSection(sid);
             uint offsetAddr = (uint)(ulong.Parse(resultItem.SubItems[(int)ResultCol.ResultListAddress].Text, NumberStyles.HexNumber) - section.Start);
             if (offsetAddr == 0) return;
@@ -1012,7 +1012,7 @@ namespace PS4CheaterNeo
             for (int i = 0; i < items.Count; ++i)
             {
                 ListViewItem resultItem = items[i];
-                (int sid, _) = ((int sid, int resultIdx))resultItem.Tag;
+                (uint sid, _) = ((uint sid, int resultIdx))resultItem.Tag;
                 Section section = sectionTool.GetSection(sid);
                 uint offsetAddr = (uint)(ulong.Parse(resultItem.SubItems[(int)ResultCol.ResultListAddress].Text, NumberStyles.HexNumber) - section.Start);
                 if (offsetAddr == 0) continue;

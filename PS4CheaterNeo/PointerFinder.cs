@@ -16,9 +16,9 @@ namespace PS4CheaterNeo
         readonly Main mainForm;
         readonly string processName;
         readonly SectionTool sectionTool;
-        Dictionary<int, List<Pointer>> addrPointerDict;
-        Dictionary<int, List<Pointer>> valuePointerDict;
-        List<((int BaseSID, uint BasePos, List<long> Offsets) pointer, List<Pointer> pathPointers)> pointerResults;
+        Dictionary<uint, List<Pointer>> addrPointerDict;
+        Dictionary<uint, List<Pointer>> valuePointerDict;
+        List<((uint BaseSID, uint BasePos, List<long> Offsets) pointer, List<Pointer> pathPointers)> pointerResults;
         List<ListViewItem> pointerItems;
 
         public PointerFinder(Main mainForm, ulong address, ScanType scanType)
@@ -27,7 +27,7 @@ namespace PS4CheaterNeo
             this.mainForm = mainForm;
             sectionTool = new SectionTool();
             processName = mainForm.ProcessName;
-            pointerResults = new List<((int BaseSID, uint BasePos, List<long> Offsets) pointer, List<Pointer> pathPointers)>();
+            pointerResults = new List<((uint BaseSID, uint BasePos, List<long> Offsets) pointer, List<Pointer> pathPointers)>();
             AddressBox.Text = address.ToString("X");
             PointerListView
                 .GetType()
@@ -116,8 +116,8 @@ namespace PS4CheaterNeo
                 System.Diagnostics.Stopwatch ticker = System.Diagnostics.Stopwatch.StartNew();
                 if (addrPointerDict != null) addrPointerDict.Clear();
                 if (valuePointerDict != null) valuePointerDict.Clear();
-                addrPointerDict = new Dictionary<int, List<Pointer>>();
-                valuePointerDict = new Dictionary<int, List<Pointer>>();
+                addrPointerDict = new Dictionary<uint, List<Pointer>>();
+                valuePointerDict = new Dictionary<uint, List<Pointer>>();
                 GC.Collect();
                 int resultCnt = 0;
                 List<Pointer> addrValueList = new List<Pointer>();
@@ -131,8 +131,8 @@ namespace PS4CheaterNeo
 
                         uint addrPosition = uint.Parse(elems[0], NumberStyles.HexNumber);
                         uint valuePosition = uint.Parse(elems[1], NumberStyles.HexNumber);
-                        int addrSID = int.Parse(elems[2]);
-                        int valueSID = int.Parse(elems[5]);
+                        uint addrSID = uint.Parse(elems[2]);
+                        uint valueSID = uint.Parse(elems[5]);
                         string addrName = elems[3];
                         string valueName = elems[6];
                         uint addrProt = uint.Parse(elems[4], NumberStyles.HexNumber);
@@ -149,7 +149,7 @@ namespace PS4CheaterNeo
                 GC.Collect();
                 if (addrValueList != null && addrValueList.Count > 0)
                 {
-                    int tmpAddrSID = 0;
+                    uint tmpAddrSID = 0;
                     List<Pointer> addrPointerList = null;
                     addrValueList.Sort((p1, p2) => p1.AddrSID.CompareTo(p2.AddrSID));
                     for (int idx = 0; idx < addrValueList.Count; idx++)
@@ -173,7 +173,7 @@ namespace PS4CheaterNeo
                         addrPointerDict[tmpAddrSID] = addrPointerList;
                     }
 
-                    int tmpValueSID = 0;
+                    uint tmpValueSID = 0;
                     List<Pointer> valuePointerList = null;
                     addrValueList.Sort((p1, p2) => p1.ValueSID.CompareTo(p2.ValueSID));
                     for (int idx = 0; idx < addrValueList.Count; idx++)
@@ -452,11 +452,11 @@ namespace PS4CheaterNeo
                                 for (int scanIdx = scanOffset; scanIdx + 8 < scanOffset + addrSection.Length; scanIdx += 8)
                                 {
                                     pointerSource.Token.ThrowIfCancellationRequested();
-                                    int valueSID = 0;
+                                    uint valueSID = 0;
                                     ulong mappedValue = BitConverter.ToUInt64(buffer, scanIdx);
                                     if (mappedValue > 0 && valueSection != null && mappedValue >= valueSection.Start && mappedValue <= (valueSection.Start + (ulong)valueSection.Length)) valueSID = valueSection.SID;
                                     else valueSID = sectionTool.GetSectionID(mappedValue);
-                                    if (valueSID == -1) continue;
+                                    if (valueSID == 0) continue; //-1(int) => 0(uint)
 
                                     valueSection = sectionTool.GetSection(valueSID);
                                     int startOffset = scanIdx - scanOffset;
@@ -486,10 +486,10 @@ namespace PS4CheaterNeo
 
                     if (addrPointerDict != null) addrPointerDict.Clear();
                     if (valuePointerDict != null) valuePointerDict.Clear();
-                    addrPointerDict = new Dictionary<int, List<Pointer>>();
-                    valuePointerDict = new Dictionary<int, List<Pointer>>();
+                    addrPointerDict = new Dictionary<uint, List<Pointer>>();
+                    valuePointerDict = new Dictionary<uint, List<Pointer>>();
 
-                    int tmpAddrSID = 0;
+                    uint tmpAddrSID = 0;
                     List<Pointer> addrPointerList = null;
                     addrValueList.Sort((p1, p2) => p1.AddrSID.CompareTo(p2.AddrSID));
                     for (int idx = 0; idx < addrValueList.Count; idx++)
@@ -513,7 +513,7 @@ namespace PS4CheaterNeo
                         addrPointerDict[tmpAddrSID] = addrPointerList;
                     }
 
-                    int tmpValueSID = 0;
+                    uint tmpValueSID = 0;
                     List<Pointer> valuePointerList = null;
                     addrValueList.Sort((p1, p2) => p1.ValueSID.CompareTo(p2.ValueSID));
                     for (int idx = 0; idx < addrValueList.Count; idx++)
@@ -569,7 +569,7 @@ namespace PS4CheaterNeo
                     ToolStripMsg.Text = string.Format("Scan elapsed:{0}s. perform first query...", tickerMajor.Elapsed.TotalSeconds);
                 }));
 
-                if (sectionTool.GetSectionID(queryAddress) is int addrSID && addrSID == -1) return true;
+                if (sectionTool.GetSectionID(queryAddress) is uint addrSID && addrSID == 0) return true; //-1(int) => 0(uint)
 
                 Section section = sectionTool.GetSection(addrSID);
                 Pointer queryPointer = new Pointer(addrSID, (uint)(queryAddress - section.Start), 0, 0);
@@ -579,7 +579,7 @@ namespace PS4CheaterNeo
             else
             {
                 Dictionary<ulong, ulong> pointerMemoryCaches = new Dictionary<ulong, ulong>();
-                var newPointerResults = new List<((int BaseSID, uint BasePos, List<long> Offsets) pointer, List<Pointer> pathPointers)>();
+                var newPointerResults = new List<((uint BaseSID, uint BasePos, List<long> Offsets) pointer, List<Pointer> pathPointers)>();
                 for (int pIdx = 0; pIdx < pointerResults.Count; ++pIdx)
                 {
                     pointerSource.Token.ThrowIfCancellationRequested();
@@ -629,7 +629,7 @@ namespace PS4CheaterNeo
             if (level >= maxOffsetLevel) return;
             if (!addrPointerDict.TryGetValue(queryPointer.AddrSID, out List<Pointer> addrPointerList) || addrPointerList.Count == 0) return;
             
-            Section[] sections = sectionTool.GetSectionSortByAddr(queryPointer.AddrSID, out int sIdx, new List<int>(addrPointerDict.Keys));
+            Section[] sections = sectionTool.GetSectionSortByAddr(queryPointer.AddrSID, out int sIdx, new List<uint>(addrPointerDict.Keys));
             if (sIdx == -1) return;
 
             Section section = sections[sIdx];
@@ -708,7 +708,7 @@ namespace PS4CheaterNeo
             Section baseSection = sectionTool.GetSection(basePointer.AddrSID);
             if (baseSection == null || isFastScan && !baseSection.Name.StartsWith("executable")) return;
 
-            (int BaseSID, uint BasePos, List<long> Offsets) pointer = (baseSection.SID, basePointer.AddrPos, new List<long>());
+            (uint BaseSID, uint BasePos, List<long> Offsets) pointer = (baseSection.SID, basePointer.AddrPos, new List<long>());
             for (int i = pathOffsets.Count - 1; i >= 0; --i) pointer.Offsets.Add(pathOffsets[i]);
 
             pointerResults.Add((pointer, new List<Pointer>(pathPointers)));
@@ -733,15 +733,15 @@ namespace PS4CheaterNeo
             tickerMajor.Stop();
             Invoke(new MethodInvoker(() => {
                 ProgBar.Value = 100;
-                ToolStripMsg.Text = string.Format("Scan elapsed:{0}s. Query pointer end, find:{1}", tickerMajor.Elapsed.TotalSeconds, pointerItems.Count);
                 if (pointerItems.Count > 0)
                 {
                     PointerListView.Items.AddRange(pointerItems.ToArray());
                     pointerItems.Clear();
-                    ScanBtn.Text = "Next Scan";
                 }
-                else if (pointerResults.Count == 0) ScanBtn.Text = "First Scan";
+                
+                if (pointerResults.Count == 0) ScanBtn.Text = "First Scan";
                 else if (pointerResults.Count > 0) ScanBtn.Text = "Next Scan";
+                ToolStripMsg.Text = string.Format("Scan elapsed:{0}s. Query pointer end, find:{1}", tickerMajor.Elapsed.TotalSeconds, PointerListView.Items.Count);
             }));
             if (pointerSource != null) pointerSource.Dispose();
             if (pointerTask != null) pointerTask.Dispose();
@@ -866,7 +866,7 @@ namespace PS4CheaterNeo
         /// </summary>
         /// <param name="pointerResult">pointer result</param>
         /// <returns></returns>
-        private ulong ReadTailAddressByAddrPointers(((int BaseSID, uint BasePos, List<long> Offsets) pointer, List<Pointer> pathPointers) pointerResult)
+        private ulong ReadTailAddressByAddrPointers(((uint BaseSID, uint BasePos, List<long> Offsets) pointer, List<Pointer> pathPointers) pointerResult)
         {
             ulong tailAddr = 0;
             Section addrSection = sectionTool.GetSection(pointerResult.pointer.BaseSID);
@@ -906,7 +906,7 @@ namespace PS4CheaterNeo
         /// <param name="pointerResult">pointer result</param>
         /// <param name="pointerMemoryCaches">memory caches for pointer</param>
         /// <returns></returns>
-        private ulong ReadTailAddress(((int BaseSID, uint BasePos, List<long> Offsets) pointer, List<Pointer> pathPointers) pointerResult, in Dictionary<ulong, ulong> pointerMemoryCaches)
+        private ulong ReadTailAddress(((uint BaseSID, uint BasePos, List<long> Offsets) pointer, List<Pointer> pathPointers) pointerResult, in Dictionary<ulong, ulong> pointerMemoryCaches)
         {
             Section baseSection = sectionTool.GetSection(pointerResult.pointer.BaseSID);
             if (baseSection == null) return 0;
@@ -920,12 +920,12 @@ namespace PS4CheaterNeo
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
         private struct Pointer
         {
-            public int AddrSID;
+            public uint AddrSID;
             public uint AddrPos;
-            public int ValueSID;
+            public uint ValueSID;
             public uint ValuePos;
 
-            public Pointer(int addrSID, uint addrPos, int valueSID, uint valuePos)
+            public Pointer(uint addrSID, uint addrPos, uint valueSID, uint valuePos)
             {
                 AddrSID = addrSID;
                 AddrPos = addrPos;

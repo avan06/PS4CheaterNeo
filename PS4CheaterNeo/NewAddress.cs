@@ -141,8 +141,8 @@ namespace PS4CheaterNeo
             try
             {
                 Address = ulong.Parse(AddressBox.Text, System.Globalization.NumberStyles.HexNumber);
-                int SID = mainForm.sectionTool.GetSectionID(Address);
-                if (SID == -1) throw new Exception("Address verification failed");
+                uint SID = mainForm.sectionTool.GetSectionID(Address);
+                if (SID == 0) throw new Exception("Address verification failed"); //-1(int) => 0(uint)
 
                 AddrSection = mainForm.sectionTool.GetSection(SID);
             }

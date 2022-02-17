@@ -84,9 +84,14 @@ namespace PS4CheaterNeo
                 }
                 #endregion
 
-                if (Application.ProductVersion != cheatHeaderItems[0] && MessageBox.Show(string.Format("PS4 Cheater Version({0}) is different with cheat file({1}), still load?", Application.ProductVersion, cheatHeaderItems[0]),
+                string productVersion = cheatHeaderItems[0];
+
+                if (Application.ProductVersion != productVersion && MessageBox.Show(string.Format("PS4 Cheater Version({0}) is different with cheat file({1}), still load?", Application.ProductVersion, productVersion),
                     "ProductVersion", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes) return;
 
+                string[] pVers = productVersion.Split('.'); //1.2.3.4 => 01020304
+                int pVerChk = int.Parse(pVers[0]) * 1000000 + int.Parse(pVers[1]) * 10000 + int.Parse(pVers[2]) * 100 + int.Parse(pVers[3]);
+                bool isSIDv1 = pVerChk < 00090505;
                 string cheatGameID = cheatHeaderItems[2];
                 string cheatGameVer = cheatHeaderItems[3];
                 string cheatFWVer = cheatHeaderItems[4];
@@ -103,7 +108,7 @@ namespace PS4CheaterNeo
                     "FMVer", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes) return;
                 #endregion
                 int count = 0;
-                (int sid, string name, uint prot, ulong offsetAddr) preData = (0, "", 0, 0);
+                (uint sid, string name, uint prot, ulong offsetAddr) preData = (0, "", 0, 0);
                 for (int idx = 1; idx < cheatStrArr.Length; ++idx)
                 {
                     string cheatStr = cheatStrArr[idx];
@@ -116,7 +121,7 @@ namespace PS4CheaterNeo
 
                     bool isRelative = cheatElements[5].StartsWith("+");
                     bool isPointer = cheatElements[5].Contains("_");
-                    int sid = isRelative ? preData.sid : int.Parse(cheatElements[0]);
+                    uint sid = isRelative ? preData.sid : uint.Parse(cheatElements[0]);
                     string name = isRelative ? preData.name : cheatElements[2];
                     uint prot = isRelative ? preData.prot : uint.Parse(cheatElements[3], NumberStyles.HexNumber);
                     ScanType cheatScanType = this.ParseFromDescription<ScanType>(cheatElements[6]);
@@ -125,7 +130,7 @@ namespace PS4CheaterNeo
                     string cheatDesc = cheatElements[9];
                     int relativeOffset = isRelative ? int.Parse(cheatElements[5].Substring(1), NumberStyles.HexNumber) : -1;
 
-                    Section section = sectionTool.GetSection(sid, name, prot);
+                    Section section = isSIDv1 ? sectionTool.GetSectionBySIDv1(sid, name, prot) : sectionTool.GetSection(sid, name, prot);
                     if (section == null && ToolStripLockEnable.Checked) ToolStripLockEnable.Checked = false;
 
                     ulong offsetAddr = 0;
@@ -372,7 +377,7 @@ namespace PS4CheaterNeo
                 if (isPointer)
                 {
                     string[] sectionArr = cheatRow.Cells[(int)ChertCol.CheatListSection].Value.ToString().Split('|');
-                    newSection = sectionTool.GetSection(int.Parse(sectionArr[0]), sectionArr[2], uint.Parse(sectionArr[3]));
+                    newSection = sectionTool.GetSection(uint.Parse(sectionArr[0]), sectionArr[2], uint.Parse(sectionArr[3]));
                     addressStr = sectionArr[sectionArr.Length - 1];
                 }
                 else if (SaveCheatDialog.FilterIndex == 2 && isRelative)
@@ -459,8 +464,8 @@ namespace PS4CheaterNeo
                 if (!InitSectionList(ProcessName)) throw new Exception(String.Format("Process({0}): InitSectionList failed", ProcessName));
 
                 ulong address = ulong.Parse(inputValue, NumberStyles.HexNumber);
-                int sid = sectionTool.GetSectionID(address);
-                if (sid == -1) return;
+                uint sid = sectionTool.GetSectionID(address);
+                if (sid == 0) return; //-1(int) => 0(uint)
 
                 section = sectionTool.GetSection(sid);
                 offsetAddr = address - section.Start;
@@ -490,7 +495,7 @@ namespace PS4CheaterNeo
 
             bool VerifySectionWhenRefresh = Properties.Settings.Default.VerifySectionWhenRefresh.Value;
             System.Diagnostics.Stopwatch tickerMajor = System.Diagnostics.Stopwatch.StartNew();
-            (int sid, string name, uint prot, ulong offsetAddr) preData = (0, "", 0, 0);
+            (uint sid, string name, uint prot, ulong offsetAddr) preData = (0, "", 0, 0);
             Dictionary<ulong, ulong> pointerMemoryCaches = new Dictionary<ulong, ulong>();
             for (int cIdx = 0; cIdx < CheatGridView.Rows.Count; cIdx++)
             {
@@ -535,12 +540,12 @@ namespace PS4CheaterNeo
             return true;
         });
 
-        private (Section section, ulong offsetAddr, string hexAddr) RefreshSection(string[] sectionArr, ulong offsetAddr, bool isPointer, (int sid, string name, uint prot, ulong offsetAddr) preData, in Dictionary<ulong, ulong> pointerMemoryCaches)
+        private (Section section, ulong offsetAddr, string hexAddr) RefreshSection(string[] sectionArr, ulong offsetAddr, bool isPointer, (uint sid, string name, uint prot, ulong offsetAddr) preData, in Dictionary<ulong, ulong> pointerMemoryCaches)
         {
             bool isRelative = sectionArr[0].StartsWith("+");
             int relativeOffset = isRelative ? int.Parse(sectionArr[0].Substring(1), NumberStyles.HexNumber) : -1;
 
-            int sid = isRelative ? preData.sid : int.Parse(sectionArr[0]);
+            uint sid = isRelative ? preData.sid : uint.Parse(sectionArr[0]);
             string name = isRelative ? preData.name : sectionArr[2];
             uint prot = isRelative ? preData.prot : uint.Parse(sectionArr[3], NumberStyles.HexNumber);
             string hexAddr;
@@ -599,7 +604,7 @@ namespace PS4CheaterNeo
 
 
             bool VerifySectionWhenLock = Properties.Settings.Default.VerifySectionWhenLock.Value;
-            (int sid, string name, uint prot, ulong offsetAddr) preData = (0, "", 0, 0);
+            (uint sid, string name, uint prot, ulong offsetAddr) preData = (0, "", 0, 0);
             Dictionary<ulong, ulong> pointerMemoryCaches = new Dictionary<ulong, ulong>();
             for (int cIdx = 0; cIdx < CheatGridView.Rows.Count; cIdx++)
             {
@@ -863,7 +868,7 @@ namespace PS4CheaterNeo
                 {
                     offsetList = new List<long>();
                     string[] baseSectionArr = cheatRow.Cells[(int)ChertCol.CheatListSection].Value.ToString().Split('|');
-                    int baseSID = int.Parse(baseSectionArr[0]);
+                    uint baseSID = uint.Parse(baseSectionArr[0]);
                     long baseSectionStart = long.Parse(baseSectionArr[1], NumberStyles.HexNumber);
                     string baseName = baseSectionArr[2];
                     uint baseProt = uint.Parse(baseSectionArr[3], NumberStyles.HexNumber);
@@ -1013,8 +1018,8 @@ namespace PS4CheaterNeo
                         }
                         else
                         {
-                            int SID = sectionTool.GetSectionID((ulong)(address + baseAddress));
-                            if (SID == -1)
+                            uint SID = sectionTool.GetSectionID((ulong)(address + baseAddress));
+                            if (SID == 0) //-1(int) => 0(uint)
                             {
                                 isFailed = true;
                                 ToolStripMsg.Text = string.Format("Add Pointer To CheatGrid failed...Section not found, address:{0:X8}, offsets:{1}, Desc:{2}", address + baseAddress, String.Join("-", offsetList.Select(p => p.ToString("X")).ToArray()), cheatDesc);

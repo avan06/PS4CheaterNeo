@@ -53,6 +53,7 @@ namespace PS4CheaterNeo
             this.ResumeBtn = new System.Windows.Forms.Button();
             this.SectionSearchBtn = new System.Windows.Forms.Button();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
+            this.SlowMotionBox = new System.Windows.Forms.CheckBox();
             this.label4 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.AddrMaxBox = new System.Windows.Forms.TextBox();
@@ -92,7 +93,6 @@ namespace PS4CheaterNeo
             this.CompareTypeBox = new System.Windows.Forms.ComboBox();
             this.Panel1 = new System.Windows.Forms.Panel();
             this.SlowMotionTimer = new System.Windows.Forms.Timer(this.components);
-            this.SlowMotionBox = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.SplitContainer1)).BeginInit();
             this.SplitContainer1.Panel1.SuspendLayout();
             this.SplitContainer1.Panel2.SuspendLayout();
@@ -361,6 +361,21 @@ namespace PS4CheaterNeo
             this.tableLayoutPanel2.Size = new System.Drawing.Size(287, 28);
             this.tableLayoutPanel2.TabIndex = 4;
             // 
+            // SlowMotionBox
+            // 
+            this.SlowMotionBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.SlowMotionBox.AutoSize = true;
+            this.SlowMotionBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.SlowMotionBox.ForeColor = System.Drawing.Color.White;
+            this.SlowMotionBox.Location = new System.Drawing.Point(240, 3);
+            this.SlowMotionBox.Name = "SlowMotionBox";
+            this.SlowMotionBox.Size = new System.Drawing.Size(44, 16);
+            this.SlowMotionBox.TabIndex = 33;
+            this.SlowMotionBox.Text = "Slow";
+            this.SlowMotionBox.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.SlowMotionBox.UseVisualStyleBackColor = true;
+            this.SlowMotionBox.CheckedChanged += new System.EventHandler(this.SlowMotionBox_CheckedChanged);
+            // 
             // label4
             // 
             this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
@@ -444,25 +459,30 @@ namespace PS4CheaterNeo
             // SectionViewProt
             // 
             this.SectionViewProt.Text = "Prot";
+            this.SectionViewProt.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.SectionViewProt.Width = 24;
             // 
             // SectionViewLength
             // 
             this.SectionViewLength.Text = "Length";
+            this.SectionViewLength.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.SectionViewLength.Width = 65;
             // 
             // SectionViewSID
             // 
-            this.SectionViewSID.Text = "ID";
+            this.SectionViewSID.Text = "SID";
+            this.SectionViewSID.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.SectionViewSID.Width = 70;
             // 
             // SectionViewOffset
             // 
             this.SectionViewOffset.Text = "Offset";
+            this.SectionViewOffset.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             // 
             // SectionViewEnd
             // 
             this.SectionViewEnd.Text = "End";
+            this.SectionViewEnd.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             // 
             // SectionViewMenu
             // 
@@ -780,21 +800,6 @@ namespace PS4CheaterNeo
             // 
             this.SlowMotionTimer.Interval = 250;
             this.SlowMotionTimer.Tick += new System.EventHandler(this.SlowMotionTimer_Tick);
-            // 
-            // SlowMotionBox
-            // 
-            this.SlowMotionBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.SlowMotionBox.AutoSize = true;
-            this.SlowMotionBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.SlowMotionBox.ForeColor = System.Drawing.Color.White;
-            this.SlowMotionBox.Location = new System.Drawing.Point(240, 3);
-            this.SlowMotionBox.Name = "SlowMotionBox";
-            this.SlowMotionBox.Size = new System.Drawing.Size(44, 16);
-            this.SlowMotionBox.TabIndex = 33;
-            this.SlowMotionBox.Text = "Slow";
-            this.SlowMotionBox.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.SlowMotionBox.UseVisualStyleBackColor = true;
-            this.SlowMotionBox.CheckedChanged += new System.EventHandler(this.SlowMotionBox_CheckedChanged);
             // 
             // Query
             // 
