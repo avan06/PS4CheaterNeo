@@ -298,7 +298,7 @@ namespace PS4CheaterNeo
         public Section GetSection(uint sid, string name, uint prot)
         {
             Section section = GetSection(sid);
-            if (section != null && name != null && name.Length > 0 && !name.Contains(section.Name)) section = GetSection(name, prot);
+            if (section != null && name != null && name.Length > 0 && (!name.Contains(section.Name) || prot != section.Prot)) section = GetSection(name, prot);
 
             return section;
         }

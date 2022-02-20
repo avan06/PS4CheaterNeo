@@ -47,5 +47,8 @@
     <Setting Name="CheatCellDirtyValueCommit" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
       <Value Profile="(Default)">True|2_Cheat|Cheat|Determine whether to automatically write to PS4 when editing cheat values in UpDown</Value>
     </Setting>
+    <Setting Name="MinResultAccessFactor" Type="OptionTreeView.Option&lt;sbyte&gt;" Scope="User">
+      <Value Profile="(Default)">50|3_Query|1_Query|Access value directly by address when the number of query results for the same Section is less than this factor, used to control whether to read Section data completely, or directly access the value by address. Default value is 50</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

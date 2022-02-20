@@ -216,5 +216,20 @@ namespace PS4CheaterNeo.Properties {
                 this["CheatCellDirtyValueCommit"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("50|3_Query|1_Query|Access value directly by address when the number of query resu" +
+            "lts for the same Section is less than this factor, used to control whether to re" +
+            "ad Section data completely, or directly access the value by address. Default val" +
+            "ue is 50")]
+        public global::OptionTreeView.Option<sbyte> MinResultAccessFactor {
+            get {
+                return ((global::OptionTreeView.Option<sbyte>)(this["MinResultAccessFactor"]));
+            }
+            set {
+                this["MinResultAccessFactor"] = value;
+            }
+        }
     }
 }

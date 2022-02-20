@@ -9,9 +9,20 @@ namespace PS4CheaterNeo
 {
     public static class PS4Tool
     {
+        private static int currentIdx = 0;
         private static readonly Mutex mutex = new Mutex();
-        private static PS4DBG ps4;
+        private static readonly Mutex[] mutexs = new Mutex[3];
+        private static readonly PS4DBG[] ps4s = new PS4DBG[mutexs.Length];
         private static System.Diagnostics.Stopwatch tickerMajor = System.Diagnostics.Stopwatch.StartNew();
+
+        private static int CurrentIdx()
+        {
+            mutex.WaitOne();
+            int result = currentIdx++;
+            if (currentIdx >= mutexs.Length) currentIdx = 0;
+            mutex.ReleaseMutex();
+            return result;
+        }
 
         /// <summary>
         /// Create a PS4DBG instance with the specified IP and connect with socket
@@ -30,14 +41,19 @@ namespace PS4CheaterNeo
             bool result = false;
             try
             {
-                if (ps4 != null && (!ps4.IsConnected || reCreateInstance))
+                for (int idx = 0; idx < ps4s.Length; idx++)
                 {
-                    ps4.Disconnect();
-                    ps4 = null;
-                }
-                if (ps4 == null) ps4 = new PS4DBG(ip);
+                    if (mutexs[idx] != null) mutexs[idx].Dispose();
+                    mutexs[idx] = new Mutex();
+                    if (ps4s[idx] != null && (!ps4s[idx].IsConnected || reCreateInstance))
+                    {
+                        ps4s[idx].Disconnect();
+                        ps4s[idx] = null;
+                    }
+                    if (ps4s[idx] == null) ps4s[idx] = new PS4DBG(ip);
 
-                result = ps4.IsConnected ? true : ps4.Connect(connectTimeout, sendTimeout, receiveTimeout);
+                    result = ps4s[idx].IsConnected ? true : ps4s[idx].Connect(connectTimeout, sendTimeout, receiveTimeout);
+                }
             }
             catch (Exception exception) { msg = exception.Message; }
             finally { mutex.ReleaseMutex(); }
@@ -48,9 +64,9 @@ namespace PS4CheaterNeo
         /// Used to check if it is connected
         /// </summary>
         /// <exception cref="Exception"></exception>
-        public static void ConnectedCheck()
+        public static void ConnectedCheck(int idx = 0)
         {
-            if (ps4 == null || (ps4 != null && !ps4.IsConnected)) throw new Exception("PS4DBG is not connected.");
+            if (ps4s[idx] == null || (ps4s[idx] != null && !ps4s[idx].IsConnected)) throw new Exception("PS4DBG is not connected.");
         }
 
         /// <summary>
@@ -61,20 +77,21 @@ namespace PS4CheaterNeo
         /// <returns>libdebug.ProcessList</returns>
         public static ProcessList GetProcessList()
         {
-            mutex.WaitOne();
-            ConnectedCheck();
+            int current = CurrentIdx();
+            mutexs[current].WaitOne();
+            ConnectedCheck(current);
             ProcessList processList = null;
-            try { processList = ps4.GetProcessList(); }
+            try { processList = ps4s[current].GetProcessList(); }
             catch (SocketException ex)
             {
-                if (ex.ErrorCode == 10054) throw; //connection closed by peer
+                if (ex.ErrorCode == 10054 || ex.ErrorCode == 10060) throw; //connection closed by peer
                 if (tickerMajor.Elapsed.TotalSeconds >= 1.5)
                 {
                     tickerMajor = System.Diagnostics.Stopwatch.StartNew();
                     Connect(Properties.Settings.Default.PS4IP.Value, out string msg, 1000);
                 }
             }
-            finally { mutex.ReleaseMutex(); }
+            finally { mutexs[current].ReleaseMutex(); }
             return processList;
         }
 
@@ -85,12 +102,13 @@ namespace PS4CheaterNeo
         /// <returns>libdebug.ProcessInfo</returns>
         public static ProcessInfo GetProcessInfo(int processID)
         {
-            mutex.WaitOne();
-            ConnectedCheck();
+            int current = CurrentIdx();
+            mutexs[current].WaitOne();
+            ConnectedCheck(current);
             ProcessInfo processInfo = new ProcessInfo();
-            try { processInfo = ps4.GetProcessInfo(processID); }
+            try { processInfo = ps4s[current].GetProcessInfo(processID); }
             catch { }
-            finally { mutex.ReleaseMutex(); }
+            finally { mutexs[current].ReleaseMutex(); }
             return processInfo;
         }
 
@@ -138,29 +156,13 @@ namespace PS4CheaterNeo
         /// <returns>libdebug.ProcessMap</returns>
         public static ProcessMap GetProcessMaps(int processID)
         {
-            //if (Properties.Settings.Default.DebugMode.Value)
-            //{
-            //    MemoryEntry[] entries = new MemoryEntry[10];
-            //    for (int idx = 0; idx < entries.Length; idx++)
-            //    {
-            //        entries[idx] = new MemoryEntry
-            //        {
-            //            name = "Debug" + idx,
-            //            start = (ulong)(idx + 1) * 1000000000,
-            //            end = (ulong)(idx + 1) * 1000000000 + 102400000,
-            //            prot = 0x5,
-            //        };
-            //    }
-            //    ProcessMap pMap = new ProcessMap(processID, entries);
-
-            //    return pMap;
-            //}
-            mutex.WaitOne();
-            ConnectedCheck();
+            int current = CurrentIdx();
+            mutexs[current].WaitOne();
+            ConnectedCheck(current);
             ProcessMap processMap = null;
-            try { processMap = ps4.GetProcessMaps(processID); }
+            try { processMap = ps4s[current].GetProcessMaps(processID); }
             catch { }
-            finally { mutex.ReleaseMutex(); }
+            finally { mutexs[current].ReleaseMutex(); }
             return processMap;
         }
 
@@ -217,29 +219,16 @@ namespace PS4CheaterNeo
         /// <returns>value of the specified address</returns>
         public static byte[] ReadMemory(int processID, ulong address, int length)
         {
-            //if (Properties.Settings.Default.DebugMode.Value)
-            //{
-            //    int fillLen = 4;
-            //    Random rnd = new Random();
-            //    byte[] buf = new byte[length];
-            //    for (int idx = 0; idx + fillLen < length; ++idx)
-            //    {
-            //        byte[] tmpBuf = new byte[fillLen];
-            //        rnd.NextBytes(tmpBuf);
-            //        Buffer.BlockCopy(tmpBuf, 0, buf, idx, fillLen);
-            //        idx += tmpBuf.Length;
-            //    }
-            //    return buf;
-            //}
-            mutex.WaitOne();
-            ConnectedCheck();
+            int current = CurrentIdx();
+            mutexs[current].WaitOne();
+            ConnectedCheck(current);
             try
             {
-                byte[] buf = ps4.ReadMemory(processID, address, length);
+                byte[] buf = ps4s[current].ReadMemory(processID, address, length);
                 return buf;
             }
             catch { }
-            finally { mutex.ReleaseMutex(); }
+            finally { mutexs[current].ReleaseMutex(); }
             return new byte[length];
         }
 
@@ -251,11 +240,12 @@ namespace PS4CheaterNeo
         /// <param name="data">new value of destination address</param>
         public static void WriteMemory(int processID, ulong address, byte[] data)
         {
-            mutex.WaitOne();
-            ConnectedCheck();
-            try { ps4.WriteMemory(processID, address, data); }
+            int current = CurrentIdx();
+            mutexs[current].WaitOne();
+            ConnectedCheck(current);
+            try { ps4s[current].WriteMemory(processID, address, data); }
             catch {}
-            finally { mutex.ReleaseMutex(); }
+            finally { mutexs[current].ReleaseMutex(); }
         }
 
         private static ProcessStatus processStatus;
@@ -268,13 +258,13 @@ namespace PS4CheaterNeo
         /// <param name="isPause">pause or resume process</param>
         public static bool AttachDebugger(int processID, string processName, ProcessStatus newStatus)
         {
-            if (ps4.IsConnected && ps4.IsDebugging)
+            if (ps4s[0].IsConnected && ps4s[0].IsDebugging)
             {
                 if (processStatus != newStatus)
                 {
                     processStatus = newStatus;
-                    if (newStatus == ProcessStatus.Pause) ps4.ProcessStop();
-                    else ps4.ProcessResume();
+                    if (newStatus == ProcessStatus.Pause) ps4s[0].ProcessStop();
+                    else ps4s[0].ProcessResume();
                 }
             }
             else if (MessageBox.Show("This experimental feature requires Attach ps4 Debugging\n\n" +
@@ -283,13 +273,13 @@ namespace PS4CheaterNeo
             {
                 try
                 {
-                    mutex.WaitOne();
-                    ps4.AttachDebugger(processID, null);
-                    ps4.Notify(222, "attached to " + processName);
+                    mutexs[0].WaitOne();
+                    ps4s[0].AttachDebugger(processID, null);
+                    ps4s[0].Notify(222, "attached to " + processName);
                     processStatus = ProcessStatus.Pause;
                 }
                 catch { return false; }
-                finally { mutex.ReleaseMutex(); }
+                finally { mutexs[0].ReleaseMutex(); }
             }
             return true;
         }
@@ -300,9 +290,9 @@ namespace PS4CheaterNeo
         /// </summary>
         public static void DetachDebugger()
         {
-            if (!ps4.IsDebugging) return;
+            if (!ps4s[0].IsDebugging) return;
 
-            ps4.TryDetachDebugger();
+            ps4s[0].TryDetachDebugger();
         }
     }
 

@@ -19,7 +19,7 @@ namespace PS4CheaterNeo
         Dictionary<uint, List<Pointer>> addrPointerDict;
         Dictionary<uint, List<Pointer>> valuePointerDict;
         List<((uint BaseSID, uint BasePos, List<long> Offsets) pointer, List<Pointer> pathPointers)> pointerResults;
-        List<ListViewItem> pointerItems;
+        List<ListViewItem> pointerItemsBuffer;
 
         public PointerFinder(Main mainForm, ulong address, ScanType scanType)
         {
@@ -258,7 +258,7 @@ namespace PS4CheaterNeo
                     int maxOffsetRange = (int)MaxRangeUpDown.Value;
                     ulong queryAddress = ulong.Parse(AddressBox.Text, NumberStyles.HexNumber);
 
-                    pointerItems = new List<ListViewItem>();
+                    pointerItemsBuffer = new List<ListViewItem>();
 
                     PointerListView.Clear();
                     PointerListView.GridLines = true;
@@ -327,7 +327,7 @@ namespace PS4CheaterNeo
                 }
                 catch (Exception exception)
                 {
-                    MessageBox.Show(exception.Message + "\n" + exception.StackTrace, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                    ToolStripMsg.Text = string.Format("Add Pointer To CheatGrid failed...{0}, {1}", exception.Message, exception.StackTrace);
                 }
             }
         }
@@ -376,106 +376,127 @@ namespace PS4CheaterNeo
                     uint SectionFilterSize = Properties.Settings.Default.SectionFilterSize.Value;
                     uint QueryBufferSize = Properties.Settings.Default.QueryBufferSize.Value;
                     SectionFilterKeys = Regex.Replace(SectionFilterKeys, " *[,;] *", "|");
-                    
-                    long processedMemoryLen = 0;
+
                     int readCnt = 0;
+                    long processedMemoryLen = 0;
                     ulong minLength = QueryBufferSize * 1024 * 1024; //set the minimum read size in bytes
 
                     List<Pointer> addrValueList = new List<Pointer>();
                     Section[] sections = sectionTool.GetSectionSortByAddr();
                     SemaphoreSlim semaphore = new SemaphoreSlim(MaxQueryThreads);
                     List<Task<bool>> tasks = new List<Task<bool>>();
+                    List<(int start, int end)> rangeList = new List<(int start, int end)>();
 
                     bool isFilter = IsFilterBox.Checked;
                     bool isFilterSize = IsFilterSizeBox.Checked;
                     (int start, int end) rangeIdx = (-1, -1);
                     for (int sectionIdx = 0; sectionIdx < sections.Length; sectionIdx++)
                     {
-                        readCnt++;
-                        bool isPerform = false;
                         bool isContinue = false;
-                        bool isContinuePerform = false;
-                        Section checkSection = sections[sectionIdx];
-                        if (!isFilter && checkSection.Name.StartsWith("libSce")) isContinue = true;
-                        if (isFilter && sectionTool.SectionIsFilter(checkSection.Name, SectionFilterKeys)) isContinue = true;
-                        if (isFilterSize && checkSection.Length < SectionFilterSize) isContinue = true;
+                        Section currentSection = sections[sectionIdx];
+
+                        if (!isFilter && currentSection.Name.StartsWith("libSce") ||
+                        isFilter && sectionTool.SectionIsFilter(currentSection.Name, SectionFilterKeys) ||
+                        isFilterSize && currentSection.Length < SectionFilterSize)
+                        {
+                            readCnt++;
+                            isContinue = true; //Check if section is not scanned
+                        }
+                        else if ((ulong)currentSection.Length > minLength)
+                        {
+                            rangeList.Add((sectionIdx, sectionIdx));
+                            isContinue = true;
+                        }
 
                         if (isContinue)
                         {
-                            if (rangeIdx.start == -1) continue; //start and end index unchanged when not scanning
-                            else //start performing a scan when the start index is set
+                            if (rangeIdx.start != -1) //add rangeIdx when the start index is set
                             {
-                                checkSection = sections[rangeIdx.end];
-                                isContinuePerform = true;
+                                rangeList.Add(rangeIdx);
+                                rangeIdx = (-1, -1);
                             }
-                        }
-                        if (rangeIdx.start == -1) //set start and end index when not set
-                        {
-                            rangeIdx.start = sectionIdx;
-                            rangeIdx.end = sectionIdx;
-                        }
-
-                        Section firstSection = sections[rangeIdx.start];
-                        ulong bufferSize = checkSection.Start + (ulong)checkSection.Length - firstSection.Start;
-                        if (bufferSize >= int.MaxValue) isPerform = true; //check the size of the scan to be executed, whether the scan size has been reached the upper limit
-
-                        if (!isContinuePerform && !isPerform && bufferSize < minLength && (sectionIdx != sections.Length - 1 || rangeIdx.start == -1))
-                        {
-                            rangeIdx.end = sectionIdx;  //update end index
                             continue;
                         }
-                        //start scanning
-                        if (!isContinuePerform && !isPerform) rangeIdx.end = sectionIdx;
-                        var readCnt_ = readCnt;
-                        var rangeIdx_ = rangeIdx;
+                        else if (rangeIdx.start == -1) rangeIdx = (sectionIdx, sectionIdx);//set start and end index when not set
+
+                        Section startSection = sections[rangeIdx.start];
+                        ulong bufferSize = currentSection.Start + (ulong)currentSection.Length - startSection.Start;
+                        if (bufferSize >= int.MaxValue) //check the size of the scan to be executed, whether the scan size has been reached the upper limit
+                        {
+                            if (rangeIdx.start != -1) //add rangeIdx when the start index is set
+                            {
+                                rangeList.Add(rangeIdx);
+                                rangeIdx = (-1, -1);
+                            }
+                            rangeIdx = (sectionIdx, sectionIdx);
+                            continue;
+                        }
+                        else if (bufferSize < minLength && (sectionIdx != sections.Length - 1))
+                        {
+                            rangeIdx.end = sectionIdx;//update end index
+                            continue;
+                        }
+
+                        rangeIdx.end = sectionIdx;//update end index
+                        rangeList.Add(rangeIdx);
+                        rangeIdx = (-1, -1); //initialize start and end index for non-isPerform scan
+                    }
+
+                    for (int idx = 0; idx < rangeList.Count; idx++)
+                    {
+                        var range = rangeList[idx];
                         tasks.Add(Task.Run<bool>(() =>
                         {
-                            semaphore.Wait();
-                            pointerSource.Token.ThrowIfCancellationRequested();
-
-                            Section lastSection = sections[rangeIdx_.end];
-                            if (isPerform) bufferSize = lastSection.Start + (ulong)lastSection.Length - firstSection.Start;
-                            byte[] buffer = PS4Tool.ReadMemory(firstSection.PID, firstSection.Start, (int)bufferSize);
-                            processedMemoryLen += buffer.Length;
-                            Invoke(new MethodInvoker(() =>
+                            try
                             {
-                                ProgBar.Value = (int)(((float)(readCnt_) / sections.Length) * 50);
-                                ToolStripMsg.Text = string.Format("Scan elapsed:{0}s. Current: {1}/{2}, read memory...{3}MB", tickerMajor.Elapsed.TotalSeconds, readCnt_, sections.Length, processedMemoryLen / (1024 * 1024));
-                            }));
-                            for (int idx = rangeIdx_.start; idx <= rangeIdx_.end; idx++)
-                            {
-                                Section addrSection = sections[idx];
-                                int scanOffset = (int)(addrSection.Start - firstSection.Start);
-
-                                List<Pointer> pointers = new List<Pointer>();
-                                Section valueSection = null;
-                                for (int scanIdx = scanOffset; scanIdx + 8 < scanOffset + addrSection.Length; scanIdx += 8)
+                                semaphore.Wait();
+                                pointerSource.Token.ThrowIfCancellationRequested();
+                                Section sectionStart = sections[range.start];
+                                Section sectionEnd = sections[range.end];
+                                readCnt += range.end - range.start + 1;
+                                Invoke(new MethodInvoker(() =>
                                 {
-                                    pointerSource.Token.ThrowIfCancellationRequested();
-                                    uint valueSID = 0;
-                                    ulong mappedValue = BitConverter.ToUInt64(buffer, scanIdx);
-                                    if (mappedValue > 0 && valueSection != null && mappedValue >= valueSection.Start && mappedValue <= (valueSection.Start + (ulong)valueSection.Length)) valueSID = valueSection.SID;
-                                    else valueSID = sectionTool.GetSectionID(mappedValue);
-                                    if (valueSID == 0) continue; //-1(int) => 0(uint)
+                                    ProgBar.Value = (int)(((float)(readCnt) / sections.Length) * 50);
+                                    ToolStripMsg.Text = string.Format("Scan elapsed:{0}s. Current: {1}/{2}, read memory...{3}MB", tickerMajor.Elapsed.TotalSeconds, readCnt, sections.Length, processedMemoryLen / (1024 * 1024));
+                                }));
 
-                                    valueSection = sectionTool.GetSection(valueSID);
-                                    int startOffset = scanIdx - scanOffset;
-                                    pointers.Add(new Pointer(addrSection.SID, (uint)startOffset, valueSID, (uint)(mappedValue - valueSection.Start)));
+                                ulong bufferSize = sectionEnd.Start + (ulong)sectionEnd.Length - sectionStart.Start;
+                                byte[] buffer = PS4Tool.ReadMemory(sectionStart.PID, sectionStart.Start, (int)bufferSize);
+                                processedMemoryLen += buffer.Length;
+
+                                for (int rIdx = range.start; rIdx <= range.end; rIdx++)
+                                {
+                                    Section addrSection = sections[rIdx];
+                                    int scanOffset = (int)(addrSection.Start - sectionStart.Start);
+
+                                    pointerSource.Token.ThrowIfCancellationRequested();
+
+                                    List<Pointer> pointers = new List<Pointer>();
+                                    Section valueSection = null;
+                                    for (int scanIdx = scanOffset; scanIdx + 8 < scanOffset + addrSection.Length; scanIdx += 8)
+                                    {
+                                        pointerSource.Token.ThrowIfCancellationRequested();
+                                        uint valueSID = 0;
+                                        ulong mappedValue = BitConverter.ToUInt64(buffer, scanIdx);
+                                        if (mappedValue > 0 && valueSection != null && mappedValue >= valueSection.Start && mappedValue <= (valueSection.Start + (ulong)valueSection.Length)) valueSID = valueSection.SID;
+                                        else valueSID = sectionTool.GetSectionID(mappedValue);
+                                        if (valueSID == 0) continue; //-1(int) => 0(uint)
+
+                                        valueSection = sectionTool.GetSection(valueSID);
+                                        int startOffset = scanIdx - scanOffset;
+                                        pointers.Add(new Pointer(addrSection.SID, (uint)startOffset, valueSID, (uint)(mappedValue - valueSection.Start)));
+                                    }
+                                    mutex.WaitOne();
+                                    addrValueList.AddRange(pointers);
+                                    mutex.ReleaseMutex();
                                 }
-                                mutex.WaitOne();
-                                addrValueList.AddRange(pointers);
-                                mutex.ReleaseMutex();
                             }
-                            semaphore.Release();
+                            finally
+                            {
+                                semaphore.Release();
+                            }
                             return true;
                         }));
-
-                        if (!isPerform) rangeIdx = (-1, -1); //initialize start and end index for non-isPerform scan
-                        else
-                        {
-                            rangeIdx.start = sectionIdx;
-                            rangeIdx.end = sectionIdx;
-                        }
                     }
                     Task whenTasks = Task.WhenAll(tasks);
                     whenTasks.Wait();
@@ -733,15 +754,15 @@ namespace PS4CheaterNeo
             tickerMajor.Stop();
             Invoke(new MethodInvoker(() => {
                 ProgBar.Value = 100;
-                if (pointerItems.Count > 0)
+                if (pointerItemsBuffer.Count > 0)
                 {
-                    PointerListView.Items.AddRange(pointerItems.ToArray());
-                    pointerItems.Clear();
+                    PointerListView.Items.AddRange(pointerItemsBuffer.ToArray());
+                    pointerItemsBuffer.Clear();
                 }
                 
                 if (pointerResults.Count == 0) ScanBtn.Text = "First Scan";
                 else if (pointerResults.Count > 0) ScanBtn.Text = "Next Scan";
-                ToolStripMsg.Text = string.Format("Scan elapsed:{0}s. Query pointer end, find:{1}", tickerMajor.Elapsed.TotalSeconds, PointerListView.Items.Count);
+                ToolStripMsg.Text = string.Format("Scan elapsed:{0}s. Query pointer end, find:{1}", tickerMajor.Elapsed.TotalSeconds, pointerResults.Count);
             }));
             if (pointerSource != null) pointerSource.Dispose();
             if (pointerTask != null) pointerTask.Dispose();
@@ -750,7 +771,7 @@ namespace PS4CheaterNeo
         }
 
         /// <summary>
-        /// add current pointers to PointerListView
+        /// add current pointers to pointerItemsBuffer first and add it to PointerListView when it reaches 100 items when perform AddPointerListViewItem
         /// </summary>
         /// <param name="idx">index position of pointerResult</param>
         /// <param name="pathPointers">all paths of pointer result</param>
@@ -766,13 +787,13 @@ namespace PS4CheaterNeo
             item.Tag = idx;
             item.SubItems.Add(sectionStr); //Base Section
             for (int i = 0; i < pathOffsets.Count; ++i) item.SubItems.Add(pathOffsets[i].ToString("X"));
-            pointerItems.Add(item);
+            pointerItemsBuffer.Add(item);
             Invoke(new MethodInvoker(() =>
             {
-                if (pointerItems.Count % 100 == 0)
+                if (pointerItemsBuffer.Count % 100 == 0)
                 {
-                    PointerListView.Items.AddRange(pointerItems.ToArray());
-                    pointerItems.Clear();
+                    PointerListView.Items.AddRange(pointerItemsBuffer.ToArray());
+                    pointerItemsBuffer.Clear();
                 }
             }));
         }
