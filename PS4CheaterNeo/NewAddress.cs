@@ -23,12 +23,12 @@ namespace PS4CheaterNeo
         public bool IsLock { get; private set; }
         public bool IsPointer { get; private set; }
         public string Descriptioin { get; private set; }
-        public List<long> OffsetList { get; private set; }
+        public List<long> PointerOffsets { get; private set; }
         public Section AddrSection { get; private set; }
         public Section BaseSection { get; private set; }
         public NewAddress(Main mainForm, Section section, ulong address, ScanType scanType, string value, bool cheatLock, string cheatDesc, bool isEdit) : 
             this(mainForm, section, null, address, scanType, value, cheatLock, cheatDesc, null, isEdit) { }
-        public NewAddress(Main mainForm, Section addrSection, Section baseSection, ulong address, ScanType scanType, string value, bool cheatLock, string cheatDesc, List<long> offsetList, bool isEdit)
+        public NewAddress(Main mainForm, Section addrSection, Section baseSection, ulong address, ScanType scanType, string value, bool cheatLock, string cheatDesc, List<long> pointerOffsets, bool isEdit)
         {
             InitializeComponent();
 
@@ -66,7 +66,7 @@ namespace PS4CheaterNeo
             Value = (value ?? "") == "" ? "0" : value;
             IsLock = cheatLock;
             Descriptioin = cheatDesc;
-            IsPointer = offsetList != null;
+            IsPointer = pointerOffsets != null;
 
             AddressBox.Text = Address.ToString("X");
             ScanTypeBox.SelectedIndex = ScanTypeBox.FindStringExact(CheatType.GetDescription());
@@ -78,7 +78,7 @@ namespace PS4CheaterNeo
             {
                 BaseSection = baseSection;
                 if (AddrSection == null) AddrSection = BaseSection;
-                OffsetList = new List<long>(offsetList);
+                PointerOffsets = new List<long>(pointerOffsets);
                 ValueBox.Enabled = false;
             }
             if (isEdit)
@@ -101,9 +101,9 @@ namespace PS4CheaterNeo
                 if (filterEnum == CheatType) ScanTypeBox.SelectedItem = item;
             }
 
-            if (OffsetList != null && OffsetList.Count > 0)
+            if (PointerOffsets != null && PointerOffsets.Count > 0)
             {
-                foreach (long offset in OffsetList)
+                foreach (long offset in PointerOffsets)
                 {
                     AddOffsetBtn.PerformClick();
                     OffsetBoxList[OffsetBoxList.Count - 1].Text = offset.ToString("X");
@@ -122,7 +122,7 @@ namespace PS4CheaterNeo
                 IsLock = LockBox.Checked;
                 Descriptioin = DescriptionBox.Text;
 
-                if (!AddressBox.ReadOnly) mainForm.AddToCheatGrid(AddrSection, Address - AddrSection.Start, CheatType, Value, IsLock, Descriptioin, IsPointer, OffsetList);
+                if (!AddressBox.ReadOnly) mainForm.AddToCheatGrid(AddrSection, (uint)(Address - AddrSection.Start), CheatType, Value, IsLock, Descriptioin, PointerOffsets);
 
                 DialogResult = DialogResult.OK;
                 Close();
@@ -161,7 +161,8 @@ namespace PS4CheaterNeo
 
             if (PointerBox.Checked)
             {
-                OffsetList = new List<long>();
+                IsPointer = PointerBox.Checked;
+                PointerOffsets = new List<long>();
                 savePosition.Y += 30;
                 cancelPosition.Y += 30;
 
@@ -252,7 +253,7 @@ namespace PS4CheaterNeo
 
         private void ScanTypeBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (IsPointer || OffsetList != null) return;
+            if (IsPointer || PointerOffsets != null) return;
 
             var newCheatType = (ScanType)((ComboboxItem)(ScanTypeBox.SelectedItem)).Value;
             if (newCheatType == ScanType.String_) return;
@@ -274,7 +275,7 @@ namespace PS4CheaterNeo
 
         private void RefreshPointerChecker_Tick(object sender, EventArgs e)
         {
-            if (!IsPointer || OffsetList == null) return;
+            if (!IsPointer || PointerOffsets == null) return;
             if (!IsHandleCreated) return;
 
             try
@@ -294,8 +295,8 @@ namespace PS4CheaterNeo
 
                     if (BaseSection == null) break;
 
-                    if (OffsetBoxList.Count > OffsetList.Count) OffsetList.Add(address);
-                    else OffsetList[idx] = address;
+                    if (OffsetBoxList.Count > PointerOffsets.Count) PointerOffsets.Add(address);
+                    else PointerOffsets[idx] = address;
 
                     if (idx != OffsetBoxList.Count - 1)
                     {
@@ -318,7 +319,7 @@ namespace PS4CheaterNeo
                     }
                 }
             }
-            catch {}
+            catch (Exception) { }
         }
     }
 }

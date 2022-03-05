@@ -304,6 +304,7 @@ namespace PS4CheaterNeo
         {
             if (PointerListView.SelectedItems.Count == 0) return;
 
+            Dictionary<ulong, ulong> pointerCaches = new Dictionary<ulong, ulong>();
             ScanType scanType = (ScanType)((ComboboxItem)(ScanTypeBox.SelectedItem)).Value;
             ListView.SelectedListViewItemCollection items = PointerListView.SelectedItems;
             for (int itemIdx = 0; itemIdx < items.Count; ++itemIdx)
@@ -318,12 +319,12 @@ namespace PS4CheaterNeo
                     Section baseSection = sectionTool.GetSection(pointerResult.pointer.BaseSID);
                     ulong baseAddress = baseSection.Start + (ulong)pointerResult.pointer.BasePos;
                     string msg = pointerResult.pointer.BasePos.ToString("X");
-                    List<long> offsetList = new List<long> { (long)baseAddress };
+                    List<long> pointerOffsets = new List<long> { (long)baseAddress };
                     pointerResult.pointer.Offsets.ForEach(offset => {
                         msg += "_" + offset.ToString("X");
-                        offsetList.Add(offset);
+                        pointerOffsets.Add(offset);
                     });
-                    mainForm.AddToCheatGrid(baseSection, 0, scanType, "0", false, msg, true, offsetList); //FIXME oldValue is 0
+                    mainForm.AddToCheatGrid(baseSection, 0, scanType, "0", false, msg, pointerOffsets, pointerCaches); //FIXME oldValue is 0
                 }
                 catch (Exception exception)
                 {
@@ -599,7 +600,7 @@ namespace PS4CheaterNeo
             }
             else
             {
-                Dictionary<ulong, ulong> pointerMemoryCaches = new Dictionary<ulong, ulong>();
+                Dictionary<ulong, ulong> pointerCaches = new Dictionary<ulong, ulong>();
                 var newPointerResults = new List<((uint BaseSID, uint BasePos, List<long> Offsets) pointer, List<Pointer> pathPointers)>();
                 for (int pIdx = 0; pIdx < pointerResults.Count; ++pIdx)
                 {
@@ -614,7 +615,7 @@ namespace PS4CheaterNeo
                     }
 
                     var pointerResult = pointerResults[pIdx];
-                    var tailAddress = pointerResults.Count > nextScanCheckNumber ? ReadTailAddressByAddrPointers(pointerResult) : ReadTailAddress(pointerResult, pointerMemoryCaches);
+                    var tailAddress = pointerResults.Count > nextScanCheckNumber ? ReadTailAddressByAddrPointers(pointerResult) : ReadTailAddress(pointerResult, pointerCaches);
                     if (tailAddress != queryAddress) continue;
 
                     newPointerResults.Add(pointerResult);
@@ -925,14 +926,14 @@ namespace PS4CheaterNeo
         /// read tailAddress from ps4 memory (slower but correct)
         /// </summary>
         /// <param name="pointerResult">pointer result</param>
-        /// <param name="pointerMemoryCaches">memory caches for pointer</param>
+        /// <param name="pointerCaches">memory caches for pointer</param>
         /// <returns></returns>
-        private ulong ReadTailAddress(((uint BaseSID, uint BasePos, List<long> Offsets) pointer, List<Pointer> pathPointers) pointerResult, in Dictionary<ulong, ulong> pointerMemoryCaches)
+        private ulong ReadTailAddress(((uint BaseSID, uint BasePos, List<long> Offsets) pointer, List<Pointer> pathPointers) pointerResult, in Dictionary<ulong, ulong> pointerCaches)
         {
             Section baseSection = sectionTool.GetSection(pointerResult.pointer.BaseSID);
             if (baseSection == null) return 0;
 
-            var tailAddr = PS4Tool.ReadTailAddress(baseSection.PID, baseSection.Start + pointerResult.pointer.BasePos, pointerResult.pointer.Offsets, pointerMemoryCaches);
+            var tailAddr = PS4Tool.ReadTailAddress(baseSection.PID, baseSection.Start + pointerResult.pointer.BasePos, pointerResult.pointer.Offsets, pointerCaches);
             return tailAddr;
         }
         #endregion

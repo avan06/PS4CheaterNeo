@@ -54,11 +54,6 @@ namespace PS4CheaterNeo
         {
             try
             {
-                //if (Properties.Settings.Default.DebugMode.Value)
-                //{
-                //    ProcessesBox.SelectedIndex = ProcessesBox.Items.Add(new ComboboxItem("Debug", 999));
-                //    return;
-                //}
                 if (!PS4Tool.Connect(Properties.Settings.Default.PS4IP.Value, out string msg)) throw new Exception(msg);
 
                 int selectedIdx = 0;
@@ -979,7 +974,7 @@ namespace PS4CheaterNeo
                 uint offsetAddr = (uint)(ulong.Parse(resultItem.SubItems[(int)ResultCol.ResultListAddress].Text, NumberStyles.HexNumber) - section.Start);
                 string oldValue = resultItem.SubItems[(int)ResultCol.ResultListValue].Text;
 
-                if (offsetAddr > 0) mainForm.AddToCheatGrid(section, offsetAddr, scanType, oldValue, false, "", false, null);
+                if (offsetAddr > 0) mainForm.AddToCheatGrid(section, offsetAddr, scanType, oldValue);
             }
         }
 
@@ -1071,7 +1066,7 @@ namespace PS4CheaterNeo
                 uint offsetAddr = (uint)(ulong.Parse(resultItem.SubItems[(int)ResultCol.ResultListAddress].Text, NumberStyles.HexNumber) - section.Start);
                 string oldValue = resultItem.SubItems[(int)ResultCol.ResultListValue].Text;
 
-                if (offsetAddr > 0) mainForm.AddToCheatGrid(section, offsetAddr, scanType, oldValue, false, "", false, null);
+                if (offsetAddr > 0) mainForm.AddToCheatGrid(section, offsetAddr, scanType, oldValue);
             }
         }
 
@@ -1130,7 +1125,7 @@ namespace PS4CheaterNeo
                 PointerFinder pointerFinder = new PointerFinder(mainForm, address, scanType);
                 pointerFinder.Show();
             }
-            catch { }
+            catch (Exception) { }
         }
         #endregion
 

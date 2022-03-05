@@ -9,6 +9,7 @@ namespace PS4CheaterNeo
 {
     public static class PS4Tool
     {
+        private static int reTrySocket = 0;
         private static int currentIdx = 0;
         private static readonly Mutex mutex = new Mutex();
         private static readonly Mutex[] mutexs = new Mutex[3];
@@ -47,7 +48,7 @@ namespace PS4CheaterNeo
                     mutexs[idx] = new Mutex();
                     if (ps4s[idx] != null && (!ps4s[idx].IsConnected || reCreateInstance))
                     {
-                        ps4s[idx].Disconnect();
+                        try { ps4s[idx].Disconnect(); } catch (Exception) { }
                         ps4s[idx] = null;
                     }
                     if (ps4s[idx] == null) ps4s[idx] = new PS4DBG(ip);
@@ -71,8 +72,8 @@ namespace PS4CheaterNeo
 
         /// <summary>
         /// get process list
-        /// Connection closed by peer when the ErrorCode of the Socket is 10054,
-        /// this situation means that ps4debug has been abnormal, ps4 may wake up from sleep, no solution.
+        /// Socket errorCode 10054: connection closed by peer, this situation means that ps4debug has been abnormal, ps4 may wake up from sleep, no solution.
+        /// Socket errorCode 10060: connection timed out, will try to reconnect 5 times and throw error when all fails
         /// </summary>
         /// <returns>libdebug.ProcessList</returns>
         public static ProcessList GetProcessList()
@@ -84,10 +85,11 @@ namespace PS4CheaterNeo
             try { processList = ps4s[current].GetProcessList(); }
             catch (SocketException ex)
             {
-                if (ex.ErrorCode == 10054 || ex.ErrorCode == 10060) throw; //connection closed by peer
                 if (tickerMajor.Elapsed.TotalSeconds >= 1.5)
                 {
+                    reTrySocket = tickerMajor.Elapsed.TotalSeconds < 10 ? reTrySocket + 1 : 0;
                     tickerMajor = System.Diagnostics.Stopwatch.StartNew();
+                    if ((ex.ErrorCode == 10054 || ex.ErrorCode == 10060) && reTrySocket > 5) throw;
                     Connect(Properties.Settings.Default.PS4IP.Value, out string msg, 1000);
                 }
             }
@@ -107,7 +109,7 @@ namespace PS4CheaterNeo
             ConnectedCheck(current);
             ProcessInfo processInfo = new ProcessInfo();
             try { processInfo = ps4s[current].GetProcessInfo(processID); }
-            catch { }
+            catch (Exception) { }
             finally { mutexs[current].ReleaseMutex(); }
             return processInfo;
         }
@@ -161,7 +163,7 @@ namespace PS4CheaterNeo
             ConnectedCheck(current);
             ProcessMap processMap = null;
             try { processMap = ps4s[current].GetProcessMaps(processID); }
-            catch { }
+            catch (Exception) { }
             finally { mutexs[current].ReleaseMutex(); }
             return processMap;
         }
@@ -172,37 +174,37 @@ namespace PS4CheaterNeo
         /// <param name="processID">specified process PID</param>
         /// <param name="baseAddress">base address for pointer</param>
         /// <param name="baseOffsetList">base offsets for pointers</param>
-        /// <param name="pointerMemoryCaches"></param>
+        /// <param name="pointerCaches"></param>
         /// <returns>destination address of pointer</returns>
-        public static ulong ReadTailAddress(int processID, ulong baseAddress, List<long> baseOffsetList, in Dictionary<ulong, ulong> pointerMemoryCaches)
+        public static ulong ReadTailAddress(int processID, ulong baseAddress, List<long> baseOffsetList, Dictionary<ulong, ulong> pointerCaches = null)
         {
-            long[] offsets = new long[baseOffsetList.Count + 1];
-            offsets[0] = (long)baseAddress;
-            for (int idx = 1; idx < offsets.Length; idx++) offsets[idx] = baseOffsetList[idx - 1];
+            long[] pointerOffsets = new long[baseOffsetList.Count + 1];
+            pointerOffsets[0] = (long)baseAddress;
+            for (int idx = 1; idx < pointerOffsets.Length; idx++) pointerOffsets[idx] = baseOffsetList[idx - 1];
 
-            return ReadTailAddress(processID, offsets, pointerMemoryCaches);
+            return ReadTailAddress(processID, pointerOffsets, pointerCaches);
         }
 
         /// <summary>
         /// Read the destination address from the pointer offsetList
         /// </summary>
         /// <param name="processID">specified process PID</param>
-        /// <param name="offsets">base address and base offset for pointer</param>
-        /// <param name="pointerMemoryCaches">cache the fetched destination address</param>
+        /// <param name="pointerOffsets">base address and base offset for pointer</param>
+        /// <param name="pointerCaches">cache the fetched destination address</param>
         /// <returns>destination address of pointer</returns>
-        public static ulong ReadTailAddress(int processID, long[] offsets, in Dictionary<ulong, ulong> pointerMemoryCaches)
+        public static ulong ReadTailAddress(int processID, long[] pointerOffsets, Dictionary<ulong, ulong> pointerCaches = null)
         {
             ulong targetAddr = 0;
             ulong headAddress = 0;
-            for (int idx = 0; idx < offsets.Length; ++idx)
+            for (int idx = 0; idx < pointerOffsets.Length; ++idx)
             {
-                long offset = offsets[idx];
+                long offset = pointerOffsets[idx];
                 ulong queryAddress = (ulong)offset + headAddress;
-                if (idx != offsets.Length - 1)
+                if (idx != pointerOffsets.Length - 1)
                 {
-                    if (pointerMemoryCaches.TryGetValue(queryAddress, out headAddress)) continue;
+                    if (pointerCaches != null && pointerCaches.TryGetValue(queryAddress, out headAddress)) continue;
                     headAddress = BitConverter.ToUInt64(ReadMemory(processID, queryAddress, 8), 0);
-                    pointerMemoryCaches.Add(queryAddress, headAddress);
+                    if (pointerCaches != null) pointerCaches.Add(queryAddress, headAddress);
                 }
                 else targetAddr = queryAddress;
             }
@@ -227,7 +229,7 @@ namespace PS4CheaterNeo
                 byte[] buf = ps4s[current].ReadMemory(processID, address, length);
                 return buf;
             }
-            catch { }
+            catch (Exception) { }
             finally { mutexs[current].ReleaseMutex(); }
             return new byte[length];
         }
@@ -244,7 +246,7 @@ namespace PS4CheaterNeo
             mutexs[current].WaitOne();
             ConnectedCheck(current);
             try { ps4s[current].WriteMemory(processID, address, data); }
-            catch {}
+            catch (Exception) {}
             finally { mutexs[current].ReleaseMutex(); }
         }
 
@@ -278,7 +280,7 @@ namespace PS4CheaterNeo
                     ps4s[0].Notify(222, "attached to " + processName);
                     processStatus = ProcessStatus.Pause;
                 }
-                catch { return false; }
+                catch (Exception) { return false; }
                 finally { mutexs[0].ReleaseMutex(); }
             }
             return true;
