@@ -33,7 +33,6 @@ namespace PS4CheaterNeo
             this.HexView = new Be.Windows.Forms.HexBox();
             this.HexBox = new System.Windows.Forms.CheckBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.InfoBox = new System.Windows.Forms.TextBox();
             this.FindBtn = new System.Windows.Forms.Button();
             this.InputBox = new System.Windows.Forms.TextBox();
             this.AddToCheatGridBtn = new System.Windows.Forms.Button();
@@ -42,6 +41,7 @@ namespace PS4CheaterNeo
             this.RefreshBtn = new System.Windows.Forms.Button();
             this.NextBtn = new System.Windows.Forms.Button();
             this.PreviousBtn = new System.Windows.Forms.Button();
+            this.InfoBox = new System.Windows.Forms.RichTextBox();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -123,6 +123,7 @@ namespace PS4CheaterNeo
             this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox1.AutoSize = true;
             this.groupBox1.Controls.Add(this.InfoBox);
             this.groupBox1.ForeColor = System.Drawing.Color.White;
             this.groupBox1.Location = new System.Drawing.Point(3, 240);
@@ -131,18 +132,6 @@ namespace PS4CheaterNeo
             this.groupBox1.TabIndex = 9;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Memory Info";
-            // 
-            // InfoBox
-            // 
-            this.InfoBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(36)))), ((int)(((byte)(36)))));
-            this.InfoBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.InfoBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.InfoBox.ForeColor = System.Drawing.Color.White;
-            this.InfoBox.Location = new System.Drawing.Point(3, 18);
-            this.InfoBox.Multiline = true;
-            this.InfoBox.Name = "InfoBox";
-            this.InfoBox.Size = new System.Drawing.Size(182, 184);
-            this.InfoBox.TabIndex = 0;
             // 
             // FindBtn
             // 
@@ -252,6 +241,18 @@ namespace PS4CheaterNeo
             this.PreviousBtn.UseVisualStyleBackColor = true;
             this.PreviousBtn.Click += new System.EventHandler(this.PreviousBtn_Click);
             // 
+            // InfoBox
+            // 
+            this.InfoBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(36)))), ((int)(((byte)(36)))));
+            this.InfoBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.InfoBox.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.InfoBox.ForeColor = System.Drawing.Color.White;
+            this.InfoBox.Location = new System.Drawing.Point(3, 18);
+            this.InfoBox.Name = "InfoBox";
+            this.InfoBox.Size = new System.Drawing.Size(182, 184);
+            this.InfoBox.TabIndex = 1;
+            this.InfoBox.Text = "";
+            // 
             // HexEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -271,7 +272,6 @@ namespace PS4CheaterNeo
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
             this.groupBox1.ResumeLayout(false);
-            this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -289,7 +289,7 @@ namespace PS4CheaterNeo
         private System.Windows.Forms.Button FindBtn;
         private System.Windows.Forms.TextBox InputBox;
         private System.Windows.Forms.GroupBox groupBox1;
-        private System.Windows.Forms.TextBox InfoBox;
         private System.Windows.Forms.CheckBox HexBox;
+        private System.Windows.Forms.RichTextBox InfoBox;
     }
 }

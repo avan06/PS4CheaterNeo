@@ -2,7 +2,7 @@
 
 PS4CheaterNeo is a program to find game cheat codes, and it is based on [`ps4debug`](https://github.com/jogolden/ps4debug) and `.Net Framework 4.8`.
 
-Currently in `version 0.9.5.7-beta`
+Currently in `version 0.9.5.8-beta`
 
 
 ## Table of Contents
@@ -221,7 +221,9 @@ AddrStart　　Prot　count　　　SIDv1　　　　　SID
 - Make address values greater than zero more obvious.
 - You can add the address to the `Cheat List` from the current cursor position.
 - The current scroll position will not be changed when refreshing the Hex editor.
-- Turns red when an address value is modified, and green after committing.
+- Turns `red` when an address value is modified, and `green` after committing.
+- Ability to `copy and paste` hex values.
+- `Disassembler` current hex value and display.
 
 ![hexeditor](assets/hexeditor.webp)
 

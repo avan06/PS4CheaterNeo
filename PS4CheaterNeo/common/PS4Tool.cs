@@ -37,18 +37,18 @@ namespace PS4CheaterNeo
         /// <returns>return whether the connection is successful</returns>
         public static bool Connect(string ip, out string msg, int connectTimeout = 10000, bool reCreateInstance = false, int sendTimeout = 10000, int receiveTimeout = 10000)
         {
-            mutex.WaitOne();
             msg = "";
             bool result = false;
             try
             {
+                mutex.WaitOne();
                 for (int idx = 0; idx < ps4s.Length; idx++)
                 {
                     if (mutexs[idx] != null) mutexs[idx].Dispose();
                     mutexs[idx] = new Mutex();
                     if (ps4s[idx] != null && (!ps4s[idx].IsConnected || reCreateInstance))
                     {
-                        try { ps4s[idx].Disconnect(); } catch (Exception) { }
+                        try { ps4s[idx].Disconnect(); } catch (Exception ex) { Console.WriteLine(ex.Message + "\n" + ex.StackTrace); }
                         ps4s[idx] = null;
                     }
                     if (ps4s[idx] == null) ps4s[idx] = new PS4DBG(ip);
@@ -79,10 +79,13 @@ namespace PS4CheaterNeo
         public static ProcessList GetProcessList()
         {
             int current = CurrentIdx();
-            mutexs[current].WaitOne();
-            ConnectedCheck(current);
             ProcessList processList = null;
-            try { processList = ps4s[current].GetProcessList(); }
+            try
+            {
+                mutexs[current].WaitOne();
+                ConnectedCheck(current);
+                processList = ps4s[current].GetProcessList();
+            }
             catch (SocketException ex)
             {
                 if (tickerMajor.Elapsed.TotalSeconds >= 1.5)
@@ -90,10 +93,10 @@ namespace PS4CheaterNeo
                     reTrySocket = tickerMajor.Elapsed.TotalSeconds < 10 ? reTrySocket + 1 : 0;
                     tickerMajor = System.Diagnostics.Stopwatch.StartNew();
                     if ((ex.ErrorCode == 10054 || ex.ErrorCode == 10060) && reTrySocket > 5) throw;
-                    Connect(Properties.Settings.Default.PS4IP.Value, out string msg, 1000);
+                    Connect(Properties.Settings.Default.PS4IP.Value, out string msg, 1000, true);
                 }
             }
-            finally { mutexs[current].ReleaseMutex(); }
+            finally { try { mutexs[current].ReleaseMutex(); } catch (Exception) { } }
             return processList;
         }
 
@@ -105,12 +108,15 @@ namespace PS4CheaterNeo
         public static ProcessInfo GetProcessInfo(int processID)
         {
             int current = CurrentIdx();
-            mutexs[current].WaitOne();
-            ConnectedCheck(current);
             ProcessInfo processInfo = new ProcessInfo();
-            try { processInfo = ps4s[current].GetProcessInfo(processID); }
+            try
+            {
+                mutexs[current].WaitOne();
+                ConnectedCheck(current);
+                processInfo = ps4s[current].GetProcessInfo(processID);
+            }
             catch (Exception) { }
-            finally { mutexs[current].ReleaseMutex(); }
+            finally { try { mutexs[current].ReleaseMutex(); } catch (Exception) { } }
             return processInfo;
         }
 
@@ -159,12 +165,24 @@ namespace PS4CheaterNeo
         public static ProcessMap GetProcessMaps(int processID)
         {
             int current = CurrentIdx();
-            mutexs[current].WaitOne();
-            ConnectedCheck(current);
             ProcessMap processMap = null;
-            try { processMap = ps4s[current].GetProcessMaps(processID); }
-            catch (Exception) { }
-            finally { mutexs[current].ReleaseMutex(); }
+            try
+            {
+                mutexs[current].WaitOne();
+                ConnectedCheck(current);
+                processMap = ps4s[current].GetProcessMaps(processID);
+            }
+            catch (SocketException ex)
+            {
+                if (tickerMajor.Elapsed.TotalSeconds >= 1.5)
+                {
+                    reTrySocket = tickerMajor.Elapsed.TotalSeconds < 10 ? reTrySocket + 1 : 0;
+                    tickerMajor = System.Diagnostics.Stopwatch.StartNew();
+                    if ((ex.ErrorCode == 10054 || ex.ErrorCode == 10060) && reTrySocket > 5) throw;
+                    Connect(Properties.Settings.Default.PS4IP.Value, out string msg, 1000, true);
+                }
+            }
+            finally { try { mutexs[current].ReleaseMutex(); } catch (Exception) { } }
             return processMap;
         }
 
@@ -222,15 +240,24 @@ namespace PS4CheaterNeo
         public static byte[] ReadMemory(int processID, ulong address, int length)
         {
             int current = CurrentIdx();
-            mutexs[current].WaitOne();
-            ConnectedCheck(current);
             try
             {
+                mutexs[current].WaitOne();
+                ConnectedCheck(current);
                 byte[] buf = ps4s[current].ReadMemory(processID, address, length);
                 return buf;
             }
-            catch (Exception) { }
-            finally { mutexs[current].ReleaseMutex(); }
+            catch (SocketException ex)
+            {
+                if (tickerMajor.Elapsed.TotalSeconds >= 1.5)
+                {
+                    reTrySocket = tickerMajor.Elapsed.TotalSeconds < 10 ? reTrySocket + 1 : 0;
+                    tickerMajor = System.Diagnostics.Stopwatch.StartNew();
+                    if ((ex.ErrorCode == 10054 || ex.ErrorCode == 10060) && reTrySocket > 5) throw;
+                    Connect(Properties.Settings.Default.PS4IP.Value, out string msg, 1000, true);
+                }
+            }
+            finally { try { mutexs[current].ReleaseMutex(); } catch (Exception) { } }
             return new byte[length];
         }
 
@@ -243,11 +270,14 @@ namespace PS4CheaterNeo
         public static void WriteMemory(int processID, ulong address, byte[] data)
         {
             int current = CurrentIdx();
-            mutexs[current].WaitOne();
-            ConnectedCheck(current);
-            try { ps4s[current].WriteMemory(processID, address, data); }
+            try
+            {
+                mutexs[current].WaitOne();
+                ConnectedCheck(current);
+                ps4s[current].WriteMemory(processID, address, data);
+            }
             catch (Exception) {}
-            finally { mutexs[current].ReleaseMutex(); }
+            finally { try { mutexs[current].ReleaseMutex(); } catch (Exception) { } }
         }
 
         private static ProcessStatus processStatus;
@@ -281,7 +311,7 @@ namespace PS4CheaterNeo
                     processStatus = ProcessStatus.Pause;
                 }
                 catch (Exception) { return false; }
-                finally { mutexs[0].ReleaseMutex(); }
+                finally { try { mutexs[0].ReleaseMutex(); } catch (Exception) { } }
             }
             return true;
         }

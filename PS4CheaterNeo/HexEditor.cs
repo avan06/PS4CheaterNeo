@@ -1,4 +1,5 @@
 ﻿using Be.Windows.Forms;
+using SharpDisasm;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -56,7 +57,7 @@ namespace PS4CheaterNeo
         /// </summary>
         private void HexView_SelectionStartChanged(object sender, EventArgs e)
         {
-            if (HexView.SelectionStart <= 0) return;
+            if (HexView.SelectionStart < 0) return;
             if (HexView.SelectionStart >= HexView.ByteProvider.Length) return;
 
             DynamicByteProvider dynaBP = HexView.ByteProvider as DynamicByteProvider;
@@ -68,7 +69,7 @@ namespace PS4CheaterNeo
             float infoF = 0;
             double infoD = 0;
 
-            for (int idx = 0; idx <= 8; ++idx)
+            for (int idx = 0; idx <= 100; ++idx)
             {
                 switch (idx)
                 {
@@ -88,7 +89,7 @@ namespace PS4CheaterNeo
                         break;
                 }
                 if (HexView.SelectionStart + idx < dynaBP.Length) tmpBList.Add(dynaBP.ReadByte(HexView.SelectionStart + idx));
-                else tmpBList.Add(0);
+                else if (idx < 8) tmpBList.Add(0);
             }
             InfoBox.Text = string.Format(@"{0:X}（{1:X}+{2:X}）
 
@@ -97,7 +98,26 @@ namespace PS4CheaterNeo
 4: {5:X8}={5}
 8: {6:X8}={6}
 F: {7}
-D: {8}", HexView.SelectionStart + HexView.LineInfoOffset, HexView.SelectionStart + HexView.LineInfoOffset - (long)section.Start, section.Start, info1, info2, info4, info8, infoF, infoD);
+D: {8}
+", HexView.SelectionStart + HexView.LineInfoOffset, HexView.SelectionStart + HexView.LineInfoOffset - (long)section.Start, section.Start, info1, info2, info4, info8, infoF, infoD);
+
+            IEnumerable<Instruction> instructions = Disassembly(tmpBList.ToArray(), (ulong)(HexView.SelectionStart + HexView.LineInfoOffset));
+            foreach (Instruction instruction in instructions)
+            {
+                string address = instruction.Offset.ToString("X").ToUpper();
+                string byteStr = Disassembler.Translator.TranslateBytes(instruction).ToUpper();
+                string mnemonic = Disassembler.Translator.TranslateMnemonic(instruction);
+                InfoBox.Text += "\r\n" + String.Format("{0,9} {1,-12} {2}", address, byteStr, mnemonic);
+            }
+        }
+
+        private IEnumerable<Instruction> Disassembly(byte[] data, ulong address)
+        {
+            ArchitectureMode architecture = ArchitectureMode.x86_64;
+            Disassembler.Translator.IncludeAddress = true;
+            Disassembler.Translator.IncludeBinary = true;
+            IEnumerable<Instruction> instructions = new Disassembler(data, architecture, address, true, Vendor.Any, 0UL).Disassemble();
+            foreach (Instruction instruction in instructions) yield return instruction;
         }
 
         private void HexEditor_Load(object sender, EventArgs e) => PageBox.SelectedIndex = Page;
@@ -254,7 +274,7 @@ D: {8}", HexView.SelectionStart + HexView.LineInfoOffset, HexView.SelectionStart
             if (HexView.ByteProvider != null) HexView.ByteProvider.Changed -= ByteProvider_Changed;
             HexView.ByteProvider = new DynamicByteProvider(dst);
             HexView.ByteProvider.Changed += ByteProvider_Changed;
-            
+
             if (line != 0)
             {
                 HexView.SelectionStart = line * HexView.BytesPerLine + Column;
