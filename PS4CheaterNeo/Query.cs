@@ -981,7 +981,7 @@ namespace PS4CheaterNeo
         private string searchSectionName = "";
         private void SectionSearchBtn_Click(object sender, EventArgs e)
         {
-            if (InputBox.Show("Search", "Enter the value of the search section name", ref searchSectionName, null) != DialogResult.OK) return;
+            if (InputBox.Show("Search", "Enter the value of the search section name", ref searchSectionName) != DialogResult.OK) return;
 
             int startIndex = 0;
             ListView.SelectedListViewItemCollection items = SectionView.SelectedItems;
@@ -997,7 +997,7 @@ namespace PS4CheaterNeo
         {
             string SectionFilterKeys = Properties.Settings.Default.SectionFilterKeys.Value;
 
-            if (InputBox.Show("Section Filter", "Enter the value of the filter keys", ref SectionFilterKeys, null) != DialogResult.OK) return;
+            if (InputBox.Show("Section Filter", "Enter the value of the filter keys", ref SectionFilterKeys) != DialogResult.OK) return;
 
             Properties.Settings.Default.SectionFilterKeys.Value = SectionFilterKeys;
         }
@@ -1159,7 +1159,7 @@ namespace PS4CheaterNeo
             {
                 string intervalStr = "200";
                 ComboboxItem process = (ComboboxItem)ProcessesBox.SelectedItem;
-                if (InputBox.Show("SlowMotion", "Enter the SlowMotion interval (in milliseconds, larger intervals will be slower)", ref intervalStr, null) != DialogResult.OK ||
+                if (InputBox.Show("SlowMotion", "Enter the SlowMotion interval (in milliseconds, larger intervals will be slower)", ref intervalStr) != DialogResult.OK ||
                     !PS4Tool.AttachDebugger((int)process.Value, (string)process.Text, processStatus))
                 {
                     SlowMotionBox.Checked = false;

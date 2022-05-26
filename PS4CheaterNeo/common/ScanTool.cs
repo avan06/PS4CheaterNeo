@@ -66,6 +66,8 @@ namespace PS4CheaterNeo
         {
             byte[] bytes = null;
 
+            if (value == null || value.Length == 0) return null;
+
             switch (scanType)
             {
                 case ScanType.Bytes_8:

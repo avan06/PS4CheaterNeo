@@ -10,12 +10,7 @@ namespace PS4CheaterNeo
     /// </summary>
     public class InputBox
     {
-        public static DialogResult Show(string title, string promptText, ref string value)
-        {
-            return Show(title, promptText, ref value, null);
-        }
-
-        public static DialogResult Show(string title, string promptText, ref string value, InputBoxValidation validation)
+        public static DialogResult Show(string title, string promptText, ref string value, int textHeight = 20, InputBoxValidation validation = null)
         {
             Form form = new Form();
             Label label = new Label();
@@ -35,9 +30,9 @@ namespace PS4CheaterNeo
             buttonCancel.DialogResult = DialogResult.Cancel;
 
             label.SetBounds(9, 20, 372, 13);
-            textBox.SetBounds(12, 36, 372, 20);
-            buttonOk.SetBounds(228, 72, 75, 23);
-            buttonCancel.SetBounds(309, 72, 75, 23);
+            textBox.SetBounds(12, 36, 372, textHeight);
+            buttonOk.SetBounds(228, textHeight + 52, 75, 23);
+            buttonCancel.SetBounds(309, textHeight + 52, 75, 23);
 
             label.AutoSize = true;
             textBox.Anchor = textBox.Anchor | AnchorStyles.Right;
@@ -45,8 +40,10 @@ namespace PS4CheaterNeo
             buttonCancel.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
 
             textBox.ImeMode = ImeMode.Off;
+            textBox.Multiline = true;
 
-            form.ClientSize = new Size(396, 107);
+
+            form.ClientSize = new Size(396, textHeight + 90);
             form.Controls.AddRange(new Control[] { label, textBox, buttonOk, buttonCancel });
             form.ClientSize = new Size(Math.Max(300, label.Right + 10), form.ClientSize.Height);
             form.FormBorderStyle = FormBorderStyle.FixedDialog;

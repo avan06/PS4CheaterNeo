@@ -337,7 +337,7 @@ namespace PS4CheaterNeo
         {
             string sectionFilterKeys = Properties.Settings.Default.SectionFilterKeys.Value;
 
-            if (InputBox.Show("Section Filter", "Enter the value of the filter keys", ref sectionFilterKeys, null) != DialogResult.OK) return;
+            if (InputBox.Show("Section Filter", "Enter the value of the filter keys", ref sectionFilterKeys) != DialogResult.OK) return;
 
             Properties.Settings.Default.SectionFilterKeys.Value = sectionFilterKeys;
         }
@@ -347,7 +347,7 @@ namespace PS4CheaterNeo
             uint sectionFilterSize = Properties.Settings.Default.SectionFilterSize.Value;
             string sectionFilterSizeStr = sectionFilterSize.ToString();
 
-            if (InputBox.Show("Section Filter", "Enter the value of the filter keys", ref sectionFilterSizeStr, null) != DialogResult.OK) return;
+            if (InputBox.Show("Section Filter", "Enter the value of the filter keys", ref sectionFilterSizeStr) != DialogResult.OK) return;
 
             Properties.Settings.Default.SectionFilterSize.Value = uint.Parse(sectionFilterSizeStr);
         }
