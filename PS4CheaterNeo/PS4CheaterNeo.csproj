@@ -49,6 +49,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AsmJit">
+      <HintPath>lib\AsmJit.dll</HintPath>
+    </Reference>
     <Reference Include="Be.Windows.Forms.HexBox">
       <HintPath>lib\Be.Windows.Forms.HexBox.dll</HintPath>
     </Reference>

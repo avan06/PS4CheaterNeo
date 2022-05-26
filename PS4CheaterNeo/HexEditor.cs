@@ -1,8 +1,10 @@
-﻿using Be.Windows.Forms;
+﻿using AsmJit.AssemblerContext;
+using Be.Windows.Forms;
 using SharpDisasm;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using static PS4CheaterNeo.SectionTool;
@@ -254,6 +256,33 @@ D: {8}
             catch (Exception exception)
             {
                 MessageBox.Show(exception.Message + "\n" + exception.StackTrace, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+            }
+        }
+
+        private void AssemblerBtn_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string inputValue = "";
+                if (PS4CheaterNeo.InputBox.Show("Assembly to bytes", "Please enter the assembly language, and the bytes value will be displayed below", ref inputValue, 100) != DialogResult.OK) return;
+                if (inputValue.Trim() == "") return;
+                
+                InfoBox.Text = "Assembly:\r\n" + inputValue + "\r\n\r\n";
+                Assembler.CreateContext<Func<int>>();
+                CodeContext<Func<int>> ctx = Assembler.CreateContext<Func<int>>();
+                ctx.Emit(inputValue);
+                var fn = ctx.Compile(out IntPtr fp, out int codeSize);
+                byte[] managedArray = new byte[codeSize];
+                Marshal.Copy(fp, managedArray, 0, codeSize);
+                for (int idx = 0; idx < managedArray.Length; idx++)
+                {
+                    if (idx > 0 && idx % 8 == 0) InfoBox.Text += "\r\n";
+                    InfoBox.Text += managedArray[idx].ToString("X2") + " ";
+                }
+            }
+            catch (Exception ex)
+            {
+                InfoBox.Text += string.Format("{0}\n{1}", ex.Message, ex.StackTrace);
             }
         }
         #endregion

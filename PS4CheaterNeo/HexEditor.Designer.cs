@@ -33,6 +33,7 @@ namespace PS4CheaterNeo
             this.HexView = new Be.Windows.Forms.HexBox();
             this.HexBox = new System.Windows.Forms.CheckBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.InfoBox = new System.Windows.Forms.RichTextBox();
             this.FindBtn = new System.Windows.Forms.Button();
             this.InputBox = new System.Windows.Forms.TextBox();
             this.AddToCheatGridBtn = new System.Windows.Forms.Button();
@@ -41,7 +42,7 @@ namespace PS4CheaterNeo
             this.RefreshBtn = new System.Windows.Forms.Button();
             this.NextBtn = new System.Windows.Forms.Button();
             this.PreviousBtn = new System.Windows.Forms.Button();
-            this.InfoBox = new System.Windows.Forms.RichTextBox();
+            this.AssemblerBtn = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -63,6 +64,7 @@ namespace PS4CheaterNeo
             // 
             // splitContainer1.Panel2
             // 
+            this.splitContainer1.Panel2.Controls.Add(this.AssemblerBtn);
             this.splitContainer1.Panel2.Controls.Add(this.HexBox);
             this.splitContainer1.Panel2.Controls.Add(this.groupBox1);
             this.splitContainer1.Panel2.Controls.Add(this.FindBtn);
@@ -111,7 +113,7 @@ namespace PS4CheaterNeo
             this.HexBox.AutoSize = true;
             this.HexBox.Checked = true;
             this.HexBox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.HexBox.Location = new System.Drawing.Point(3, 187);
+            this.HexBox.Location = new System.Drawing.Point(3, 157);
             this.HexBox.Name = "HexBox";
             this.HexBox.Size = new System.Drawing.Size(43, 16);
             this.HexBox.TabIndex = 10;
@@ -133,13 +135,25 @@ namespace PS4CheaterNeo
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Memory Info";
             // 
+            // InfoBox
+            // 
+            this.InfoBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(36)))), ((int)(((byte)(36)))));
+            this.InfoBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.InfoBox.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.InfoBox.ForeColor = System.Drawing.Color.White;
+            this.InfoBox.Location = new System.Drawing.Point(3, 18);
+            this.InfoBox.Name = "InfoBox";
+            this.InfoBox.Size = new System.Drawing.Size(182, 184);
+            this.InfoBox.TabIndex = 1;
+            this.InfoBox.Text = "";
+            // 
             // FindBtn
             // 
             this.FindBtn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.FindBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.FindBtn.ForeColor = System.Drawing.Color.White;
-            this.FindBtn.Location = new System.Drawing.Point(3, 211);
+            this.FindBtn.Location = new System.Drawing.Point(3, 181);
             this.FindBtn.Name = "FindBtn";
             this.FindBtn.Size = new System.Drawing.Size(190, 23);
             this.FindBtn.TabIndex = 8;
@@ -151,7 +165,7 @@ namespace PS4CheaterNeo
             // 
             this.InputBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.InputBox.Location = new System.Drawing.Point(52, 181);
+            this.InputBox.Location = new System.Drawing.Point(52, 151);
             this.InputBox.Name = "InputBox";
             this.InputBox.Size = new System.Drawing.Size(141, 22);
             this.InputBox.TabIndex = 7;
@@ -162,7 +176,7 @@ namespace PS4CheaterNeo
             | System.Windows.Forms.AnchorStyles.Right)));
             this.AddToCheatGridBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.AddToCheatGridBtn.ForeColor = System.Drawing.Color.White;
-            this.AddToCheatGridBtn.Location = new System.Drawing.Point(3, 150);
+            this.AddToCheatGridBtn.Location = new System.Drawing.Point(3, 120);
             this.AddToCheatGridBtn.Name = "AddToCheatGridBtn";
             this.AddToCheatGridBtn.Size = new System.Drawing.Size(190, 23);
             this.AddToCheatGridBtn.TabIndex = 6;
@@ -176,7 +190,7 @@ namespace PS4CheaterNeo
             | System.Windows.Forms.AnchorStyles.Right)));
             this.CommitBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.CommitBtn.ForeColor = System.Drawing.Color.White;
-            this.CommitBtn.Location = new System.Drawing.Point(3, 120);
+            this.CommitBtn.Location = new System.Drawing.Point(3, 90);
             this.CommitBtn.Name = "CommitBtn";
             this.CommitBtn.Size = new System.Drawing.Size(190, 23);
             this.CommitBtn.TabIndex = 5;
@@ -193,7 +207,7 @@ namespace PS4CheaterNeo
             this.PageBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.PageBox.ForeColor = System.Drawing.Color.White;
             this.PageBox.FormattingEnabled = true;
-            this.PageBox.Location = new System.Drawing.Point(3, 63);
+            this.PageBox.Location = new System.Drawing.Point(3, 33);
             this.PageBox.Name = "PageBox";
             this.PageBox.Size = new System.Drawing.Size(190, 20);
             this.PageBox.TabIndex = 4;
@@ -205,7 +219,7 @@ namespace PS4CheaterNeo
             | System.Windows.Forms.AnchorStyles.Right)));
             this.RefreshBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.RefreshBtn.ForeColor = System.Drawing.Color.White;
-            this.RefreshBtn.Location = new System.Drawing.Point(3, 90);
+            this.RefreshBtn.Location = new System.Drawing.Point(3, 60);
             this.RefreshBtn.Name = "RefreshBtn";
             this.RefreshBtn.Size = new System.Drawing.Size(190, 23);
             this.RefreshBtn.TabIndex = 3;
@@ -219,9 +233,9 @@ namespace PS4CheaterNeo
             | System.Windows.Forms.AnchorStyles.Right)));
             this.NextBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.NextBtn.ForeColor = System.Drawing.Color.White;
-            this.NextBtn.Location = new System.Drawing.Point(3, 33);
+            this.NextBtn.Location = new System.Drawing.Point(99, 3);
             this.NextBtn.Name = "NextBtn";
-            this.NextBtn.Size = new System.Drawing.Size(190, 23);
+            this.NextBtn.Size = new System.Drawing.Size(94, 23);
             this.NextBtn.TabIndex = 1;
             this.NextBtn.Text = "Next";
             this.NextBtn.UseVisualStyleBackColor = true;
@@ -229,29 +243,29 @@ namespace PS4CheaterNeo
             // 
             // PreviousBtn
             // 
-            this.PreviousBtn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.PreviousBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.PreviousBtn.ForeColor = System.Drawing.Color.White;
             this.PreviousBtn.Location = new System.Drawing.Point(3, 3);
             this.PreviousBtn.Name = "PreviousBtn";
-            this.PreviousBtn.Size = new System.Drawing.Size(190, 23);
+            this.PreviousBtn.Size = new System.Drawing.Size(94, 23);
             this.PreviousBtn.TabIndex = 0;
             this.PreviousBtn.Text = "Previous";
             this.PreviousBtn.UseVisualStyleBackColor = true;
             this.PreviousBtn.Click += new System.EventHandler(this.PreviousBtn_Click);
             // 
-            // InfoBox
+            // AssemblerBtn
             // 
-            this.InfoBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(36)))), ((int)(((byte)(36)))));
-            this.InfoBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.InfoBox.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.InfoBox.ForeColor = System.Drawing.Color.White;
-            this.InfoBox.Location = new System.Drawing.Point(3, 18);
-            this.InfoBox.Name = "InfoBox";
-            this.InfoBox.Size = new System.Drawing.Size(182, 184);
-            this.InfoBox.TabIndex = 1;
-            this.InfoBox.Text = "";
+            this.AssemblerBtn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.AssemblerBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.AssemblerBtn.ForeColor = System.Drawing.Color.White;
+            this.AssemblerBtn.Location = new System.Drawing.Point(2, 213);
+            this.AssemblerBtn.Name = "AssemblerBtn";
+            this.AssemblerBtn.Size = new System.Drawing.Size(190, 23);
+            this.AssemblerBtn.TabIndex = 11;
+            this.AssemblerBtn.Text = "AssemblerBox";
+            this.AssemblerBtn.UseVisualStyleBackColor = true;
+            this.AssemblerBtn.Click += new System.EventHandler(this.AssemblerBtn_Click);
             // 
             // HexEditor
             // 
@@ -291,5 +305,6 @@ namespace PS4CheaterNeo
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.CheckBox HexBox;
         private System.Windows.Forms.RichTextBox InfoBox;
+        private System.Windows.Forms.Button AssemblerBtn;
     }
 }
