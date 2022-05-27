@@ -11,9 +11,6 @@
             Value = value;
         }
 
-        public override string ToString()
-        {
-            return Text.ToString();
-        }
+        public override string ToString() => Text.ToString();
     }
 }

@@ -6,6 +6,8 @@ using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Json;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -17,6 +19,7 @@ namespace PS4CheaterNeo
     {
         private Option option;
         private SendPayload sendPayload;
+        private CheatJson cheatJson = null;
         public SectionTool sectionTool { get; private set; }
         public string ProcessName;
         public Main()
@@ -63,115 +66,121 @@ namespace PS4CheaterNeo
         {
             try
             {
-                OpenCheatDialog.Filter = "Cheat files (*.cht)|*.cht|Cheat Relative files (*.chtr)|*.chtr";
+                OpenCheatDialog.Filter = "Cheat (*.cht)|*.cht|Cheat Relative (*.chtr)|*.chtr|Cheat Json (*.json)|*.json";
                 OpenCheatDialog.AddExtension = true;
                 OpenCheatDialog.RestoreDirectory = true;
 
                 if (OpenCheatDialog.ShowDialog() != DialogResult.OK) return;
 
-                string[] cheatStrArr = File.ReadAllLines(OpenCheatDialog.FileName);
-                #region cheatHeaderItems Check
-                string[] cheatHeaderItems = cheatStrArr[0].Split('|');
-
-                ProcessName = cheatHeaderItems[1];
-                if (!InitSectionList(ProcessName)) return;
-
-                #region ParsePS4CheatFiles
-                if (cheatStrArr[0].ToUpper().Contains("ID") && cheatStrArr[0].ToUpper().Contains("VER") && cheatStrArr[0].ToUpper().Contains("FM"))
-                {
-                    ParseCheatFiles(ref cheatStrArr);
-                    cheatHeaderItems = cheatStrArr[0].Split('|');
-                }
-                #endregion
-
-                string productVersion = cheatHeaderItems[0];
-
-                if (Application.ProductVersion != productVersion && MessageBox.Show(string.Format("PS4 Cheater Version({0}) is different with cheat file({1}), still load?", Application.ProductVersion, productVersion),
-                    "ProductVersion", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes) return;
-
-                string[] pVers = productVersion.Split('.'); //1.2.3.4 => 01020304
-                int pVerChk = int.Parse(pVers[0]) * 1000000 + int.Parse(pVers[1]) * 10000 + int.Parse(pVers[2]) * 100 + int.Parse(pVers[3]);
-                bool isSIDv1 = pVerChk < 00090505;
-                bool isRelativeV1 = pVerChk < 00090507;
-                string cheatGameID = cheatHeaderItems[2];
-                string cheatGameVer = cheatHeaderItems[3];
-                string cheatFWVer = cheatHeaderItems[4];
-                string PS4FWVersion = Properties.Settings.Default.PS4FWVersion.Value ?? "";
-                string FMVer = PS4FWVersion != "" ? PS4FWVersion : Constant.Versions[0];
-
-                ScanTool.GameInfo(FMVer, out string gameID, out string gameVer);
-
-                if (gameID != cheatGameID && MessageBox.Show(string.Format("Your Game ID({0}) is different with cheat file({1}), still load?", gameID, cheatGameID),
-                    "GameID", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes) return;
-                if (gameVer != cheatGameVer && MessageBox.Show(string.Format("Your Game version({0}) is different with cheat file({1}), still load?", gameVer, cheatGameVer),
-                    "GameVer", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes) return;
-                if (FMVer != cheatFWVer && MessageBox.Show(string.Format("Your Firmware version({0}) is different with cheat file({1}), still load?", FMVer, cheatFWVer),
-                    "FMVer", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes) return;
-                #endregion
                 int count = 0;
-                Dictionary<ulong, ulong> pointerCaches = new Dictionary<ulong, ulong>();
-                (uint sid, string name, uint prot, uint offsetFirst, uint offsetAddr) preData = (0, "", 0, 0, 0);
-                for (int idx = 1; idx < cheatStrArr.Length; ++idx)
+                string cheatTexts = File.ReadAllText(OpenCheatDialog.FileName);
+                if (OpenCheatDialog.FileName.ToUpper().EndsWith("JSON")) count = ParseCheatJson(cheatTexts);
+                else
                 {
-                    string cheatStr = cheatStrArr[idx];
+                    string[] cheatStrArr = cheatTexts.Split(new string[] { "\r\n", "\r", "\n" }, StringSplitOptions.None); //File.ReadAllLines(OpenCheatDialog.FileName);
+                    #region cheatHeaderItems Check
+                    string[] cheatHeaderItems = cheatStrArr[0].Split('|');
 
-                    if (string.IsNullOrWhiteSpace(cheatStr)) continue;
+                    ProcessName = cheatHeaderItems[1];
+                    if (!InitSectionList(ProcessName)) return;
 
-                    string[] cheatElements = cheatStr.Split('|');
-
-                    if (cheatElements.Length < 5) continue;
-
-                    bool isRelative = cheatElements[5].StartsWith("+");
-                    bool isPointer = cheatElements[5].Contains("_");
-                    uint sid = isRelative ? preData.sid : uint.Parse(cheatElements[0]);
-                    string name = isRelative ? preData.name : cheatElements[2];
-                    uint prot = isRelative ? preData.prot : uint.Parse(cheatElements[3], NumberStyles.HexNumber);
-                    ScanType cheatScanType = this.ParseFromDescription<ScanType>(cheatElements[6]);
-                    bool cheatLock = bool.Parse(cheatElements[7]);
-                    string cheatValue = cheatElements[8];
-                    string cheatDesc = cheatElements[9];
-                    int relativeOffset = isRelative ? int.Parse(cheatElements[5].Substring(1), NumberStyles.HexNumber) : -1;
-
-                    Section section = isSIDv1 ? sectionTool.GetSectionBySIDv1(sid, name, prot) : sectionTool.GetSection(sid, name, prot);
-                    if (section == null && ToolStripLockEnable.Checked) ToolStripLockEnable.Checked = false;
-
-                    uint offsetAddr = 0;
-                    List<long> pointerOffsets = null;
-                    if (isPointer)
+                    #region ParsePS4CheatFiles
+                    if (cheatStrArr[0].ToUpper().Contains("ID") && cheatStrArr[0].ToUpper().Contains("VER") && cheatStrArr[0].ToUpper().Contains("FM"))
                     {
-                        pointerOffsets = new List<long>();
-                        string[] offsetArr = cheatElements[5].Split('_');
-                        for (int offsetIdx = 0; offsetIdx < offsetArr.Length; ++offsetIdx)
+                        ParseCheatFiles(ref cheatStrArr);
+                        cheatHeaderItems = cheatStrArr[0].Split('|');
+                    }
+                    #endregion
+
+                    string productVersion = cheatHeaderItems[0];
+
+                    if (Application.ProductVersion != productVersion && MessageBox.Show(string.Format("PS4 Cheater Version({0}) is different with cheat file({1}), still load?", Application.ProductVersion, productVersion),
+                        "ProductVersion", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes) return;
+
+                    string[] pVers = productVersion.Split('.'); //1.2.3.4 => 01020304
+                    int pVerChk = int.Parse(pVers[0]) * 1000000 + int.Parse(pVers[1]) * 10000 + int.Parse(pVers[2]) * 100 + int.Parse(pVers[3]);
+                    bool isSIDv1 = pVerChk < 00090505;
+                    bool isRelativeV1 = pVerChk < 00090507;
+                    string cheatGameID = cheatHeaderItems[2];
+                    string cheatGameVer = cheatHeaderItems[3];
+                    string cheatFWVer = cheatHeaderItems[4];
+                    string PS4FWVersion = Properties.Settings.Default.PS4FWVersion.Value ?? "";
+                    string FMVer = PS4FWVersion != "" ? PS4FWVersion : Constant.Versions[0];
+
+                    ScanTool.GameInfo(FMVer, out string gameID, out string gameVer);
+
+                    if (gameID != cheatGameID && MessageBox.Show(string.Format("Your Game ID({0}) is different with cheat file({1}), still load?", gameID, cheatGameID),
+                        "GameID", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes) return;
+                    if (gameVer != cheatGameVer && MessageBox.Show(string.Format("Your Game version({0}) is different with cheat file({1}), still load?", gameVer, cheatGameVer),
+                        "GameVer", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes) return;
+                    if (FMVer != cheatFWVer && MessageBox.Show(string.Format("Your Firmware version({0}) is different with cheat file({1}), still load?", FMVer, cheatFWVer),
+                        "FMVer", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes) return;
+                    #endregion
+                    Dictionary<ulong, ulong> pointerCaches = new Dictionary<ulong, ulong>();
+                    (uint sid, string name, uint prot, uint offsetFirst, uint offsetAddr) preData = (0, "", 0, 0, 0);
+                    for (int idx = 1; idx < cheatStrArr.Length; ++idx)
+                    {
+                        string cheatStr = cheatStrArr[idx];
+
+                        if (string.IsNullOrWhiteSpace(cheatStr)) continue;
+
+                        string[] cheatElements = cheatStr.Split('|');
+
+                        if (cheatElements.Length < 5) continue;
+
+                        bool isRelative = cheatElements[5].StartsWith("+");
+                        bool isPointer = cheatElements[5].Contains("_");
+                        uint sid = isRelative ? preData.sid : uint.Parse(cheatElements[0]);
+                        string name = isRelative ? preData.name : cheatElements[2];
+                        uint prot = isRelative ? preData.prot : uint.Parse(cheatElements[3], NumberStyles.HexNumber);
+                        ScanType cheatScanType = this.ParseFromDescription<ScanType>(cheatElements[6]);
+                        bool cheatLock = bool.Parse(cheatElements[7]);
+                        string cheatValue = cheatElements[8];
+                        string cheatDesc = cheatElements[9];
+                        int relativeOffset = isRelative ? int.Parse(cheatElements[5].Substring(1), NumberStyles.HexNumber) : -1;
+
+                        Section section = isSIDv1 ? sectionTool.GetSectionBySIDv1(sid, name, prot) : sectionTool.GetSection(sid, name, prot);
+                        if (section == null && ToolStripLockEnable.Checked) ToolStripLockEnable.Checked = false;
+
+                        uint offsetAddr = 0;
+                        List<long> pointerOffsets = null;
+                        if (isPointer)
                         {
-                            string offsetStr = offsetArr[offsetIdx];
-                            long offset = long.Parse(offsetStr, NumberStyles.HexNumber);
-                            if (offsetIdx == 0 && section != null) offset += (long)section.Start;
-                            pointerOffsets.Add(offset);
+                            pointerOffsets = new List<long>();
+                            string[] offsetArr = cheatElements[5].Split('_');
+                            for (int offsetIdx = 0; offsetIdx < offsetArr.Length; ++offsetIdx)
+                            {
+                                string offsetStr = offsetArr[offsetIdx];
+                                long offset = long.Parse(offsetStr, NumberStyles.HexNumber);
+                                if (offsetIdx == 0 && section != null) offset += (long)section.Start;
+                                pointerOffsets.Add(offset);
+                            }
                         }
-                    }
-                    else if (isRelative)
-                    {
-                        preData.offsetAddr = (uint)relativeOffset + (isRelativeV1 ? preData.offsetAddr : 0);
-                        offsetAddr = preData.offsetFirst + preData.offsetAddr;
-                    }
-                    else offsetAddr = uint.Parse(cheatElements[5], NumberStyles.HexNumber);
+                        else if (isRelative)
+                        {
+                            preData.offsetAddr = (uint)relativeOffset + (isRelativeV1 ? preData.offsetAddr : 0);
+                            offsetAddr = preData.offsetFirst + preData.offsetAddr;
+                        }
+                        else offsetAddr = uint.Parse(cheatElements[5], NumberStyles.HexNumber);
 
-                    DataGridViewRow cheatRow = AddToCheatGrid(section, offsetAddr, cheatScanType, cheatValue, cheatLock, cheatDesc, pointerOffsets, pointerCaches, isRelative ? (int)preData.offsetAddr : -1);
-                    if (cheatRow == null)
-                    {
-                        preData = (0, "", 0, 0, 0);
-                        continue;
+                        DataGridViewRow cheatRow = AddToCheatGrid(section, offsetAddr, cheatScanType, cheatValue, cheatLock, cheatDesc, pointerOffsets, pointerCaches, isRelative ? (int)preData.offsetAddr : -1);
+                        if (cheatRow == null)
+                        {
+                            preData = (0, "", 0, 0, 0);
+                            continue;
+                        }
+                        if (isPointer)
+                        {
+                            (section, offsetAddr) = ((Section section, uint offsetAddr))cheatRow.Tag;
+                            sid = section.SID;
+                            name = section.Name;
+                            prot = section.Prot;
+                        }
+                        if (!isRelative) preData = (sid, name, prot, offsetAddr, 0);
+                        count++;
                     }
-                    if (isPointer)
-                    {
-                        (section, offsetAddr) = ((Section section, uint offsetAddr))cheatRow.Tag;
-                        sid = section.SID;
-                        name = section.Name;
-                        prot = section.Prot;
-                    }
-                    if (!isRelative) preData = (sid, name, prot, offsetAddr, 0);
-                    count++;
                 }
+
                 CheatGridView.GroupRefresh();
                 SaveCheatDialog.FileName = OpenCheatDialog.FileName;
                 SaveCheatDialog.FilterIndex = OpenCheatDialog.FilterIndex;
@@ -352,67 +361,170 @@ namespace PS4CheaterNeo
             return code;
         }
 
+        private int ParseCheatJson(string cheatTexts)
+        {
+            int count = 0;
+            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(cheatTexts)))
+            {
+                DataContractJsonSerializer deseralizer = new DataContractJsonSerializer(typeof(CheatJson));
+                cheatJson = (CheatJson)deseralizer.ReadObject(ms);
+
+                ProcessName = cheatJson.Process;
+                if (!InitSectionList(ProcessName)) return 0;
+
+                #region cheatHeaderItems Check
+                string cheatGameID = cheatJson.Id;
+                string cheatGameVer = cheatJson.Version;
+                string PS4FWVersion = Properties.Settings.Default.PS4FWVersion.Value ?? "";
+                string FMVer = PS4FWVersion != "" ? PS4FWVersion : Constant.Versions[0];
+
+                ScanTool.GameInfo(FMVer, out string gameID, out string gameVer);
+
+                if (gameID != cheatGameID && MessageBox.Show(string.Format("Your Game ID({0}) is different with cheat file({1}), still load?", gameID, cheatGameID),
+                    "GameID", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes) return 0;
+                if (gameVer != cheatGameVer && MessageBox.Show(string.Format("Your Game version({0}) is different with cheat file({1}), still load?", gameVer, cheatGameVer),
+                    "GameVer", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes) return 0;
+                #endregion
+
+                Section section;
+                Section sectionFirst = sectionTool.GetSectionSortByAddr()[0];
+                foreach (CheatJson.Mod cheatMod in cheatJson.Mods)
+                {
+                    bool cheatLock = false;
+                    string cheatDesc = cheatMod.Name;
+                    ScanType cheatScanType = ScanType.Hex;
+                    section = sectionFirst;
+                    foreach (CheatJson.Memory memory in cheatMod.Memory)
+                    {
+                        string cheatValue = memory.On;
+                        ulong offsetAddr = ulong.Parse(memory.Offset, NumberStyles.HexNumber);
+                        if (offsetAddr >= (ulong)sectionFirst.Length)
+                        {
+                            var sid = sectionTool.GetSectionID(offsetAddr + sectionFirst.Start);
+                            if (sid == 0) section = new Section();
+                            else
+                            {
+                                var newSection = sectionTool.GetSection(sid);
+                                offsetAddr += sectionFirst.Start - newSection.Start;
+                                section = newSection;
+                            }
+                        }
+
+                        DataGridViewRow cheatRow = AddToCheatGrid(section, (uint)offsetAddr, cheatScanType, cheatValue, cheatLock, String.Format("{0} __ [ on: {1} off: {2} ]", cheatDesc, memory.On, memory.Off));
+                        count++;
+                    }
+                }
+            }
+            return count;
+        }
+
         private void ToolStripSave_Click(object sender, EventArgs e)
         {
             if (CheatGridView.Rows.Count == 0) return;
 
             string FMVer = Properties.Settings.Default.PS4FWVersion.Value;
             ScanTool.GameInfo(FMVer, out string gameID, out string gameVer);
-            SaveCheatDialog.Filter = "Cheat files (*.cht)|*.cht|Cheat Relative files (*.chtr)|*.chtr";
+            SaveCheatDialog.Filter = "Cheat (*.cht)|*.cht|Cheat Relative (*.chtr)|*.chtr|Cheat Json (*.json)|*.json";
             SaveCheatDialog.AddExtension = true;
             SaveCheatDialog.RestoreDirectory = true;
             if (string.IsNullOrWhiteSpace(SaveCheatDialog.FileName)) SaveCheatDialog.FileName = gameID;
 
             if (SaveCheatDialog.ShowDialog() != DialogResult.OK) return;
             if (!InitSectionList(ProcessName)) return;
-
-            string processName = ProcessName;
-            string saveBuf = $"{Application.ProductVersion}|{processName}|{gameID}|{gameVer}|{FMVer}\n";
-            uint maxRelative = 0x100;
-            ulong preAddr = 0;
-            for (int cIdx = 0; cIdx < CheatGridView.Rows.Count; cIdx++)
+            
+            if (SaveCheatDialog.FileName.ToUpper().EndsWith("JSON"))
             {
-                DataGridViewRow cheatRow = CheatGridView.Rows[cIdx];
+                if (cheatJson == null || cheatJson.Id != gameID) cheatJson = new CheatJson(gameID, gameID, gameVer, ProcessName);
+                else cheatJson.Mods = new List<CheatJson.Mod>();
 
-                (Section section, uint offsetAddr) = ((Section section, uint offsetAddr))cheatRow.Tag;
-                bool isRelative = preAddr > 0 && offsetAddr > preAddr && offsetAddr - preAddr <= maxRelative;
-                bool isPointer = cheatRow.Cells[(int)ChertCol.CheatListAddress].Value.ToString().StartsWith("P->");
-                Section newSection = section;
-                string addressStr;
-                string sectionStr = "";
-                if (isPointer)
+                CheatJson.Mod modBak = null;
+                Section sectionFirst = sectionTool.GetSectionSortByAddr()[0];
+                for (int cIdx = 0; cIdx < CheatGridView.Rows.Count; cIdx++)
                 {
-                    string[] sectionArr = cheatRow.Cells[(int)ChertCol.CheatListSection].Value.ToString().Split('|');
-                    newSection = sectionTool.GetSection(uint.Parse(sectionArr[0]), sectionArr[2], uint.Parse(sectionArr[3]));
-                    addressStr = sectionArr[sectionArr.Length - 1];
-                }
-                else if (SaveCheatDialog.FilterIndex == 2 && isRelative)
-                {
-                    addressStr = "+" + (offsetAddr - preAddr).ToString("X");
-                    sectionStr = "||||";
-                }
-                else addressStr = offsetAddr.ToString("X");
-                if (sectionStr == "") sectionStr = string.Format("{0}|{1}|{2}|{3}|{4}",
-                    newSection.SID,
-                    newSection.Start.ToString("X"),
-                    newSection.Name,
-                    newSection.Prot.ToString("X"),
-                    newSection.Offset.ToString("X"));
+                    DataGridViewRow cheatRow = CheatGridView.Rows[cIdx];
 
-                saveBuf += string.Format("{0}|{1}|{2}|{3}|{4}|{5}\n",
-                    sectionStr,
-                    addressStr,
-                    cheatRow.Cells[(int)ChertCol.CheatListType].Value,
-                    cheatRow.Cells[(int)ChertCol.CheatListLock].Value,
-                    cheatRow.Cells[(int)ChertCol.CheatListValue].Value,
-                    cheatRow.Cells[(int)ChertCol.CheatListDesc].Value
-                    );
-                if (SaveCheatDialog.FilterIndex == 2 && !isRelative) preAddr = offsetAddr;
+                    (Section section, ulong offsetAddr) = ((Section section, uint offsetAddr))cheatRow.Tag;
+                    if (section.SID != sectionFirst.SID) offsetAddr += section.Start - sectionFirst.Start;
+
+                    string cheatDesc = cheatRow.Cells[(int)ChertCol.CheatListDesc].Value.ToString();
+                    string on = cheatRow.Cells[(int)ChertCol.CheatListValue].Value.ToString();
+                    string off = cheatRow.Cells[(int)ChertCol.CheatListValue].Value.ToString();
+                    if (Regex.Match(cheatDesc, @"(.*) *__ *\[ *on: *([0-9a-zA-Z]+) *off: *([0-9a-zA-Z]+)") is Match m1 && m1.Success)
+                    {
+                        cheatDesc = m1.Groups[1].Value;
+                        off = m1.Groups[3].Value;
+                    }
+
+                    if (modBak != null && modBak.Name == cheatDesc) cheatJson.Mods[cheatJson.Mods.Count - 1].Memory.Add(new CheatJson.Memory(offsetAddr.ToString("X"), on, off));
+                    else
+                    {
+                        CheatJson.Mod mod = new CheatJson.Mod(cheatDesc, "checkbox");
+                        mod.Memory.Add(new CheatJson.Memory(offsetAddr.ToString("X"), on, off));
+
+                        cheatJson.Mods.Add(mod);
+                        modBak = mod;
+                    }
+
+                }
+
+                DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(CheatJson));
+                using (var msObj = new MemoryStream())
+                {
+                    serializer.WriteObject(msObj, cheatJson);
+                    var bytes = msObj.ToArray();
+                    string json = Encoding.UTF8.GetString(bytes, 0, bytes.Length);
+                    using (var myStream = new StreamWriter(SaveCheatDialog.FileName)) myStream.Write(json);
+                }
+            }
+            else
+            {
+                string processName = ProcessName;
+                string saveBuf = $"{Application.ProductVersion}|{processName}|{gameID}|{gameVer}|{FMVer}\n";
+                uint maxRelative = 0x100;
+                ulong preAddr = 0;
+                for (int cIdx = 0; cIdx < CheatGridView.Rows.Count; cIdx++)
+                {
+                    DataGridViewRow cheatRow = CheatGridView.Rows[cIdx];
+
+                    (Section section, uint offsetAddr) = ((Section section, uint offsetAddr))cheatRow.Tag;
+                    bool isRelative = preAddr > 0 && offsetAddr > preAddr && offsetAddr - preAddr <= maxRelative;
+                    bool isPointer = cheatRow.Cells[(int)ChertCol.CheatListAddress].Value.ToString().StartsWith("P->");
+                    Section newSection = section;
+                    string addressStr;
+                    string sectionStr = "";
+                    if (isPointer)
+                    {
+                        string[] sectionArr = cheatRow.Cells[(int)ChertCol.CheatListSection].Value.ToString().Split('|');
+                        newSection = sectionTool.GetSection(uint.Parse(sectionArr[0]), sectionArr[2], uint.Parse(sectionArr[3]));
+                        addressStr = sectionArr[sectionArr.Length - 1];
+                    }
+                    else if (SaveCheatDialog.FilterIndex == 2 && isRelative)
+                    {
+                        addressStr = "+" + (offsetAddr - preAddr).ToString("X");
+                        sectionStr = "||||";
+                    }
+                    else addressStr = offsetAddr.ToString("X");
+                    if (sectionStr == "") sectionStr = string.Format("{0}|{1}|{2}|{3}|{4}",
+                        newSection.SID,
+                        newSection.Start.ToString("X"),
+                        newSection.Name,
+                        newSection.Prot.ToString("X"),
+                        newSection.Offset.ToString("X"));
+
+                    saveBuf += string.Format("{0}|{1}|{2}|{3}|{4}|{5}\n",
+                        sectionStr,
+                        addressStr,
+                        cheatRow.Cells[(int)ChertCol.CheatListType].Value,
+                        cheatRow.Cells[(int)ChertCol.CheatListLock].Value,
+                        cheatRow.Cells[(int)ChertCol.CheatListValue].Value,
+                        cheatRow.Cells[(int)ChertCol.CheatListDesc].Value
+                        );
+                    if (SaveCheatDialog.FilterIndex == 2 && !isRelative) preAddr = offsetAddr;
+                }
+
+                using (var myStream = new StreamWriter(SaveCheatDialog.FileName)) myStream.Write(saveBuf);
             }
 
-            StreamWriter myStream = new StreamWriter(SaveCheatDialog.FileName);
-            myStream.Write(saveBuf);
-            myStream.Close();
             OpenCheatDialog.FileName = SaveCheatDialog.FileName;
             OpenCheatDialog.FilterIndex = SaveCheatDialog.FilterIndex;
         }
