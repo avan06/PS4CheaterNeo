@@ -172,6 +172,20 @@ namespace PS4CheaterNeo
             return result;
         }
 
+        public static string ReverseHexString(string hex)
+        {
+            if (hex == null || hex.Trim().Length <= 2) return hex;
+
+            hex = hex.Replace(" ", "").Replace("-", "").Replace("_", "");
+
+            if (hex.Length % 2 != 0) hex = "0" + hex;
+
+            string result = "";
+            for (int idx = 0; idx <= hex.Length - 2; idx += 2) result = hex.Substring(idx, 2) + result;
+
+            return result;
+        }
+
         public static bool ComparerExact(ScanType scanType, byte[] newValue, byte[] inputValue0)
         {
             bool result;

@@ -13,6 +13,8 @@ namespace PS4CheaterNeo
             Version = version;
             Process = process;
             Mods = new List<Mod>();
+            Credits = new List<string>();
+            Credits.Add("PS4CheaterNeo");
         }
 
         [DataMember(Name = "name", Order = 1)]

@@ -447,10 +447,17 @@ namespace PS4CheaterNeo
                     if (section.SID != sectionFirst.SID) offsetAddr += section.Start - sectionFirst.Start;
 
                     string cheatDesc = cheatRow.Cells[(int)ChertCol.CheatListDesc].Value.ToString();
+                    ScanType scanType = this.ParseFromDescription<ScanType>(cheatRow.Cells[(int)ChertCol.CheatListType].Value.ToString());
                     string on = cheatRow.Cells[(int)ChertCol.CheatListValue].Value.ToString();
-                    string off = cheatRow.Cells[(int)ChertCol.CheatListValue].Value.ToString();
-                    if (Regex.Match(cheatDesc, @"(.*) *__ *\[ *on: *([0-9a-zA-Z]+) *off: *([0-9a-zA-Z]+)") is Match m1 && m1.Success)
+                    if (scanType != ScanType.Hex)
                     {
+                        byte[] bytes = ScanTool.ValueStringToByte(scanType, on);
+                        on = ScanTool.BytesToString(scanType, bytes, true);
+                        on = ScanTool.ReverseHexString(on);
+                    }
+                    string off = on;
+                    if (Regex.Match(cheatDesc, @"(.*) *__ *\[ *on: *([0-9a-zA-Z]+) *off: *([0-9a-zA-Z]+)") is Match m1 && m1.Success)
+                    { //Attempt to restore off value from desc
                         cheatDesc = m1.Groups[1].Value;
                         off = m1.Groups[3].Value;
                     }
