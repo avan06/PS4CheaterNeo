@@ -9,20 +9,38 @@ namespace PS4CheaterNeo
 {
     public static class PS4Tool
     {
+        private static readonly int initIdx1 = 0;
+        private static readonly int initIdx2 = 2;
+        private static int currentIdx1 = initIdx1;
+        private static int currentIdx2 = initIdx2;
         private static int reTrySocket = 0;
-        private static int currentIdx = 0;
         private static readonly Mutex mutex = new Mutex();
-        private static readonly Mutex[] mutexs = new Mutex[3];
+        private static readonly Mutex[] mutexs = new Mutex[4];
         private static readonly PS4DBG[] ps4s = new PS4DBG[mutexs.Length];
         private static System.Diagnostics.Stopwatch tickerMajor = System.Diagnostics.Stopwatch.StartNew();
 
-        private static int CurrentIdx()
+        private static int CurrentIdx1()
         {
             mutex.WaitOne();
-            int result = currentIdx++;
-            if (currentIdx >= mutexs.Length) currentIdx = 0;
-            mutex.ReleaseMutex();
-            return result;
+            try
+            {
+                int result = currentIdx1++;
+                if (currentIdx1 >= initIdx2) currentIdx1 = initIdx1;
+                return result;
+            }
+            finally { mutex.ReleaseMutex(); }
+        }
+
+        private static int CurrentIdx2()
+        {
+            mutex.WaitOne();
+            try
+            {
+                int result = currentIdx2++;
+                if (currentIdx2 >= mutexs.Length) currentIdx2 = initIdx2;
+                return result;
+            }
+            finally { mutex.ReleaseMutex(); }
         }
 
         /// <summary>
@@ -78,7 +96,7 @@ namespace PS4CheaterNeo
         /// <returns>libdebug.ProcessList</returns>
         public static ProcessList GetProcessList()
         {
-            int current = CurrentIdx();
+            int current = CurrentIdx2();
             ProcessList processList = null;
             try
             {
@@ -107,7 +125,7 @@ namespace PS4CheaterNeo
         /// <returns>libdebug.ProcessInfo</returns>
         public static ProcessInfo GetProcessInfo(int processID)
         {
-            int current = CurrentIdx();
+            int current = CurrentIdx2();
             ProcessInfo processInfo = new ProcessInfo();
             try
             {
@@ -164,7 +182,7 @@ namespace PS4CheaterNeo
         /// <returns>libdebug.ProcessMap</returns>
         public static ProcessMap GetProcessMaps(int processID)
         {
-            int current = CurrentIdx();
+            int current = CurrentIdx2();
             ProcessMap processMap = null;
             try
             {
@@ -239,7 +257,7 @@ namespace PS4CheaterNeo
         /// <returns>value of the specified address</returns>
         public static byte[] ReadMemory(int processID, ulong address, int length)
         {
-            int current = CurrentIdx();
+            int current = CurrentIdx1();
             try
             {
                 mutexs[current].WaitOne();
@@ -269,7 +287,7 @@ namespace PS4CheaterNeo
         /// <param name="data">new value of destination address</param>
         public static void WriteMemory(int processID, ulong address, byte[] data)
         {
-            int current = CurrentIdx();
+            int current = CurrentIdx2();
             try
             {
                 mutexs[current].WaitOne();

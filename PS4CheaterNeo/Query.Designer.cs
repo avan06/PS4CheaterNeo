@@ -93,6 +93,7 @@ namespace PS4CheaterNeo
             this.CompareTypeBox = new System.Windows.Forms.ComboBox();
             this.Panel1 = new System.Windows.Forms.Panel();
             this.SlowMotionTimer = new System.Windows.Forms.Timer(this.components);
+            this.SaveDialog = new System.Windows.Forms.SaveFileDialog();
             ((System.ComponentModel.ISupportInitialize)(this.SplitContainer1)).BeginInit();
             this.SplitContainer1.Panel1.SuspendLayout();
             this.SplitContainer1.Panel2.SuspendLayout();
@@ -492,7 +493,7 @@ namespace PS4CheaterNeo
             this.ToolStripSeparator3,
             this.SectionViewCheck});
             this.SectionViewMenu.Name = "SectionViewMenu";
-            this.SectionViewMenu.Size = new System.Drawing.Size(134, 76);
+            this.SectionViewMenu.Size = new System.Drawing.Size(181, 98);
             // 
             // SectionViewHexEditor
             // 
@@ -503,9 +504,8 @@ namespace PS4CheaterNeo
             // 
             // SectionViewDump
             // 
-            this.SectionViewDump.Enabled = false;
             this.SectionViewDump.Name = "SectionViewDump";
-            this.SectionViewDump.Size = new System.Drawing.Size(133, 22);
+            this.SectionViewDump.Size = new System.Drawing.Size(180, 22);
             this.SectionViewDump.Text = "Dump";
             this.SectionViewDump.Click += new System.EventHandler(this.SectionViewDump_Click);
             // 
@@ -901,5 +901,6 @@ namespace PS4CheaterNeo
         private System.Windows.Forms.Button ResumeBtn;
         private System.Windows.Forms.Timer SlowMotionTimer;
         private System.Windows.Forms.CheckBox SlowMotionBox;
+        private System.Windows.Forms.SaveFileDialog SaveDialog;
     }
 }

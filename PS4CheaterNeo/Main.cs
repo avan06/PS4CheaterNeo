@@ -129,6 +129,8 @@ namespace PS4CheaterNeo
                         if (cheatElements.Length < 5) continue;
 
                         bool isRelative = cheatElements[5].StartsWith("+");
+                        bool isRelativeV1a = cheatElements[5].StartsWith("++");
+                        if (isRelativeV1a) cheatElements[5] = cheatElements[5].Substring(1);
                         bool isPointer = cheatElements[5].Contains("_");
                         uint sid = isRelative ? preData.sid : uint.Parse(cheatElements[0]);
                         string name = isRelative ? preData.name : cheatElements[2];
@@ -158,7 +160,7 @@ namespace PS4CheaterNeo
                         }
                         else if (isRelative)
                         {
-                            preData.offsetAddr = (uint)relativeOffset + (isRelativeV1 ? preData.offsetAddr : 0);
+                            preData.offsetAddr = (uint)relativeOffset + (isRelativeV1 || isRelativeV1a ? preData.offsetAddr : 0);
                             offsetAddr = preData.offsetFirst + preData.offsetAddr;
                         }
                         else offsetAddr = uint.Parse(cheatElements[5], NumberStyles.HexNumber);

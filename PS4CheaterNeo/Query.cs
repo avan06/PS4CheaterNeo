@@ -8,6 +8,7 @@ using static PS4CheaterNeo.SectionTool;
 using System.Threading.Tasks;
 using System.Threading;
 using System.Globalization;
+using System.IO;
 
 namespace PS4CheaterNeo
 {
@@ -1032,14 +1033,46 @@ namespace PS4CheaterNeo
 
         private void SectionViewDump_Click(object sender, EventArgs e)
         {
-            //ListView.SelectedListViewItemCollection items = SectionView.SelectedItems;
-            //if (items.Count > 0)
-            //{
-            //    for (int idx = 0; idx < items.Count; ++idx)
-            //    {
-            //        dump_dialog(int.Parse(items[idx].Name));
-            //    }
-            //}
+            ListView.SelectedListViewItemCollection items = SectionView.SelectedItems;
+            if (items.Count > 0)
+            {
+                SaveDialog.Filter = "Directory | directory"; //"Section binary (*.bin)|*.bin";
+                SaveDialog.FilterIndex = 1;
+                SaveDialog.RestoreDirectory = true;
+                SaveDialog.FileName = "Save Here";
+
+                if (SaveDialog.ShowDialog() != DialogResult.OK) return;
+
+                double dumpSize = 0;
+                string savePath = Path.GetDirectoryName(SaveDialog.FileName);
+                string processName = MakeValidFileName(mainForm.ProcessName);
+                ComboboxItem process = (ComboboxItem)ProcessesBox.SelectedItem;
+                for (int idx = 0; idx < items.Count; ++idx)
+                {
+                    string sectionAddr = MakeValidFileName(items[idx].SubItems[(int)SectionCol.SectionViewAddress].Text);
+                    string sectionName = MakeValidFileName(items[idx].SubItems[(int)SectionCol.SectionViewName].Text);
+                    uint sid = uint.Parse(items[idx].SubItems[(int)SectionCol.SectionViewSID].Text);
+                    Section section = sectionTool.GetSection(sid);
+                    byte[] subBuffer = PS4Tool.ReadMemory(section.PID, section.Start, section.Length);
+                    string path = string.Format("{0}{1}{2}_{3}_{4}.bin", savePath, Path.DirectorySeparatorChar, processName, sectionAddr, sectionName);
+                    File.WriteAllBytes(path, subBuffer);
+                    dumpSize += subBuffer.Length;
+                }
+                
+                MessageBox.Show(string.Format("SectionViewDump success, dump size: {0}MB", Math.Round(dumpSize / 1024 / 1024, 2)), "SectionViewDump", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+        }
+
+        /// <summary>
+        /// Sanitize File Name
+        /// https://stackoverflow.com/a/847251
+        /// </summary>
+        private static string MakeValidFileName(string name)
+        {
+            string invalidChars = System.Text.RegularExpressions.Regex.Escape(new string(System.IO.Path.GetInvalidFileNameChars()));
+            string invalidRegStr = string.Format(@"([{0}]*\.+$)|([{0}]+)", invalidChars);
+
+            return System.Text.RegularExpressions.Regex.Replace(name, invalidRegStr, "_");
         }
 
         private void SectionViewCheck_Click(object sender, EventArgs e)

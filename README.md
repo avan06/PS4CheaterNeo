@@ -2,7 +2,7 @@
 
 PS4CheaterNeo is a program to find game cheat codes, and it is based on [`ps4debug`](https://github.com/jogolden/ps4debug) and `.Net Framework 4.8`.
 
-Currently in `version 0.9.6.1-beta`
+Currently in `version 0.9.6.2-beta`
 
 
 ## Table of Contents
@@ -60,12 +60,12 @@ Currently in `version 0.9.6.1-beta`
 
 - It can be downloaded at the following URL(`Only ps4debug 6.72 has been tested`).
 
-> [ps4debug 5.05](https://github.com/jogolden/ps4debug/releases)  
-> [ps4debug 6.72](https://github.com/GiantPluto/ps4debug/releases)  
-> [ps4debug 7.02](https://github.com/ChendoChap/ps4debug/tags)  
-> [ps4debug 7.55](https://github.com/Joonie86/ps4debug/releases)  
-> [ps4debug 9.00](https://www.reddit.com/r/ps4homebrew/comments/rimeyi/900fw_ported_ps4debug_and_webrte_payloads/)  
-
+> [ps4debug 5.05 by jogolden](https://github.com/jogolden/ps4debug/releases)  
+> [ps4debug 6.72 by GiantPluto](https://github.com/GiantPluto/ps4debug/releases)  
+> [ps4debug 7.02 by ChendoChap](https://github.com/ChendoChap/ps4debug/tags)  
+> [ps4debug 7.55 by Joonie86](https://github.com/Joonie86/ps4debug/releases)  
+> [ps4debug 9.00 by Karo](https://twitter.com/i/web/status/1471590847707856905)  
+> [ps4debug all firmware (5.0X, 6.72, 7.02, 7.5X, 9.00) by ctn123](https://github.com/ctn123/PS4_Cheater/releases/)
 
 ### Cheat window
 
@@ -115,6 +115,7 @@ Cheat format used by PS4 Trainer and GoldHEN Cheat
 - The `section` list whose length is less than `SectionFilterSize` (default is 200K, can be modified in Option) will be filtered when the `FilterSize` checkbox is clicked.
 - The query value will skip the filtered `section` list when the `Filter` checkbox is clicked.
 - The preset `section` filter rules is `libSce, libc.prx, SceShell, SceLib, SceNp, SceVoice, SceFios, libkernel, SceVdec`, these rules can also be customized.
+- Support dump `section` to binary files in `section` list.
 
 ![query_1](assets/query_1.webp)
 ![query_2](assets/query_2.webp)
