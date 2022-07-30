@@ -39,8 +39,10 @@
             this.optionTreeView1.ContextMenuStripLeftView = null;
             this.optionTreeView1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.optionTreeView1.FloatingPointDecimalPlaces = 2;
-            this.optionTreeView1.FontLeftView = new System.Drawing.Font("PMingLiU", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.optionTreeView1.Font = new System.Drawing.Font("Times New Roman", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.optionTreeView1.FontLeftView = new System.Drawing.Font("Times New Roman", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.optionTreeView1.ForeColor = System.Drawing.Color.White;
+            this.optionTreeView1.ForeColorLeftView = System.Drawing.Color.White;
             this.optionTreeView1.FullRowSelectLeftView = true;
             this.optionTreeView1.ItemHeightLeftView = 14;
             this.optionTreeView1.Location = new System.Drawing.Point(0, 0);

@@ -13,23 +13,27 @@ namespace PS4CheaterNeo
 {
     public partial class HexEditor : Form
     {
-        readonly Main mainForm;
-        readonly Section section;
-        Dictionary<long, long> changedPosDic;
         int Page;
         int PageCount;
         long Line;
         int Column;
+        Dictionary<long, long> changedPosDic;
         const int PageSize = 8 * 1024 * 1024;
+        readonly Main mainForm;
+        readonly Section section;
 
-        public HexEditor(Main mainForm, Section section, int baseAddr)
+        private HexEditor(Main mainForm)
+        {
+            this.mainForm = mainForm;
+            changedPosDic = new Dictionary<long, long>();
+
+            InitializeComponent();
+        }
+
+        public HexEditor(Main mainForm, Section section, int baseAddr) : this(mainForm)
         {
             if (section == null || section.SID == 0) throw new ArgumentNullException("Init HexEditor failed, section is null.");
 
-            InitializeComponent();
-
-            changedPosDic = new Dictionary<long, long>();
-            this.mainForm = mainForm;
             this.section = section;
             Page = baseAddr / PageSize;
             Line = (baseAddr - Page * PageSize) / HexView.BytesPerLine;
@@ -50,7 +54,7 @@ namespace PS4CheaterNeo
         {
             DynamicByteProvider dynaBP = HexView.ByteProvider as DynamicByteProvider;
 
-            if (dynaBP.HasChanges() && MessageBox.Show("Byte data has changes, Do you want to close HexEditor?", "HexEditor", 
+            if (dynaBP != null && dynaBP.HasChanges() && MessageBox.Show("Byte data has changes, Do you want to close HexEditor?", "HexEditor", 
                 MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) e.Cancel = true;
         }
 
@@ -291,15 +295,13 @@ D: {8}
 
         private void UpdateUi(int page, long line)
         {
-            long ScrollVpos = 0;
-            if (HexView.ScrollVpos > 0) ScrollVpos = HexView.ScrollVpos;
-            HexView.LineInfoOffset = (long)section.Start + (long)(PageSize * page);
-
             int memSize = PageSize;
-
+            long ScrollVpos = HexView.ScrollVpos > 0 ? HexView.ScrollVpos : 0;
+            HexView.LineInfoOffset = (long)section.Start + (long)(PageSize * page);
             if (section.Length - PageSize * page < memSize) memSize = section.Length - PageSize * page;
 
             byte[] dst = PS4Tool.ReadMemory(section.PID, section.Start + (ulong)page * PageSize, (int)memSize);
+
             if (HexView.ByteProvider != null) HexView.ByteProvider.Changed -= ByteProvider_Changed;
             HexView.ByteProvider = new DynamicByteProvider(dst);
             HexView.ByteProvider.Changed += ByteProvider_Changed;

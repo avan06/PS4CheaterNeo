@@ -96,7 +96,7 @@ namespace PS4CheaterNeo
             {
                 if (filterEnum == ScanType.Group) continue;
                 string scanTypeStr = filterEnum.GetDescription();
-                ComboboxItem item = new ComboboxItem(scanTypeStr, filterEnum);
+                ComboItem item = new ComboItem(scanTypeStr, filterEnum);
                 ScanTypeBox.Items.Add(item);
                 if (filterEnum == CheatType) ScanTypeBox.SelectedItem = item;
             }
@@ -116,7 +116,7 @@ namespace PS4CheaterNeo
             try
             {
                 Address = ulong.Parse(AddressBox.Text, System.Globalization.NumberStyles.HexNumber);
-                CheatType = (ScanType)((ComboboxItem)(ScanTypeBox.SelectedItem)).Value;
+                CheatType = (ScanType)((ComboItem)(ScanTypeBox.SelectedItem)).Value;
                 ScanTool.ValueStringToULong(CheatType, ValueBox.Text);
                 Value = ValueBox.Text;
                 IsLock = LockBox.Checked;
@@ -255,7 +255,7 @@ namespace PS4CheaterNeo
         {
             if (IsPointer || PointerOffsets != null) return;
 
-            var newCheatType = (ScanType)((ComboboxItem)(ScanTypeBox.SelectedItem)).Value;
+            var newCheatType = (ScanType)((ComboItem)(ScanTypeBox.SelectedItem)).Value;
             if (newCheatType == ScanType.String_) return;
 
             var newValue = ScanTool.ValueStringToULong(CheatType, ValueBox.Text);
@@ -280,7 +280,7 @@ namespace PS4CheaterNeo
 
             try
             {
-                var newCheatType = (ScanType)((ComboboxItem)(ScanTypeBox.SelectedItem)).Value;
+                var newCheatType = (ScanType)((ComboItem)(ScanTypeBox.SelectedItem)).Value;
                 var changedCheatType = CheatType != newCheatType;
                 if (changedCheatType) CheatType = newCheatType;
 

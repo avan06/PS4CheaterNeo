@@ -38,7 +38,7 @@ namespace PS4CheaterNeo
             for (int idx = 0; idx < scanTypes.Length; idx++)
             {
                 ScanType filterEnum = scanTypes[idx];
-                ScanTypeBox.Items.Add(new ComboboxItem(filterEnum.GetDescription(), filterEnum));
+                ScanTypeBox.Items.Add(new ComboItem(filterEnum.GetDescription(), filterEnum));
                 if (scanType == filterEnum) ScanTypeBox.SelectedIndex = ScanTypeBox.Items.Count - 1;
             }
             IsFilterBox.Checked = Properties.Settings.Default.EnableFilterQuery.Value;
@@ -219,7 +219,7 @@ namespace PS4CheaterNeo
 
             var pointerResult = pointerResults[idx];
 
-            ScanType scanType = (ScanType)((ComboboxItem)(ScanTypeBox.SelectedItem)).Value;
+            ScanType scanType = (ScanType)((ComboItem)(ScanTypeBox.SelectedItem)).Value;
             Section baseSection = sectionTool.GetSection(pointerResult.pointer.BaseSID);
             ulong baseAddress = baseSection.Start + pointerResult.pointer.BasePos;
 
@@ -305,7 +305,7 @@ namespace PS4CheaterNeo
             if (PointerListView.SelectedItems.Count == 0) return;
 
             Dictionary<ulong, ulong> pointerCaches = new Dictionary<ulong, ulong>();
-            ScanType scanType = (ScanType)((ComboboxItem)(ScanTypeBox.SelectedItem)).Value;
+            ScanType scanType = (ScanType)((ComboItem)(ScanTypeBox.SelectedItem)).Value;
             ListView.SelectedListViewItemCollection items = PointerListView.SelectedItems;
             for (int itemIdx = 0; itemIdx < items.Count; ++itemIdx)
             {

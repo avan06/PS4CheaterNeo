@@ -340,7 +340,7 @@ namespace PS4CheaterNeo
         /// </summary>
         public static void DetachDebugger()
         {
-            if (!ps4s[0].IsDebugging) return;
+            if (ps4s[0] == null || !ps4s[0].IsDebugging) return;
 
             ps4s[0].TryDetachDebugger();
         }

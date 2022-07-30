@@ -102,6 +102,7 @@ namespace PS4CheaterNeo
             }
             catch (Exception exception)
             {
+                if (ToolStripMsg.ForeColor != Color.Red) e.Cancel = true;
                 ToolStripMsg.ForeColor = Color.Red;
                 ToolStripMsg.Text = exception.Message;
             }

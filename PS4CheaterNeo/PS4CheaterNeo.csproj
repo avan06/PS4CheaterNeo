@@ -83,7 +83,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="common\CheatJson.cs" />
-    <Compile Include="common\ComboboxItem.cs" />
+    <Compile Include="common\ComboItemBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="common\Constant.cs" />
     <Compile Include="common\PS4Tool.cs" />
     <Compile Include="common\BitsDictionary.cs" />
@@ -128,7 +130,6 @@
       <DependentUpon>Query.cs</DependentUpon>
     </Compile>
     <Compile Include="common\ScanTool.cs" />
-    <Compile Include="common\ResultList.cs" />
     <Compile Include="SendPayload.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -137,6 +138,7 @@
     </Compile>
     <EmbeddedResource Include="HexEditor.resx">
       <DependentUpon>HexEditor.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Main.resx">
       <DependentUpon>Main.cs</DependentUpon>
@@ -144,9 +146,11 @@
     </EmbeddedResource>
     <EmbeddedResource Include="NewAddress.resx">
       <DependentUpon>NewAddress.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Option.resx">
       <DependentUpon>Option.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="PointerFinder.resx">
       <DependentUpon>PointerFinder.cs</DependentUpon>
@@ -168,6 +172,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="SendPayload.resx">
       <DependentUpon>SendPayload.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

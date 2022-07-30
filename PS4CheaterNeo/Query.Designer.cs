@@ -72,7 +72,7 @@ namespace PS4CheaterNeo
             this.ToolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.SectionViewCheck = new System.Windows.Forms.ToolStripMenuItem();
             this.GetProcessesBtn = new System.Windows.Forms.Button();
-            this.ProcessesBox = new System.Windows.Forms.ComboBox();
+            this.ProcessesBox = new ComboItemBox();
             this.FilterRuleBtn = new System.Windows.Forms.Button();
             this.IsFilterBox = new System.Windows.Forms.CheckBox();
             this.IsFilterSizeBox = new System.Windows.Forms.CheckBox();
@@ -493,7 +493,7 @@ namespace PS4CheaterNeo
             this.ToolStripSeparator3,
             this.SectionViewCheck});
             this.SectionViewMenu.Name = "SectionViewMenu";
-            this.SectionViewMenu.Size = new System.Drawing.Size(181, 98);
+            this.SectionViewMenu.Size = new System.Drawing.Size(134, 76);
             // 
             // SectionViewHexEditor
             // 
@@ -505,7 +505,7 @@ namespace PS4CheaterNeo
             // SectionViewDump
             // 
             this.SectionViewDump.Name = "SectionViewDump";
-            this.SectionViewDump.Size = new System.Drawing.Size(180, 22);
+            this.SectionViewDump.Size = new System.Drawing.Size(133, 22);
             this.SectionViewDump.Text = "Dump";
             this.SectionViewDump.Click += new System.EventHandler(this.SectionViewDump_Click);
             // 
@@ -850,7 +850,7 @@ namespace PS4CheaterNeo
         private System.Windows.Forms.Button SectionSearchBtn;
         private System.Windows.Forms.ListView SectionView;
         private System.Windows.Forms.Button GetProcessesBtn;
-        private System.Windows.Forms.ComboBox ProcessesBox;
+        private ComboItemBox ProcessesBox;
         private System.Windows.Forms.CheckBox SelectAllBox;
         private System.Windows.Forms.CheckBox AlignmentBox;
         private System.Windows.Forms.ColumnHeader SectionViewAddress;

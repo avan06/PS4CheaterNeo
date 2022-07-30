@@ -18,10 +18,12 @@ namespace PS4CheaterNeo
         readonly SectionTool sectionTool;
         ComparerTool comparerTool;
         Dictionary<uint, BitsDictionary> bitsDictDict;
+
         public Query(Main mainForm)
         {
             InitializeComponent();
             this.mainForm = mainForm;
+
             sectionTool = new SectionTool();
             bitsDictDict = new Dictionary<uint, BitsDictionary>();
             IsFilterBox.Checked = Properties.Settings.Default.EnableFilterQuery.Value;
@@ -32,7 +34,7 @@ namespace PS4CheaterNeo
         private void Query_Load(object sender, EventArgs e)
         {
             foreach (ScanType filterEnum in (ScanType[])Enum.GetValues(typeof(ScanType)))
-                ScanTypeBox.Items.Add(new ComboboxItem(filterEnum.GetDescription(), filterEnum));
+                ScanTypeBox.Items.Add(new ComboItem(filterEnum.GetDescription(), filterEnum));
             ScanTypeBox.SelectedIndex = 2;
             if (Properties.Settings.Default.AutoPerformGetProcesses.Value) GetProcessesBtn.PerformClick();
         }
@@ -64,7 +66,7 @@ namespace PS4CheaterNeo
                 for (int pIdx = 0; pIdx < procList.processes.Length; pIdx++)
                 {
                     Process process = procList.processes[pIdx];
-                    int idx = ProcessesBox.Items.Add(new ComboboxItem(process.name, process.pid));
+                    int idx = ProcessesBox.Items.Add(new ComboItem(process.name, process.pid));
                     if (process.name == DefaultProcess) selectedIdx = idx;
                 }
                 ProcessesBox.SelectedIndex = selectedIdx;
@@ -82,7 +84,7 @@ namespace PS4CheaterNeo
                 SectionView.Items.Clear();
                 ResultView.Items.Clear();
 
-                ComboboxItem process = (ComboboxItem)ProcessesBox.SelectedItem;
+                ComboItem process = (ComboItem)ProcessesBox.SelectedItem;
                 sectionTool.InitSectionList((int)process.Value, (string)process.Text);
                 mainForm.ProcessName = (string)process.Text;
 
@@ -163,7 +165,7 @@ namespace PS4CheaterNeo
                     MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) return;
                 else
                 {
-                    ComboboxItem process = (ComboboxItem)ProcessesBox.SelectedItem;
+                    ComboItem process = (ComboItem)ProcessesBox.SelectedItem;
                     int pid = (int)process.Value;
 
                     string value0 = ValueBox.Text;
@@ -171,7 +173,7 @@ namespace PS4CheaterNeo
                     bool alignment = AlignmentBox.Checked;
                     bool isFilter = IsFilterBox.Checked;
                     bool isFilterSize = IsFilterSizeBox.Checked;
-                    Enum.TryParse(((ComboboxItem)(ScanTypeBox.SelectedItem)).Value.ToString(), out ScanType scanType);
+                    Enum.TryParse(((ComboItem)(ScanTypeBox.SelectedItem)).Value.ToString(), out ScanType scanType);
                     Enum.TryParse(CompareTypeBox.SelectedItem.ToString(), out CompareType compareType);
 
                     ulong AddrMin = ulong.Parse(AddrMinBox.Text, NumberStyles.HexNumber);
@@ -609,7 +611,7 @@ namespace PS4CheaterNeo
         {
             try
             {
-                ComboboxItem process = (ComboboxItem)ProcessesBox.SelectedItem;
+                ComboItem process = (ComboItem)ProcessesBox.SelectedItem;
                 int pid = (int)process.Value;
                 ProcessMap pMap = PS4Tool.GetProcessMaps(pid);
                 if (pMap.entries == null || ResultView.Items.Count == 0) return;
@@ -966,17 +968,17 @@ namespace PS4CheaterNeo
 
         private void ResultView_DoubleClick(object sender, EventArgs e)
         {
-            if (ResultView.SelectedItems.Count == 1)
-            {
-                ListViewItem resultItem = ResultView.SelectedItems[0];
-                (uint sid, _) = ((uint sid, int resultIdx))resultItem.Tag;
-                Section section = sectionTool.GetSection(sid);
-                ScanType scanType = this.ParseFromDescription<ScanType>(resultItem.SubItems[(int)ResultCol.ResultListType].Text);
-                uint offsetAddr = (uint)(ulong.Parse(resultItem.SubItems[(int)ResultCol.ResultListAddress].Text, NumberStyles.HexNumber) - section.Start);
-                string oldValue = resultItem.SubItems[(int)ResultCol.ResultListValue].Text;
+            if (ResultView.SelectedItems.Count != 1) return;
 
-                if (offsetAddr > 0) mainForm.AddToCheatGrid(section, offsetAddr, scanType, oldValue);
-            }
+            ListViewItem resultItem = ResultView.SelectedItems[0];
+
+            (uint sid, _) = ((uint sid, int resultIdx))resultItem.Tag;
+            Section section = sectionTool.GetSection(sid);
+            ScanType scanType = this.ParseFromDescription<ScanType>(resultItem.SubItems[(int)ResultCol.ResultListType].Text);
+            uint offsetAddr = (uint)(ulong.Parse(resultItem.SubItems[(int)ResultCol.ResultListAddress].Text, NumberStyles.HexNumber) - section.Start);
+            string oldValue = resultItem.SubItems[(int)ResultCol.ResultListValue].Text;
+
+            if (offsetAddr > 0) mainForm.AddToCheatGrid(section, offsetAddr, scanType, oldValue);
         }
 
         private string searchSectionName = "";
@@ -1005,14 +1007,14 @@ namespace PS4CheaterNeo
         private void ResumeBtn_Click(object sender, EventArgs e)
         {
             processStatus = ProcessStatus.Resume;
-            ComboboxItem process = (ComboboxItem)ProcessesBox.SelectedItem;
+            ComboItem process = (ComboItem)ProcessesBox.SelectedItem;
             PS4Tool.AttachDebugger((int)process.Value, (string)process.Text, processStatus);
         }
 
         private void PauseBtn_Click(object sender, EventArgs e)
         {
             processStatus = ProcessStatus.Pause;
-            ComboboxItem process = (ComboboxItem)ProcessesBox.SelectedItem;
+            ComboItem process = (ComboItem)ProcessesBox.SelectedItem;
             PS4Tool.AttachDebugger((int)process.Value, (string)process.Text, processStatus);
         }
         #endregion
@@ -1046,14 +1048,16 @@ namespace PS4CheaterNeo
                 double dumpSize = 0;
                 string savePath = Path.GetDirectoryName(SaveDialog.FileName);
                 string processName = MakeValidFileName(mainForm.ProcessName);
-                ComboboxItem process = (ComboboxItem)ProcessesBox.SelectedItem;
+                ComboItem process = (ComboItem)ProcessesBox.SelectedItem;
                 for (int idx = 0; idx < items.Count; ++idx)
                 {
                     string sectionAddr = MakeValidFileName(items[idx].SubItems[(int)SectionCol.SectionViewAddress].Text);
                     string sectionName = MakeValidFileName(items[idx].SubItems[(int)SectionCol.SectionViewName].Text);
+
                     uint sid = uint.Parse(items[idx].SubItems[(int)SectionCol.SectionViewSID].Text);
                     Section section = sectionTool.GetSection(sid);
                     byte[] subBuffer = PS4Tool.ReadMemory(section.PID, section.Start, section.Length);
+
                     string path = string.Format("{0}{1}{2}_{3}_{4}.bin", savePath, Path.DirectorySeparatorChar, processName, sectionAddr, sectionName);
                     File.WriteAllBytes(path, subBuffer);
                     dumpSize += subBuffer.Length;
@@ -1191,7 +1195,7 @@ namespace PS4CheaterNeo
             if (SlowMotionBox.Checked)
             {
                 string intervalStr = "200";
-                ComboboxItem process = (ComboboxItem)ProcessesBox.SelectedItem;
+                ComboItem process = (ComboItem)ProcessesBox.SelectedItem;
                 if (InputBox.Show("SlowMotion", "Enter the SlowMotion interval (in milliseconds, larger intervals will be slower)", ref intervalStr) != DialogResult.OK ||
                     !PS4Tool.AttachDebugger((int)process.Value, (string)process.Text, processStatus))
                 {
