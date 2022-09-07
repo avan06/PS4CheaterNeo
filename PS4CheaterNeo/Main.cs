@@ -1036,7 +1036,7 @@ namespace PS4CheaterNeo
                 }
                 else cheatRow.Cells[(int)ChertCol.CheatListSection].Value = string.Format("{0}|{1}|{2}|{3}|{4}", newAddress.AddrSection.SID, newAddress.AddrSection.Start.ToString("X"), newAddress.AddrSection.Name, newAddress.AddrSection.Prot.ToString("X"), newAddress.AddrSection.Offset.ToString("X"));
 
-                byte[] data = ScanTool.ValueStringToByte(scanType, newAddress.Value);
+                byte[] data = ScanTool.ValueStringToByte(newAddress.CheatType, newAddress.Value);
                 PS4Tool.WriteMemory(section.PID, offsetAddr + section.Start, data);
                 cheatRow.Cells[(int)ChertCol.CheatListValue].Value = newAddress.Value;
             }
