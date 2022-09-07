@@ -71,7 +71,7 @@ namespace PS4CheaterNeo
                     }
                     if (ps4s[idx] == null) ps4s[idx] = new PS4DBG(ip);
 
-                    result = ps4s[idx].IsConnected ? true : ps4s[idx].Connect(connectTimeout, sendTimeout, receiveTimeout);
+                    result = ps4s[idx].IsConnected ? true : ps4s[idx].Connect(connectTimeout, sendTimeout, receiveTimeout, idx == 0 ? true : false);
                 }
             }
             catch (Exception exception) { msg = exception.Message; }
@@ -308,7 +308,16 @@ namespace PS4CheaterNeo
         /// <param name="isPause">pause or resume process</param>
         public static bool AttachDebugger(int processID, string processName, ProcessStatus newStatus)
         {
-            if (ps4s[0].IsConnected && ps4s[0].IsDebugging)
+            if (ps4s[0].IsConnected && ps4s[0].ExtFWVersion > 0)
+            {
+                if (processStatus != newStatus)
+                {
+                    processStatus = newStatus;
+                    if (newStatus == ProcessStatus.Pause) ps4s[0].ProcessExtStop(processID);
+                    else ps4s[0].ProcessExtResume(processID);
+                }
+            }
+            else if (ps4s[0].IsConnected && ps4s[0].IsDebugging)
             {
                 if (processStatus != newStatus)
                 {

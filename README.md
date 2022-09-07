@@ -2,7 +2,7 @@
 
 PS4CheaterNeo is a program to find game cheat codes, and it is based on [`ps4debug`](https://github.com/jogolden/ps4debug) and `.Net Framework 4.8`.
 
-Currently in `version 0.9.6.4-beta`
+Currently in `version 0.9.6.5-beta`
 
 
 ## Table of Contents
@@ -55,6 +55,7 @@ Currently in `version 0.9.6.4-beta`
 
 - You must manually copy `ps4debug.bin` to the `same path as PS4CheaterNeo.exe`\payloads\\[`FW version`]\ directory.
 
+> ex.  
 > path\PS4CheaterNeo\bin\Debug\payloads\\[FW version]\ps4debug.bin  
 > path\PS4CheaterNeo\bin\Release\payloads\\[FW version]\ps4debug.bin  
 
