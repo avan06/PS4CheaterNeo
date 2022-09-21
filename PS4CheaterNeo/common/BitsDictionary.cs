@@ -38,7 +38,7 @@ namespace PS4CheaterNeo
     /// Mass data processing-BitMap algorithm
     /// https://www.programmerall.com/article/2197589673/
     /// </summary>
-    public class BitsDictionary : ICollection<KeyValuePair<UInt32, byte[]>>, IEnumerable<KeyValuePair<UInt32, byte[]>>, IEnumerable, IDictionary, ICollection, IReadOnlyDictionary<UInt32, byte[]>, IReadOnlyCollection<KeyValuePair<UInt32, byte[]>>, ISerializable, IDeserializationCallback
+    public class BitsDictionary : ICollection<KeyValuePair<UInt32, byte[]>>, IEnumerable<KeyValuePair<UInt32, byte[]>>, IEnumerable, IDictionary, ICollection, IReadOnlyDictionary<UInt32, byte[]>, IReadOnlyCollection<KeyValuePair<UInt32, byte[]>>, ISerializable, IDeserializationCallback, ICloneable
     {
         #region Fields
         /// <summary>
@@ -104,6 +104,16 @@ namespace PS4CheaterNeo
         public int DataLength { get; private set; } = 0;
 
         /// <summary>
+        /// Number of data items, default is 1
+        /// </summary>
+        public int DataAmount { get; private set; } = 1;
+
+        /// <summary>
+        /// length of a single data
+        /// </summary>
+        public int DataLengthSingle { get; private set; } = 0;
+
+        /// <summary>
         /// number of steps, may be 1, 2, 4, 8
         /// Key's Greatest (highest) common divisor, used for Key data compression, when each Key is divisible by this number.
         /// For example, Key data is 100, 104, 108..., then Setp is 4.
@@ -114,18 +124,42 @@ namespace PS4CheaterNeo
         /// <summary>
         /// The keyStep value will be affected by the alignment of the data
         /// </summary>
-        /// <param name="dataLength">Data length, can be any value</param>
         /// <param name="keyStep">number of steps, may be 1, 2, 4</param>
-        public BitsDictionary(int keyStep, int dataLength)
+        /// <param name="dataLength">Data length, can be any value</param>
+        /// <param name="dataAmount">Number of data items, default is 1</param>
+        /// <exception cref="Exception"></exception>
+        public BitsDictionary(int keyStep, int dataLength, int dataAmount = 1)
         {
             if (keyStep == 0) throw new Exception(string.Format("Invalid keyStep: {0}", keyStep));
             if (dataLength == 0) throw new Exception(string.Format("Invalid dataLength: {0}", dataLength));
 
-            DataLength = dataLength;
             KeyStep = keyStep;
+            DataAmount = (dataAmount > 1 ? dataAmount : 1);
+            DataLength = dataLength * DataAmount;
+            DataLengthSingle = dataLength;
             bufferDataSize = DataLength * 0x4000;
             dataFactor = bufferDataSize / DataLength;
             Clear();
+        }
+
+        /// <summary>
+        /// add key and multiple datas
+        /// experimental feature with very low throughput
+        /// </summary>
+        /// <param name="key">key, must be a multiple of keyStep</param>
+        /// <param name="datas">multiple datas</param>
+        public void Add(UInt32 key, params byte[][] datas)
+        {
+            if (datas.Length != DataAmount) throw new Exception(string.Format("Add:Invalid datas len: {0}, the amount of data should be {1}", datas.Length, DataAmount));
+            byte[] mergeData = new byte[DataLength];
+            for (int idx = 0; idx < DataAmount; idx++)
+            {
+                byte[] data = datas[idx];
+                if (data.Length != DataLengthSingle) throw new Exception(string.Format("Add:Invalid data len: {0}, data length should be {1}", data.Length, DataLength));
+
+                Buffer.BlockCopy(data, 0, mergeData, idx * DataLengthSingle, DataLengthSingle);
+            }
+            Add(key, mergeData);
         }
 
         /// <summary>
@@ -176,6 +210,26 @@ namespace PS4CheaterNeo
         /// </summary>
         /// <param name="newData">new data</param>
         public void Set(byte[] newData) => Buffer.BlockCopy(newData, 0, state.Get.BufferData, DataLength * state.Get.DataPos, DataLength);
+
+        /// <summary>
+        /// Obtain the specified amount of data according to the DataAmount setting
+        /// automatically obtain the next data, or obtain the data of the specified index
+        /// experimental feature with very low throughput
+        /// </summary>
+        /// <param name="index">use index to get specified data</param>
+        /// <returns></returns>
+        public (UInt32 key, byte[][] datas) GetDatas(int index = -1)
+        {
+            (uint key, byte[] mergeData) = Get(index);
+            byte[][] datas = new byte[DataAmount][];
+            for (int idx = 0; idx < DataAmount; idx++)
+            {
+                byte[] data = new byte[DataLengthSingle];
+                Buffer.BlockCopy(mergeData, idx * DataAmount, data, 0, DataAmount);
+                datas[idx] = data;
+            }
+            return (key, datas);
+        }
 
         /// <summary>
         /// automatically obtain the next data, or obtain the data of the specified index
@@ -771,6 +825,19 @@ namespace PS4CheaterNeo
         public void GetObjectData(SerializationInfo info, StreamingContext context) => throw new NotImplementedException();
 
         public void OnDeserialization(object sender) => throw new NotImplementedException();
+
+        public object Clone()
+        {
+            BitsDictionary cloneBitsDict = new BitsDictionary(KeyStep, DataLengthSingle, DataAmount);
+            cloneBitsDict.bufferBits.Clear();
+            cloneBitsDict.bufferDatas.Clear();
+            cloneBitsDict.bufferBits.AddRange(bufferBits);
+            cloneBitsDict.bufferDatas.AddRange(bufferDatas);
+            cloneBitsDict.state = state;
+            cloneBitsDict.Count = Count;
+
+            return cloneBitsDict;
+        }
         #endregion
     }
 }

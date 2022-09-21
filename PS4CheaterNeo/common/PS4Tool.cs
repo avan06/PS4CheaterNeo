@@ -347,9 +347,13 @@ namespace PS4CheaterNeo
         /// perform PS4DBG's DetachDebugger
         /// After performing AttachDebugger, close the PS4 program, and then perform PS4DBG.DetachDebugger will cause the PS4 to crash
         /// </summary>
-        public static void DetachDebugger()
+        public static void DetachDebugger(int processID = 0)
         {
-            if (ps4s[0] == null || !ps4s[0].IsDebugging) return;
+            if (ps4s[0] == null) return;
+            
+            if (ps4s[0].IsConnected && ps4s[0].ExtFWVersion > 0 && processStatus == ProcessStatus.Pause) ps4s[0].ProcessExtResume(processID);
+
+            if (!ps4s[0].IsDebugging) return;
 
             ps4s[0].TryDetachDebugger();
         }

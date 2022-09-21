@@ -16,8 +16,14 @@ namespace PS4CheaterNeo
     {
         readonly Main mainForm;
         readonly SectionTool sectionTool;
+        readonly bool enableUndoScan;
+        readonly bool enableScanAutoPause;
+        readonly bool enableScanDoneResume;
         ComparerTool comparerTool;
+        int hitCnt = 0;
+
         Dictionary<uint, BitsDictionary> bitsDictDict;
+        Dictionary<uint, BitsDictionary> bitsDictDictUndo;
 
         public Query(Main mainForm)
         {
@@ -26,8 +32,12 @@ namespace PS4CheaterNeo
 
             sectionTool = new SectionTool();
             bitsDictDict = new Dictionary<uint, BitsDictionary>();
+            bitsDictDictUndo = new Dictionary<uint, BitsDictionary>();
             IsFilterBox.Checked = Properties.Settings.Default.EnableFilterQuery.Value;
             IsFilterSizeBox.Checked = Properties.Settings.Default.EnableFilterSizeQuery.Value;
+            enableUndoScan = Properties.Settings.Default.EnableUndoScan.Value;
+            enableScanAutoPause = Properties.Settings.Default.EnableScanAutoPause.Value;
+            enableScanDoneResume = Properties.Settings.Default.EnableScanDoneResume.Value;
         }
 
         #region Event
@@ -47,8 +57,10 @@ namespace PS4CheaterNeo
                 return;
             }
 
-            PS4Tool.DetachDebugger();
+            ComboItem process = (ComboItem)ProcessesBox.SelectedItem;
+            PS4Tool.DetachDebugger((int)process.Value);
             bitsDictDict = null;
+            bitsDictDictUndo = null;
             GC.Collect();
             Properties.Settings.Default.Save();
         }
@@ -141,13 +153,61 @@ namespace PS4CheaterNeo
 
             ResultView.Items.Clear();
             if (bitsDictDict != null) bitsDictDict.Clear();
+            if (bitsDictDictUndo != null) bitsDictDictUndo.Clear();
+
             bitsDictDict = new Dictionary<uint, BitsDictionary>();
+            bitsDictDictUndo = new Dictionary<uint, BitsDictionary>();
             GC.Collect();
 
             ScanBtn.Text = "First Scan";
             ScanTypeBox.Enabled = true;
             AlignmentBox.Enabled = true;
             NewBtn.Enabled = false;
+            UndoBtn.Enabled = false;
+            RedoBtn.Enabled = false;
+        }
+
+        private void UndoBtn_Click(object sender, EventArgs e)
+        {
+            if (!enableUndoScan) return;
+
+            UnReDO();
+            ToolStripMsg.Text = string.Format("Undo scan, count:{0}", hitCnt);
+            UndoBtn.Enabled = false;
+            RedoBtn.Enabled = true;
+        }
+
+        private void RedoBtn_Click(object sender, EventArgs e)
+        {
+            if (!enableUndoScan) return;
+
+            UnReDO();
+            ToolStripMsg.Text = string.Format("Redo scan, count:{0}", hitCnt);
+            UndoBtn.Enabled = true;
+            RedoBtn.Enabled = false;
+        }
+
+        private void UnReDO()
+        {
+            if (!enableUndoScan) return;
+
+            Dictionary<uint, BitsDictionary> tmp = bitsDictDict;
+            bitsDictDict = bitsDictDictUndo;
+            bitsDictDictUndo = tmp;
+            for (int sectionIdx = 0; sectionIdx < SectionView.Items.Count; ++sectionIdx)
+            {
+                ListViewItem sectionItem = SectionView.Items[sectionIdx];
+                uint sid = uint.Parse(sectionItem.SubItems[(int)SectionCol.SectionViewSID].Text);
+
+                if (bitsDictDict.ContainsKey(sid))
+                {
+                    BitsDictionary bitsDict = bitsDictDict[sid];
+                    sectionItem.Checked = bitsDict.Count > 0;
+                    if (!sectionItem.Checked) bitsDictDict.Remove(sid);
+                }
+                else sectionItem.Checked = false;
+            }
+            TaskCompleted();
         }
 
         Task<bool> scanTask;
@@ -165,6 +225,7 @@ namespace PS4CheaterNeo
                     MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) return;
                 else
                 {
+                    if (enableScanAutoPause) PauseBtn.PerformClick();
                     ComboItem process = (ComboItem)ProcessesBox.SelectedItem;
                     int pid = (int)process.Value;
 
@@ -186,7 +247,8 @@ namespace PS4CheaterNeo
                     if (scanSource != null) scanSource.Dispose();
                     scanSource = new CancellationTokenSource();
                     scanTask = ScanTask(alignment, isFilter, isFilterSize, AddrMin, AddrMax);
-                    scanTask.ContinueWith(t => TaskCompleted());
+                    scanTask.ContinueWith(t => TaskCompleted())
+                        .ContinueWith(t => Invoke(new MethodInvoker(() => { if (enableScanDoneResume) ResumeBtn.PerformClick(); })));
 
                     ScanTypeBox.Enabled = false;
                     AlignmentBox.Enabled = false;
@@ -205,6 +267,14 @@ namespace PS4CheaterNeo
             System.Diagnostics.Stopwatch tickerMajor = System.Diagnostics.Stopwatch.StartNew();
             try
             {
+                if (enableUndoScan && bitsDictDict.Count > 0)
+                {
+                    Invoke(new MethodInvoker(() => { ToolStripMsg.Text = string.Format("Scan elapsed:{0}s. Start backup of current query results", tickerMajor.Elapsed.TotalSeconds);}));
+                    bitsDictDictUndo.Clear();
+                    foreach (KeyValuePair<uint, BitsDictionary> bitsDict in bitsDictDict) bitsDictDictUndo.Add(bitsDict.Key, (BitsDictionary)bitsDict.Value.Clone());
+                    Invoke(new MethodInvoker(() => { UndoBtn.Enabled = true; ToolStripMsg.Text = string.Format("Scan elapsed:{0}s. Complete backup of current query results", tickerMajor.Elapsed.TotalSeconds); }));
+                }
+
                 ulong hitCnt = 0;
                 int scanStep = (comparerTool.scanType == ScanType.Hex || comparerTool.scanType == ScanType.String_) ? 1 :
                     alignment ? (comparerTool.scanTypeLength > 4 ? 4 : comparerTool.scanTypeLength) : 1;
@@ -525,13 +595,14 @@ namespace PS4CheaterNeo
 
         private void TaskCompleted()
         {
-            if (bitsDictDict.Count <= 0)
+            if (bitsDictDict.Count <= 0 && !enableUndoScan)
             {
                 Invoke(new MethodInvoker(() => { NewBtn.PerformClick(); }));
                 return;
             }
 
-            int hitCnt = 0;
+            hitCnt = 0;
+            int chkHitCnt = 0;
             uint MaxResultShow = Properties.Settings.Default.MaxResultShow.Value;
             MaxResultShow = MaxResultShow == 0 ? 0x2000 : MaxResultShow;
             Invoke(new MethodInvoker(() =>
@@ -548,10 +619,12 @@ namespace PS4CheaterNeo
                 bitsDictDict.TryGetValue(section.SID, out BitsDictionary bitsDict);
                 if (bitsDict == null || bitsDict.Count == 0) continue;
 
+                hitCnt += bitsDict.Count;
+
                 bitsDict.Begin();
                 for (int idx = 0; idx < bitsDict.Count; idx++)
                 {
-                    if (++hitCnt > MaxResultShow) break;
+                    if (++chkHitCnt > MaxResultShow) break;
 
                     (uint offsetAddr, byte[] oldBytes) = bitsDict.Get();
 

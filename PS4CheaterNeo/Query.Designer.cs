@@ -72,7 +72,9 @@ namespace PS4CheaterNeo
             this.ToolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.SectionViewCheck = new System.Windows.Forms.ToolStripMenuItem();
             this.GetProcessesBtn = new System.Windows.Forms.Button();
-            this.ProcessesBox = new ComboItemBox();
+            this.ProcessesBox = new PS4CheaterNeo.ComboItemBox();
+            this.RedoBtn = new System.Windows.Forms.Button();
+            this.UndoBtn = new System.Windows.Forms.Button();
             this.FilterRuleBtn = new System.Windows.Forms.Button();
             this.IsFilterBox = new System.Windows.Forms.CheckBox();
             this.IsFilterSizeBox = new System.Windows.Forms.CheckBox();
@@ -277,6 +279,8 @@ namespace PS4CheaterNeo
             // 
             // SplitContainer2.Panel2
             // 
+            this.SplitContainer2.Panel2.Controls.Add(this.RedoBtn);
+            this.SplitContainer2.Panel2.Controls.Add(this.UndoBtn);
             this.SplitContainer2.Panel2.Controls.Add(this.FilterRuleBtn);
             this.SplitContainer2.Panel2.Controls.Add(this.IsFilterBox);
             this.SplitContainer2.Panel2.Controls.Add(this.IsFilterSizeBox);
@@ -547,9 +551,39 @@ namespace PS4CheaterNeo
             this.ProcessesBox.FormattingEnabled = true;
             this.ProcessesBox.Location = new System.Drawing.Point(3, 28);
             this.ProcessesBox.Name = "ProcessesBox";
-            this.ProcessesBox.Size = new System.Drawing.Size(207, 20);
+            this.ProcessesBox.Size = new System.Drawing.Size(207, 23);
             this.ProcessesBox.TabIndex = 0;
             this.ProcessesBox.SelectedIndexChanged += new System.EventHandler(this.ProcessesBox_SelectedIndexChanged);
+            // 
+            // RedoBtn
+            // 
+            this.RedoBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.RedoBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(36)))), ((int)(((byte)(36)))));
+            this.RedoBtn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.RedoBtn.Enabled = false;
+            this.RedoBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.RedoBtn.Image = ((System.Drawing.Image)(resources.GetObject("RedoBtn.Image")));
+            this.RedoBtn.Location = new System.Drawing.Point(261, 116);
+            this.RedoBtn.Name = "RedoBtn";
+            this.RedoBtn.Size = new System.Drawing.Size(24, 23);
+            this.RedoBtn.TabIndex = 20;
+            this.RedoBtn.UseVisualStyleBackColor = false;
+            this.RedoBtn.Click += new System.EventHandler(this.RedoBtn_Click);
+            // 
+            // UndoBtn
+            // 
+            this.UndoBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.UndoBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(36)))), ((int)(((byte)(36)))));
+            this.UndoBtn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.UndoBtn.Enabled = false;
+            this.UndoBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.UndoBtn.Image = ((System.Drawing.Image)(resources.GetObject("UndoBtn.Image")));
+            this.UndoBtn.Location = new System.Drawing.Point(235, 116);
+            this.UndoBtn.Name = "UndoBtn";
+            this.UndoBtn.Size = new System.Drawing.Size(24, 23);
+            this.UndoBtn.TabIndex = 19;
+            this.UndoBtn.UseVisualStyleBackColor = false;
+            this.UndoBtn.Click += new System.EventHandler(this.UndoBtn_Click);
             // 
             // FilterRuleBtn
             // 
@@ -728,7 +762,7 @@ namespace PS4CheaterNeo
             this.NewBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(36)))), ((int)(((byte)(36)))));
             this.NewBtn.Enabled = false;
             this.NewBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.NewBtn.Location = new System.Drawing.Point(235, 116);
+            this.NewBtn.Location = new System.Drawing.Point(235, 146);
             this.NewBtn.Name = "NewBtn";
             this.NewBtn.Size = new System.Drawing.Size(50, 23);
             this.NewBtn.TabIndex = 17;
@@ -753,7 +787,7 @@ namespace PS4CheaterNeo
             this.RefreshBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.RefreshBtn.Location = new System.Drawing.Point(3, 146);
             this.RefreshBtn.Name = "RefreshBtn";
-            this.RefreshBtn.Size = new System.Drawing.Size(283, 23);
+            this.RefreshBtn.Size = new System.Drawing.Size(226, 23);
             this.RefreshBtn.TabIndex = 13;
             this.RefreshBtn.Text = "Refresh";
             this.RefreshBtn.UseVisualStyleBackColor = false;
@@ -902,5 +936,7 @@ namespace PS4CheaterNeo
         private System.Windows.Forms.Timer SlowMotionTimer;
         private System.Windows.Forms.CheckBox SlowMotionBox;
         private System.Windows.Forms.SaveFileDialog SaveDialog;
+        private System.Windows.Forms.Button RedoBtn;
+        private System.Windows.Forms.Button UndoBtn;
     }
 }

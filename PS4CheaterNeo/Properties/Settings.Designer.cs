@@ -12,7 +12,7 @@ namespace PS4CheaterNeo.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.0.3.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.3.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -229,6 +229,46 @@ namespace PS4CheaterNeo.Properties {
             }
             set {
                 this["MinResultAccessFactor"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True|3_Query|1_Query|Determines whether to enable undo scan(revert to the previou" +
+            "s scan result), if enabled, more memory needs to be used during scanning. Defaul" +
+            "t enable")]
+        public global::OptionTreeView.Option<bool> EnableUndoScan {
+            get {
+                return ((global::OptionTreeView.Option<bool>)(this["EnableUndoScan"]));
+            }
+            set {
+                this["EnableUndoScan"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False|3_Query|1_Query|Determines whether to automatically pause the game when sta" +
+            "rting the scan in query. Default disabled")]
+        public global::OptionTreeView.Option<bool> EnableScanAutoPause {
+            get {
+                return ((global::OptionTreeView.Option<bool>)(this["EnableScanAutoPause"]));
+            }
+            set {
+                this["EnableScanAutoPause"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False|3_Query|1_Query|Determines whether to automatically resume the game when th" +
+            "e scan is complete in query. Default disabled")]
+        public global::OptionTreeView.Option<bool> EnableScanDoneResume {
+            get {
+                return ((global::OptionTreeView.Option<bool>)(this["EnableScanDoneResume"]));
+            }
+            set {
+                this["EnableScanDoneResume"] = value;
             }
         }
     }

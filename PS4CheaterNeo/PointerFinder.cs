@@ -815,7 +815,7 @@ namespace PS4CheaterNeo
             if (index < 0) return resultPointers;
 
             int start = index;
-            for (; start >= 0; --start) if (valuePointerList[start].ValuePos != addrPointer.AddrPos) break;
+            for (; start > 0; --start) if (valuePointerList[start].ValuePos != addrPointer.AddrPos) break;
 
             bool find = false;
             for (int i = start; i < valuePointerList.Count; ++i)

@@ -2,7 +2,7 @@
 
 PS4CheaterNeo is a program to find game cheat codes, and it is based on [`ps4debug`](https://github.com/jogolden/ps4debug) and `.Net Framework 4.8`.
 
-Currently in `version 0.9.6.5-beta`
+Currently in `version 0.9.7.0-beta`
 
 
 ## Table of Contents
@@ -132,7 +132,13 @@ Cheat format used by PS4 Trainer and GoldHEN Cheat
 - 
 - Performing `SlowMotion` will require Enter the `SlowMotion interval` (in `milliseconds`, larger intervals will be slower)
 
-![query_3](assets/slowmotion.webp)
+![slowmotion](assets/slowmotion.webp)
+
+- Support redo scan(revert to the previous scan result), need to enable `EnableUndoScan` in the options.
+- Support automatically pause the game when starting the scan in query, need to enable `EnableScanAutoPause` in the options.
+- Support automatically resume the game when the scan is complete in query, need to enable `EnableScanDoneResume` in the options.
+
+![experimental1](assets/experimental1.webp)
 
 
 ### Section
@@ -272,6 +278,9 @@ AddrStart　　Prot　count　　　SIDv1　　　　　SID
 `SectionFilterSize`: Filter out when section size is less than this value(unit is bytes), `Default is 204,800`.  
 `MaxResultShow`: Enter the maximum number of displayed query results. will only affect the number of results displayed in the ResultView, `Default value is 8192`.  
 `QueryBufferSize`: Set the minimum buffer size (in MB) in querying and pointerFinder, enter 0 to not use buffer, Setting this value to 0 is better when the total number of Sections in the game is low. If the game has more than a thousand Sections, Buffer must be set.  
+`EnableUndoScan`: Determines whether to enable undo scan(revert to the previous scan result), if enabled, more memory needs to be used during scanning. `Default enable`.  
+`EnableScanAutoPause`: Determines whether to automatically pause the game when starting the scan in query. `Default disabled`.  
+`EnableScanDoneResume`: Determines whether to automatically resume the game when the scan is complete in query. `Default disabled`.  
 
 ![option](assets/option.webp)
 

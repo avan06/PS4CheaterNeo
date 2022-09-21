@@ -283,6 +283,8 @@ namespace PS4CheaterNeo
         /// <returns></returns>
         public Section GetSection(uint sid)
         {
+            if (SectionDict == null) return null;
+
             SectionDict.TryGetValue(sid, out Section section);
 
             return section;
