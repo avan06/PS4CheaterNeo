@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Windows.Forms;
 using static PS4CheaterNeo.SectionTool;
 
@@ -21,11 +22,13 @@ namespace PS4CheaterNeo
         const int PageSize = 8 * 1024 * 1024;
         readonly Main mainForm;
         readonly Section section;
+        private readonly Mutex mutex;
 
         private HexEditor(Main mainForm)
         {
             this.mainForm = mainForm;
             changedPosDic = new Dictionary<long, long>();
+            mutex = new Mutex();
 
             InitializeComponent();
         }
@@ -167,7 +170,7 @@ D: {8}
                 Column = int.Parse(lastChar.ToString(), NumberStyles.HexNumber);
             }
             else Column = 0;
-            UpdateUi(Page, Line);
+            UpdateUi(Page, Line, true);
         }
 
         private void CommitBtn_Click(object sender, EventArgs e)
@@ -289,11 +292,23 @@ D: {8}
                 InfoBox.Text += string.Format("{0}\n{1}", ex.Message, ex.StackTrace);
             }
         }
+
+        private void AutoRefreshTimer_Tick(object sender, EventArgs e)
+        {
+            if (!AutoRefreshBox.Checked) return;
+
+            mutex.WaitOne();
+            try
+            {
+                RefreshBtn.PerformClick();
+            }
+            finally { mutex.ReleaseMutex(); }
+        }
         #endregion
 
         private int DivUP(int sum, int div) => sum / div + ((sum % div != 0) ? 1 : 0);
 
-        private void UpdateUi(int page, long line)
+        private void UpdateUi(int page, long line, bool chkChangedPosSet = false)
         {
             int memSize = PageSize;
             long ScrollVpos = HexView.ScrollVpos > 0 ? HexView.ScrollVpos : 0;
@@ -302,8 +317,17 @@ D: {8}
 
             byte[] dst = PS4Tool.ReadMemory(section.PID, section.Start + (ulong)page * PageSize, (int)memSize);
 
-            if (HexView.ByteProvider != null) HexView.ByteProvider.Changed -= ByteProvider_Changed;
-            HexView.ByteProvider = new DynamicByteProvider(dst);
+            HashSet<long> changedPosSet = new HashSet<long>();
+            if (HexView.ByteProvider != null)
+            {
+                HexView.ByteProvider.Changed -= ByteProvider_Changed;
+                if (chkChangedPosSet)
+                {
+                    DynamicByteProvider oldBP = (DynamicByteProvider)HexView.ByteProvider;
+                    for (int idx = 0; idx < dst.Length; idx++) if (oldBP.Bytes[idx] != dst[idx]) changedPosSet.Add(idx);
+                }
+            }
+            HexView.ByteProvider = new DynamicByteProvider(dst, changedPosSet);
             HexView.ByteProvider.Changed += ByteProvider_Changed;
 
             if (line != 0)

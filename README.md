@@ -2,7 +2,7 @@
 
 PS4CheaterNeo is a program to find game cheat codes, and it is based on [`ps4debug`](https://github.com/jogolden/ps4debug) and `.Net Framework 4.8`.
 
-Currently in `version 0.9.7.0-beta`
+Currently in `version 0.9.7.1-beta`
 
 
 ## Table of Contents
@@ -140,6 +140,11 @@ Cheat format used by PS4 Trainer and GoldHEN Cheat
 
 ![experimental1](assets/experimental1.webp)
 
+- Immediately show the changed position when `refreshing in the Hex editor`.
+- Support `auto refresh interval` when `Auto is enabled` in the `Hex editor`.(recommended for wired network, the current setting is every 2.5 seconds)
+
+![experimental2](assets/experimental2.webp)
+
 
 ### Section
 
@@ -238,6 +243,8 @@ AddrStart　　Prot　count　　　SIDv1　　　　　SID
 - Ability to `copy and paste` hex values.
 - `Disassembler` current hex values and display.
 - Enter `assembler` and display as hex value.
+- Immediately show the changed position when `refreshing in the Hex editor`.
+- Support `auto refresh interval` when `Auto is enabled` in the `Hex editor`.(recommended for wired network, the current setting is every 2.5 seconds)
 
 ![hexeditor](assets/hexeditor1.webp)
 ![hexeditor](assets/hexeditor2.webp)
@@ -249,6 +256,7 @@ AddrStart　　Prot　count　　　SIDv1　　　　　SID
 - If there is no result, you can try to click `NegativeOffset`.
 - The finder will skip the filtered section list when the `filter` checkbox is clicked.
 - The preset section filter rules is `libSce, libc.prx, SceShell, SceLib, SceNp, SceVoice, SceFios, libkernel, SceVdec`, these rules can also be customized.
+- Default maximum offset range (MaxRange) changed from 8192 to 0 (unlimited range) in PointerFinder.
 
 ![pointerfinder_1](assets/pointerfinder_1.webp)
 ![pointerfinder_2](assets/pointerfinder_2.webp)

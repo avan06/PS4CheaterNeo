@@ -1131,12 +1131,46 @@ namespace PS4CheaterNeo
                     Section section = sectionTool.GetSection(sid);
                     byte[] subBuffer = PS4Tool.ReadMemory(section.PID, section.Start, section.Length);
 
-                    string path = string.Format("{0}{1}{2}_{3}_{4}.bin", savePath, Path.DirectorySeparatorChar, processName, sectionAddr, sectionName);
+                    string path = string.Format("{0}{1}{2}_{3}_{4}_{5}.bin", savePath, Path.DirectorySeparatorChar, processName, sectionAddr, sectionName, sid);
                     File.WriteAllBytes(path, subBuffer);
                     dumpSize += subBuffer.Length;
                 }
                 
                 MessageBox.Show(string.Format("SectionViewDump success, dump size: {0}MB", Math.Round(dumpSize / 1024 / 1024, 2)), "SectionViewDump", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+        }
+        private void SectionViewImport_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                OpenDialog.Filter = "SectionDump binary (*.bin)|*.bin";
+                OpenDialog.FilterIndex = 0;
+                OpenDialog.RestoreDirectory = true;
+
+                if (OpenDialog.ShowDialog() != DialogResult.OK) return;
+
+                foreach (String file in OpenDialog.FileNames)
+                {
+                    byte[] bin = File.ReadAllBytes(file);
+                    string name = Path.GetFileNameWithoutExtension(file);
+                    string[] names = name.Split(new char[] { '_' }, 4);
+
+                    if (names.Length < 4) continue;
+
+                    string processName = names[0];
+                    ulong sectionAddr = ulong.Parse(names[1], NumberStyles.HexNumber);
+                    string sectionName = names[2];
+                    uint.TryParse(names[3], out uint sid);
+                    Section section = sectionTool.GetSection(sid);
+                    if (section == null || section.Length != bin.Length) continue;
+
+                    PS4Tool.WriteMemory(section.PID, section.Start, bin);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
 

@@ -69,6 +69,7 @@ namespace PS4CheaterNeo
             this.SectionViewMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.SectionViewHexEditor = new System.Windows.Forms.ToolStripMenuItem();
             this.SectionViewDump = new System.Windows.Forms.ToolStripMenuItem();
+            this.SectionViewImport = new System.Windows.Forms.ToolStripMenuItem();
             this.ToolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.SectionViewCheck = new System.Windows.Forms.ToolStripMenuItem();
             this.GetProcessesBtn = new System.Windows.Forms.Button();
@@ -96,6 +97,7 @@ namespace PS4CheaterNeo
             this.Panel1 = new System.Windows.Forms.Panel();
             this.SlowMotionTimer = new System.Windows.Forms.Timer(this.components);
             this.SaveDialog = new System.Windows.Forms.SaveFileDialog();
+            this.OpenDialog = new System.Windows.Forms.OpenFileDialog();
             ((System.ComponentModel.ISupportInitialize)(this.SplitContainer1)).BeginInit();
             this.SplitContainer1.Panel1.SuspendLayout();
             this.SplitContainer1.Panel2.SuspendLayout();
@@ -494,34 +496,44 @@ namespace PS4CheaterNeo
             this.SectionViewMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.SectionViewHexEditor,
             this.SectionViewDump,
+            this.SectionViewImport,
             this.ToolStripSeparator3,
             this.SectionViewCheck});
             this.SectionViewMenu.Name = "SectionViewMenu";
-            this.SectionViewMenu.Size = new System.Drawing.Size(134, 76);
+            this.SectionViewMenu.Size = new System.Drawing.Size(181, 120);
             // 
             // SectionViewHexEditor
             // 
             this.SectionViewHexEditor.Name = "SectionViewHexEditor";
-            this.SectionViewHexEditor.Size = new System.Drawing.Size(133, 22);
+            this.SectionViewHexEditor.Size = new System.Drawing.Size(180, 22);
             this.SectionViewHexEditor.Text = "Hex Editor";
             this.SectionViewHexEditor.Click += new System.EventHandler(this.SectionViewHexEditor_Click);
             // 
             // SectionViewDump
             // 
             this.SectionViewDump.Name = "SectionViewDump";
-            this.SectionViewDump.Size = new System.Drawing.Size(133, 22);
+            this.SectionViewDump.Size = new System.Drawing.Size(180, 22);
             this.SectionViewDump.Text = "Dump";
             this.SectionViewDump.Click += new System.EventHandler(this.SectionViewDump_Click);
+            // 
+            // SectionViewImport
+            // 
+            this.SectionViewImport.Enabled = false;
+            this.SectionViewImport.Name = "SectionViewImport";
+            this.SectionViewImport.Size = new System.Drawing.Size(180, 22);
+            this.SectionViewImport.Text = "Import";
+            this.SectionViewImport.Visible = false;
+            this.SectionViewImport.Click += new System.EventHandler(this.SectionViewImport_Click);
             // 
             // ToolStripSeparator3
             // 
             this.ToolStripSeparator3.Name = "ToolStripSeparator3";
-            this.ToolStripSeparator3.Size = new System.Drawing.Size(130, 6);
+            this.ToolStripSeparator3.Size = new System.Drawing.Size(177, 6);
             // 
             // SectionViewCheck
             // 
             this.SectionViewCheck.Name = "SectionViewCheck";
-            this.SectionViewCheck.Size = new System.Drawing.Size(133, 22);
+            this.SectionViewCheck.Size = new System.Drawing.Size(180, 22);
             this.SectionViewCheck.Text = "Check";
             this.SectionViewCheck.Click += new System.EventHandler(this.SectionViewCheck_Click);
             // 
@@ -545,6 +557,7 @@ namespace PS4CheaterNeo
             this.ProcessesBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.ProcessesBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(36)))), ((int)(((byte)(36)))));
+            this.ProcessesBox.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.ProcessesBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.ProcessesBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.ProcessesBox.ForeColor = System.Drawing.Color.White;
@@ -835,6 +848,11 @@ namespace PS4CheaterNeo
             this.SlowMotionTimer.Interval = 250;
             this.SlowMotionTimer.Tick += new System.EventHandler(this.SlowMotionTimer_Tick);
             // 
+            // OpenDialog
+            // 
+            this.OpenDialog.DefaultExt = "bin";
+            this.OpenDialog.Multiselect = true;
+            // 
             // Query
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -938,5 +956,7 @@ namespace PS4CheaterNeo
         private System.Windows.Forms.SaveFileDialog SaveDialog;
         private System.Windows.Forms.Button RedoBtn;
         private System.Windows.Forms.Button UndoBtn;
+        private System.Windows.Forms.ToolStripMenuItem SectionViewImport;
+        private System.Windows.Forms.OpenFileDialog OpenDialog;
     }
 }

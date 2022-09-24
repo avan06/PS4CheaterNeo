@@ -29,8 +29,10 @@ namespace PS4CheaterNeo
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.HexView = new Be.Windows.Forms.HexBox();
+            this.AssemblerBtn = new System.Windows.Forms.Button();
             this.HexBox = new System.Windows.Forms.CheckBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.InfoBox = new System.Windows.Forms.RichTextBox();
@@ -42,7 +44,8 @@ namespace PS4CheaterNeo
             this.RefreshBtn = new System.Windows.Forms.Button();
             this.NextBtn = new System.Windows.Forms.Button();
             this.PreviousBtn = new System.Windows.Forms.Button();
-            this.AssemblerBtn = new System.Windows.Forms.Button();
+            this.AutoRefreshTimer = new System.Windows.Forms.Timer(this.components);
+            this.AutoRefreshBox = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -64,6 +67,7 @@ namespace PS4CheaterNeo
             // 
             // splitContainer1.Panel2
             // 
+            this.splitContainer1.Panel2.Controls.Add(this.AutoRefreshBox);
             this.splitContainer1.Panel2.Controls.Add(this.AssemblerBtn);
             this.splitContainer1.Panel2.Controls.Add(this.HexBox);
             this.splitContainer1.Panel2.Controls.Add(this.groupBox1);
@@ -107,6 +111,20 @@ namespace PS4CheaterNeo
             this.HexView.VScrollBarVisible = true;
             this.HexView.ZeroBytesForeColor = System.Drawing.Color.DimGray;
             this.HexView.SelectionStartChanged += new System.EventHandler(this.HexView_SelectionStartChanged);
+            // 
+            // AssemblerBtn
+            // 
+            this.AssemblerBtn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.AssemblerBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.AssemblerBtn.ForeColor = System.Drawing.Color.White;
+            this.AssemblerBtn.Location = new System.Drawing.Point(2, 213);
+            this.AssemblerBtn.Name = "AssemblerBtn";
+            this.AssemblerBtn.Size = new System.Drawing.Size(190, 23);
+            this.AssemblerBtn.TabIndex = 11;
+            this.AssemblerBtn.Text = "AssemblerBox";
+            this.AssemblerBtn.UseVisualStyleBackColor = true;
+            this.AssemblerBtn.Click += new System.EventHandler(this.AssemblerBtn_Click);
             // 
             // HexBox
             // 
@@ -219,9 +237,9 @@ namespace PS4CheaterNeo
             | System.Windows.Forms.AnchorStyles.Right)));
             this.RefreshBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.RefreshBtn.ForeColor = System.Drawing.Color.White;
-            this.RefreshBtn.Location = new System.Drawing.Point(3, 60);
+            this.RefreshBtn.Location = new System.Drawing.Point(52, 60);
             this.RefreshBtn.Name = "RefreshBtn";
-            this.RefreshBtn.Size = new System.Drawing.Size(190, 23);
+            this.RefreshBtn.Size = new System.Drawing.Size(141, 23);
             this.RefreshBtn.TabIndex = 3;
             this.RefreshBtn.Text = "Refresh";
             this.RefreshBtn.UseVisualStyleBackColor = true;
@@ -253,19 +271,21 @@ namespace PS4CheaterNeo
             this.PreviousBtn.UseVisualStyleBackColor = true;
             this.PreviousBtn.Click += new System.EventHandler(this.PreviousBtn_Click);
             // 
-            // AssemblerBtn
+            // AutoRefreshTimer
             // 
-            this.AssemblerBtn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.AssemblerBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.AssemblerBtn.ForeColor = System.Drawing.Color.White;
-            this.AssemblerBtn.Location = new System.Drawing.Point(2, 213);
-            this.AssemblerBtn.Name = "AssemblerBtn";
-            this.AssemblerBtn.Size = new System.Drawing.Size(190, 23);
-            this.AssemblerBtn.TabIndex = 11;
-            this.AssemblerBtn.Text = "AssemblerBox";
-            this.AssemblerBtn.UseVisualStyleBackColor = true;
-            this.AssemblerBtn.Click += new System.EventHandler(this.AssemblerBtn_Click);
+            this.AutoRefreshTimer.Enabled = true;
+            this.AutoRefreshTimer.Interval = 2500;
+            this.AutoRefreshTimer.Tick += new System.EventHandler(this.AutoRefreshTimer_Tick);
+            // 
+            // AutoRefreshBox
+            // 
+            this.AutoRefreshBox.AutoSize = true;
+            this.AutoRefreshBox.Location = new System.Drawing.Point(3, 64);
+            this.AutoRefreshBox.Name = "AutoRefreshBox";
+            this.AutoRefreshBox.Size = new System.Drawing.Size(47, 16);
+            this.AutoRefreshBox.TabIndex = 12;
+            this.AutoRefreshBox.Text = "Auto";
+            this.AutoRefreshBox.UseVisualStyleBackColor = true;
             // 
             // HexEditor
             // 
@@ -306,5 +326,7 @@ namespace PS4CheaterNeo
         private System.Windows.Forms.CheckBox HexBox;
         private System.Windows.Forms.RichTextBox InfoBox;
         private System.Windows.Forms.Button AssemblerBtn;
+        private System.Windows.Forms.Timer AutoRefreshTimer;
+        private System.Windows.Forms.CheckBox AutoRefreshBox;
     }
 }

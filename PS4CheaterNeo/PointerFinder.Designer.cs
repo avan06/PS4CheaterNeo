@@ -246,11 +246,6 @@ namespace PS4CheaterNeo
             this.MaxRangeUpDown.Name = "MaxRangeUpDown";
             this.MaxRangeUpDown.Size = new System.Drawing.Size(120, 22);
             this.MaxRangeUpDown.TabIndex = 15;
-            this.MaxRangeUpDown.Value = new decimal(new int[] {
-            8192,
-            0,
-            0,
-            0});
             // 
             // LevelUpdown
             // 
