@@ -2,7 +2,7 @@
 
 PS4CheaterNeo is a program to find game cheat codes, and it is based on [`ps4debug`](https://github.com/jogolden/ps4debug) and `.Net Framework 4.8`.
 
-Currently in `version 0.9.7.1-beta`
+Currently in `version 0.9.7.2-beta`
 
 
 ## Table of Contents
@@ -14,7 +14,7 @@ Currently in `version 0.9.7.1-beta`
   * [Cheat file support](#cheat-file-support)
   * [Add Address](#add-address)
   * [Query window](#query-window)
-  * [Experimental feature in Query window](#experimental-feature-slowmotion-and-pause-in-query-window)
+  * [Experimental feature](#experimental-feature)
   * [Section](#section)
   * [Section ID](#section-id)
   * [Group ScanType](#group-scantype)
@@ -123,7 +123,10 @@ Cheat format used by PS4 Trainer and GoldHEN Cheat
 ![query_3](assets/query_3.webp)
 
 
-### Experimental feature SlowMotion and Pause in Query window
+### Experimental feature
+
+
+#### Query window: SlowMotion and Pause
 
 - It's an `experimental feature` requires `Attach ps4 Debugging`, after Attach ps4 Debugging,
 - Be sure to `close query window before closing the game`, otherwise the PS4 will `crash`.
@@ -134,16 +137,53 @@ Cheat format used by PS4 Trainer and GoldHEN Cheat
 
 ![slowmotion](assets/slowmotion.webp)
 
+
+#### Query window: undo scan
+
 - Support undo scan(revert to the previous scan result), need to enable `EnableUndoScan` in the options.
 - Support automatically pause the game when starting the scan in query, need to enable `EnableScanAutoPause` in the options.
 - Support automatically resume the game when the scan is complete in query, need to enable `EnableScanDoneResume` in the options.
 
 ![experimental1](assets/experimental1.webp)
 
+
+#### Hex editor: show changed
+
 - Immediately show the changed position when `refreshing in the Hex editor`.
 - Support `auto refresh interval` when `Auto is enabled` in the `Hex editor`.(recommended for wired network, the current setting is every 2.5 seconds)
 
 ![experimental2](assets/experimental2.webp)
+
+
+#### Hex editor: displaying decimal, float, and double
+
+- The hex value can be displayed as a numeric value, when the ByteGrouping of Hex editor is set to decimal or float or double.
+- Note: This feature is for display only and does not support direct editing of values.
+- ByteGrouping types are as follows:
+- B01 = Size:01, Hex
+- B02 = Size:02, Hex
+- B04 = Size:04, Hex
+- B08 = Size:08, Hex
+- B16 = Size:16, Hex
+- B01Decimal = Size:01, Decimal byte
+- B02Decimal = Size:02, Decimal ushort
+- B04Decimal = Size:04, Decimal uint
+- B08Decimal = Size:08, Decimal ulong
+- B04Float = Size:04, Float
+- B08Double  = Size:08, Double
+
+![hexeditor3](assets/hexeditor3.webp)
+![hexeditor4](assets/hexeditor4.webp)
+
+
+#### Query window: format of range value supports offset
+
+- An offset can be used to enter the scan range in the Query window.
+- Range format (hex, "0x" can be omitted):
+- Min: 12345678-1000 Max: 12345678+1000
+- Min: 0x12345678-0x1000 Max: 0x12345678+0x1000
+
+![query_4](assets/query_4.webp)
 
 
 ### Section

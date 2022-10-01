@@ -32,6 +32,11 @@ namespace PS4CheaterNeo
             this.components = new System.ComponentModel.Container();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.HexView = new Be.Windows.Forms.HexBox();
+            this.HexViewMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.HexViewGroupSize = new System.Windows.Forms.ToolStripComboBox();
+            this.HexViewByteGroup = new System.Windows.Forms.ToolStripComboBox();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.AutoRefreshBox = new System.Windows.Forms.CheckBox();
             this.AssemblerBtn = new System.Windows.Forms.Button();
             this.HexBox = new System.Windows.Forms.CheckBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
@@ -45,11 +50,11 @@ namespace PS4CheaterNeo
             this.NextBtn = new System.Windows.Forms.Button();
             this.PreviousBtn = new System.Windows.Forms.Button();
             this.AutoRefreshTimer = new System.Windows.Forms.Timer(this.components);
-            this.AutoRefreshBox = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
+            this.HexViewMenu.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -88,6 +93,7 @@ namespace PS4CheaterNeo
             this.HexView.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(36)))), ((int)(((byte)(36)))));
             this.HexView.ChangedFinishForeColor = System.Drawing.Color.LimeGreen;
             this.HexView.ColumnInfoVisible = true;
+            this.HexView.ContextMenuStrip = this.HexViewMenu;
             this.HexView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.HexView.EnableAutoChangedPosSetFinish = false;
             this.HexView.EnableCut = false;
@@ -111,6 +117,44 @@ namespace PS4CheaterNeo
             this.HexView.VScrollBarVisible = true;
             this.HexView.ZeroBytesForeColor = System.Drawing.Color.DimGray;
             this.HexView.SelectionStartChanged += new System.EventHandler(this.HexView_SelectionStartChanged);
+            // 
+            // HexViewMenu
+            // 
+            this.HexViewMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.HexViewByteGroup,
+            this.HexViewGroupSize,
+            this.toolStripSeparator1});
+            this.HexViewMenu.Name = "HexViewMenu";
+            this.HexViewMenu.Size = new System.Drawing.Size(211, 86);
+            // 
+            // HexViewGroupSize
+            // 
+            this.HexViewGroupSize.Name = "HexViewGroupSize";
+            this.HexViewGroupSize.Size = new System.Drawing.Size(150, 23);
+            this.HexViewGroupSize.Text = "HexViewGroupSize";
+            this.HexViewGroupSize.SelectedIndexChanged += new System.EventHandler(this.HexViewGroupSize_SelectedIndexChanged);
+            // 
+            // HexViewByteGroup
+            // 
+            this.HexViewByteGroup.Name = "HexViewByteGroup";
+            this.HexViewByteGroup.Size = new System.Drawing.Size(150, 23);
+            this.HexViewByteGroup.Text = "HexViewByteGroup";
+            this.HexViewByteGroup.SelectedIndexChanged += new System.EventHandler(this.HexViewByteGroup_SelectedIndexChanged);
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(207, 6);
+            // 
+            // AutoRefreshBox
+            // 
+            this.AutoRefreshBox.AutoSize = true;
+            this.AutoRefreshBox.Location = new System.Drawing.Point(3, 64);
+            this.AutoRefreshBox.Name = "AutoRefreshBox";
+            this.AutoRefreshBox.Size = new System.Drawing.Size(47, 16);
+            this.AutoRefreshBox.TabIndex = 12;
+            this.AutoRefreshBox.Text = "Auto";
+            this.AutoRefreshBox.UseVisualStyleBackColor = true;
             // 
             // AssemblerBtn
             // 
@@ -277,16 +321,6 @@ namespace PS4CheaterNeo
             this.AutoRefreshTimer.Interval = 2500;
             this.AutoRefreshTimer.Tick += new System.EventHandler(this.AutoRefreshTimer_Tick);
             // 
-            // AutoRefreshBox
-            // 
-            this.AutoRefreshBox.AutoSize = true;
-            this.AutoRefreshBox.Location = new System.Drawing.Point(3, 64);
-            this.AutoRefreshBox.Name = "AutoRefreshBox";
-            this.AutoRefreshBox.Size = new System.Drawing.Size(47, 16);
-            this.AutoRefreshBox.TabIndex = 12;
-            this.AutoRefreshBox.Text = "Auto";
-            this.AutoRefreshBox.UseVisualStyleBackColor = true;
-            // 
             // HexEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -305,6 +339,7 @@ namespace PS4CheaterNeo
             this.splitContainer1.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
+            this.HexViewMenu.ResumeLayout(false);
             this.groupBox1.ResumeLayout(false);
             this.ResumeLayout(false);
 
@@ -328,5 +363,9 @@ namespace PS4CheaterNeo
         private System.Windows.Forms.Button AssemblerBtn;
         private System.Windows.Forms.Timer AutoRefreshTimer;
         private System.Windows.Forms.CheckBox AutoRefreshBox;
+        private System.Windows.Forms.ContextMenuStrip HexViewMenu;
+        private System.Windows.Forms.ToolStripComboBox HexViewGroupSize;
+        private System.Windows.Forms.ToolStripComboBox HexViewByteGroup;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
     }
 }

@@ -31,6 +31,26 @@ namespace PS4CheaterNeo
             mutex = new Mutex();
 
             InitializeComponent();
+
+            try
+            {
+                BuiltInContextMenu builtInMenu = HexView.BuiltInContextMenu;
+                HexViewMenu.Items.Add(builtInMenu.GetCopyHexToolStripMenuItem());
+                HexViewMenu.Items.Add(builtInMenu.GetCopyToolStripMenuItem());
+                HexViewMenu.Items.Add(builtInMenu.GetPasteToolStripMenuItem());
+                HexViewMenu.Items.Add(builtInMenu.GetSelectAllToolStripMenuItem());
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Source);
+            }
+
+            HexBox.ByteGroupingType[] byteGroupingTypes = (HexBox.ByteGroupingType[])Enum.GetValues(typeof(HexBox.ByteGroupingType));
+            foreach (var byteGroupingType in byteGroupingTypes) HexViewByteGroup.Items.Add(new ComboItem("GroupType:" + byteGroupingType.ToString(), byteGroupingType));
+            HexViewByteGroup.SelectedIndex = 0;
+
+            for (int idx = 0; idx <= 0x10; idx++) HexViewGroupSize.Items.Add("GroupSize:" + idx);
+            HexViewGroupSize.SelectedIndex = HexView.GroupSize;
         }
 
         public HexEditor(Main mainForm, Section section, int baseAddr) : this(mainForm)
@@ -303,6 +323,24 @@ D: {8}
                 RefreshBtn.PerformClick();
             }
             finally { mutex.ReleaseMutex(); }
+        }
+
+        private void HexViewByteGroup_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            var byteGroupComboBox = (ToolStripComboBox)sender;
+            ComboItem comboItem = (ComboItem)byteGroupComboBox.SelectedItem;
+            HexBox.ByteGroupingType byteGroupingType = (HexBox.ByteGroupingType)comboItem.Value;
+            HexView.ByteGrouping = byteGroupingType;
+            if (HexViewGroupSize.Items.Count > 0) HexViewGroupSize.SelectedIndex = HexView.ByteGroupingSize;
+        }
+
+        private void HexViewGroupSize_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            var groupSizeComboBox = (ToolStripComboBox)sender;
+            int groupSize = groupSizeComboBox.SelectedIndex;
+
+            HexView.GroupSeparatorVisible = groupSize > 0;
+            HexView.GroupSize = groupSize;
         }
         #endregion
 

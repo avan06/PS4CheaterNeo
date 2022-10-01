@@ -237,8 +237,8 @@ namespace PS4CheaterNeo
                     Enum.TryParse(((ComboItem)(ScanTypeBox.SelectedItem)).Value.ToString(), out ScanType scanType);
                     Enum.TryParse(CompareTypeBox.SelectedItem.ToString(), out CompareType compareType);
 
-                    ulong AddrMin = ulong.Parse(AddrMinBox.Text, NumberStyles.HexNumber);
-                    ulong AddrMax = ulong.Parse(AddrMaxBox.Text, NumberStyles.HexNumber);
+                    ulong AddrMin = ParseAddrText(AddrMinBox.Text);
+                    ulong AddrMax = ParseAddrText(AddrMaxBox.Text);
                     if (AddrMin > AddrMax && MessageBox.Show(String.Format("AddrMin({1:X}) > AddrMax({0:X})", AddrMin, AddrMax), "Scan", MessageBoxButtons.OK, MessageBoxIcon.Error) == DialogResult.OK) return;
 
                     comparerTool = new ComparerTool(scanType, compareType, value0, value1);
@@ -259,6 +259,28 @@ namespace PS4CheaterNeo
             {
                 MessageBox.Show(exception.Message + "\n" + exception.StackTrace, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
+        }
+
+        private ulong ParseAddrText(string text)
+        {
+            ulong addr;
+            if (text.Contains("+"))
+            {
+                var texts = text.Split('+');
+                addr = ulong.Parse(texts[0].ToLower().Replace("0x", "").Trim(), NumberStyles.HexNumber);
+                ulong offset = ulong.Parse(texts[1].ToLower().Replace("0x", "").Trim(), NumberStyles.HexNumber);
+                addr += offset;
+            }
+            else if (text.Contains("-"))
+            {
+                var texts = text.Split('-');
+                addr = ulong.Parse(texts[0].ToLower().Replace("0x", "").Trim(), NumberStyles.HexNumber);
+                ulong offset = ulong.Parse(texts[1].ToLower().Replace("0x", "").Trim(), NumberStyles.HexNumber);
+                addr -= offset;
+            }
+            else addr = ulong.Parse(text.ToLower().Replace("0x", "").Trim(), NumberStyles.HexNumber);
+
+            return addr;
         }
 
         //Invoke(new MethodInvoker(() => { }));
@@ -959,16 +981,16 @@ namespace PS4CheaterNeo
             if (section.Check)
             {
                 sectionTool.TotalMemorySize += (ulong)section.Length;
-                if (AddrMinBox.Text == "") AddrMinBox.Text = section.Start.ToString("X");
+                if (AddrMinBox.Text.Trim() == "") AddrMinBox.Text = section.Start.ToString("X");
                 else
                 {
-                    var AddrMin = ulong.Parse(AddrMinBox.Text, NumberStyles.HexNumber);
+                    var AddrMin = ParseAddrText(AddrMinBox.Text);
                     if (section.Start < AddrMin) AddrMinBox.Text = section.Start.ToString("X");
                 }
-                if (AddrMaxBox.Text == "") AddrMaxBox.Text = (section.Start + (ulong)section.Length).ToString("X");
+                if (AddrMaxBox.Text.Trim() == "") AddrMaxBox.Text = (section.Start + (ulong)section.Length).ToString("X");
                 else
                 {
-                    var AddrMax = ulong.Parse(AddrMaxBox.Text, NumberStyles.HexNumber);
+                    var AddrMax = ParseAddrText(AddrMaxBox.Text);
                     if (section.Start + (ulong)section.Length > AddrMax) AddrMaxBox.Text = (section.Start + (ulong)section.Length).ToString("X");
                 }
             }
