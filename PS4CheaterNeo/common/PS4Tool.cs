@@ -71,7 +71,18 @@ namespace PS4CheaterNeo
                     }
                     if (ps4s[idx] == null) ps4s[idx] = new PS4DBG(ip);
 
-                    result = ps4s[idx].IsConnected ? true : ps4s[idx].Connect(connectTimeout, sendTimeout, receiveTimeout, idx == 0 ? true : false);
+                    if (idx == 0)
+                    {
+                        result = ps4s[idx].IsConnected ? true : ps4s[idx].Connect(connectTimeout, sendTimeout, receiveTimeout, true);
+                        if (result && ps4s[idx].ExtFWVersion == -1)
+                        {
+                            ps4s[idx].Disconnect();
+                            ps4s[idx] = null;
+                            ps4s[idx] = new PS4DBG(ip);
+                            result = ps4s[idx].Connect(connectTimeout, sendTimeout, receiveTimeout);
+                        }
+                    }
+                    else result = ps4s[idx].IsConnected ? true : ps4s[idx].Connect(connectTimeout, sendTimeout, receiveTimeout);
                 }
             }
             catch (Exception exception) { msg = exception.Message; }

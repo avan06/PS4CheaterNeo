@@ -26,6 +26,7 @@ namespace PS4CheaterNeo
         {
             if ((Properties.Settings.Default.PS4IP.Value ?? "") == "") Properties.Settings.Default.Upgrade(); //Need to get the settings again when the AssemblyVersion is changed
             InitializeComponent();
+            ToolStripLockEnable.Checked = Properties.Settings.Default.EnableCheatLock.Value;
             Text += " " + Application.ProductVersion; //Assembly.GetExecutingAssembly().GetName().Version.ToString(); // Assembly.GetEntryAssembly().GetName().Version.ToString();
             sectionTool = new SectionTool();
         }
@@ -1217,8 +1218,11 @@ namespace PS4CheaterNeo
 
             if (processInfo.pid == 0 || processInfo.name != processName)
             {
-                ToolStripProcessInfo.Text = string.Format("ProcessInfo: Cheat file Process({0}) could not find.", processName);
-                ToolStripProcessInfo.Tag = false;
+                Invoke(new MethodInvoker(() =>
+                {
+                    ToolStripProcessInfo.Text = string.Format("ProcessInfo: Cheat file Process({0}) could not find.", processName);
+                    ToolStripProcessInfo.Tag = false;
+                }));
                 return false;
             }
             else if (ToolStripProcessInfo.Tag is bool) ToolStripProcessInfo.Tag = null; //當已查詢到ProcessInfo時，清除失敗的Tag

@@ -31,7 +31,7 @@ namespace PS4CheaterNeo
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Query));
-            this.SplitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.SplitContainer1 = new PS4CheaterNeo.CollapsibleSplitContainer();
             this.StatusStrip1 = new System.Windows.Forms.StatusStrip();
             this.ToolStripMsg = new System.Windows.Forms.ToolStripStatusLabel();
             this.ResultView = new System.Windows.Forms.ListView();
@@ -48,7 +48,7 @@ namespace PS4CheaterNeo
             this.ResultViewDump = new System.Windows.Forms.ToolStripMenuItem();
             this.ToolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.ResultViewFindPointer = new System.Windows.Forms.ToolStripMenuItem();
-            this.SplitContainer2 = new System.Windows.Forms.SplitContainer();
+            this.SplitContainer2 = new PS4CheaterNeo.CollapsibleSplitContainer();
             this.PauseBtn = new System.Windows.Forms.Button();
             this.ResumeBtn = new System.Windows.Forms.Button();
             this.SectionSearchBtn = new System.Windows.Forms.Button();
@@ -74,6 +74,8 @@ namespace PS4CheaterNeo
             this.SectionViewCheck = new System.Windows.Forms.ToolStripMenuItem();
             this.GetProcessesBtn = new System.Windows.Forms.Button();
             this.ProcessesBox = new PS4CheaterNeo.ComboItemBox();
+            this.DoneResumeBox = new System.Windows.Forms.CheckBox();
+            this.AutoPauseBox = new System.Windows.Forms.CheckBox();
             this.RedoBtn = new System.Windows.Forms.Button();
             this.UndoBtn = new System.Windows.Forms.Button();
             this.FilterRuleBtn = new System.Windows.Forms.Button();
@@ -83,12 +85,13 @@ namespace PS4CheaterNeo
             this.SelectAllBox = new System.Windows.Forms.CheckBox();
             this.AlignmentBox = new System.Windows.Forms.CheckBox();
             this.TableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.HexBox = new System.Windows.Forms.CheckBox();
             this.ValueBox = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.Value1Box = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
+            this.HexBox = new System.Windows.Forms.CheckBox();
+            this.NotBox = new System.Windows.Forms.CheckBox();
             this.NewBtn = new System.Windows.Forms.Button();
             this.ToolStripBar = new System.Windows.Forms.ProgressBar();
             this.RefreshBtn = new System.Windows.Forms.Button();
@@ -98,6 +101,7 @@ namespace PS4CheaterNeo
             this.SlowMotionTimer = new System.Windows.Forms.Timer(this.components);
             this.SaveDialog = new System.Windows.Forms.SaveFileDialog();
             this.OpenDialog = new System.Windows.Forms.OpenFileDialog();
+            this.SimpleValuesBox = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.SplitContainer1)).BeginInit();
             this.SplitContainer1.Panel1.SuspendLayout();
             this.SplitContainer1.Panel2.SuspendLayout();
@@ -131,6 +135,9 @@ namespace PS4CheaterNeo
             // 
             this.SplitContainer1.Panel2.Controls.Add(this.SplitContainer2);
             this.SplitContainer1.Size = new System.Drawing.Size(800, 450);
+            this.SplitContainer1.SplitterButtonLocation = PS4CheaterNeo.ButtonLocation.Panel1;
+            this.SplitContainer1.SplitterButtonSize = 13;
+            this.SplitContainer1.SplitterButtonStyle = PS4CheaterNeo.ButtonStyle.SingleImage;
             this.SplitContainer1.SplitterDistance = 507;
             this.SplitContainer1.TabIndex = 0;
             // 
@@ -281,6 +288,9 @@ namespace PS4CheaterNeo
             // 
             // SplitContainer2.Panel2
             // 
+            this.SplitContainer2.Panel2.Controls.Add(this.DoneResumeBox);
+            this.SplitContainer2.Panel2.Controls.Add(this.SimpleValuesBox);
+            this.SplitContainer2.Panel2.Controls.Add(this.AutoPauseBox);
             this.SplitContainer2.Panel2.Controls.Add(this.RedoBtn);
             this.SplitContainer2.Panel2.Controls.Add(this.UndoBtn);
             this.SplitContainer2.Panel2.Controls.Add(this.FilterRuleBtn);
@@ -296,7 +306,11 @@ namespace PS4CheaterNeo
             this.SplitContainer2.Panel2.Controls.Add(this.ScanBtn);
             this.SplitContainer2.Panel2.Controls.Add(this.CompareTypeBox);
             this.SplitContainer2.Size = new System.Drawing.Size(289, 450);
-            this.SplitContainer2.SplitterDistance = 255;
+            this.SplitContainer2.SplitterButtonLocation = PS4CheaterNeo.ButtonLocation.Panel1;
+            this.SplitContainer2.SplitterButtonPosition = PS4CheaterNeo.ButtonPosition.BottomRight;
+            this.SplitContainer2.SplitterButtonSize = 13;
+            this.SplitContainer2.SplitterButtonStyle = PS4CheaterNeo.ButtonStyle.SingleImage;
+            this.SplitContainer2.SplitterDistance = 237;
             this.SplitContainer2.TabIndex = 0;
             // 
             // PauseBtn
@@ -361,7 +375,7 @@ namespace PS4CheaterNeo
             this.tableLayoutPanel2.Controls.Add(this.label5, 2, 0);
             this.tableLayoutPanel2.Controls.Add(this.AddrMaxBox, 3, 0);
             this.tableLayoutPanel2.Controls.Add(this.AddrMinBox, 1, 0);
-            this.tableLayoutPanel2.Location = new System.Drawing.Point(-1, 222);
+            this.tableLayoutPanel2.Location = new System.Drawing.Point(-1, 204);
             this.tableLayoutPanel2.Name = "tableLayoutPanel2";
             this.tableLayoutPanel2.RowCount = 1;
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
@@ -447,7 +461,7 @@ namespace PS4CheaterNeo
             this.SectionView.HideSelection = false;
             this.SectionView.Location = new System.Drawing.Point(3, 53);
             this.SectionView.Name = "SectionView";
-            this.SectionView.Size = new System.Drawing.Size(283, 169);
+            this.SectionView.Size = new System.Drawing.Size(283, 151);
             this.SectionView.TabIndex = 2;
             this.SectionView.UseCompatibleStateImageBehavior = false;
             this.SectionView.View = System.Windows.Forms.View.Details;
@@ -500,19 +514,19 @@ namespace PS4CheaterNeo
             this.ToolStripSeparator3,
             this.SectionViewCheck});
             this.SectionViewMenu.Name = "SectionViewMenu";
-            this.SectionViewMenu.Size = new System.Drawing.Size(181, 120);
+            this.SectionViewMenu.Size = new System.Drawing.Size(134, 98);
             // 
             // SectionViewHexEditor
             // 
             this.SectionViewHexEditor.Name = "SectionViewHexEditor";
-            this.SectionViewHexEditor.Size = new System.Drawing.Size(180, 22);
+            this.SectionViewHexEditor.Size = new System.Drawing.Size(133, 22);
             this.SectionViewHexEditor.Text = "Hex Editor";
             this.SectionViewHexEditor.Click += new System.EventHandler(this.SectionViewHexEditor_Click);
             // 
             // SectionViewDump
             // 
             this.SectionViewDump.Name = "SectionViewDump";
-            this.SectionViewDump.Size = new System.Drawing.Size(180, 22);
+            this.SectionViewDump.Size = new System.Drawing.Size(133, 22);
             this.SectionViewDump.Text = "Dump";
             this.SectionViewDump.Click += new System.EventHandler(this.SectionViewDump_Click);
             // 
@@ -520,7 +534,7 @@ namespace PS4CheaterNeo
             // 
             this.SectionViewImport.Enabled = false;
             this.SectionViewImport.Name = "SectionViewImport";
-            this.SectionViewImport.Size = new System.Drawing.Size(180, 22);
+            this.SectionViewImport.Size = new System.Drawing.Size(133, 22);
             this.SectionViewImport.Text = "Import";
             this.SectionViewImport.Visible = false;
             this.SectionViewImport.Click += new System.EventHandler(this.SectionViewImport_Click);
@@ -528,12 +542,12 @@ namespace PS4CheaterNeo
             // ToolStripSeparator3
             // 
             this.ToolStripSeparator3.Name = "ToolStripSeparator3";
-            this.ToolStripSeparator3.Size = new System.Drawing.Size(177, 6);
+            this.ToolStripSeparator3.Size = new System.Drawing.Size(130, 6);
             // 
             // SectionViewCheck
             // 
             this.SectionViewCheck.Name = "SectionViewCheck";
-            this.SectionViewCheck.Size = new System.Drawing.Size(180, 22);
+            this.SectionViewCheck.Size = new System.Drawing.Size(133, 22);
             this.SectionViewCheck.Text = "Check";
             this.SectionViewCheck.Click += new System.EventHandler(this.SectionViewCheck_Click);
             // 
@@ -568,6 +582,28 @@ namespace PS4CheaterNeo
             this.ProcessesBox.TabIndex = 0;
             this.ProcessesBox.SelectedIndexChanged += new System.EventHandler(this.ProcessesBox_SelectedIndexChanged);
             // 
+            // DoneResumeBox
+            // 
+            this.DoneResumeBox.AutoSize = true;
+            this.DoneResumeBox.Location = new System.Drawing.Point(72, 22);
+            this.DoneResumeBox.Margin = new System.Windows.Forms.Padding(0, 3, 0, 0);
+            this.DoneResumeBox.Name = "DoneResumeBox";
+            this.DoneResumeBox.Size = new System.Drawing.Size(86, 16);
+            this.DoneResumeBox.TabIndex = 21;
+            this.DoneResumeBox.Text = "DoneResume";
+            this.DoneResumeBox.UseVisualStyleBackColor = true;
+            // 
+            // AutoPauseBox
+            // 
+            this.AutoPauseBox.AutoSize = true;
+            this.AutoPauseBox.Location = new System.Drawing.Point(3, 22);
+            this.AutoPauseBox.Margin = new System.Windows.Forms.Padding(0, 3, 0, 0);
+            this.AutoPauseBox.Name = "AutoPauseBox";
+            this.AutoPauseBox.Size = new System.Drawing.Size(73, 16);
+            this.AutoPauseBox.TabIndex = 11;
+            this.AutoPauseBox.Text = "AutoPause";
+            this.AutoPauseBox.UseVisualStyleBackColor = true;
+            // 
             // RedoBtn
             // 
             this.RedoBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -576,7 +612,7 @@ namespace PS4CheaterNeo
             this.RedoBtn.Enabled = false;
             this.RedoBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.RedoBtn.Image = ((System.Drawing.Image)(resources.GetObject("RedoBtn.Image")));
-            this.RedoBtn.Location = new System.Drawing.Point(261, 116);
+            this.RedoBtn.Location = new System.Drawing.Point(261, 137);
             this.RedoBtn.Name = "RedoBtn";
             this.RedoBtn.Size = new System.Drawing.Size(24, 23);
             this.RedoBtn.TabIndex = 20;
@@ -591,7 +627,7 @@ namespace PS4CheaterNeo
             this.UndoBtn.Enabled = false;
             this.UndoBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.UndoBtn.Image = ((System.Drawing.Image)(resources.GetObject("UndoBtn.Image")));
-            this.UndoBtn.Location = new System.Drawing.Point(235, 116);
+            this.UndoBtn.Location = new System.Drawing.Point(235, 137);
             this.UndoBtn.Name = "UndoBtn";
             this.UndoBtn.Size = new System.Drawing.Size(24, 23);
             this.UndoBtn.TabIndex = 19;
@@ -648,7 +684,7 @@ namespace PS4CheaterNeo
             this.ScanTypeBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.ScanTypeBox.ForeColor = System.Drawing.Color.White;
             this.ScanTypeBox.FormattingEnabled = true;
-            this.ScanTypeBox.Location = new System.Drawing.Point(3, 64);
+            this.ScanTypeBox.Location = new System.Drawing.Point(3, 85);
             this.ScanTypeBox.Name = "ScanTypeBox";
             this.ScanTypeBox.Size = new System.Drawing.Size(283, 20);
             this.ScanTypeBox.TabIndex = 10;
@@ -688,29 +724,21 @@ namespace PS4CheaterNeo
             this.TableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 45F));
             this.TableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
             this.TableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 45F));
-            this.TableLayoutPanel1.Controls.Add(this.HexBox, 0, 1);
             this.TableLayoutPanel1.Controls.Add(this.ValueBox, 1, 1);
             this.TableLayoutPanel1.Controls.Add(this.label3, 2, 1);
             this.TableLayoutPanel1.Controls.Add(this.Value1Box, 3, 1);
             this.TableLayoutPanel1.Controls.Add(this.label1, 1, 0);
             this.TableLayoutPanel1.Controls.Add(this.label2, 3, 0);
-            this.TableLayoutPanel1.Location = new System.Drawing.Point(3, 21);
+            this.TableLayoutPanel1.Controls.Add(this.HexBox, 0, 1);
+            this.TableLayoutPanel1.Controls.Add(this.NotBox, 0, 0);
+            this.TableLayoutPanel1.Location = new System.Drawing.Point(3, 41);
             this.TableLayoutPanel1.Name = "TableLayoutPanel1";
             this.TableLayoutPanel1.RowCount = 2;
             this.TableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.TableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.TableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.TableLayoutPanel1.Size = new System.Drawing.Size(283, 40);
             this.TableLayoutPanel1.TabIndex = 1;
-            // 
-            // HexBox
-            // 
-            this.HexBox.AutoSize = true;
-            this.HexBox.Location = new System.Drawing.Point(3, 15);
-            this.HexBox.Name = "HexBox";
-            this.HexBox.Size = new System.Drawing.Size(43, 16);
-            this.HexBox.TabIndex = 4;
-            this.HexBox.Text = "Hex";
-            this.HexBox.UseVisualStyleBackColor = true;
             // 
             // ValueBox
             // 
@@ -719,16 +747,17 @@ namespace PS4CheaterNeo
             this.ValueBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(36)))), ((int)(((byte)(36)))));
             this.ValueBox.ForeColor = System.Drawing.Color.White;
             this.ValueBox.ImeMode = System.Windows.Forms.ImeMode.Off;
-            this.ValueBox.Location = new System.Drawing.Point(52, 15);
+            this.ValueBox.Location = new System.Drawing.Point(46, 19);
+            this.ValueBox.Margin = new System.Windows.Forms.Padding(0);
             this.ValueBox.Name = "ValueBox";
-            this.ValueBox.Size = new System.Drawing.Size(99, 22);
+            this.ValueBox.Size = new System.Drawing.Size(106, 22);
             this.ValueBox.TabIndex = 6;
             this.ValueBox.Text = "0";
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(157, 12);
+            this.label3.Location = new System.Drawing.Point(155, 19);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(16, 24);
             this.label3.TabIndex = 8;
@@ -741,9 +770,10 @@ namespace PS4CheaterNeo
             this.Value1Box.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(36)))), ((int)(((byte)(36)))));
             this.Value1Box.ForeColor = System.Drawing.Color.White;
             this.Value1Box.ImeMode = System.Windows.Forms.ImeMode.Off;
-            this.Value1Box.Location = new System.Drawing.Point(180, 15);
+            this.Value1Box.Location = new System.Drawing.Point(175, 19);
+            this.Value1Box.Margin = new System.Windows.Forms.Padding(0);
             this.Value1Box.Name = "Value1Box";
-            this.Value1Box.Size = new System.Drawing.Size(100, 22);
+            this.Value1Box.Size = new System.Drawing.Size(108, 22);
             this.Value1Box.TabIndex = 9;
             this.Value1Box.Text = "0";
             // 
@@ -752,9 +782,9 @@ namespace PS4CheaterNeo
             this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(52, 0);
+            this.label1.Location = new System.Drawing.Point(49, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(99, 12);
+            this.label1.Size = new System.Drawing.Size(100, 12);
             this.label1.TabIndex = 5;
             this.label1.Text = "Value:";
             // 
@@ -763,11 +793,33 @@ namespace PS4CheaterNeo
             this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(180, 0);
+            this.label2.Location = new System.Drawing.Point(178, 0);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(100, 12);
+            this.label2.Size = new System.Drawing.Size(102, 12);
             this.label2.TabIndex = 7;
             this.label2.Text = "Value:";
+            // 
+            // HexBox
+            // 
+            this.HexBox.AutoSize = true;
+            this.HexBox.Location = new System.Drawing.Point(0, 22);
+            this.HexBox.Margin = new System.Windows.Forms.Padding(0, 3, 3, 3);
+            this.HexBox.Name = "HexBox";
+            this.HexBox.Size = new System.Drawing.Size(43, 16);
+            this.HexBox.TabIndex = 4;
+            this.HexBox.Text = "Hex";
+            this.HexBox.UseVisualStyleBackColor = true;
+            // 
+            // NotBox
+            // 
+            this.NotBox.AutoSize = true;
+            this.NotBox.Location = new System.Drawing.Point(0, 3);
+            this.NotBox.Margin = new System.Windows.Forms.Padding(0, 3, 0, 0);
+            this.NotBox.Name = "NotBox";
+            this.NotBox.Size = new System.Drawing.Size(41, 16);
+            this.NotBox.TabIndex = 10;
+            this.NotBox.Text = "Not";
+            this.NotBox.UseVisualStyleBackColor = true;
             // 
             // NewBtn
             // 
@@ -775,7 +827,7 @@ namespace PS4CheaterNeo
             this.NewBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(36)))), ((int)(((byte)(36)))));
             this.NewBtn.Enabled = false;
             this.NewBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.NewBtn.Location = new System.Drawing.Point(235, 146);
+            this.NewBtn.Location = new System.Drawing.Point(235, 167);
             this.NewBtn.Name = "NewBtn";
             this.NewBtn.Size = new System.Drawing.Size(50, 23);
             this.NewBtn.TabIndex = 17;
@@ -787,7 +839,7 @@ namespace PS4CheaterNeo
             // 
             this.ToolStripBar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.ToolStripBar.Location = new System.Drawing.Point(3, 177);
+            this.ToolStripBar.Location = new System.Drawing.Point(3, 195);
             this.ToolStripBar.Name = "ToolStripBar";
             this.ToolStripBar.Size = new System.Drawing.Size(283, 10);
             this.ToolStripBar.TabIndex = 16;
@@ -798,7 +850,7 @@ namespace PS4CheaterNeo
             | System.Windows.Forms.AnchorStyles.Right)));
             this.RefreshBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(36)))), ((int)(((byte)(36)))));
             this.RefreshBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.RefreshBtn.Location = new System.Drawing.Point(3, 146);
+            this.RefreshBtn.Location = new System.Drawing.Point(3, 167);
             this.RefreshBtn.Name = "RefreshBtn";
             this.RefreshBtn.Size = new System.Drawing.Size(226, 23);
             this.RefreshBtn.TabIndex = 13;
@@ -812,7 +864,7 @@ namespace PS4CheaterNeo
             | System.Windows.Forms.AnchorStyles.Right)));
             this.ScanBtn.BackColor = System.Drawing.Color.SteelBlue;
             this.ScanBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.ScanBtn.Location = new System.Drawing.Point(3, 116);
+            this.ScanBtn.Location = new System.Drawing.Point(3, 137);
             this.ScanBtn.Name = "ScanBtn";
             this.ScanBtn.Size = new System.Drawing.Size(226, 23);
             this.ScanBtn.TabIndex = 12;
@@ -828,7 +880,7 @@ namespace PS4CheaterNeo
             this.CompareTypeBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.CompareTypeBox.ForeColor = System.Drawing.Color.White;
             this.CompareTypeBox.FormattingEnabled = true;
-            this.CompareTypeBox.Location = new System.Drawing.Point(3, 90);
+            this.CompareTypeBox.Location = new System.Drawing.Point(3, 111);
             this.CompareTypeBox.Name = "CompareTypeBox";
             this.CompareTypeBox.Size = new System.Drawing.Size(283, 20);
             this.CompareTypeBox.TabIndex = 11;
@@ -852,6 +904,17 @@ namespace PS4CheaterNeo
             // 
             this.OpenDialog.DefaultExt = "bin";
             this.OpenDialog.Multiselect = true;
+            // 
+            // SimpleValuesBox
+            // 
+            this.SimpleValuesBox.AutoSize = true;
+            this.SimpleValuesBox.Location = new System.Drawing.Point(205, 22);
+            this.SimpleValuesBox.Margin = new System.Windows.Forms.Padding(0, 3, 0, 0);
+            this.SimpleValuesBox.Name = "SimpleValuesBox";
+            this.SimpleValuesBox.Size = new System.Drawing.Size(87, 16);
+            this.SimpleValuesBox.TabIndex = 12;
+            this.SimpleValuesBox.Text = "SimpleValues";
+            this.SimpleValuesBox.UseVisualStyleBackColor = true;
             // 
             // Query
             // 
@@ -891,8 +954,8 @@ namespace PS4CheaterNeo
 
         #endregion
 
-        private System.Windows.Forms.SplitContainer SplitContainer1;
-        private System.Windows.Forms.SplitContainer SplitContainer2;
+        private CollapsibleSplitContainer SplitContainer1;
+        private CollapsibleSplitContainer SplitContainer2;
         private System.Windows.Forms.ListView ResultView;
         private System.Windows.Forms.ColumnHeader ResultViewAddress;
         private System.Windows.Forms.ColumnHeader ResultViewType;
@@ -916,16 +979,6 @@ namespace PS4CheaterNeo
         private System.Windows.Forms.ToolStripStatusLabel ToolStripMsg;
         private System.Windows.Forms.Button FilterRuleBtn;
         private System.Windows.Forms.CheckBox IsFilterBox;
-        private System.Windows.Forms.CheckBox HexBox;
-        private System.Windows.Forms.TextBox ValueBox;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.TextBox Value1Box;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.ComboBox ScanTypeBox;
-        private System.Windows.Forms.ComboBox CompareTypeBox;
-        private System.Windows.Forms.Button ScanBtn;
-        private System.Windows.Forms.Button RefreshBtn;
         private System.Windows.Forms.ProgressBar ToolStripBar;
         private System.Windows.Forms.ContextMenuStrip ResultViewMenu;
         private System.Windows.Forms.ToolStripMenuItem ResultViewAddToCheatGrid;
@@ -939,8 +992,6 @@ namespace PS4CheaterNeo
         private System.Windows.Forms.ToolStripMenuItem SectionViewDump;
         private System.Windows.Forms.ToolStripSeparator ToolStripSeparator3;
         private System.Windows.Forms.ToolStripMenuItem SectionViewCheck;
-        private System.Windows.Forms.Button NewBtn;
-        private System.Windows.Forms.TableLayoutPanel TableLayoutPanel1;
         private System.Windows.Forms.TextBox AddrMinBox;
         private System.Windows.Forms.TextBox AddrMaxBox;
         private System.Windows.Forms.Label label4;
@@ -954,9 +1005,25 @@ namespace PS4CheaterNeo
         private System.Windows.Forms.Timer SlowMotionTimer;
         private System.Windows.Forms.CheckBox SlowMotionBox;
         private System.Windows.Forms.SaveFileDialog SaveDialog;
-        private System.Windows.Forms.Button RedoBtn;
-        private System.Windows.Forms.Button UndoBtn;
         private System.Windows.Forms.ToolStripMenuItem SectionViewImport;
         private System.Windows.Forms.OpenFileDialog OpenDialog;
+        private System.Windows.Forms.CheckBox AutoPauseBox;
+        private System.Windows.Forms.Button RedoBtn;
+        private System.Windows.Forms.Button UndoBtn;
+        private System.Windows.Forms.ComboBox ScanTypeBox;
+        private System.Windows.Forms.TableLayoutPanel TableLayoutPanel1;
+        private System.Windows.Forms.TextBox ValueBox;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.TextBox Value1Box;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.CheckBox HexBox;
+        private System.Windows.Forms.CheckBox NotBox;
+        private System.Windows.Forms.Button NewBtn;
+        private System.Windows.Forms.Button RefreshBtn;
+        private System.Windows.Forms.Button ScanBtn;
+        private System.Windows.Forms.ComboBox CompareTypeBox;
+        private System.Windows.Forms.CheckBox DoneResumeBox;
+        private System.Windows.Forms.CheckBox SimpleValuesBox;
     }
 }

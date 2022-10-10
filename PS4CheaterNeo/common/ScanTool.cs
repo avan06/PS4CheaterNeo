@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -186,7 +187,23 @@ namespace PS4CheaterNeo
             return result;
         }
 
-        public static bool ComparerExact(ScanType scanType, byte[] newValue, byte[] inputValue0)
+        /// <summary>
+        /// Floating-Point simple values only
+        /// Refer to IEEE754 and cheat-engine's floatscanWithoutExponents specification
+        /// IEEE Floating-Point numbers are stored as follows:
+        /// The single format 32 bit has: 1 bit for sign,  8 bits for exponent, 23 bits for fraction
+        /// The double format 64 bit has: 1 bit for sign, 11 bits for exponent, 52 bits for fraction
+        /// https://en.wikipedia.org/wiki/IEEE_754
+        /// https://github.com/cheat-engine/cheat-engine
+        /// https://stackoverflow.com/a/390072
+        /// https://userpages.umbc.edu/~squire/cs411_l11.html
+        /// </summary>
+        /// <param name="scanType">scan type</param>
+        /// <param name="newValue">new value in memory</param>
+        /// <param name="inputValue0">the value of the specified query</param>
+        /// <param name="isFloatingSimpleValues">whether to compare only simple values when the type is Floating-Point</param>
+        /// <param name="floatingSimpleValueExponents">Determine the exponents value of the simple value of floating. Cheat Engine is set to 11 (2 to the 11th power = 2^11 = plus or minus 2048). Default value is 11</param>
+        public static bool ComparerExact(ScanType scanType, byte[] newValue, byte[] inputValue0, bool isFloatingSimpleValues, byte floatingSimpleValueExponents)
         {
             bool result;
             switch (scanType)
@@ -206,11 +223,21 @@ namespace PS4CheaterNeo
                     var newDouble = BitConverter.ToDouble(newValue, 0);
                     var input0Double = BitConverter.ToDouble(inputValue0, 0);
                     result = Math.Abs(newDouble - input0Double) < 1;
+                    if (result && isFloatingSimpleValues)
+                    {
+                        ulong newVar = BitConverter.ToUInt64(newValue, 0);
+                        if (newVar > 0 && Math.Abs(1023 - (int)(((long)newVar >> 52) & 0x7ffL)) > floatingSimpleValueExponents) return false;
+                    }
                     break;
                 case ScanType.Float_:
                     var newFloat = BitConverter.ToSingle(newValue, 0);
                     var input0Float = BitConverter.ToSingle(inputValue0, 0);
                     result = Math.Abs(newFloat - input0Float) < 1;
+                    if (result && isFloatingSimpleValues)
+                    {
+                        uint newVar = BitConverter.ToUInt32(newValue, 0);
+                        if (newVar > 0 && Math.Abs(127 - (int)(((int)newVar >> 23) & 0xffL)) > floatingSimpleValueExponents) return false;
+                    }
                     break;
                 default:
                     throw new Exception("Unknown scanType type.");
@@ -219,6 +246,20 @@ namespace PS4CheaterNeo
             return result;
         }
 
+        /// <summary>
+        /// Floating-Point simple values only
+        /// Refer to IEEE754 and cheat-engine's floatscanWithoutExponents specification
+        /// IEEE Floating-Point numbers are stored as follows:
+        /// The single format 32 bit has: 1 bit for sign,  8 bits for exponent, 23 bits for fraction
+        /// The double format 64 bit has: 1 bit for sign, 11 bits for exponent, 52 bits for fraction
+        /// https://en.wikipedia.org/wiki/IEEE_754
+        /// https://github.com/cheat-engine/cheat-engine
+        /// https://stackoverflow.com/a/390072
+        /// https://userpages.umbc.edu/~squire/cs411_l11.html
+        /// </summary>
+        /// <param name="comparerTool">comparison tool</param>
+        /// <param name="newData">new value in memory</param>
+        /// <param name="oldData">previous result value</param>
         public static bool Comparer(ComparerTool comparerTool, ulong newData, ulong oldData)
         {
             bool result = false;
@@ -571,6 +612,24 @@ namespace PS4CheaterNeo
                         throw new Exception("Unknown scanType type.");
                 }
             }
+
+            if (result && comparerTool.isFloatingSimpleValues && newData > 0)
+            {
+                if (comparerTool.scanType == ScanType.Double_)
+                {
+                    if (Math.Abs(1023 - (int)(((long)newData >> 52) & 0x7ffL)) > comparerTool.floatingSimpleValueExponents) result = false;
+                }
+                else if (comparerTool.scanType == ScanType.Float_)
+                {
+                    if (Math.Abs(127 - (int)(((int)newData >> 23) & 0xffL)) > comparerTool.floatingSimpleValueExponents) result = false;
+                }
+            }
+
+            if (comparerTool.isNot &&
+                comparerTool.compareType != CompareType.IncreasedBy &&
+                comparerTool.compareType != CompareType.DecreasedBy &&
+                comparerTool.compareType != CompareType.UnknownInitial) result ^= comparerTool.isNot; //result XOR true
+
             return result;
         }
 
@@ -752,17 +811,39 @@ namespace PS4CheaterNeo
         }
     }
 
+    /// <summary>
+    /// comparison tool
+    /// parse the value of the input query before comparing
+    /// </summary>
     public class ComparerTool
     {
+        /// <summary>scan type</summary>
         public ScanType scanType { get; }
         public CompareType compareType { get; }
+        /// <summary>the length of the query value</summary>
         public int scanTypeLength { get; }
+        /// <summary>the length of the first query value for group query</summary>
         public int groupFirstLength { get; }
-        public byte[] value0Byte { get; } //for ScanType:Hex、String
+        /// <summary>input value for ScanType:Hex、String</summary>
+        public byte[] value0Byte { get; }
+        /// <summary>input value for comparison</summary>
         public ulong value0Long { get; }
+        /// <summary>used for the second input value of compare type between</summary>
         public ulong value1Long { get; }
+        /// <summary>input values for group query</summary>
         public List<byte[]> groupValues { get; }
+        /// <summary>input types for group query</summary>
         public List<(ScanType scanType, int groupTypeLength, bool isAny)> groupTypes { get; }
+        /// <summary>input value for comparison</summary>
+        public string value0 { get; }
+        /// <summary>used for the second input value of compare type between</summary>
+        public string value1 { get; }
+        /// <summary>whether to invert the comparison result</summary>
+        public bool isNot { get; }
+        /// <summary>whether to compare only simple values when the type is Floating-Point</summary>
+        public bool isFloatingSimpleValues { get; }
+        /// <summary>Determine the exponents value of the simple value of floating. Cheat Engine is set to 11 (2 to the 11th power = 2^11 = plus or minus 2048). Default value is 11</summary>
+        public byte floatingSimpleValueExponents { get; }
 
         public UInt64 input0UInt64 { get; }
         public UInt64 input1UInt64 { get; }
@@ -782,36 +863,41 @@ namespace PS4CheaterNeo
         public float input0Float { get; }
         public float input1Float { get; }
 
-        public ComparerTool(ScanType scanType, CompareType compareType, string value0, string value1)
+        public ComparerTool(ScanType scanType, CompareType compareType, string value0, string value1, bool isHex, bool isNot, bool isFloatingSimpleValues, byte floatingSimpleValueExponents)
         {
             this.scanType = scanType;
             this.compareType = compareType;
+            this.value0 = value0;
+            this.value1 = value1;
+            this.isNot = isNot;
+            this.isFloatingSimpleValues = isFloatingSimpleValues;
+            this.floatingSimpleValueExponents = floatingSimpleValueExponents;
 
             switch (scanType)
             {
                 case ScanType.Bytes_8:
-                    input0UInt64 = Convert.ToUInt64(value0);
-                    input1UInt64 = Convert.ToUInt64(value1);
+                    input0UInt64 = isHex ? ulong.Parse(value0, NumberStyles.HexNumber) : ulong.Parse(value0);
+                    input1UInt64 = isHex ? ulong.Parse(value1, NumberStyles.HexNumber) : ulong.Parse(value1);
                     break;
                 case ScanType.Bytes_4:
-                    input0UInt32 = Convert.ToUInt32(value0);
-                    input1UInt32 = Convert.ToUInt32(value1);
+                    input0UInt32 = isHex ? uint.Parse(value0, NumberStyles.HexNumber) : uint.Parse(value0);
+                    input1UInt32 = isHex ? uint.Parse(value1, NumberStyles.HexNumber) : uint.Parse(value1);
                     break;
                 case ScanType.Bytes_2:
-                    input0UInt16 = Convert.ToUInt16(value0);
-                    input1UInt16 = Convert.ToUInt16(value1);
+                    input0UInt16 = isHex ? ushort.Parse(value0, NumberStyles.HexNumber) : ushort.Parse(value0);
+                    input1UInt16 = isHex ? ushort.Parse(value1, NumberStyles.HexNumber) : ushort.Parse(value1);
                     break;
                 case ScanType.Byte_:
-                    input0Byte = Convert.ToByte(value0);
-                    input1Byte = Convert.ToByte(value1);
+                    input0Byte = isHex ? byte.Parse(value0, NumberStyles.HexNumber) : byte.Parse(value0);
+                    input1Byte = isHex ? byte.Parse(value1, NumberStyles.HexNumber) : byte.Parse(value1);
                     break;
                 case ScanType.Double_:
-                    input0Double = Convert.ToDouble(value0);
-                    input1Double = Convert.ToDouble(value1);
+                    input0Double = isHex ? double.Parse(value0, NumberStyles.HexNumber) : double.Parse(value0);
+                    input1Double = isHex ? double.Parse(value1, NumberStyles.HexNumber) : double.Parse(value1);
                     break;
                 case ScanType.Float_:
-                    input0Float = Convert.ToSingle(value0);
-                    input1Float = Convert.ToSingle(value1);
+                    input0Float = isHex ? float.Parse(value0, NumberStyles.HexNumber) : float.Parse(value0);
+                    input1Float = isHex ? float.Parse(value1, NumberStyles.HexNumber) : float.Parse(value1);
                     break;
             }
 

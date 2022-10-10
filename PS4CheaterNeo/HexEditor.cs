@@ -31,6 +31,11 @@ namespace PS4CheaterNeo
             mutex = new Mutex();
 
             InitializeComponent();
+            if (!Properties.Settings.Default.EnableCollapsibleContainer.Value)
+            {
+                SplitContainer1.SplitterButtonStyle = ButtonStyle.None;
+                SplitContainer2.SplitterButtonStyle = ButtonStyle.None;
+            }
 
             try
             {
@@ -51,6 +56,7 @@ namespace PS4CheaterNeo
 
             for (int idx = 0; idx <= 0x10; idx++) HexViewGroupSize.Items.Add("GroupSize:" + idx);
             HexViewGroupSize.SelectedIndex = HexView.GroupSize;
+            AutoRefreshTimer.Interval = (int)Properties.Settings.Default.AutoRefreshTimerInterval.Value;
         }
 
         public HexEditor(Main mainForm, Section section, int baseAddr) : this(mainForm)

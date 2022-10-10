@@ -30,7 +30,7 @@ namespace PS4CheaterNeo
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.SplitContainer1 = new PS4CheaterNeo.CollapsibleSplitContainer();
             this.PointerListView = new System.Windows.Forms.ListView();
             this.PointerListViewMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.PointerListViewAddToCheatGrid = new System.Windows.Forms.ToolStripMenuItem();
@@ -57,53 +57,56 @@ namespace PS4CheaterNeo
             this.label1 = new System.Windows.Forms.Label();
             this.SaveDialog = new System.Windows.Forms.SaveFileDialog();
             this.OpenDialog = new System.Windows.Forms.OpenFileDialog();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
-            this.splitContainer1.Panel1.SuspendLayout();
-            this.splitContainer1.Panel2.SuspendLayout();
-            this.splitContainer1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.SplitContainer1)).BeginInit();
+            this.SplitContainer1.Panel1.SuspendLayout();
+            this.SplitContainer1.Panel2.SuspendLayout();
+            this.SplitContainer1.SuspendLayout();
             this.PointerListViewMenu.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.MaxRangeUpDown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.LevelUpdown)).BeginInit();
             this.SuspendLayout();
             // 
-            // splitContainer1
+            // SplitContainer1
             // 
-            this.splitContainer1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitContainer1.Location = new System.Drawing.Point(0, 0);
-            this.splitContainer1.Name = "splitContainer1";
+            this.SplitContainer1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.SplitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.SplitContainer1.Location = new System.Drawing.Point(0, 0);
+            this.SplitContainer1.Name = "SplitContainer1";
             // 
-            // splitContainer1.Panel1
+            // SplitContainer1.Panel1
             // 
-            this.splitContainer1.Panel1.Controls.Add(this.PointerListView);
-            this.splitContainer1.Panel1.Controls.Add(this.statusStrip1);
-            this.splitContainer1.Panel1.ForeColor = System.Drawing.Color.White;
+            this.SplitContainer1.Panel1.Controls.Add(this.PointerListView);
+            this.SplitContainer1.Panel1.Controls.Add(this.statusStrip1);
+            this.SplitContainer1.Panel1.ForeColor = System.Drawing.Color.White;
             // 
-            // splitContainer1.Panel2
+            // SplitContainer1.Panel2
             // 
-            this.splitContainer1.Panel2.Controls.Add(this.FilterSizeRuleBtn);
-            this.splitContainer1.Panel2.Controls.Add(this.IsFilterSizeBox);
-            this.splitContainer1.Panel2.Controls.Add(this.NegativeOffsetBox);
-            this.splitContainer1.Panel2.Controls.Add(this.ScanTypeBox);
-            this.splitContainer1.Panel2.Controls.Add(this.NewBtn);
-            this.splitContainer1.Panel2.Controls.Add(this.label3);
-            this.splitContainer1.Panel2.Controls.Add(this.MaxRangeUpDown);
-            this.splitContainer1.Panel2.Controls.Add(this.LevelUpdown);
-            this.splitContainer1.Panel2.Controls.Add(this.ProgBar);
-            this.splitContainer1.Panel2.Controls.Add(this.LoadBtn);
-            this.splitContainer1.Panel2.Controls.Add(this.SaveBtn);
-            this.splitContainer1.Panel2.Controls.Add(this.FilterRuleBtn);
-            this.splitContainer1.Panel2.Controls.Add(this.IsFilterBox);
-            this.splitContainer1.Panel2.Controls.Add(this.FastScanBox);
-            this.splitContainer1.Panel2.Controls.Add(this.IsInitScan);
-            this.splitContainer1.Panel2.Controls.Add(this.label2);
-            this.splitContainer1.Panel2.Controls.Add(this.ScanBtn);
-            this.splitContainer1.Panel2.Controls.Add(this.AddressBox);
-            this.splitContainer1.Panel2.Controls.Add(this.label1);
-            this.splitContainer1.Size = new System.Drawing.Size(800, 450);
-            this.splitContainer1.SplitterDistance = 672;
-            this.splitContainer1.TabIndex = 0;
+            this.SplitContainer1.Panel2.Controls.Add(this.FilterSizeRuleBtn);
+            this.SplitContainer1.Panel2.Controls.Add(this.IsFilterSizeBox);
+            this.SplitContainer1.Panel2.Controls.Add(this.NegativeOffsetBox);
+            this.SplitContainer1.Panel2.Controls.Add(this.ScanTypeBox);
+            this.SplitContainer1.Panel2.Controls.Add(this.NewBtn);
+            this.SplitContainer1.Panel2.Controls.Add(this.label3);
+            this.SplitContainer1.Panel2.Controls.Add(this.MaxRangeUpDown);
+            this.SplitContainer1.Panel2.Controls.Add(this.LevelUpdown);
+            this.SplitContainer1.Panel2.Controls.Add(this.ProgBar);
+            this.SplitContainer1.Panel2.Controls.Add(this.LoadBtn);
+            this.SplitContainer1.Panel2.Controls.Add(this.SaveBtn);
+            this.SplitContainer1.Panel2.Controls.Add(this.FilterRuleBtn);
+            this.SplitContainer1.Panel2.Controls.Add(this.IsFilterBox);
+            this.SplitContainer1.Panel2.Controls.Add(this.FastScanBox);
+            this.SplitContainer1.Panel2.Controls.Add(this.IsInitScan);
+            this.SplitContainer1.Panel2.Controls.Add(this.label2);
+            this.SplitContainer1.Panel2.Controls.Add(this.ScanBtn);
+            this.SplitContainer1.Panel2.Controls.Add(this.AddressBox);
+            this.SplitContainer1.Panel2.Controls.Add(this.label1);
+            this.SplitContainer1.Size = new System.Drawing.Size(800, 450);
+            this.SplitContainer1.SplitterButtonLocation = PS4CheaterNeo.ButtonLocation.Panel1;
+            this.SplitContainer1.SplitterButtonSize = 13;
+            this.SplitContainer1.SplitterButtonStyle = PS4CheaterNeo.ButtonStyle.SingleImage;
+            this.SplitContainer1.SplitterDistance = 672;
+            this.SplitContainer1.TabIndex = 0;
             // 
             // PointerListView
             // 
@@ -405,17 +408,17 @@ namespace PS4CheaterNeo
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(36)))), ((int)(((byte)(36)))));
             this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Controls.Add(this.splitContainer1);
+            this.Controls.Add(this.SplitContainer1);
             this.ForeColor = System.Drawing.Color.White;
             this.Name = "PointerFinder";
             this.Text = "PointerFinder";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.PointerFinder_FormClosing);
-            this.splitContainer1.Panel1.ResumeLayout(false);
-            this.splitContainer1.Panel1.PerformLayout();
-            this.splitContainer1.Panel2.ResumeLayout(false);
-            this.splitContainer1.Panel2.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
-            this.splitContainer1.ResumeLayout(false);
+            this.SplitContainer1.Panel1.ResumeLayout(false);
+            this.SplitContainer1.Panel1.PerformLayout();
+            this.SplitContainer1.Panel2.ResumeLayout(false);
+            this.SplitContainer1.Panel2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.SplitContainer1)).EndInit();
+            this.SplitContainer1.ResumeLayout(false);
             this.PointerListViewMenu.ResumeLayout(false);
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
@@ -427,7 +430,7 @@ namespace PS4CheaterNeo
 
         #endregion
 
-        private System.Windows.Forms.SplitContainer splitContainer1;
+        private CollapsibleSplitContainer SplitContainer1;
         private System.Windows.Forms.TextBox AddressBox;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button ScanBtn;

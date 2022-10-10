@@ -83,6 +83,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="common\CheatJson.cs" />
+    <Compile Include="common\CollapsibleSplitContainer.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="common\ComboItemBox.cs">
       <SubType>Component</SubType>
     </Compile>

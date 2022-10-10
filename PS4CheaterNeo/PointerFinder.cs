@@ -24,6 +24,7 @@ namespace PS4CheaterNeo
         public PointerFinder(Main mainForm, ulong address, ScanType scanType)
         {
             InitializeComponent();
+            if (!Properties.Settings.Default.EnableCollapsibleContainer.Value) SplitContainer1.SplitterButtonStyle = ButtonStyle.None;
             this.mainForm = mainForm;
             sectionTool = new SectionTool();
             processName = mainForm.ProcessName;

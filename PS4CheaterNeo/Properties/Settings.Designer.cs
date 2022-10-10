@@ -62,6 +62,32 @@ namespace PS4CheaterNeo.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True|1_General|2_UI|Determines whether to enable collapsible split container ui i" +
+            "n Query and HexEditor and PointerFinder windows. Default enabled")]
+        public global::OptionTreeView.Option<bool> EnableCollapsibleContainer {
+            get {
+                return ((global::OptionTreeView.Option<bool>)(this["EnableCollapsibleContainer"]));
+            }
+            set {
+                this["EnableCollapsibleContainer"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True|2_Cheat|Cheat|Determines whether to enable cheat lock in the main window. De" +
+            "fault enabled")]
+        public global::OptionTreeView.Option<bool> EnableCheatLock {
+            get {
+                return ((global::OptionTreeView.Option<bool>)(this["EnableCheatLock"]));
+            }
+            set {
+                this["EnableCheatLock"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True|2_Cheat|Cheat|Determine whether to enable verifying Section values when lock" +
             "ing cheat items. Default enabled")]
         public global::OptionTreeView.Option<bool> VerifySectionWhenLock {
@@ -83,6 +109,19 @@ namespace PS4CheaterNeo.Properties {
             }
             set {
                 this["VerifySectionWhenRefresh"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True|2_Cheat|Cheat|Determine whether to automatically write to PS4 when editing c" +
+            "heat values in UpDown")]
+        public global::OptionTreeView.Option<bool> CheatCellDirtyValueCommit {
+            get {
+                return ((global::OptionTreeView.Option<bool>)(this["CheatCellDirtyValueCommit"]));
+            }
+            set {
+                this["CheatCellDirtyValueCommit"] = value;
             }
         }
         
@@ -127,73 +166,6 @@ namespace PS4CheaterNeo.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True|3_Query|2_Filter|Determine whether to enable filtering Sections when opening" +
-            " the query window. Default enabled")]
-        public global::OptionTreeView.Option<bool> EnableFilterQuery {
-            get {
-                return ((global::OptionTreeView.Option<bool>)(this["EnableFilterQuery"]));
-            }
-            set {
-                this["EnableFilterQuery"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("libSce,libc.prx,SceShell,SceLib,SceNp,SceVoice,SceFios,libkernel,SceVdec|3_Query|" +
-            "2_Filter|Enter the filter value, the filter will be set here when listing Sectio" +
-            "ns")]
-        public global::OptionTreeView.Option<string> SectionFilterKeys {
-            get {
-                return ((global::OptionTreeView.Option<string>)(this["SectionFilterKeys"]));
-            }
-            set {
-                this["SectionFilterKeys"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0x2000|3_Query|3_Result|Enter the maximum number of displayed query results. will" +
-            " only affect the number of results displayed in the ResultView. Default value is" +
-            " 8192")]
-        public global::OptionTreeView.Option<uint> MaxResultShow {
-            get {
-                return ((global::OptionTreeView.Option<uint>)(this["MaxResultShow"]));
-            }
-            set {
-                this["MaxResultShow"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("204800|3_Query|2_Filter|Filter out when section size is less than this value(unit" +
-            " is bytes)")]
-        public global::OptionTreeView.Option<uint> SectionFilterSize {
-            get {
-                return ((global::OptionTreeView.Option<uint>)(this["SectionFilterSize"]));
-            }
-            set {
-                this["SectionFilterSize"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False|3_Query|2_Filter|Determine whether to enable filtering Sections by size whe" +
-            "n opening the query window. Default disabled")]
-        public global::OptionTreeView.Option<bool> EnableFilterSizeQuery {
-            get {
-                return ((global::OptionTreeView.Option<bool>)(this["EnableFilterSizeQuery"]));
-            }
-            set {
-                this["EnableFilterSizeQuery"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute(@"50|3_Query|1_Query|Set the minimum buffer size (in MB) in querying and pointerFinder, enter 0 to not use buffer, setting this value to 0 is better when the total number of Sections in the game is low. If the game has more than a thousand Sections, Buffer must be set")]
         public global::OptionTreeView.Option<uint> QueryBufferSize {
             get {
@@ -201,19 +173,6 @@ namespace PS4CheaterNeo.Properties {
             }
             set {
                 this["QueryBufferSize"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True|2_Cheat|Cheat|Determine whether to automatically write to PS4 when editing c" +
-            "heat values in UpDown")]
-        public global::OptionTreeView.Option<bool> CheatCellDirtyValueCommit {
-            get {
-                return ((global::OptionTreeView.Option<bool>)(this["CheatCellDirtyValueCommit"]));
-            }
-            set {
-                this["CheatCellDirtyValueCommit"] = value;
             }
         }
         
@@ -269,6 +228,114 @@ namespace PS4CheaterNeo.Properties {
             }
             set {
                 this["EnableScanDoneResume"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("11|3_Query|1_Query|Determine the exponents value of the simple value of floating." +
+            " Cheat Engine is set to 11 (2 to the 11th power = 2^11 = plus or minus 2048). De" +
+            "fault value is 11")]
+        public global::OptionTreeView.Option<byte> FloatingSimpleValueExponents {
+            get {
+                return ((global::OptionTreeView.Option<byte>)(this["FloatingSimpleValueExponents"]));
+            }
+            set {
+                this["FloatingSimpleValueExponents"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True|3_Query|2_Filter|Determine whether to enable filtering Sections when opening" +
+            " the query window. Default enabled")]
+        public global::OptionTreeView.Option<bool> EnableFilterQuery {
+            get {
+                return ((global::OptionTreeView.Option<bool>)(this["EnableFilterQuery"]));
+            }
+            set {
+                this["EnableFilterQuery"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("libSce,libc.prx,SceShell,SceLib,SceNp,SceVoice,SceFios,libkernel,SceVdec|3_Query|" +
+            "2_Filter|Enter the filter value, the filter will be set here when listing Sectio" +
+            "ns")]
+        public global::OptionTreeView.Option<string> SectionFilterKeys {
+            get {
+                return ((global::OptionTreeView.Option<string>)(this["SectionFilterKeys"]));
+            }
+            set {
+                this["SectionFilterKeys"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False|3_Query|2_Filter|Determine whether to enable filtering Sections by size whe" +
+            "n opening the query window. Default disabled")]
+        public global::OptionTreeView.Option<bool> EnableFilterSizeQuery {
+            get {
+                return ((global::OptionTreeView.Option<bool>)(this["EnableFilterSizeQuery"]));
+            }
+            set {
+                this["EnableFilterSizeQuery"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("204800|3_Query|2_Filter|Filter out when section size is less than this value(unit" +
+            " is bytes)")]
+        public global::OptionTreeView.Option<uint> SectionFilterSize {
+            get {
+                return ((global::OptionTreeView.Option<uint>)(this["SectionFilterSize"]));
+            }
+            set {
+                this["SectionFilterSize"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0x2000|3_Query|3_Result|Enter the maximum number of displayed query results. will" +
+            " only affect the number of results displayed in the ResultView. Default value is" +
+            " 8192")]
+        public global::OptionTreeView.Option<uint> MaxResultShow {
+            get {
+                return ((global::OptionTreeView.Option<uint>)(this["MaxResultShow"]));
+            }
+            set {
+                this["MaxResultShow"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False|4_HexEditor|Hex|Determines whether to enable Auto Refresh in HexEditor. Def" +
+            "ault disabled")]
+        public global::OptionTreeView.Option<bool> EnableAutoRefresh {
+            get {
+                return ((global::OptionTreeView.Option<bool>)(this["EnableAutoRefresh"]));
+            }
+            set {
+                this["EnableAutoRefresh"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("2500|4_HexEditor|Hex|Determines the Interval of AutoRefreshTimer when AutoRefresh" +
+            " is enabled, in milliseconds, HexEditor needs to be restarted after this value i" +
+            "s changed. Default 2500")]
+        public global::OptionTreeView.Option<uint> AutoRefreshTimerInterval {
+            get {
+                return ((global::OptionTreeView.Option<uint>)(this["AutoRefreshTimerInterval"]));
+            }
+            set {
+                this["AutoRefreshTimerInterval"] = value;
             }
         }
     }

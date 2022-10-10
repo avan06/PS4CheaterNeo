@@ -2,7 +2,7 @@
 
 PS4CheaterNeo is a program to find game cheat codes, and it is based on [`ps4debug`](https://github.com/jogolden/ps4debug) and `.Net Framework 4.8`.
 
-Currently in `version 0.9.7.2-beta`
+Currently in `version 0.9.7.3-beta`
 
 
 ## Table of Contents
@@ -186,6 +186,16 @@ Cheat format used by PS4 Trainer and GoldHEN Cheat
 ![query_4](assets/query_4.webp)
 
 
+#### Query window: collapsible split container ui and added SimpleValue, Not, AutoPause and DoneResume CheckBox 
+
+- Added collapsible split container ui in Query and HexEditor and PointerFinder (can be set in options to enable or not).
+- Added SimpleValue CheckBox in the query window. When the scan type is float or double, this feature can be enabled to reduce unnecessary results.
+- Added Not CheckBox in the query window. When this feature is enabled, the scanning logic can be reversed. For example, if the compare type is exact and Not is enabled, it becomes not exact.
+- Added AutoPause and DoneResume CheckBox in the query window, you can determine whether to enable or not.
+
+![query_5](assets/query_5.webp)
+
+
 ### Section
 
 - The memory address of the PS4 game is the start position of the specific `section` plus the relative offset value.
@@ -313,8 +323,12 @@ Enter PS4 IP location.
 Enter PS4 Port.  
 - `PS4FWVersion`:  
 Enter PS4 FW Version (Confirm the fw version only when perform sendpayload).  
+- `EnableCollapsibleContainer`:  
+Determines whether to enable `collapsible split container` ui in `Query and HexEditor and PointerFinder` windows. Default enabled.
 
 #### Cheat  
+- `EnableCheatLock`:  
+Determines whether to `enable cheat lock` in the `main` window. `Default enabled`.  
 - `CheatCellDirtyValueCommit`:  
 Determine whether to automatically write to PS4 when editing cheat values in UpDown, `Default enabled`.  
 - `VerifySectionWhenLock`:  
@@ -335,6 +349,8 @@ Access value directly by address when the number of query results for the same S
 Determine whether to enable filtering Sections when opening the query window, `Default enabled`.  
 - `SectionFilterKeys`:  
 Enter the filter value, the filter will be set here when listing Sections.  
+- `EnableFilterSizeQuery`:  
+Determine whether to enable filtering Sections when opening the query window. `Default enabled`.
 - `SectionFilterSize`:  
 Filter out when section size is less than this value(unit is bytes), `Default is 204,800`.  
 - `MaxResultShow`:  
@@ -344,9 +360,17 @@ Set the minimum buffer size (in MB) in querying and pointerFinder, enter 0 to no
 - `EnableUndoScan`:  
 Determines whether to enable undo scan(revert to the previous scan result), if enabled, more memory needs to be used during scanning. `Default enable`.  
 - `EnableScanAutoPause`:  
-  Determines whether to automatically pause the game when starting the scan in query. `Default disabled`.  
+Determines whether to automatically pause the game when starting the scan in query. `Default disabled`.  
 - `EnableScanDoneResume`:  
-  Determines whether to automatically resume the game when the scan is complete in query. `Default disabled`.  
+Determines whether to automatically resume the game when the scan is complete in query. `Default disabled`.  
+- `FloatingSimpleValueExponents`:  
+Determine the `exponents value of the simple value of floating`. this option value is used in the query window when SimpleValues for floating point numbers is enabled. Cheat Engine is set to 11 (2 to the 11th power = 2^11 = plus or minus 2048). `Default value is 11`.
+
+#### HexEditor  
+- `EnableAutoRefresh`:  
+Determines whether to enable `Auto Refresh` in HexEditor. `Default disabled`.  
+- `AutoRefreshTimerInterval`:  
+Determines the Interval of AutoRefreshTimer when AutoRefresh is enabled, in `milliseconds`, HexEditor needs to be restarted after this value is changed. `Default 2500`.  
 
 ![option](assets/option.webp)
 
