@@ -1017,9 +1017,8 @@ namespace PS4CheaterNeo
 
             int listIdx = 0;
             int listCount = CompareTypeBox.Items.Count;
-
-            for (; listIdx < listCount; ++listIdx) if (CompareTypeBox.Items[listIdx] == selectedCompareType) break;
-
+            for (; listIdx < listCount; ++listIdx)
+                if (selectedCompareType != null && (CompareType)CompareTypeBox.Items[listIdx] == (CompareType)selectedCompareType) break;
             CompareTypeBox.SelectedIndex = listIdx == listCount ? 0 : listIdx;
         }
 
