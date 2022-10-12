@@ -2,7 +2,7 @@
 
 PS4CheaterNeo is a program to find game cheat codes, and it is based on [`ps4debug`](https://github.com/jogolden/ps4debug) and `.Net Framework 4.8`.
 
-Currently in `version 0.9.7.4-beta`
+Currently in `version 0.9.7.5-beta`
 
 
 ## Table of Contents
@@ -196,6 +196,21 @@ Cheat format used by PS4 Trainer and GoldHEN Cheat
 ![query_5](assets/query_5.webp)
 
 
+#### Query window: search hex with wildcards or decimal
+
+- Added support for search hex with wildcards when ScanType is Hex  
+> For example  
+> Memory: 00 00 00 10 FF EE DD CC 00 00 00 20  
+> Input: 00 00 00 10 `??` `??` `**` `**` 00 00 00 20  
+> Hex CheckBox `clicked`, ?? is the same as **, `blank` can also be `omitted`  
+
+- Added support for search hex using decimal when ScanType is Hex  
+> For example  
+> Memory: 00 00 00 10 FF EE DD CC 00 00 00 20  
+> Input: `?` `?` `?` `?` 255 238 221 204 `*` `*` `*` `*`  
+> Hex CheckBox `unclicked`, ? is the same as *, `blank` spaces are `required`  
+
+
 ### Section
 
 - The memory address of the PS4 game is the start position of the specific `section` plus the relative offset value.
@@ -363,6 +378,8 @@ Determines whether to enable undo scan(revert to the previous scan result), if e
 Determines whether to automatically pause the game when starting the scan in query. `Default disabled`.  
 - `EnableScanDoneResume`:  
 Determines whether to automatically resume the game when the scan is complete in query. `Default disabled`.  
+- `EnableFloatingResultExact`:  
+Determines whether to make the calculation result of `Floating(float, double) completely exact` in query window, there can be `0.0001 difference` in the old mechanism. `Default enabled`.  
 - `FloatingSimpleValueExponents`:  
 Determine the `exponents value of the simple value of floating`. this option value is used in the query window when SimpleValues for floating point numbers is enabled. Cheat Engine is set to 11 (2 to the 11th power = 2^11 = plus or minus 2048). `Default value is 11`.
 
@@ -385,3 +402,4 @@ Determines the Interval of AutoRefreshTimer when AutoRefresh is enabled, in `mil
 [AsmJit](https://github.com/hypeartist/AsmJit)  
 [GroupGridView](https://github.com/avan06/GroupGridView)  
 [OptionTreeView](https://github.com/avan06/OptionTreeView)  
+[CollapsibleSplitcontainer](https://github.com/avan06/CollapsibleSplitcontainer)  

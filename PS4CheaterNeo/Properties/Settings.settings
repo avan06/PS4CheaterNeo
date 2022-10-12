@@ -50,23 +50,26 @@
     <Setting Name="EnableScanDoneResume" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
       <Value Profile="(Default)">False|3_Query|1_Query|Determines whether to automatically resume the game when the scan is complete in query. Default disabled</Value>
     </Setting>
+    <Setting Name="EnableFloatingResultExact" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
+      <Value Profile="(Default)">True|3_Query|2_Floating|Determines whether to make the calculation result of Floating(float, double) completely exact in query window, there can be 0.0001 difference in the old mechanism. Default enabled</Value>
+    </Setting>
     <Setting Name="FloatingSimpleValueExponents" Type="OptionTreeView.Option&lt;byte&gt;" Scope="User">
-      <Value Profile="(Default)">11|3_Query|1_Query|Determine the exponents value of the simple value of floating. Cheat Engine is set to 11 (2 to the 11th power = 2^11 = plus or minus 2048). Default value is 11</Value>
+      <Value Profile="(Default)">11|3_Query|2_Floating|Determine the exponents value of the simple value of floating. Cheat Engine is set to 11 (2 to the 11th power = 2^11 = plus or minus 2048). Default value is 11</Value>
     </Setting>
     <Setting Name="EnableFilterQuery" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
-      <Value Profile="(Default)">True|3_Query|2_Filter|Determine whether to enable filtering Sections when opening the query window. Default enabled</Value>
+      <Value Profile="(Default)">True|3_Query|3_Filter|Determine whether to enable filtering Sections when opening the query window. Default enabled</Value>
     </Setting>
     <Setting Name="SectionFilterKeys" Type="OptionTreeView.Option&lt;string&gt;" Scope="User">
-      <Value Profile="(Default)">libSce,libc.prx,SceShell,SceLib,SceNp,SceVoice,SceFios,libkernel,SceVdec|3_Query|2_Filter|Enter the filter value, the filter will be set here when listing Sections</Value>
+      <Value Profile="(Default)">libSce,libc.prx,SceShell,SceLib,SceNp,SceVoice,SceFios,libkernel,SceVdec|3_Query|3_Filter|Enter the filter value, the filter will be set here when listing Sections</Value>
     </Setting>
     <Setting Name="EnableFilterSizeQuery" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
-      <Value Profile="(Default)">False|3_Query|2_Filter|Determine whether to enable filtering Sections by size when opening the query window. Default disabled</Value>
+      <Value Profile="(Default)">False|3_Query|3_Filter|Determine whether to enable filtering Sections by size when opening the query window. Default disabled</Value>
     </Setting>
     <Setting Name="SectionFilterSize" Type="OptionTreeView.Option&lt;uint&gt;" Scope="User">
-      <Value Profile="(Default)">204800|3_Query|2_Filter|Filter out when section size is less than this value(unit is bytes)</Value>
+      <Value Profile="(Default)">204800|3_Query|3_Filter|Filter out when section size is less than this value(unit is bytes)</Value>
     </Setting>
     <Setting Name="MaxResultShow" Type="OptionTreeView.Option&lt;uint&gt;" Scope="User">
-      <Value Profile="(Default)">0x2000|3_Query|3_Result|Enter the maximum number of displayed query results. will only affect the number of results displayed in the ResultView. Default value is 8192</Value>
+      <Value Profile="(Default)">0x2000|3_Query|4_Result|Enter the maximum number of displayed query results. will only affect the number of results displayed in the ResultView. Default value is 8192</Value>
     </Setting>
     <Setting Name="EnableAutoRefresh" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
       <Value Profile="(Default)">False|4_HexEditor|Hex|Determines whether to enable Auto Refresh in HexEditor. Default disabled</Value>

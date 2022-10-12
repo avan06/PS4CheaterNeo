@@ -233,9 +233,23 @@ namespace PS4CheaterNeo.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("11|3_Query|1_Query|Determine the exponents value of the simple value of floating." +
-            " Cheat Engine is set to 11 (2 to the 11th power = 2^11 = plus or minus 2048). De" +
-            "fault value is 11")]
+        [global::System.Configuration.DefaultSettingValueAttribute("True|3_Query|2_Floating|Determines whether to make the calculation result of Floa" +
+            "ting(float, double) completely exact in query window, there can be 0.0001 differ" +
+            "ence in the old mechanism. Default enabled")]
+        public global::OptionTreeView.Option<bool> EnableFloatingResultExact {
+            get {
+                return ((global::OptionTreeView.Option<bool>)(this["EnableFloatingResultExact"]));
+            }
+            set {
+                this["EnableFloatingResultExact"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("11|3_Query|2_Floating|Determine the exponents value of the simple value of floati" +
+            "ng. Cheat Engine is set to 11 (2 to the 11th power = 2^11 = plus or minus 2048)." +
+            " Default value is 11")]
         public global::OptionTreeView.Option<byte> FloatingSimpleValueExponents {
             get {
                 return ((global::OptionTreeView.Option<byte>)(this["FloatingSimpleValueExponents"]));
@@ -247,7 +261,7 @@ namespace PS4CheaterNeo.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True|3_Query|2_Filter|Determine whether to enable filtering Sections when opening" +
+        [global::System.Configuration.DefaultSettingValueAttribute("True|3_Query|3_Filter|Determine whether to enable filtering Sections when opening" +
             " the query window. Default enabled")]
         public global::OptionTreeView.Option<bool> EnableFilterQuery {
             get {
@@ -261,7 +275,7 @@ namespace PS4CheaterNeo.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("libSce,libc.prx,SceShell,SceLib,SceNp,SceVoice,SceFios,libkernel,SceVdec|3_Query|" +
-            "2_Filter|Enter the filter value, the filter will be set here when listing Sectio" +
+            "3_Filter|Enter the filter value, the filter will be set here when listing Sectio" +
             "ns")]
         public global::OptionTreeView.Option<string> SectionFilterKeys {
             get {
@@ -274,7 +288,7 @@ namespace PS4CheaterNeo.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False|3_Query|2_Filter|Determine whether to enable filtering Sections by size whe" +
+        [global::System.Configuration.DefaultSettingValueAttribute("False|3_Query|3_Filter|Determine whether to enable filtering Sections by size whe" +
             "n opening the query window. Default disabled")]
         public global::OptionTreeView.Option<bool> EnableFilterSizeQuery {
             get {
@@ -287,7 +301,7 @@ namespace PS4CheaterNeo.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("204800|3_Query|2_Filter|Filter out when section size is less than this value(unit" +
+        [global::System.Configuration.DefaultSettingValueAttribute("204800|3_Query|3_Filter|Filter out when section size is less than this value(unit" +
             " is bytes)")]
         public global::OptionTreeView.Option<uint> SectionFilterSize {
             get {
@@ -300,7 +314,7 @@ namespace PS4CheaterNeo.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0x2000|3_Query|3_Result|Enter the maximum number of displayed query results. will" +
+        [global::System.Configuration.DefaultSettingValueAttribute("0x2000|3_Query|4_Result|Enter the maximum number of displayed query results. will" +
             " only affect the number of results displayed in the ResultView. Default value is" +
             " 8192")]
         public global::OptionTreeView.Option<uint> MaxResultShow {

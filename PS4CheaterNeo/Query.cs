@@ -19,6 +19,7 @@ namespace PS4CheaterNeo
         readonly bool enableUndoScan;
         ComparerTool comparerTool;
         int hitCnt = 0;
+        bool enableFloatingResultExact = true;
         byte floatingSimpleValueExponents = 10;
 
         Dictionary<uint, BitsDictionary> bitsDictDict;
@@ -241,6 +242,7 @@ namespace PS4CheaterNeo
                     ComboItem process = (ComboItem)ProcessesBox.SelectedItem;
                     int pid = (int)process.Value;
 
+                    enableFloatingResultExact = Properties.Settings.Default.EnableFloatingResultExact.Value;
                     floatingSimpleValueExponents = Properties.Settings.Default.FloatingSimpleValueExponents.Value;
                     floatingSimpleValueExponents = (floatingSimpleValueExponents > 1 && floatingSimpleValueExponents < 51) ? (byte)(floatingSimpleValueExponents - 1) : (byte)10;
 
@@ -267,7 +269,13 @@ namespace PS4CheaterNeo
                         value1 = value1.Replace(" ", "").Replace("-", "").Replace("_", "");
                     }
 
-                    comparerTool = new ComparerTool(scanType, compareType, value0, value1, isHex, isNot, isFloatingSimpleValues, floatingSimpleValueExponents);
+                    comparerTool = new ComparerTool(scanType, compareType, value0, value1, isHex, isNot, isFloatingSimpleValues, enableFloatingResultExact, floatingSimpleValueExponents);
+
+                    if (scanType == ScanType.Hex && !isHex)
+                    { //ComparerTool has converted decimal to hex
+                        HexBox.Checked = true;
+                        ValueBox.Text = comparerTool.value0;
+                    }
 
                     ScanBtn.Text = "Stop";
                     if (scanSource != null) scanSource.Dispose();
@@ -284,6 +292,7 @@ namespace PS4CheaterNeo
             catch (Exception exception)
             {
                 MessageBox.Show(exception.Message + "\n" + exception.StackTrace, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                if (DoneResumeBox.Checked) ResumeBtn.PerformClick();
             }
         }
 
@@ -525,7 +534,7 @@ namespace PS4CheaterNeo
                         ulong longValue = ScanTool.BytesToULong(newValue);
                         if (ScanTool.Comparer(comparerTool, longValue, 0)) bitsDict.Add((uint)scanIdx, newValue);
                     }
-                    else if (ScanTool.ComparerExact(comparerTool.scanType, newValue, comparerTool.value0Byte, comparerTool.isFloatingSimpleValues, comparerTool.floatingSimpleValueExponents)) bitsDict.Add((uint)scanIdx, newValue);
+                    else if (ScanTool.ComparerExact(comparerTool, newValue, comparerTool.value0Byte)) bitsDict.Add((uint)scanIdx, newValue);
                 }
             }
             else
@@ -555,7 +564,7 @@ namespace PS4CheaterNeo
                         ulong newData = ScanTool.BytesToULong(newValue);
                         if (ScanTool.Comparer(comparerTool, newData, oldData)) newBitsDict.Add(offsetAddr, newValue);
                     }
-                    else if (ScanTool.ComparerExact(comparerTool.scanType, newValue, comparerTool.value0Byte, comparerTool.isFloatingSimpleValues, comparerTool.floatingSimpleValueExponents)) newBitsDict.Add(offsetAddr, newValue);
+                    else if (ScanTool.ComparerExact(comparerTool, newValue, comparerTool.value0Byte)) newBitsDict.Add(offsetAddr, newValue);
                 }
                 bitsDict.Clear();
                 bitsDict = newBitsDict;
@@ -575,7 +584,7 @@ namespace PS4CheaterNeo
                     int firstScanIdx = scanIdx;
                     for (int gIdx = 0; gIdx < comparerTool.groupTypes.Count; gIdx++)
                     {
-                        (ScanType scanType, int groupTypeLength, bool isAny) = comparerTool.groupTypes[gIdx];
+                        (ScanType groupScanType, int groupTypeLength, bool isAny) = comparerTool.groupTypes[gIdx];
                         if (scanIdx + groupTypeLength > buffer.LongLength) break;
                         bool comparer = false;
                         if (!isAny)
@@ -583,7 +592,7 @@ namespace PS4CheaterNeo
                             byte[] valueBytes = comparerTool.groupValues[gIdx];
                             byte[] newGroupBytes = new byte[groupTypeLength];
                             Buffer.BlockCopy(buffer, scanIdx, newGroupBytes, 0, groupTypeLength);
-                            comparer = ScanTool.ComparerExact(scanType, newGroupBytes, valueBytes, comparerTool.isFloatingSimpleValues, comparerTool.floatingSimpleValueExponents);
+                            comparer = ScanTool.ComparerExact(comparerTool, newGroupBytes, valueBytes, groupScanType);
                         }
 
                         if (!isAny && !comparer)
@@ -593,11 +602,11 @@ namespace PS4CheaterNeo
                         }
                         else
                         {
-                            if (isAny && comparerTool.isFloatingSimpleValues && (scanType == ScanType.Double_ || scanType == ScanType.Float_))
+                            if (isAny && comparerTool.isFloatingSimpleValues && (groupScanType == ScanType.Double_ || groupScanType == ScanType.Float_))
                             {
                                 byte[] newGroupBytes = new byte[groupTypeLength];
                                 Buffer.BlockCopy(buffer, scanIdx, newGroupBytes, 0, groupTypeLength);
-                                if (scanType == ScanType.Double_)
+                                if (groupScanType == ScanType.Double_)
                                 {
                                     ulong newVar = BitConverter.ToUInt64(newGroupBytes, 0);
                                     if (newVar > 0 && Math.Abs(1023 - (int)(((long)newVar >> 52) & 0x7ffL)) > floatingSimpleValueExponents)
@@ -606,7 +615,7 @@ namespace PS4CheaterNeo
                                         break;
                                     }
                                 }
-                                else if (scanType == ScanType.Float_)
+                                else if (groupScanType == ScanType.Float_)
                                 {
                                     uint newVar = BitConverter.ToUInt32(newGroupBytes, 0);
                                     if (newVar > 0 && Math.Abs(127 - (int)(((int)newVar >> 23) & 0xffL)) > floatingSimpleValueExponents)
@@ -651,19 +660,19 @@ namespace PS4CheaterNeo
                     int scanOffset = 0;
                     for (int gIdx = 0; gIdx < comparerTool.groupTypes.Count; gIdx++)
                     {
-                        (ScanType scanType, int groupTypeLength, bool isAny) = comparerTool.groupTypes[gIdx];
+                        (ScanType groupScanType, int groupTypeLength, bool isAny) = comparerTool.groupTypes[gIdx];
                         byte[] valueBytes = comparerTool.groupValues[gIdx];
                         byte[] newGroupBytes = new byte[groupTypeLength];
                         Buffer.BlockCopy(newBytes, scanOffset, newGroupBytes, 0, groupTypeLength);
-                        if (!isAny && !ScanTool.ComparerExact(scanType, newGroupBytes, valueBytes, comparerTool.isFloatingSimpleValues, comparerTool.floatingSimpleValueExponents)) break;
-                        else if (isAny && comparerTool.isFloatingSimpleValues && (scanType == ScanType.Double_ || scanType == ScanType.Float_))
+                        if (!isAny && !ScanTool.ComparerExact(comparerTool, newGroupBytes, valueBytes, groupScanType)) break;
+                        else if (isAny && comparerTool.isFloatingSimpleValues && (groupScanType == ScanType.Double_ || groupScanType == ScanType.Float_))
                         {
-                            if (scanType == ScanType.Double_)
+                            if (groupScanType == ScanType.Double_)
                             {
                                 ulong newVar = BitConverter.ToUInt64(newGroupBytes, 0);
                                 if (newVar > 0 && Math.Abs(1023 - (int)(((long)newVar >> 52) & 0x7ffL)) > floatingSimpleValueExponents) break;
                             }
-                            else if (scanType == ScanType.Float_)
+                            else if (groupScanType == ScanType.Float_)
                             {
                                 uint newVar = BitConverter.ToUInt32(newGroupBytes, 0);
                                 if (newVar > 0 && Math.Abs(127 - (int)(((int)newVar >> 23) & 0xffL)) > floatingSimpleValueExponents) break;
@@ -994,10 +1003,18 @@ namespace PS4CheaterNeo
                 case ScanType.Hex:
                 case ScanType.Group:
                 case ScanType.String_:
-                    HexBox.Enabled = false;
-                    HexBox.Checked = false;
                     NotBox.Checked = false;
                     NotBox.Enabled = false;
+                    if (scanType == ScanType.Hex)
+                    {
+                        HexBox.Enabled = true;
+                        HexBox.Checked = true;
+                    }
+                    else
+                    {
+                        HexBox.Enabled = false;
+                        HexBox.Checked = false;
+                    }
                     if (scanType != ScanType.Group)
                     {
                         AlignmentBox.Enabled = false;
@@ -1025,8 +1042,9 @@ namespace PS4CheaterNeo
         private void CompareTypeBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             Enum.TryParse(CompareTypeBox.SelectedItem.ToString(), out CompareType compareType);
+
             switch (compareType)
-            {
+            { //Show second input column when Between
                 case CompareType.Between:
                     TableLayoutPanel1.ColumnStyles[1].Width = 50;
                     TableLayoutPanel1.ColumnStyles[2].SizeType = SizeType.AutoSize;
@@ -1040,7 +1058,7 @@ namespace PS4CheaterNeo
                     break;
             }
             switch (compareType)
-            {
+            { //Hide not checkbox when not applicable
                 case CompareType.IncreasedBy:
                 case CompareType.DecreasedBy:
                 case CompareType.UnknownInitial:
@@ -1050,6 +1068,19 @@ namespace PS4CheaterNeo
                 default:
                     ScanType scanType = this.ParseFromDescription<ScanType>(ScanTypeBox.SelectedItem.ToString());
                     if (scanType != ScanType.String_ && scanType != ScanType.Hex && scanType != ScanType.Group) NotBox.Enabled = true;
+                    break;
+            }
+            switch (compareType)
+            { //Hide input column when not applicable
+                case CompareType.Increased:
+                case CompareType.Decreased:
+                case CompareType.Changed:
+                case CompareType.Unchanged:
+                case CompareType.UnknownInitial:
+                    ValueBox.Hide();
+                    break;
+                default:
+                    ValueBox.Show();
                     break;
             }
         }
