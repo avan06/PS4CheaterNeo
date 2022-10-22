@@ -36,6 +36,7 @@ namespace PS4CheaterNeo
                 SplitContainer1.SplitterButtonStyle = ButtonStyle.None;
                 SplitContainer2.SplitterButtonStyle = ButtonStyle.None;
             }
+            else SplitContainer2.SplitterDistance = SplitContainer2.Height - SplitContainer2.SplitterWidth + SplitContainer2.Panel2MinSize;
 
             try
             {
@@ -126,23 +127,25 @@ namespace PS4CheaterNeo
                 if (HexView.SelectionStart + idx < dynaBP.Length) tmpBList.Add(dynaBP.ReadByte(HexView.SelectionStart + idx));
                 else if (idx < 8) tmpBList.Add(0);
             }
-            InfoBox.Text = string.Format(@"{0:X}（{1:X}+{2:X}）
+            InfoBox0.Text = string.Format(@"{0:X} | {1:X}+{2:X}", HexView.SelectionStart + HexView.LineInfoOffset, HexView.SelectionStart + HexView.LineInfoOffset - (long)section.Start, section.Start);
+            InfoBox1.Text = string.Format("{0} | {0:X1}", info1);
+            InfoBox2.Text = string.Format("{0} | {0:X2}", info2);
+            InfoBox3.Text = string.Format("{0} | {0:X4}", info4);
+            InfoBox4.Text = string.Format("{0} | {0:X8}", info8);
+            InfoBox5.Text = string.Format("{0}", infoF);
+            InfoBox6.Text = string.Format("{0}", infoD);
 
-1: {3:X8}={3}
-2: {4:X8}={4}
-4: {5:X8}={5}
-8: {6:X8}={6}
-F: {7}
-D: {8}
-", HexView.SelectionStart + HexView.LineInfoOffset, HexView.SelectionStart + HexView.LineInfoOffset - (long)section.Start, section.Start, info1, info2, info4, info8, infoF, infoD);
-
-            IEnumerable<Instruction> instructions = Disassembly(tmpBList.ToArray(), (ulong)(HexView.SelectionStart + HexView.LineInfoOffset));
-            foreach (Instruction instruction in instructions)
+            if (SplitContainer2.Panel1Minimized)
             {
-                string address = instruction.Offset.ToString("X").ToUpper();
-                string byteStr = Disassembler.Translator.TranslateBytes(instruction).ToUpper();
-                string mnemonic = Disassembler.Translator.TranslateMnemonic(instruction);
-                InfoBox.Text += "\r\n" + String.Format("{0,9} {1,-12} {2}", address, byteStr, mnemonic);
+                AsmBox1.Text = "";
+                IEnumerable<Instruction> instructions = Disassembly(tmpBList.ToArray(), (ulong)(HexView.SelectionStart + HexView.LineInfoOffset));
+                foreach (Instruction instruction in instructions)
+                {
+                    string address = instruction.Offset.ToString("X").ToUpper();
+                    string byteStr = Disassembler.Translator.TranslateBytes(instruction).ToUpper();
+                    string mnemonic = Disassembler.Translator.TranslateMnemonic(instruction);
+                    AsmBox1.Text += String.Format("{0,9} {1,-12} {2}", address, byteStr, mnemonic) + "\r\n";
+                }
             }
         }
 
@@ -300,7 +303,7 @@ D: {8}
                 if (PS4CheaterNeo.InputBox.Show("Assembly to bytes", "Please enter the assembly language, and the bytes value will be displayed below", ref inputValue, 100) != DialogResult.OK) return;
                 if (inputValue.Trim() == "") return;
                 
-                InfoBox.Text = "Assembly:\r\n" + inputValue + "\r\n\r\n";
+                AsmBox1.Text = "Assembly:\r\n" + inputValue + "\r\n\r\n";
                 Assembler.CreateContext<Func<int>>();
                 CodeContext<Func<int>> ctx = Assembler.CreateContext<Func<int>>();
                 ctx.Emit(inputValue);
@@ -309,13 +312,13 @@ D: {8}
                 Marshal.Copy(fp, managedArray, 0, codeSize);
                 for (int idx = 0; idx < managedArray.Length; idx++)
                 {
-                    if (idx > 0 && idx % 8 == 0) InfoBox.Text += "\r\n";
-                    InfoBox.Text += managedArray[idx].ToString("X2") + " ";
+                    if (idx > 0 && idx % 8 == 0) AsmBox1.Text += "\r\n";
+                    AsmBox1.Text += managedArray[idx].ToString("X2") + " ";
                 }
             }
             catch (Exception ex)
             {
-                InfoBox.Text += string.Format("{0}\n{1}", ex.Message, ex.StackTrace);
+                AsmBox1.Text += string.Format("{0}\n{1}", ex.Message, ex.StackTrace);
             }
         }
 
@@ -347,6 +350,12 @@ D: {8}
 
             HexView.GroupSeparatorVisible = groupSize > 0;
             HexView.GroupSize = groupSize;
+        }
+
+        private void AutoRefreshBox_CheckedChanged(object sender, EventArgs e)
+        {
+            if (!AutoRefreshBox.Checked) AutoRefreshTimer.Stop();
+            AutoRefreshTimer.Enabled = AutoRefreshBox.Checked;
         }
         #endregion
 

@@ -2,7 +2,7 @@
 
 PS4CheaterNeo is a program to find game cheat codes, and it is based on [`ps4debug`](https://github.com/jogolden/ps4debug) and `.Net Framework 4.8`.
 
-Currently in `version 0.9.7.5-beta`
+Currently in `version 0.9.7.6-beta`
 
 
 ## Table of Contents
@@ -378,6 +378,8 @@ Determines whether to enable undo scan(revert to the previous scan result), if e
 Determines whether to automatically pause the game when starting the scan in query. `Default disabled`.  
 - `EnableScanDoneResume`:  
 Determines whether to automatically resume the game when the scan is complete in query. `Default disabled`.  
+- `EnableShowSearchSizeFirstScan`:  
+Determines whether to show search size message when FirstScan. `Default enabled`.
 - `EnableFloatingResultExact`:  
 Determines whether to make the calculation result of `Floating(float, double) completely exact` in query window, there can be `0.0001 difference` in the old mechanism. `Default enabled`.  
 - `FloatingSimpleValueExponents`:  

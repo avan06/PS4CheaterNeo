@@ -234,7 +234,7 @@ namespace PS4CheaterNeo
                         if (DoneResumeBox.Checked) ResumeBtn.PerformClick();
                     }
                 }
-                else if (ResultView.Items.Count == 0 && MessageBox.Show("search size:" + (sectionTool.TotalMemorySize / (1024 * 1024)).ToString() + "MB", "First Scan",
+                else if (Properties.Settings.Default.EnableShowSearchSizeFirstScan.Value && ResultView.Items.Count == 0 && MessageBox.Show("search size:" + (sectionTool.TotalMemorySize / (1024 * 1024)).ToString() + "MB", "First Scan",
                     MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) return;
                 else
                 {

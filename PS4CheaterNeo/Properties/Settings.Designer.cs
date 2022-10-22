@@ -233,6 +233,19 @@ namespace PS4CheaterNeo.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True|3_Query|1_Query|Determines whether to show search size message when FirstSca" +
+            "n. Default enabled")]
+        public global::OptionTreeView.Option<bool> EnableShowSearchSizeFirstScan {
+            get {
+                return ((global::OptionTreeView.Option<bool>)(this["EnableShowSearchSizeFirstScan"]));
+            }
+            set {
+                this["EnableShowSearchSizeFirstScan"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True|3_Query|2_Floating|Determines whether to make the calculation result of Floa" +
             "ting(float, double) completely exact in query window, there can be 0.0001 differ" +
             "ence in the old mechanism. Default enabled")]

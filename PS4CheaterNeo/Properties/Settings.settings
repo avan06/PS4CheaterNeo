@@ -50,6 +50,9 @@
     <Setting Name="EnableScanDoneResume" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
       <Value Profile="(Default)">False|3_Query|1_Query|Determines whether to automatically resume the game when the scan is complete in query. Default disabled</Value>
     </Setting>
+    <Setting Name="EnableShowSearchSizeFirstScan" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
+      <Value Profile="(Default)">True|3_Query|1_Query|Determines whether to show search size message when FirstScan. Default enabled</Value>
+    </Setting>
     <Setting Name="EnableFloatingResultExact" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
       <Value Profile="(Default)">True|3_Query|2_Floating|Determines whether to make the calculation result of Floating(float, double) completely exact in query window, there can be 0.0001 difference in the old mechanism. Default enabled</Value>
     </Setting>
