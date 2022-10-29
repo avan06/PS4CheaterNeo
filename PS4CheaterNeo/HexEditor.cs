@@ -18,6 +18,7 @@ namespace PS4CheaterNeo
         int PageCount;
         long Line;
         int Column;
+        string delimitedDash;
         Dictionary<long, long> changedPosDic;
         const int PageSize = 8 * 1024 * 1024;
         readonly Main mainForm;
@@ -31,6 +32,8 @@ namespace PS4CheaterNeo
             mutex = new Mutex();
 
             InitializeComponent();
+            Opacity = Properties.Settings.Default.UIOpacity.Value;
+            delimitedDash = Properties.Settings.Default.HexInfoDash.Value;
             if (!Properties.Settings.Default.EnableCollapsibleContainer.Value)
             {
                 SplitContainer1.SplitterButtonStyle = ButtonStyle.None;
@@ -52,11 +55,11 @@ namespace PS4CheaterNeo
             }
 
             HexBox.ByteGroupingType[] byteGroupingTypes = (HexBox.ByteGroupingType[])Enum.GetValues(typeof(HexBox.ByteGroupingType));
-            foreach (var byteGroupingType in byteGroupingTypes) HexViewByteGroup.Items.Add(new ComboItem("GroupType:" + byteGroupingType.ToString(), byteGroupingType));
-            HexViewByteGroup.SelectedIndex = 0;
+            foreach (var byteGroupingType in byteGroupingTypes) HexViewMenuByteGroup.Items.Add(new ComboItem("GroupType:" + byteGroupingType.ToString(), byteGroupingType));
+            HexViewMenuByteGroup.SelectedIndex = 0;
 
-            for (int idx = 0; idx <= 0x10; idx++) HexViewGroupSize.Items.Add("GroupSize:" + idx);
-            HexViewGroupSize.SelectedIndex = HexView.GroupSize;
+            for (int idx = 0; idx <= 0x10; idx++) HexViewMenuGroupSize.Items.Add("GroupSize:" + idx);
+            HexViewMenuGroupSize.SelectedIndex = HexView.GroupSize;
             AutoRefreshTimer.Interval = (int)Properties.Settings.Default.AutoRefreshTimerInterval.Value;
         }
 
@@ -99,41 +102,98 @@ namespace PS4CheaterNeo
             DynamicByteProvider dynaBP = HexView.ByteProvider as DynamicByteProvider;
 
             List<byte> tmpBList = new List<byte>();
-            int info1 = 0, info2 = 0;
-            uint info4 = 0;
-            ulong info8 = 0;
+            byte info1 = 0;
+            UInt16 info2 = 0;
+            UInt32 info4 = 0;
+            UInt64 info8 = 0;
+            sbyte info1S = 0;
+            Int16 info2S = 0;
+            Int32 info4S = 0;
+            Int64 info8S = 0;
             float infoF = 0;
             double infoD = 0;
+            string hexStr = "", zeroStr = "";
 
             for (int idx = 0; idx <= 100; ++idx)
             {
                 switch (idx)
                 {
                     case 1:
-                        info1 = Convert.ToUInt16(tmpBList[0]);
+                        info1 = tmpBList[0];
+                        InfoBox1U.Text = InfoBox1S.Text = hexStr;
                         break;
                     case 2:
                         info2 = BitConverter.ToUInt16(tmpBList.ToArray(), 0);
+                        InfoBox2U.Text = InfoBox2S.Text = hexStr;
                         break;
                     case 4:
-                        info4 = BitConverter.ToUInt32(tmpBList.ToArray(), 0);
-                        infoF = BitConverter.ToSingle(tmpBList.ToArray(), 0);
+                        byte[] value4 = tmpBList.ToArray();
+                        info4 = BitConverter.ToUInt32(value4, 0);
+                        if (SwapBytesBox.Checked) Array.Reverse(value4);
+                        infoF = BitConverter.ToSingle(value4, 0);
+                        InfoBox3U.Text = InfoBox3S.Text = hexStr;
                         break;
                     case 8:
-                        info8 = BitConverter.ToUInt64(tmpBList.ToArray(), 0);
-                        infoD = BitConverter.ToDouble(tmpBList.ToArray(), 0);
+                        byte[] value8 = tmpBList.ToArray();
+                        info8 = BitConverter.ToUInt64(value8, 0);
+                        if (SwapBytesBox.Checked) Array.Reverse(value8);
+                        infoD = BitConverter.ToDouble(value8, 0);
+                        InfoBox4U.Text = InfoBox4S.Text = hexStr;
                         break;
                 }
-                if (HexView.SelectionStart + idx < dynaBP.Length) tmpBList.Add(dynaBP.ReadByte(HexView.SelectionStart + idx));
+                if (!SplitContainer2.Panel1Minimized && idx > 8) break;
+                else if(HexView.SelectionStart + idx < dynaBP.Length)
+                {
+                    byte item = dynaBP.ReadByte(HexView.SelectionStart + idx);
+                    tmpBList.Add(item);
+                    string dash = hexStr.Length == 0 && zeroStr.Length == 0 ? "" : delimitedDash;
+                    if (SwapBytesBox.Checked)
+                    {
+                        if (item == 0 && hexStr.Length == 0) zeroStr += dash + "00";
+                        else
+                        {
+                            hexStr += zeroStr + dash + item.ToString("X2");
+                            zeroStr = "";
+                        }
+                    }
+                    else
+                    {
+                        if (item == 0) zeroStr = "00" + dash + zeroStr;
+                        else
+                        {
+                            hexStr = item.ToString("X2") + dash + zeroStr + hexStr;
+                            zeroStr = "";
+                        }
+                    }
+                }
                 else if (idx < 8) tmpBList.Add(0);
             }
-            InfoBox0.Text = string.Format(@"{0:X} | {1:X}+{2:X}", HexView.SelectionStart + HexView.LineInfoOffset, HexView.SelectionStart + HexView.LineInfoOffset - (long)section.Start, section.Start);
-            InfoBox1.Text = string.Format("{0} | {0:X1}", info1);
-            InfoBox2.Text = string.Format("{0} | {0:X2}", info2);
-            InfoBox3.Text = string.Format("{0} | {0:X4}", info4);
-            InfoBox4.Text = string.Format("{0} | {0:X8}", info8);
-            InfoBox5.Text = string.Format("{0}", infoF);
-            InfoBox6.Text = string.Format("{0}", infoD);
+
+            if (SwapBytesBox.Checked)
+            {
+                info2 = ScanTool.SwapBytes(info2);
+                info4 = ScanTool.SwapBytes(info4);
+                info8 = ScanTool.SwapBytes(info8);
+            }
+            info1S = (sbyte)info1;
+            info2S = (Int16)info2;
+            info4S = (Int32)info4;
+            info8S = (Int64)info8;
+            InfoBoxB.Text = Convert.ToString(info8S, 2);
+            if (InfoBoxB.Text.Length % 8 != 0) InfoBoxB.Text = InfoBoxB.Text.PadLeft(InfoBoxB.Text.Length + 8 - InfoBoxB.Text.Length % 8, '0');
+            for (int i = InfoBoxB.Text.Length - 8; i >= 8; i -= 8) InfoBoxB.Text = InfoBoxB.Text.Insert(i, ",");
+
+            InfoBox0.Text  = string.Format(@"{0:X} | {1:X}+{2:X}", HexView.SelectionStart + HexView.LineInfoOffset, HexView.SelectionStart + HexView.LineInfoOffset - (long)section.Start, section.Start);
+            InfoBox1U.Text  = string.Format("{0:N0} | ", info1) + InfoBox1U.Text;
+            InfoBox2U.Text  = string.Format("{0:N0} | ", info2) + InfoBox2U.Text;
+            InfoBox3U.Text  = string.Format("{0:N0} | ", info4) + InfoBox3U.Text;
+            InfoBox4U.Text  = string.Format("{0:N0} | ", info8) + InfoBox4U.Text;
+            InfoBoxF.Text  = string.Format("{0}", infoF);
+            InfoBoxD.Text  = string.Format("{0}", infoD);
+            InfoBox1S.Text = string.Format("{0:N0} | ", info1S) + InfoBox1S.Text;
+            InfoBox2S.Text = string.Format("{0:N0} | ", info2S) + InfoBox2S.Text;
+            InfoBox3S.Text = string.Format("{0:N0} | ", info4S) + InfoBox3S.Text;
+            InfoBox4S.Text = string.Format("{0:N0} | ", info8S) + InfoBox4S.Text;
 
             if (SplitContainer2.Panel1Minimized)
             {
@@ -340,7 +400,7 @@ namespace PS4CheaterNeo
             ComboItem comboItem = (ComboItem)byteGroupComboBox.SelectedItem;
             HexBox.ByteGroupingType byteGroupingType = (HexBox.ByteGroupingType)comboItem.Value;
             HexView.ByteGrouping = byteGroupingType;
-            if (HexViewGroupSize.Items.Count > 0) HexViewGroupSize.SelectedIndex = HexView.ByteGroupingSize;
+            if (HexViewMenuGroupSize.Items.Count > 0) HexViewMenuGroupSize.SelectedIndex = HexView.ByteGroupingSize;
         }
 
         private void HexViewGroupSize_SelectedIndexChanged(object sender, EventArgs e)
@@ -357,6 +417,8 @@ namespace PS4CheaterNeo
             if (!AutoRefreshBox.Checked) AutoRefreshTimer.Stop();
             AutoRefreshTimer.Enabled = AutoRefreshBox.Checked;
         }
+
+        private void SwapBytesBox_CheckedChanged(object sender, EventArgs e) => HexView_SelectionStartChanged(HexView, e);
         #endregion
 
         private int DivUP(int sum, int div) => sum / div + ((sum % div != 0) ? 1 : 0);

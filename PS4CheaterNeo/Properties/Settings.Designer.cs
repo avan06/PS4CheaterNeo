@@ -75,6 +75,19 @@ namespace PS4CheaterNeo.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0.95|1_General|2_UI|Determines the opacity of the window, the maximum is 1 (opaqu" +
+            "e), the default is 0.95|0.2|1")]
+        public global::OptionTreeView.Option<float> UIOpacity {
+            get {
+                return ((global::OptionTreeView.Option<float>)(this["UIOpacity"]));
+            }
+            set {
+                this["UIOpacity"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True|2_Cheat|Cheat|Determines whether to enable cheat lock in the main window. De" +
             "fault enabled")]
         public global::OptionTreeView.Option<bool> EnableCheatLock {
@@ -363,6 +376,19 @@ namespace PS4CheaterNeo.Properties {
             }
             set {
                 this["AutoRefreshTimerInterval"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-|4_HexEditor|Hex|Determines the delimited dash value that displays the current H" +
+            "ex value in the HexEditor. Default \"-\"")]
+        public global::OptionTreeView.Option<string> HexInfoDash {
+            get {
+                return ((global::OptionTreeView.Option<string>)(this["HexInfoDash"]));
+            }
+            set {
+                this["HexInfoDash"] = value;
             }
         }
     }

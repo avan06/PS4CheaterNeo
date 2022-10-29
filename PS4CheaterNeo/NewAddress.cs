@@ -31,6 +31,7 @@ namespace PS4CheaterNeo
         public NewAddress(Main mainForm, Section addrSection, Section baseSection, ulong address, ScanType scanType, string value, bool cheatLock, string cheatDesc, List<long> pointerOffsets, bool isEdit)
         {
             InitializeComponent();
+            Opacity = Properties.Settings.Default.UIOpacity.Value;
 
             if (mainForm.ProcessName == "") throw new Exception("No Process currently");
 

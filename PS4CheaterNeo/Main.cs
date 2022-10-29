@@ -26,6 +26,7 @@ namespace PS4CheaterNeo
         {
             if ((Properties.Settings.Default.PS4IP.Value ?? "") == "") Properties.Settings.Default.Upgrade(); //Need to get the settings again when the AssemblyVersion is changed
             InitializeComponent();
+            Opacity = Properties.Settings.Default.UIOpacity.Value;
             ToolStripLockEnable.Checked = Properties.Settings.Default.EnableCheatLock.Value;
             Text += " " + Application.ProductVersion; //Assembly.GetExecutingAssembly().GetName().Version.ToString(); // Assembly.GetEntryAssembly().GetName().Version.ToString();
             sectionTool = new SectionTool();

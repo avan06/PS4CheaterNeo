@@ -826,6 +826,41 @@ namespace PS4CheaterNeo
             }
             return b.ToString().PadLeft(64, '0');
         }
+
+        /// <summary>
+        /// swap the bits using bit shift operations
+        /// https://stackoverflow.com/a/19560621
+        /// </summary>
+        public static UInt16 SwapBytes(UInt16 x)
+        {
+            return (UInt16)((UInt16)((x & 0xff) << 8) | ((x >> 8) & 0xff));
+        }
+
+        /// <summary>
+        /// swap the bits using bit shift operations
+        /// https://stackoverflow.com/a/19560621
+        /// </summary>
+        public static UInt32 SwapBytes(UInt32 x)
+        {
+            // swap adjacent 16-bit blocks
+            x = (x >> 16) | (x << 16);
+            // swap adjacent 8-bit blocks
+            return ((x & 0xFF00FF00) >> 8) | ((x & 0x00FF00FF) << 8);
+        }
+
+        /// <summary>
+        /// swap the bits using bit shift operations
+        /// https://stackoverflow.com/a/19560621
+        /// </summary>
+        public static UInt64 SwapBytes(UInt64 x)
+        {
+            // swap adjacent 32-bit blocks
+            x = (x >> 32) | (x << 32);
+            // swap adjacent 16-bit blocks
+            x = ((x & 0xFFFF0000FFFF0000) >> 16) | ((x & 0x0000FFFF0000FFFF) << 16);
+            // swap adjacent 8-bit blocks
+            return ((x & 0xFF00FF00FF00FF00) >> 8) | ((x & 0x00FF00FF00FF00FF) << 8);
+        }
     }
 
     /// <summary>
@@ -898,36 +933,36 @@ namespace PS4CheaterNeo
             switch (scanType)
             {
                 case ScanType.Bytes_8:
-                    input0UInt64 = (isHex && value0 != "0") ? BitConverter.ToUInt64(ScanTool.ValueStringToByte(ScanType.Hex, value0), 0) : ulong.Parse(value0); //Big-Endian
-                    input1UInt64 = (isHex && value1 != "0") ? BitConverter.ToUInt64(ScanTool.ValueStringToByte(ScanType.Hex, value1), 0) : ulong.Parse(value1);
+                    input0UInt64 = (isHex && value0 != "0") ? BitConverter.ToUInt64(ScanTool.ValueStringToByte(ScanType.Hex, value0), 0) : ulong.Parse(value0.Replace(",","")); //Big-Endian
+                    input1UInt64 = (isHex && value1 != "0") ? BitConverter.ToUInt64(ScanTool.ValueStringToByte(ScanType.Hex, value1), 0) : ulong.Parse(value1.Replace(",", ""));
                     //input0UInt64 = isHex ? ulong.Parse(value0, NumberStyles.HexNumber) : ulong.Parse(value0); //Little-Endian
                     //input1UInt64 = isHex ? ulong.Parse(value1, NumberStyles.HexNumber) : ulong.Parse(value1);
                     break;
                 case ScanType.Bytes_4:
-                    input0UInt32 = (isHex && value0 != "0") ? BitConverter.ToUInt32(ScanTool.ValueStringToByte(ScanType.Hex, value0), 0) : uint.Parse(value0);
-                    input1UInt32 = (isHex && value1 != "0") ? BitConverter.ToUInt32(ScanTool.ValueStringToByte(ScanType.Hex, value1), 0) : uint.Parse(value1);
+                    input0UInt32 = (isHex && value0 != "0") ? BitConverter.ToUInt32(ScanTool.ValueStringToByte(ScanType.Hex, value0), 0) : uint.Parse(value0.Replace(",", ""));
+                    input1UInt32 = (isHex && value1 != "0") ? BitConverter.ToUInt32(ScanTool.ValueStringToByte(ScanType.Hex, value1), 0) : uint.Parse(value1.Replace(",", ""));
                     //input0UInt32 = isHex ? uint.Parse(value0, NumberStyles.HexNumber) : uint.Parse(value0);
                     //input1UInt32 = isHex ? uint.Parse(value1, NumberStyles.HexNumber) : uint.Parse(value1);
                     break;
                 case ScanType.Bytes_2:
-                    input0UInt16 = (isHex && value0 != "0") ? BitConverter.ToUInt16(ScanTool.ValueStringToByte(ScanType.Hex, value0), 0) : ushort.Parse(value0);
-                    input1UInt16 = (isHex && value1 != "0") ? BitConverter.ToUInt16(ScanTool.ValueStringToByte(ScanType.Hex, value1), 0) : ushort.Parse(value1);
+                    input0UInt16 = (isHex && value0 != "0") ? BitConverter.ToUInt16(ScanTool.ValueStringToByte(ScanType.Hex, value0), 0) : ushort.Parse(value0.Replace(",", ""));
+                    input1UInt16 = (isHex && value1 != "0") ? BitConverter.ToUInt16(ScanTool.ValueStringToByte(ScanType.Hex, value1), 0) : ushort.Parse(value1.Replace(",", ""));
                     //input0UInt16 = isHex ? ushort.Parse(value0, NumberStyles.HexNumber) : ushort.Parse(value0);
                     //input1UInt16 = isHex ? ushort.Parse(value1, NumberStyles.HexNumber) : ushort.Parse(value1);
                     break;
                 case ScanType.Byte_:
-                    input0Byte = (isHex && value0 != "0") ? ScanTool.ValueStringToByte(ScanType.Hex, value0)[0] : byte.Parse(value0);
-                    input1Byte = (isHex && value1 != "0") ? ScanTool.ValueStringToByte(ScanType.Hex, value1)[1] : byte.Parse(value1);
+                    input0Byte = (isHex && value0 != "0") ? ScanTool.ValueStringToByte(ScanType.Hex, value0)[0] : byte.Parse(value0.Replace(",", ""));
+                    input1Byte = (isHex && value1 != "0") ? ScanTool.ValueStringToByte(ScanType.Hex, value1)[1] : byte.Parse(value1.Replace(",", ""));
                     //input0Byte = isHex ? byte.Parse(value0, NumberStyles.HexNumber) : byte.Parse(value0);
                     //input1Byte = isHex ? byte.Parse(value1, NumberStyles.HexNumber) : byte.Parse(value1);
                     break;
                 case ScanType.Double_:
-                    input0Double = (isHex && value0 != "0") ? BitConverter.ToDouble(ScanTool.ValueStringToByte(ScanType.Hex, value0), 0) : double.Parse(value0);
-                    input1Double = (isHex && value1 != "0") ? BitConverter.ToDouble(ScanTool.ValueStringToByte(ScanType.Hex, value1), 0) : double.Parse(value1);
+                    input0Double = (isHex && value0 != "0") ? BitConverter.ToDouble(ScanTool.ValueStringToByte(ScanType.Hex, value0), 0) : double.Parse(value0.Replace(",", ""));
+                    input1Double = (isHex && value1 != "0") ? BitConverter.ToDouble(ScanTool.ValueStringToByte(ScanType.Hex, value1), 0) : double.Parse(value1.Replace(",", ""));
                     break;
                 case ScanType.Float_:
-                    input0Float = (isHex && value0 != "0") ? BitConverter.ToSingle(ScanTool.ValueStringToByte(ScanType.Hex, value0), 0) : float.Parse(value0);
-                    input1Float = (isHex && value1 != "0") ? BitConverter.ToSingle(ScanTool.ValueStringToByte(ScanType.Hex, value1), 0) : float.Parse(value1);
+                    input0Float = (isHex && value0 != "0") ? BitConverter.ToSingle(ScanTool.ValueStringToByte(ScanType.Hex, value0), 0) : float.Parse(value0.Replace(",", ""));
+                    input1Float = (isHex && value1 != "0") ? BitConverter.ToSingle(ScanTool.ValueStringToByte(ScanType.Hex, value1), 0) : float.Parse(value1.Replace(",", ""));
                     break;
             }
 
@@ -935,8 +970,8 @@ namespace PS4CheaterNeo
             else if (!isHex && ScanTool.ScanTypeLengthDict.TryGetValue(scanType, out int scanTypeLength))
             {
                 this.scanTypeLength = scanTypeLength;
-                value0Long = ScanTool.ValueStringToULong(scanType, value0);
-                if (!string.IsNullOrWhiteSpace(value1)) value1Long = ScanTool.ValueStringToULong(scanType, value1);
+                value0Long = ScanTool.ValueStringToULong(scanType, value0.Replace(",", ""));
+                if (!string.IsNullOrWhiteSpace(value1)) value1Long = ScanTool.ValueStringToULong(scanType, value1.Replace(",", ""));
             }
             else
             { //for ScanType:Hex、String

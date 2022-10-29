@@ -28,6 +28,7 @@ namespace PS4CheaterNeo
         public Query(Main mainForm)
         {
             InitializeComponent();
+            Opacity = Properties.Settings.Default.UIOpacity.Value;
             if (!Properties.Settings.Default.EnableCollapsibleContainer.Value)
             {
                 SplitContainer1.SplitterButtonStyle = ButtonStyle.None;

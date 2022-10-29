@@ -13,6 +13,7 @@ namespace PS4CheaterNeo
         public SendPayload()
         {
             InitializeComponent();
+            Opacity = Properties.Settings.Default.UIOpacity.Value;
             VersionComboBox.Items.AddRange(Constant.Versions);
         }
 

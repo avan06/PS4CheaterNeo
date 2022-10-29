@@ -14,6 +14,9 @@
     <Setting Name="EnableCollapsibleContainer" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
       <Value Profile="(Default)">True|1_General|2_UI|Determines whether to enable collapsible split container ui in Query and HexEditor and PointerFinder windows. Default enabled</Value>
     </Setting>
+    <Setting Name="UIOpacity" Type="OptionTreeView.Option&lt;float&gt;" Scope="User">
+      <Value Profile="(Default)">0.95|1_General|2_UI|Determines the opacity of the window, the maximum is 1 (opaque), the default is 0.95|0.2|1</Value>
+    </Setting>
     <Setting Name="EnableCheatLock" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
       <Value Profile="(Default)">True|2_Cheat|Cheat|Determines whether to enable cheat lock in the main window. Default enabled</Value>
     </Setting>
@@ -79,6 +82,9 @@
     </Setting>
     <Setting Name="AutoRefreshTimerInterval" Type="OptionTreeView.Option&lt;uint&gt;" Scope="User">
       <Value Profile="(Default)">2500|4_HexEditor|Hex|Determines the Interval of AutoRefreshTimer when AutoRefresh is enabled, in milliseconds, HexEditor needs to be restarted after this value is changed. Default 2500</Value>
+    </Setting>
+    <Setting Name="HexInfoDash" Type="OptionTreeView.Option&lt;string&gt;" Scope="User">
+      <Value Profile="(Default)">-|4_HexEditor|Hex|Determines the delimited dash value that displays the current Hex value in the HexEditor. Default "-"</Value>
     </Setting>
   </Settings>
 </SettingsFile>

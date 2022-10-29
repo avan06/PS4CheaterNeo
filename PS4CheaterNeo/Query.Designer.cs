@@ -75,6 +75,7 @@ namespace PS4CheaterNeo
             this.GetProcessesBtn = new System.Windows.Forms.Button();
             this.ProcessesBox = new PS4CheaterNeo.ComboItemBox();
             this.DoneResumeBox = new System.Windows.Forms.CheckBox();
+            this.SimpleValuesBox = new System.Windows.Forms.CheckBox();
             this.AutoPauseBox = new System.Windows.Forms.CheckBox();
             this.RedoBtn = new System.Windows.Forms.Button();
             this.UndoBtn = new System.Windows.Forms.Button();
@@ -101,7 +102,6 @@ namespace PS4CheaterNeo
             this.SlowMotionTimer = new System.Windows.Forms.Timer(this.components);
             this.SaveDialog = new System.Windows.Forms.SaveFileDialog();
             this.OpenDialog = new System.Windows.Forms.OpenFileDialog();
-            this.SimpleValuesBox = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.SplitContainer1)).BeginInit();
             this.SplitContainer1.Panel1.SuspendLayout();
             this.SplitContainer1.Panel2.SuspendLayout();
@@ -135,6 +135,7 @@ namespace PS4CheaterNeo
             // 
             this.SplitContainer1.Panel2.Controls.Add(this.SplitContainer2);
             this.SplitContainer1.Size = new System.Drawing.Size(800, 450);
+            this.SplitContainer1.SplitterButtonBitmap = ((System.Drawing.Bitmap)(resources.GetObject("SplitContainer1.SplitterButtonBitmap")));
             this.SplitContainer1.SplitterButtonLocation = PS4CheaterNeo.ButtonLocation.Panel1;
             this.SplitContainer1.SplitterButtonSize = 13;
             this.SplitContainer1.SplitterButtonStyle = PS4CheaterNeo.ButtonStyle.SingleImage;
@@ -306,6 +307,7 @@ namespace PS4CheaterNeo
             this.SplitContainer2.Panel2.Controls.Add(this.ScanBtn);
             this.SplitContainer2.Panel2.Controls.Add(this.CompareTypeBox);
             this.SplitContainer2.Size = new System.Drawing.Size(289, 450);
+            this.SplitContainer2.SplitterButtonBitmap = ((System.Drawing.Bitmap)(resources.GetObject("SplitContainer2.SplitterButtonBitmap")));
             this.SplitContainer2.SplitterButtonLocation = PS4CheaterNeo.ButtonLocation.Panel1;
             this.SplitContainer2.SplitterButtonPosition = PS4CheaterNeo.ButtonPosition.BottomRight;
             this.SplitContainer2.SplitterButtonSize = 13;
@@ -592,6 +594,17 @@ namespace PS4CheaterNeo
             this.DoneResumeBox.TabIndex = 21;
             this.DoneResumeBox.Text = "DoneResume";
             this.DoneResumeBox.UseVisualStyleBackColor = true;
+            // 
+            // SimpleValuesBox
+            // 
+            this.SimpleValuesBox.AutoSize = true;
+            this.SimpleValuesBox.Location = new System.Drawing.Point(205, 22);
+            this.SimpleValuesBox.Margin = new System.Windows.Forms.Padding(0, 3, 0, 0);
+            this.SimpleValuesBox.Name = "SimpleValuesBox";
+            this.SimpleValuesBox.Size = new System.Drawing.Size(87, 16);
+            this.SimpleValuesBox.TabIndex = 12;
+            this.SimpleValuesBox.Text = "SimpleValues";
+            this.SimpleValuesBox.UseVisualStyleBackColor = true;
             // 
             // AutoPauseBox
             // 
@@ -905,17 +918,6 @@ namespace PS4CheaterNeo
             this.OpenDialog.DefaultExt = "bin";
             this.OpenDialog.Multiselect = true;
             // 
-            // SimpleValuesBox
-            // 
-            this.SimpleValuesBox.AutoSize = true;
-            this.SimpleValuesBox.Location = new System.Drawing.Point(205, 22);
-            this.SimpleValuesBox.Margin = new System.Windows.Forms.Padding(0, 3, 0, 0);
-            this.SimpleValuesBox.Name = "SimpleValuesBox";
-            this.SimpleValuesBox.Size = new System.Drawing.Size(87, 16);
-            this.SimpleValuesBox.TabIndex = 12;
-            this.SimpleValuesBox.Text = "SimpleValues";
-            this.SimpleValuesBox.UseVisualStyleBackColor = true;
-            // 
             // Query
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -925,7 +927,6 @@ namespace PS4CheaterNeo
             this.Controls.Add(this.Panel1);
             this.ForeColor = System.Drawing.Color.White;
             this.Name = "Query";
-            this.Opacity = 0.95D;
             this.Text = "Query";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Query_FormClosing);
             this.Load += new System.EventHandler(this.Query_Load);

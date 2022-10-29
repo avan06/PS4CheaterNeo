@@ -2,7 +2,7 @@
 
 PS4CheaterNeo is a program to find game cheat codes, and it is based on [`ps4debug`](https://github.com/jogolden/ps4debug) and `.Net Framework 4.8`.
 
-Currently in `version 0.9.7.6-beta`
+Currently in `version 0.9.7.7-beta`
 
 
 ## Table of Contents
@@ -310,7 +310,9 @@ AddrStart　　Prot　count　　　SIDv1　　　　　SID
 - Enter `assembler` and display as hex value.
 - Immediately show the changed position when `refreshing in the Hex editor`.
 - Support `auto refresh interval` when `Auto is enabled` in the `Hex editor`.(recommended for wired network, the current setting is every 2.5 seconds)
+- It is now possible to `swap bytes` to display the value of the current address in the Hex Editor.
 
+![hexeditor](assets/hexeditor5.webp)
 ![hexeditor](assets/hexeditor1.webp)
 ![hexeditor](assets/hexeditor2.webp)
 
@@ -339,7 +341,9 @@ Enter PS4 Port.
 - `PS4FWVersion`:  
 Enter PS4 FW Version (Confirm the fw version only when perform sendpayload).  
 - `EnableCollapsibleContainer`:  
-Determines whether to enable `collapsible split container` ui in `Query and HexEditor and PointerFinder` windows. Default enabled.
+Determines whether to enable `collapsible split container` ui in `Query and HexEditor and PointerFinder` windows. Default enabled.  
+- `UIOpacity`:
+Determines the opacity of the window, the maximum is 1 (opaque), `Default is 0.95`.  
 
 #### Cheat  
 - `EnableCheatLock`:  
@@ -379,17 +383,19 @@ Determines whether to automatically pause the game when starting the scan in que
 - `EnableScanDoneResume`:  
 Determines whether to automatically resume the game when the scan is complete in query. `Default disabled`.  
 - `EnableShowSearchSizeFirstScan`:  
-Determines whether to show search size message when FirstScan. `Default enabled`.
+Determines whether to show search size message when FirstScan. `Default enabled`.  
 - `EnableFloatingResultExact`:  
 Determines whether to make the calculation result of `Floating(float, double) completely exact` in query window, there can be `0.0001 difference` in the old mechanism. `Default enabled`.  
 - `FloatingSimpleValueExponents`:  
-Determine the `exponents value of the simple value of floating`. this option value is used in the query window when SimpleValues for floating point numbers is enabled. Cheat Engine is set to 11 (2 to the 11th power = 2^11 = plus or minus 2048). `Default value is 11`.
+Determine the `exponents value of the simple value of floating`. this option value is used in the query window when SimpleValues for floating point numbers is enabled. Cheat Engine is set to 11 (2 to the 11th power = 2^11 = plus or minus 2048). `Default value is 11`.  
 
 #### HexEditor  
 - `EnableAutoRefresh`:  
 Determines whether to enable `Auto Refresh` in HexEditor. `Default disabled`.  
 - `AutoRefreshTimerInterval`:  
 Determines the Interval of AutoRefreshTimer when AutoRefresh is enabled, in `milliseconds`, HexEditor needs to be restarted after this value is changed. `Default 2500`.  
+- `HexInfoDash`:  
+Determines the delimited dash value that displays the current Hex value in the HexEditor. Default "-".  
 
 ![option](assets/option.webp)
 

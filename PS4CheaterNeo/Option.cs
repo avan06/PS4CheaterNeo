@@ -15,6 +15,7 @@ namespace PS4CheaterNeo
         public Option()
         {
             InitializeComponent();
+            Opacity = Properties.Settings.Default.UIOpacity.Value;
 
             optionTreeView1.InitSettings(Properties.Settings.Default);
         }
