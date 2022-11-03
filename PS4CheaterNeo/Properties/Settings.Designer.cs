@@ -391,5 +391,381 @@ namespace PS4CheaterNeo.Properties {
                 this["HexInfoDash"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0|5_UI|1_Color Theme|Determine color theme")]
+        public global::OptionTreeView.Option<PS4CheaterNeo.ColorTheme> ColorTheme {
+            get {
+                return ((global::OptionTreeView.Option<PS4CheaterNeo.ColorTheme>)(this["ColorTheme"]));
+            }
+            set {
+                this["ColorTheme"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("White|5_UI|1_Color Ui|Determine the UI foreground color")]
+        public global::OptionTreeView.Option<System.Drawing.Color> UiForeColor {
+            get {
+                return ((global::OptionTreeView.Option<System.Drawing.Color>)(this["UiForeColor"]));
+            }
+            set {
+                this["UiForeColor"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("242424|5_UI|1_Color Ui|Determine the UI background color")]
+        public global::OptionTreeView.Option<System.Drawing.Color> UiBackColor {
+            get {
+                return ((global::OptionTreeView.Option<System.Drawing.Color>)(this["UiBackColor"]));
+            }
+            set {
+                this["UiBackColor"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("ControlText|5_UI|2_Color Main|Determine the Main foreground color")]
+        public global::OptionTreeView.Option<System.Drawing.Color> MainForeColor {
+            get {
+                return ((global::OptionTreeView.Option<System.Drawing.Color>)(this["MainForeColor"]));
+            }
+            set {
+                this["MainForeColor"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("ControlDarkDark|5_UI|2_Color Main|Determine the Main background color")]
+        public global::OptionTreeView.Option<System.Drawing.Color> MainBackColor {
+            get {
+                return ((global::OptionTreeView.Option<System.Drawing.Color>)(this["MainBackColor"]));
+            }
+            set {
+                this["MainBackColor"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("FF99B4D1|5_UI|2_Color Main|Determine the Main ToolStrip1 background color")]
+        public global::OptionTreeView.Option<System.Drawing.Color> MainToolStrip1BackColor {
+            get {
+                return ((global::OptionTreeView.Option<System.Drawing.Color>)(this["MainToolStrip1BackColor"]));
+            }
+            set {
+                this["MainToolStrip1BackColor"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("White|5_UI|2_Color Main|Determine the Main CheatGridView RowIndex foreground colo" +
+            "r")]
+        public global::OptionTreeView.Option<System.Drawing.Color> MainCheatGridViewRowIndexForeColor {
+            get {
+                return ((global::OptionTreeView.Option<System.Drawing.Color>)(this["MainCheatGridViewRowIndexForeColor"]));
+            }
+            set {
+                this["MainCheatGridViewRowIndexForeColor"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("DimGray|5_UI|2_Color Main|Determine the Main CheatGridView background color")]
+        public global::OptionTreeView.Option<System.Drawing.Color> MainCheatGridViewBackgroundColor {
+            get {
+                return ((global::OptionTreeView.Option<System.Drawing.Color>)(this["MainCheatGridViewBackgroundColor"]));
+            }
+            set {
+                this["MainCheatGridViewBackgroundColor"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("647381|5_UI|2_Color Main|Determine the Main CheatGridView base row color")]
+        public global::OptionTreeView.Option<System.Drawing.Color> MainCheatGridViewBaseRowColor {
+            get {
+                return ((global::OptionTreeView.Option<System.Drawing.Color>)(this["MainCheatGridViewBaseRowColor"]));
+            }
+            set {
+                this["MainCheatGridViewBaseRowColor"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Silver|5_UI|2_Color Main|Determine the Main CheatGridView grid color")]
+        public global::OptionTreeView.Option<System.Drawing.Color> MainCheatGridViewGridColor {
+            get {
+                return ((global::OptionTreeView.Option<System.Drawing.Color>)(this["MainCheatGridViewGridColor"]));
+            }
+            set {
+                this["MainCheatGridViewGridColor"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("White|5_UI|2_Color Main|Determine the Main dataGridViewCellStyle foreground color" +
+            "")]
+        public global::OptionTreeView.Option<System.Drawing.Color> MainCheatGridCellForeColor {
+            get {
+                return ((global::OptionTreeView.Option<System.Drawing.Color>)(this["MainCheatGridCellForeColor"]));
+            }
+            set {
+                this["MainCheatGridCellForeColor"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("404040|5_UI|2_Color Main|Determine the Main dataGridViewCellStyle background colo" +
+            "r")]
+        public global::OptionTreeView.Option<System.Drawing.Color> MainCheatGridCellBackColor {
+            get {
+                return ((global::OptionTreeView.Option<System.Drawing.Color>)(this["MainCheatGridCellBackColor"]));
+            }
+            set {
+                this["MainCheatGridCellBackColor"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("DimGray|5_UI|3_Color Query|Determine the Query StatusStrip1 background color")]
+        public global::OptionTreeView.Option<System.Drawing.Color> QueryStatusStrip1BackColor {
+            get {
+                return ((global::OptionTreeView.Option<System.Drawing.Color>)(this["QueryStatusStrip1BackColor"]));
+            }
+            set {
+                this["QueryStatusStrip1BackColor"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Silver|5_UI|3_Color Query|Determine the AlignmentBox foreground color")]
+        public global::OptionTreeView.Option<System.Drawing.Color> QueryAlignmentBoxForeColor {
+            get {
+                return ((global::OptionTreeView.Option<System.Drawing.Color>)(this["QueryAlignmentBoxForeColor"]));
+            }
+            set {
+                this["QueryAlignmentBoxForeColor"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("SteelBlue|5_UI|3_Color Query|Determine the Query ScanBtn background color")]
+        public global::OptionTreeView.Option<System.Drawing.Color> QueryScanBtnBackColor {
+            get {
+                return ((global::OptionTreeView.Option<System.Drawing.Color>)(this["QueryScanBtnBackColor"]));
+            }
+            set {
+                this["QueryScanBtnBackColor"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("DarkGray|5_UI|3_Color Query|Determine the Query SectionView Filter foreground col" +
+            "or")]
+        public global::OptionTreeView.Option<System.Drawing.Color> QuerySectionViewFilterForeColor {
+            get {
+                return ((global::OptionTreeView.Option<System.Drawing.Color>)(this["QuerySectionViewFilterForeColor"]));
+            }
+            set {
+                this["QuerySectionViewFilterForeColor"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("DimGray|5_UI|3_Color Query|Determine the Query SectionView Filter background colo" +
+            "r")]
+        public global::OptionTreeView.Option<System.Drawing.Color> QuerySectionViewFilterBackColor {
+            get {
+                return ((global::OptionTreeView.Option<System.Drawing.Color>)(this["QuerySectionViewFilterBackColor"]));
+            }
+            set {
+                this["QuerySectionViewFilterBackColor"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("DarkCyan|5_UI|3_Color Query|Determine the Query SectionView FilterSize foreground" +
+            " color")]
+        public global::OptionTreeView.Option<System.Drawing.Color> QuerySectionViewFilterSizeForeColor {
+            get {
+                return ((global::OptionTreeView.Option<System.Drawing.Color>)(this["QuerySectionViewFilterSizeForeColor"]));
+            }
+            set {
+                this["QuerySectionViewFilterSizeForeColor"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("DarkSlateGray|5_UI|3_Color Query|Determine the Query SectionView FilterSize backg" +
+            "round color")]
+        public global::OptionTreeView.Option<System.Drawing.Color> QuerySectionViewFilterSizeBackColor {
+            get {
+                return ((global::OptionTreeView.Option<System.Drawing.Color>)(this["QuerySectionViewFilterSizeBackColor"]));
+            }
+            set {
+                this["QuerySectionViewFilterSizeBackColor"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("GreenYellow|5_UI|3_Color Query|Determine the Query SectionView executable foregro" +
+            "und color")]
+        public global::OptionTreeView.Option<System.Drawing.Color> QuerySectionViewExecutableForeColor {
+            get {
+                return ((global::OptionTreeView.Option<System.Drawing.Color>)(this["QuerySectionViewExecutableForeColor"]));
+            }
+            set {
+                this["QuerySectionViewExecutableForeColor"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Red|5_UI|3_Color Query|Determine the Query SectionView NoName foreground color")]
+        public global::OptionTreeView.Option<System.Drawing.Color> QuerySectionViewNoNameForeColor {
+            get {
+                return ((global::OptionTreeView.Option<System.Drawing.Color>)(this["QuerySectionViewNoNameForeColor"]));
+            }
+            set {
+                this["QuerySectionViewNoNameForeColor"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("HotPink|5_UI|3_Color Query|Determine the Query SectionView NoName2 foreground col" +
+            "or")]
+        public global::OptionTreeView.Option<System.Drawing.Color> QuerySectionViewNoName2ForeColor {
+            get {
+                return ((global::OptionTreeView.Option<System.Drawing.Color>)(this["QuerySectionViewNoName2ForeColor"]));
+            }
+            set {
+                this["QuerySectionViewNoName2ForeColor"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("DarkSlateGray|5_UI|3_Color Query|Determine the Query SectionView ItemCheck1 backg" +
+            "round color")]
+        public global::OptionTreeView.Option<System.Drawing.Color> QuerySectionViewItemCheck1BackColor {
+            get {
+                return ((global::OptionTreeView.Option<System.Drawing.Color>)(this["QuerySectionViewItemCheck1BackColor"]));
+            }
+            set {
+                this["QuerySectionViewItemCheck1BackColor"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("DarkGreen|5_UI|3_Color Query|Determine the Query SectionView ItemCheck2 backgroun" +
+            "d color")]
+        public global::OptionTreeView.Option<System.Drawing.Color> QuerySectionViewItemCheck2BackColor {
+            get {
+                return ((global::OptionTreeView.Option<System.Drawing.Color>)(this["QuerySectionViewItemCheck2BackColor"]));
+            }
+            set {
+                this["QuerySectionViewItemCheck2BackColor"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("LimeGreen|5_UI|4_Color HexEditor|Determine the HexEditor ChangedFinish foreground" +
+            " color")]
+        public global::OptionTreeView.Option<System.Drawing.Color> HexEditorChangedFinishForeColor {
+            get {
+                return ((global::OptionTreeView.Option<System.Drawing.Color>)(this["HexEditorChangedFinishForeColor"]));
+            }
+            set {
+                this["HexEditorChangedFinishForeColor"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("643CBCFF|5_UI|4_Color HexEditor|Determine the HexEditor ShadowSelection color")]
+        public global::OptionTreeView.Option<System.Drawing.Color> HexEditorShadowSelectionColor {
+            get {
+                return ((global::OptionTreeView.Option<System.Drawing.Color>)(this["HexEditorShadowSelectionColor"]));
+            }
+            set {
+                this["HexEditorShadowSelectionColor"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("DimGray|5_UI|4_Color HexEditor|Determine the HexEditor ZeroBytes foreground color" +
+            "")]
+        public global::OptionTreeView.Option<System.Drawing.Color> HexEditorZeroBytesForeColor {
+            get {
+                return ((global::OptionTreeView.Option<System.Drawing.Color>)(this["HexEditorZeroBytesForeColor"]));
+            }
+            set {
+                this["HexEditorZeroBytesForeColor"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("DimGray|5_UI|5_Color PointerFinder|Determine the PointerFinder statusStrip1 backg" +
+            "round color")]
+        public global::OptionTreeView.Option<System.Drawing.Color> PointerFinderStatusStrip1BackColor {
+            get {
+                return ((global::OptionTreeView.Option<System.Drawing.Color>)(this["PointerFinderStatusStrip1BackColor"]));
+            }
+            set {
+                this["PointerFinderStatusStrip1BackColor"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("SteelBlue|5_UI|5_Color PointerFinder|Determine the PointerFinder ScanBtn backgrou" +
+            "nd color")]
+        public global::OptionTreeView.Option<System.Drawing.Color> PointerFinderScanBtnBackColor {
+            get {
+                return ((global::OptionTreeView.Option<System.Drawing.Color>)(this["PointerFinderScanBtnBackColor"]));
+            }
+            set {
+                this["PointerFinderScanBtnBackColor"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Silver|5_UI|6_Color SendPayload|Determine the SendPayload statusStrip1 background" +
+            " color")]
+        public global::OptionTreeView.Option<System.Drawing.Color> SendPayloadStatusStrip1BackColor {
+            get {
+                return ((global::OptionTreeView.Option<System.Drawing.Color>)(this["SendPayloadStatusStrip1BackColor"]));
+            }
+            set {
+                this["SendPayloadStatusStrip1BackColor"] = value;
+            }
+        }
     }
 }

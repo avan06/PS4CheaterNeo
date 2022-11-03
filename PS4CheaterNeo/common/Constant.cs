@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace PS4CheaterNeo
 {
@@ -35,6 +31,12 @@ namespace PS4CheaterNeo
         CheatListSection,
         CheatListLock,
         CheatListDesc,
+    }
+
+    public enum ColorTheme
+    {
+        Dark,
+        Light,
     }
 
     partial class Constant

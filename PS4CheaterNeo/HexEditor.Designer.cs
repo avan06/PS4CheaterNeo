@@ -910,7 +910,6 @@
             this.Controls.Add(this.SplitContainer1);
             this.ForeColor = System.Drawing.Color.White;
             this.Name = "HexEditor";
-            this.Opacity = 0.95D;
             this.Text = "HexEditor";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.HexEditor_FormClosing);
             this.Load += new System.EventHandler(this.HexEditor_Load);

@@ -147,7 +147,6 @@ namespace PS4CheaterNeo
             this.Controls.Add(this.OKBtn);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "SendPayload";
-            this.Opacity = 0.95D;
             this.Text = "SendPayload or SaveIP";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.SendPayload_FormClosing);
             this.Load += new System.EventHandler(this.SendPayload_Load);

@@ -39,8 +39,8 @@
             this.optionTreeView1.ContextMenuStripLeftView = null;
             this.optionTreeView1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.optionTreeView1.FloatingPointDecimalPlaces = 2;
-            this.optionTreeView1.Font = new System.Drawing.Font("Times New Roman", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.optionTreeView1.FontLeftView = new System.Drawing.Font("Times New Roman", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.optionTreeView1.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.optionTreeView1.FontLeftView = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.optionTreeView1.ForeColor = System.Drawing.Color.White;
             this.optionTreeView1.ForeColorLeftView = System.Drawing.Color.White;
             this.optionTreeView1.FullRowSelectLeftView = true;
@@ -55,7 +55,7 @@
             this.optionTreeView1.OptionRightLabelSize = 200F;
             this.optionTreeView1.OptionRightMinSize = 25;
             this.optionTreeView1.ShowToolTipDuration = 25000;
-            this.optionTreeView1.Size = new System.Drawing.Size(548, 450);
+            this.optionTreeView1.Size = new System.Drawing.Size(609, 450);
             this.optionTreeView1.SortGroupBeforeUnderline = true;
             this.optionTreeView1.SortTreeBeforeUnderline = true;
             this.optionTreeView1.SplitterDistance = 160;
@@ -67,10 +67,11 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(548, 450);
+            this.ClientSize = new System.Drawing.Size(609, 450);
             this.Controls.Add(this.optionTreeView1);
             this.Name = "Option";
             this.Text = "Option";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Option_FormClosed);
             this.ResumeLayout(false);
 
         }

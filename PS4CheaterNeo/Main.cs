@@ -20,16 +20,59 @@ namespace PS4CheaterNeo
         private Option option;
         private SendPayload sendPayload;
         private CheatJson cheatJson = null;
+        private Brush cheatGridViewRowIndexForeBrush;
         public SectionTool sectionTool { get; private set; }
         public string ProcessName;
         public Main()
         {
             if ((Properties.Settings.Default.PS4IP.Value ?? "") == "") Properties.Settings.Default.Upgrade(); //Need to get the settings again when the AssemblyVersion is changed
             InitializeComponent();
-            Opacity = Properties.Settings.Default.UIOpacity.Value;
+            ApplyUI();
             ToolStripLockEnable.Checked = Properties.Settings.Default.EnableCheatLock.Value;
             Text += " " + Application.ProductVersion; //Assembly.GetExecutingAssembly().GetName().Version.ToString(); // Assembly.GetEntryAssembly().GetName().Version.ToString();
             sectionTool = new SectionTool();
+        }
+
+        public void ApplyUI()
+        {
+            try
+            {
+                Opacity = Properties.Settings.Default.UIOpacity.Value;
+                cheatGridViewRowIndexForeBrush = new SolidBrush(Properties.Settings.Default.MainCheatGridViewRowIndexForeColor.Value); //SystemBrushes.HighlightText
+
+                ForeColor = Properties.Settings.Default.MainForeColor.Value; //SystemColors.ControlText;
+                BackColor = Properties.Settings.Default.MainBackColor.Value; //SystemColors.ControlDarkDark;
+                ToolStrip1.BackColor = Properties.Settings.Default.MainToolStrip1BackColor.Value; //Color.FromArgb(153, 180, 209);
+                CheatGridView.BackgroundColor = Properties.Settings.Default.MainCheatGridViewBackgroundColor.Value; //Color.DimGray;
+                CheatGridView.BaseRowColor = Properties.Settings.Default.MainCheatGridViewBaseRowColor.Value; //Color.FromArgb(100, 115, 129);
+                CheatGridView.GridColor = Properties.Settings.Default.MainCheatGridViewGridColor.Value; //Color.Silver;
+
+                var MainCheatGridCellBackColor = Properties.Settings.Default.MainCheatGridCellBackColor.Value;
+                var MainCheatGridCellForeColor = Properties.Settings.Default.MainCheatGridCellForeColor.Value;
+
+                ToolStripMsg.ForeColor = MainCheatGridCellForeColor; //Color.White;
+                CheatGridViewDel.DefaultCellStyle.BackColor = MainCheatGridCellBackColor; //Color.FromArgb(64, 64, 64);
+                CheatGridViewDel.DefaultCellStyle.ForeColor = MainCheatGridCellForeColor; //Color.White;
+                CheatGridViewAddress.DefaultCellStyle.BackColor = MainCheatGridCellBackColor; //Color.FromArgb(64, 64, 64);
+                CheatGridViewAddress.DefaultCellStyle.ForeColor = MainCheatGridCellForeColor; //Color.White;
+                CheatGridViewType.DefaultCellStyle.BackColor = MainCheatGridCellBackColor; //Color.FromArgb(64, 64, 64);
+                CheatGridViewType.DefaultCellStyle.ForeColor = MainCheatGridCellForeColor; //Color.White;
+                CheatGridViewActive.DefaultCellStyle.BackColor = MainCheatGridCellBackColor; //Color.FromArgb(64, 64, 64);
+                CheatGridViewActive.DefaultCellStyle.ForeColor = MainCheatGridCellForeColor; //Color.White;
+                CheatGridViewValue.DefaultCellStyle.BackColor = MainCheatGridCellBackColor; //Color.FromArgb(64, 64, 64);
+                CheatGridViewValue.DefaultCellStyle.ForeColor = MainCheatGridCellForeColor; //Color.White;
+                CheatGridViewSection.DefaultCellStyle.BackColor = MainCheatGridCellBackColor; //Color.FromArgb(64, 64, 64);
+                CheatGridViewSection.DefaultCellStyle.ForeColor = MainCheatGridCellForeColor; //Color.White;
+                CheatGridViewLock.DefaultCellStyle.BackColor = MainCheatGridCellBackColor; //Color.FromArgb(64, 64, 64);
+                CheatGridViewLock.DefaultCellStyle.ForeColor = MainCheatGridCellForeColor; //Color.White;
+                CheatGridViewDescription.DefaultCellStyle.BackColor = MainCheatGridCellBackColor; //Color.FromArgb(64, 64, 64);
+                CheatGridViewDescription.DefaultCellStyle.ForeColor = MainCheatGridCellForeColor; //Color.White;
+                CheatGridView.GroupRefresh();
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show(exception.Message + "\n" + exception.StackTrace, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+            }
         }
 
         #region Event
@@ -565,7 +608,7 @@ namespace PS4CheaterNeo
 
         private void ToolStripSettings_Click(object sender, EventArgs e)
         {
-            if (option == null || option.IsDisposed) option = new Option();
+            if (option == null || option.IsDisposed) option = new Option(this);
             option.StartPosition = FormStartPosition.CenterParent;
             option.Show();
         }
@@ -804,7 +847,7 @@ namespace PS4CheaterNeo
         {
             var format = new StringFormat() { Alignment = StringAlignment.Near, LineAlignment = StringAlignment.Near };
             var bounds = new Rectangle(e.RowBounds.X + 16, e.RowBounds.Top, 16, e.RowBounds.Height);
-            e.Graphics.DrawString(e.RowIndex.ToString(), Font, SystemBrushes.HighlightText, bounds, format);
+            e.Graphics.DrawString(e.RowIndex.ToString(), Font, cheatGridViewRowIndexForeBrush, bounds, format);
         }
 
         private void CheatGridView_RowsRemoved(object sender, DataGridViewRowsRemovedEventArgs e)

@@ -120,7 +120,7 @@
   <metadata name="CheatGridMenu.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>675, 17</value>
   </metadata>
-  <metadata name="toolStrip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+  <metadata name="ToolStrip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>17, 17</value>
   </metadata>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
@@ -166,9 +166,9 @@
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
         YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAD3SURBVDhPY4CBb9++/UfG79+/F4BKEQdAmiy6TMCYJAOQ
         bUU2AIYJGoSsER1TxYAvX74s+/Tp08P79+//BvGB+ClI7OvXr2ZwA2AYWSMIP3j75X/l0df/c/a//N92
-        8hUYg9ggscMXrv/9/v17MgPIiSCMzYD43c//P3vz8f+H96gYJAaSA6p5B3YFCMA0IWOXDU9xGgCSA6mB
+        8hUYg9ggsYPnrv79/v17MgPIiSCMzYD43c//P3vz8f+H96gYJAaSA6p5B3YFCMA0IWOXDU9xGgCSA6mB
         ameAuwTZRdILH4Fx8LZn/5uOvwJjEBsmjmIAOkA2ABceAQa8s1z7FKtGEAbJgdRAlWMCUCIBJRZQorFY
-        8/S//OJHYAxioyQkfACUXEHJFmjT069A54IwiI1IygwMAABWFKjeCS+KAAAAAElFTkSuQmCC
+        8/S//OJHYAxioyQkfACUXEHJFmjT069A54IwiI1IygwMAOzZFJZp9RkKAAAAAElFTkSuQmCC
 </value>
   </data>
   <data name="ToolStripHexView.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">

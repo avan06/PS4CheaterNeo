@@ -31,7 +31,7 @@ namespace PS4CheaterNeo
         public NewAddress(Main mainForm, Section addrSection, Section baseSection, ulong address, ScanType scanType, string value, bool cheatLock, string cheatDesc, List<long> pointerOffsets, bool isEdit)
         {
             InitializeComponent();
-            Opacity = Properties.Settings.Default.UIOpacity.Value;
+            ApplyUI();
 
             if (mainForm.ProcessName == "") throw new Exception("No Process currently");
 
@@ -89,6 +89,41 @@ namespace PS4CheaterNeo
                 if (!IsPointer) PointerBox.Enabled = false;
             }
             isCheckAddressBox = true;
+        }
+
+        public void ApplyUI()
+        {
+            try
+            {
+                Opacity = Properties.Settings.Default.UIOpacity.Value;
+
+                ForeColor = Properties.Settings.Default.UiForeColor.Value; //Color.White;
+                BackColor = Properties.Settings.Default.UiBackColor.Value; //Color.FromArgb(36, 36, 36);
+
+                label1.ForeColor = ForeColor;
+                label2.ForeColor = ForeColor;
+                label3.ForeColor = ForeColor;
+                label4.ForeColor = ForeColor;
+                LockBox.ForeColor = ForeColor;
+                PointerBox.ForeColor = ForeColor;
+
+                AddressBox.ForeColor = ForeColor;
+                AddressBox.BackColor = BackColor;
+                ValueBox.ForeColor = ForeColor;
+                ValueBox.BackColor = BackColor;
+                ScanTypeBox.ForeColor = ForeColor;
+                ScanTypeBox.BackColor = BackColor;
+                DescriptionBox.ForeColor = ForeColor;
+                DescriptionBox.BackColor = BackColor;
+                SaveBtn.ForeColor = ForeColor;
+                SaveBtn.BackColor = BackColor;
+                CloseBtn.ForeColor = ForeColor;
+                CloseBtn.BackColor = BackColor;
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show(exception.Message + "\n" + exception.StackTrace, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+            }
         }
 
         private void NewAddress_Load(object sender, EventArgs e)

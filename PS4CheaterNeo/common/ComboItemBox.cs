@@ -30,9 +30,10 @@ namespace PS4CheaterNeo
 
             Rectangle rect = e.Bounds; //Rectangle of item
             ComboItem item = (ComboItem)Items[e.Index];
+            using (Brush brush = new SolidBrush(e.ForeColor))
             using (Graphics g = e.Graphics)
             {
-                if (item.ICON == null) g.DrawString(item.Text.ToString(), e.Font, Brushes.White, rect.X, rect.Top); //Draw the item name
+                if (item.ICON == null) g.DrawString(item.Text.ToString(), e.Font, brush, rect.X, rect.Top); //Draw the item name
                 else
                 {
                     using (Pen pen = new Pen(item.ForeColor, 2)) g.DrawRectangle(pen, rect);
@@ -42,7 +43,7 @@ namespace PS4CheaterNeo
                     // Draw the ICON
                     g.DrawImage(img, e.Bounds.Left, e.Bounds.Top);
                     //Draw the item name
-                    g.DrawString(item.Text.ToString(), e.Font, Brushes.White, e.Bounds.Left + img.Width, e.Bounds.Top + 2);
+                    g.DrawString(item.Text.ToString(), e.Font, brush, e.Bounds.Left + img.Width, e.Bounds.Top + 2);
                 }
             }
 

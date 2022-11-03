@@ -13,8 +13,38 @@ namespace PS4CheaterNeo
         public SendPayload()
         {
             InitializeComponent();
-            Opacity = Properties.Settings.Default.UIOpacity.Value;
+            ApplyUI();
             VersionComboBox.Items.AddRange(Constant.Versions);
+        }
+
+        public void ApplyUI()
+        {
+            try
+            {
+                Opacity = Properties.Settings.Default.UIOpacity.Value;
+                ForeColor = Properties.Settings.Default.UiForeColor.Value; //Color.White;
+                BackColor = Properties.Settings.Default.UiBackColor.Value; //Color.FromArgb(36, 36, 36);
+                statusStrip1.BackColor = Properties.Settings.Default.SendPayloadStatusStrip1BackColor.Value; //Color.Silver;
+
+                ToolStripMsg.ForeColor = ForeColor;
+                ToolStripMsg.BackColor = Color.Transparent;
+                VersionComboBox.ForeColor = ForeColor;
+                VersionComboBox.BackColor = BackColor;
+                IpBox.ForeColor = ForeColor;
+                IpBox.BackColor = BackColor;
+                PortBox.ForeColor = ForeColor;
+                PortBox.BackColor = BackColor;
+                SendPayloadBtn.ForeColor = ForeColor;
+                SendPayloadBtn.BackColor = BackColor;
+                OKBtn.ForeColor = ForeColor;
+                OKBtn.BackColor = BackColor;
+                VersionBox.ForeColor = ForeColor;
+                VersionBox.BackColor = BackColor;
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show(exception.Message + "\n" + exception.StackTrace, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+            }
         }
 
         private void OKBtn_Click(object sender, EventArgs e)

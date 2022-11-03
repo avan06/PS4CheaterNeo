@@ -3,6 +3,7 @@ using Be.Windows.Forms;
 using SharpDisasm;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
@@ -32,7 +33,8 @@ namespace PS4CheaterNeo
             mutex = new Mutex();
 
             InitializeComponent();
-            Opacity = Properties.Settings.Default.UIOpacity.Value;
+            ApplyUI();
+
             delimitedDash = Properties.Settings.Default.HexInfoDash.Value;
             if (!Properties.Settings.Default.EnableCollapsibleContainer.Value)
             {
@@ -79,6 +81,71 @@ namespace PS4CheaterNeo
                 ulong start = section.Start + (ulong)i * PageSize;
                 ulong end = section.Start + (ulong)(i + 1) * PageSize;
                 PageBox.Items.Add((i + 1).ToString("00") + String.Format(" {0:X8}-{1:X8}", start, end));
+            }
+        }
+
+        public void ApplyUI()
+        {
+            try
+            {
+                Opacity = Properties.Settings.Default.UIOpacity.Value;
+
+                BackColor = Properties.Settings.Default.UiBackColor.Value; //Color.FromArgb(36, 36, 36);
+                ForeColor = Properties.Settings.Default.UiForeColor.Value; //Color.White;
+                HexView.ChangedFinishForeColor = Properties.Settings.Default.HexEditorChangedFinishForeColor.Value; //Color.LimeGreen;
+                HexView.ShadowSelectionColor = Properties.Settings.Default.HexEditorShadowSelectionColor.Value; //Color.FromArgb(100, 60, 188, 255);
+                HexView.ZeroBytesForeColor = Properties.Settings.Default.HexEditorZeroBytesForeColor.Value; //Color.DimGray;
+
+                CommitBtn.ForeColor = ForeColor;
+                FindBtn.ForeColor = ForeColor;
+                AddToCheatGridBtn.ForeColor = ForeColor;
+                NextBtn.ForeColor = ForeColor;
+                PreviousBtn.ForeColor = ForeColor;
+                RefreshBtn.ForeColor = ForeColor;
+                AssemblerBtn.ForeColor = ForeColor;
+                GroupBoxAsm.ForeColor = ForeColor;
+                InfoBox4SSeparator.BackColor = ForeColor;
+                InfoBoxDSeparator.BackColor = ForeColor;
+                InfoBox4Separator.BackColor = ForeColor;
+
+                HexView.ForeColor = ForeColor;
+                HexView.BackColor = BackColor;
+                SplitContainer1.BackColor = BackColor;
+                SplitContainer2.ForeColor = ForeColor;
+                InfoBox0.ForeColor = ForeColor;
+                InfoBox0.BackColor = BackColor;
+                InputBox.ForeColor = ForeColor;
+                InputBox.BackColor = BackColor;
+                PageBox.ForeColor = ForeColor;
+                PageBox.BackColor = BackColor;
+                InfoBoxB.ForeColor = ForeColor;
+                InfoBoxB.BackColor = BackColor;
+                InfoBox4S.ForeColor = ForeColor;
+                InfoBox4S.BackColor = BackColor;
+                InfoBox3S.ForeColor = ForeColor;
+                InfoBox3S.BackColor = BackColor;
+                InfoBox2S.ForeColor = ForeColor;
+                InfoBox2S.BackColor = BackColor;
+                InfoBoxF.ForeColor = ForeColor;
+                InfoBoxF.BackColor = BackColor;
+                InfoBox4U.ForeColor = ForeColor;
+                InfoBox4U.BackColor = BackColor;
+                InfoBox3U.ForeColor = ForeColor;
+                InfoBox3U.BackColor = BackColor;
+                InfoBox1U.ForeColor = ForeColor;
+                InfoBox1U.BackColor = BackColor;
+                InfoBox2U.ForeColor = ForeColor;
+                InfoBox2U.BackColor = BackColor;
+                InfoBoxD.ForeColor = ForeColor;
+                InfoBoxD.BackColor = BackColor;
+                InfoBox1S.ForeColor = ForeColor;
+                InfoBox1S.BackColor = BackColor;
+                AsmBox1.ForeColor = ForeColor;
+                AsmBox1.BackColor = BackColor;
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show(exception.Message + "\n" + exception.StackTrace, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
 

@@ -52,7 +52,7 @@ namespace PS4CheaterNeo
             this.CheatGridMenuFindPointer = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator8 = new System.Windows.Forms.ToolStripSeparator();
             this.CheatGridMenuDelete = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStrip1 = new System.Windows.Forms.ToolStrip();
+            this.ToolStrip1 = new System.Windows.Forms.ToolStrip();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.ToolStripSend = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator9 = new System.Windows.Forms.ToolStripSeparator();
@@ -87,7 +87,7 @@ namespace PS4CheaterNeo
             this.OpenCheatDialog = new System.Windows.Forms.OpenFileDialog();
             this.SaveCheatDialog = new System.Windows.Forms.SaveFileDialog();
             this.CheatGridMenu.SuspendLayout();
-            this.toolStrip1.SuspendLayout();
+            this.ToolStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.CheatGridView)).BeginInit();
@@ -187,11 +187,11 @@ namespace PS4CheaterNeo
             this.CheatGridMenuDelete.Text = "Delete";
             this.CheatGridMenuDelete.Click += new System.EventHandler(this.CheatGridMenuDelete_Click);
             // 
-            // toolStrip1
+            // ToolStrip1
             // 
-            this.toolStrip1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(153)))), ((int)(((byte)(180)))), ((int)(((byte)(209)))));
-            this.toolStrip1.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
-            this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.ToolStrip1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(153)))), ((int)(((byte)(180)))), ((int)(((byte)(209)))));
+            this.ToolStrip1.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
+            this.ToolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripSeparator1,
             this.ToolStripSend,
             this.toolStripSeparator9,
@@ -210,11 +210,11 @@ namespace PS4CheaterNeo
             this.ToolStripLockEnable,
             this.toolStripSeparator3,
             this.ToolStripSettings});
-            this.toolStrip1.Location = new System.Drawing.Point(0, 0);
-            this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(800, 25);
-            this.toolStrip1.TabIndex = 1;
-            this.toolStrip1.Text = "toolStrip1";
+            this.ToolStrip1.Location = new System.Drawing.Point(0, 0);
+            this.ToolStrip1.Name = "ToolStrip1";
+            this.ToolStrip1.Size = new System.Drawing.Size(800, 25);
+            this.ToolStrip1.TabIndex = 1;
+            this.ToolStrip1.Text = "toolStrip1";
             // 
             // toolStripSeparator1
             // 
@@ -398,7 +398,7 @@ namespace PS4CheaterNeo
             // 
             this.panel1.Controls.Add(this.CheatGridView);
             this.panel1.Controls.Add(this.statusStrip1);
-            this.panel1.Controls.Add(this.toolStrip1);
+            this.panel1.Controls.Add(this.ToolStrip1);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel1.Location = new System.Drawing.Point(0, 0);
             this.panel1.Name = "panel1";
@@ -409,7 +409,7 @@ namespace PS4CheaterNeo
             // 
             this.CheatGridView.AllowUserToAddRows = false;
             this.CheatGridView.AllowUserToResizeRows = false;
-            this.CheatGridView.BackgroundColor = System.Drawing.Color.DimGray;
+            this.CheatGridView.BackgroundColor = System.Drawing.SystemColors.ControlDarkDark;
             this.CheatGridView.BaseRowColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(115)))), ((int)(((byte)(129)))));
             this.CheatGridView.BaseRowColorEnabled = true;
             this.CheatGridView.BaseRowColorInterleaved = true;
@@ -558,12 +558,11 @@ namespace PS4CheaterNeo
             this.ClientSize = new System.Drawing.Size(800, 450);
             this.Controls.Add(this.panel1);
             this.Name = "Main";
-            this.Opacity = 0.95D;
             this.Text = "PS4 Cheater Neo";
             this.Shown += new System.EventHandler(this.Main_Shown);
             this.CheatGridMenu.ResumeLayout(false);
-            this.toolStrip1.ResumeLayout(false);
-            this.toolStrip1.PerformLayout();
+            this.ToolStrip1.ResumeLayout(false);
+            this.ToolStrip1.PerformLayout();
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
             this.panel1.ResumeLayout(false);
@@ -575,7 +574,7 @@ namespace PS4CheaterNeo
 
         #endregion
         private GroupGridView.GroupGridView CheatGridView;
-        private System.Windows.Forms.ToolStrip toolStrip1;
+        private System.Windows.Forms.ToolStrip ToolStrip1;
         private System.Windows.Forms.ToolStripButton ToolStripSend;
         private System.Windows.Forms.ToolStripButton ToolStripNewQuery;
         private System.Windows.Forms.StatusStrip statusStrip1;

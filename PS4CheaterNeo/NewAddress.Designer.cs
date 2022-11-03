@@ -206,7 +206,6 @@ namespace PS4CheaterNeo
             this.ForeColor = System.Drawing.Color.White;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Name = "NewAddress";
-            this.Opacity = 0.95D;
             this.Text = "NewAddress";
             this.Load += new System.EventHandler(this.NewAddress_Load);
             this.ResumeLayout(false);

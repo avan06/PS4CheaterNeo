@@ -18,6 +18,13 @@ namespace PS4CheaterNeo
         readonly SectionTool sectionTool;
         readonly bool enableUndoScan;
         ComparerTool comparerTool;
+        Color querySectionViewFilterForeColor;
+        Color querySectionViewFilterBackColor;
+        Color querySectionViewFilterSizeForeColor;
+        Color querySectionViewFilterSizeBackColor;
+        Color querySectionViewItemCheck1BackColor;
+        Color querySectionViewItemCheck2BackColor;
+
         int hitCnt = 0;
         bool enableFloatingResultExact = true;
         byte floatingSimpleValueExponents = 10;
@@ -28,7 +35,8 @@ namespace PS4CheaterNeo
         public Query(Main mainForm)
         {
             InitializeComponent();
-            Opacity = Properties.Settings.Default.UIOpacity.Value;
+            ApplyUI();
+
             if (!Properties.Settings.Default.EnableCollapsibleContainer.Value)
             {
                 SplitContainer1.SplitterButtonStyle = ButtonStyle.None;
@@ -44,6 +52,75 @@ namespace PS4CheaterNeo
             enableUndoScan = Properties.Settings.Default.EnableUndoScan.Value;
             AutoPauseBox.Checked = Properties.Settings.Default.EnableScanAutoPause.Value;
             DoneResumeBox.Checked = Properties.Settings.Default.EnableScanDoneResume.Value;
+        }
+
+        public void ApplyUI()
+        {
+            try
+            {
+                Opacity = Properties.Settings.Default.UIOpacity.Value;
+
+                ForeColor = Properties.Settings.Default.UiForeColor.Value; //Color.White;
+                BackColor = Properties.Settings.Default.UiBackColor.Value; //Color.FromArgb(36, 36, 36);
+                StatusStrip1.BackColor = Properties.Settings.Default.QueryStatusStrip1BackColor.Value; //Color.DimGray;
+                AlignmentBox.ForeColor = Properties.Settings.Default.QueryAlignmentBoxForeColor.Value; //Color.Silver;
+                ScanBtn.BackColor = Properties.Settings.Default.QueryScanBtnBackColor.Value; //Color.SteelBlue;
+
+                querySectionViewFilterForeColor = Properties.Settings.Default.QuerySectionViewFilterForeColor.Value;
+                querySectionViewFilterBackColor = Properties.Settings.Default.QuerySectionViewFilterBackColor.Value;
+                querySectionViewFilterSizeForeColor = Properties.Settings.Default.QuerySectionViewFilterSizeForeColor.Value;
+                querySectionViewFilterSizeBackColor = Properties.Settings.Default.QuerySectionViewFilterSizeBackColor.Value;
+                querySectionViewItemCheck1BackColor = Properties.Settings.Default.QuerySectionViewItemCheck1BackColor.Value;
+                querySectionViewItemCheck2BackColor = Properties.Settings.Default.QuerySectionViewItemCheck2BackColor.Value;
+
+                SplitContainer1.ForeColor = ForeColor;
+                ToolStripMsg.ForeColor = ForeColor;
+                SplitContainer2.ForeColor = ForeColor;
+
+                SlowMotionBox.ForeColor = ForeColor;
+                SelectAllBox.ForeColor = ForeColor;
+                IsFilterSizeBox.ForeColor = ForeColor;
+                IsFilterBox.ForeColor = ForeColor;
+
+                ResultView.ForeColor = ForeColor;
+                ResultView.BackColor = BackColor;
+                SectionView.ForeColor = ForeColor;
+                SectionView.BackColor = BackColor;
+
+                AddrMaxBox.ForeColor = ForeColor;
+                AddrMaxBox.BackColor = BackColor;
+                AddrMinBox.ForeColor = ForeColor;
+                AddrMinBox.BackColor = BackColor;
+                ProcessesBox.ForeColor = ForeColor;
+                ProcessesBox.BackColor = BackColor;
+
+                ScanTypeBox.ForeColor = ForeColor;
+                ScanTypeBox.BackColor = BackColor;
+                ValueBox.ForeColor = ForeColor;
+                ValueBox.BackColor = BackColor;
+                Value1Box.ForeColor = ForeColor;
+                Value1Box.BackColor = BackColor;
+                CompareTypeBox.ForeColor = ForeColor;
+                CompareTypeBox.BackColor = BackColor;
+                PauseBtn.ForeColor = ForeColor;
+                PauseBtn.BackColor = BackColor;
+                ResumeBtn.ForeColor = ForeColor;
+                ResumeBtn.BackColor = BackColor;
+                SectionSearchBtn.ForeColor = ForeColor;
+                SectionSearchBtn.BackColor = BackColor;
+                GetProcessesBtn.ForeColor = ForeColor;
+                GetProcessesBtn.BackColor = BackColor;
+                FilterRuleBtn.ForeColor = ForeColor;
+                FilterRuleBtn.BackColor = BackColor;
+                RedoBtn.BackColor = BackColor;
+                UndoBtn.BackColor = BackColor;
+                NewBtn.BackColor = BackColor;
+                RefreshBtn.BackColor = BackColor;
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show(exception.Message + "\n" + exception.StackTrace, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+            }
         }
 
         #region Event
@@ -127,18 +204,18 @@ namespace PS4CheaterNeo
                     if (section.IsFilter)
                     {
                         SectionView.Items[itemIdx].Tag = "filter";
-                        SectionView.Items[itemIdx].ForeColor = Color.DarkGray;
-                        SectionView.Items[itemIdx].BackColor = Color.DimGray;
+                        SectionView.Items[itemIdx].ForeColor = querySectionViewFilterForeColor; //Color.DarkGray;
+                        SectionView.Items[itemIdx].BackColor = querySectionViewFilterBackColor; //Color.DimGray;
                     }
                     else if (section.IsFilterSize)
                     {
                         SectionView.Items[itemIdx].Tag = "filterSize";
-                        SectionView.Items[itemIdx].ForeColor = Color.DarkCyan;
-                        SectionView.Items[itemIdx].BackColor = Color.DarkSlateGray;
+                        SectionView.Items[itemIdx].ForeColor = querySectionViewFilterSizeForeColor; //Color.DarkCyan;
+                        SectionView.Items[itemIdx].BackColor = querySectionViewFilterSizeBackColor; //Color.DarkSlateGray;
                     }
-                    else if (section.Name.StartsWith("executable")) SectionView.Items[itemIdx].ForeColor = Color.GreenYellow;
-                    else if (section.Name.Contains("NoName")) SectionView.Items[itemIdx].ForeColor = Color.Red;
-                    else if (Regex.IsMatch(section.Name, @"^\[\d+\]$")) SectionView.Items[itemIdx].ForeColor = Color.HotPink;
+                    else if (section.Name.StartsWith("executable")) SectionView.Items[itemIdx].ForeColor = Properties.Settings.Default.QuerySectionViewExecutableForeColor.Value; //Color.GreenYellow;
+                    else if (section.Name.Contains("NoName")) SectionView.Items[itemIdx].ForeColor = Properties.Settings.Default.QuerySectionViewNoNameForeColor.Value; //Color.Red;
+                    else if (Regex.IsMatch(section.Name, @"^\[\d+\]$")) SectionView.Items[itemIdx].ForeColor = Properties.Settings.Default.QuerySectionViewNoName2ForeColor.Value; //Color.HotPink;
                 }
                 SectionView.EndUpdate();
             }
@@ -1113,8 +1190,7 @@ namespace PS4CheaterNeo
             }
             else sectionTool.TotalMemorySize -= (ulong)section.Length;
 
-            if (item.Checked) item.BackColor = Color.DarkSlateGray;
-            else item.BackColor = Color.DarkGreen;
+            item.BackColor = item.Checked ? querySectionViewItemCheck1BackColor : querySectionViewItemCheck2BackColor; //Color.DarkSlateGray : Color.DarkGreen;
         }
 
         private void SelectAllBox_CheckedChanged(object sender, EventArgs e)

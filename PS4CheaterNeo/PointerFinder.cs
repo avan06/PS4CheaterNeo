@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -24,7 +25,7 @@ namespace PS4CheaterNeo
         public PointerFinder(Main mainForm, ulong address, ScanType scanType)
         {
             InitializeComponent();
-            Opacity = Properties.Settings.Default.UIOpacity.Value;
+            ApplyUI();
             if (!Properties.Settings.Default.EnableCollapsibleContainer.Value) SplitContainer1.SplitterButtonStyle = ButtonStyle.None;
             this.mainForm = mainForm;
             sectionTool = new SectionTool();
@@ -45,6 +46,40 @@ namespace PS4CheaterNeo
             }
             IsFilterBox.Checked = Properties.Settings.Default.EnableFilterQuery.Value;
             IsFilterSizeBox.Checked = Properties.Settings.Default.EnableFilterSizeQuery.Value;
+        }
+
+        public void ApplyUI()
+        {
+            try
+            {
+                Opacity = Properties.Settings.Default.UIOpacity.Value;
+
+                ForeColor = Properties.Settings.Default.UiForeColor.Value; //Color.White;
+                BackColor = Properties.Settings.Default.UiBackColor.Value; //Color.FromArgb(36, 36, 36);
+                statusStrip1.BackColor = Properties.Settings.Default.PointerFinderStatusStrip1BackColor.Value; //Color.DimGray;
+                ScanBtn.BackColor = Properties.Settings.Default.PointerFinderScanBtnBackColor.Value; //Color.SteelBlue;
+
+                SplitContainer1.Panel1.ForeColor = ForeColor;
+                PointerListView.ForeColor = ForeColor;
+                PointerListView.BackColor = BackColor;
+                ScanTypeBox.ForeColor = ForeColor;
+                ScanTypeBox.BackColor = BackColor;
+                MaxRangeUpDown.ForeColor = ForeColor;
+                MaxRangeUpDown.BackColor = BackColor;
+                LevelUpdown.ForeColor = ForeColor;
+                LevelUpdown.BackColor = BackColor;
+                AddressBox.ForeColor = ForeColor;
+                AddressBox.BackColor = BackColor;
+                FilterSizeRuleBtn.BackColor = BackColor;
+                NewBtn.BackColor = BackColor;
+                LoadBtn.BackColor = BackColor;
+                SaveBtn.BackColor = BackColor;
+                FilterRuleBtn.BackColor = BackColor;
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show(exception.Message + "\n" + exception.StackTrace, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+            }
         }
 
         #region Event

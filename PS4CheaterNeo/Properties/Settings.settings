@@ -86,5 +86,95 @@
     <Setting Name="HexInfoDash" Type="OptionTreeView.Option&lt;string&gt;" Scope="User">
       <Value Profile="(Default)">-|4_HexEditor|Hex|Determines the delimited dash value that displays the current Hex value in the HexEditor. Default "-"</Value>
     </Setting>
+    <Setting Name="ColorTheme" Type="OptionTreeView.Option&lt;PS4CheaterNeo.ColorTheme&gt;" Scope="User">
+      <Value Profile="(Default)">0|5_UI|1_Color Theme|Determine color theme</Value>
+    </Setting>
+    <Setting Name="UiForeColor" Type="OptionTreeView.Option&lt;System.Drawing.Color&gt;" Scope="User">
+      <Value Profile="(Default)">White|5_UI|1_Color Ui|Determine the UI foreground color</Value>
+    </Setting>
+    <Setting Name="UiBackColor" Type="OptionTreeView.Option&lt;System.Drawing.Color&gt;" Scope="User">
+      <Value Profile="(Default)">242424|5_UI|1_Color Ui|Determine the UI background color</Value>
+    </Setting>
+    <Setting Name="MainForeColor" Type="OptionTreeView.Option&lt;System.Drawing.Color&gt;" Scope="User">
+      <Value Profile="(Default)">ControlText|5_UI|2_Color Main|Determine the Main foreground color</Value>
+    </Setting>
+    <Setting Name="MainBackColor" Type="OptionTreeView.Option&lt;System.Drawing.Color&gt;" Scope="User">
+      <Value Profile="(Default)">ControlDarkDark|5_UI|2_Color Main|Determine the Main background color</Value>
+    </Setting>
+    <Setting Name="MainToolStrip1BackColor" Type="OptionTreeView.Option&lt;System.Drawing.Color&gt;" Scope="User">
+      <Value Profile="(Default)">FF99B4D1|5_UI|2_Color Main|Determine the Main ToolStrip1 background color</Value>
+    </Setting>
+    <Setting Name="MainCheatGridViewRowIndexForeColor" Type="OptionTreeView.Option&lt;System.Drawing.Color&gt;" Scope="User">
+      <Value Profile="(Default)">White|5_UI|2_Color Main|Determine the Main CheatGridView RowIndex foreground color</Value>
+    </Setting>
+    <Setting Name="MainCheatGridViewBackgroundColor" Type="OptionTreeView.Option&lt;System.Drawing.Color&gt;" Scope="User">
+      <Value Profile="(Default)">DimGray|5_UI|2_Color Main|Determine the Main CheatGridView background color</Value>
+    </Setting>
+    <Setting Name="MainCheatGridViewBaseRowColor" Type="OptionTreeView.Option&lt;System.Drawing.Color&gt;" Scope="User">
+      <Value Profile="(Default)">647381|5_UI|2_Color Main|Determine the Main CheatGridView base row color</Value>
+    </Setting>
+    <Setting Name="MainCheatGridViewGridColor" Type="OptionTreeView.Option&lt;System.Drawing.Color&gt;" Scope="User">
+      <Value Profile="(Default)">Silver|5_UI|2_Color Main|Determine the Main CheatGridView grid color</Value>
+    </Setting>
+    <Setting Name="MainCheatGridCellForeColor" Type="OptionTreeView.Option&lt;System.Drawing.Color&gt;" Scope="User">
+      <Value Profile="(Default)">White|5_UI|2_Color Main|Determine the Main dataGridViewCellStyle foreground color</Value>
+    </Setting>
+    <Setting Name="MainCheatGridCellBackColor" Type="OptionTreeView.Option&lt;System.Drawing.Color&gt;" Scope="User">
+      <Value Profile="(Default)">404040|5_UI|2_Color Main|Determine the Main dataGridViewCellStyle background color</Value>
+    </Setting>
+    <Setting Name="QueryStatusStrip1BackColor" Type="OptionTreeView.Option&lt;System.Drawing.Color&gt;" Scope="User">
+      <Value Profile="(Default)">DimGray|5_UI|3_Color Query|Determine the Query StatusStrip1 background color</Value>
+    </Setting>
+    <Setting Name="QueryAlignmentBoxForeColor" Type="OptionTreeView.Option&lt;System.Drawing.Color&gt;" Scope="User">
+      <Value Profile="(Default)">Silver|5_UI|3_Color Query|Determine the AlignmentBox foreground color</Value>
+    </Setting>
+    <Setting Name="QueryScanBtnBackColor" Type="OptionTreeView.Option&lt;System.Drawing.Color&gt;" Scope="User">
+      <Value Profile="(Default)">SteelBlue|5_UI|3_Color Query|Determine the Query ScanBtn background color</Value>
+    </Setting>
+    <Setting Name="QuerySectionViewFilterForeColor" Type="OptionTreeView.Option&lt;System.Drawing.Color&gt;" Scope="User">
+      <Value Profile="(Default)">DarkGray|5_UI|3_Color Query|Determine the Query SectionView Filter foreground color</Value>
+    </Setting>
+    <Setting Name="QuerySectionViewFilterBackColor" Type="OptionTreeView.Option&lt;System.Drawing.Color&gt;" Scope="User">
+      <Value Profile="(Default)">DimGray|5_UI|3_Color Query|Determine the Query SectionView Filter background color</Value>
+    </Setting>
+    <Setting Name="QuerySectionViewFilterSizeForeColor" Type="OptionTreeView.Option&lt;System.Drawing.Color&gt;" Scope="User">
+      <Value Profile="(Default)">DarkCyan|5_UI|3_Color Query|Determine the Query SectionView FilterSize foreground color</Value>
+    </Setting>
+    <Setting Name="QuerySectionViewFilterSizeBackColor" Type="OptionTreeView.Option&lt;System.Drawing.Color&gt;" Scope="User">
+      <Value Profile="(Default)">DarkSlateGray|5_UI|3_Color Query|Determine the Query SectionView FilterSize background color</Value>
+    </Setting>
+    <Setting Name="QuerySectionViewExecutableForeColor" Type="OptionTreeView.Option&lt;System.Drawing.Color&gt;" Scope="User">
+      <Value Profile="(Default)">GreenYellow|5_UI|3_Color Query|Determine the Query SectionView executable foreground color</Value>
+    </Setting>
+    <Setting Name="QuerySectionViewNoNameForeColor" Type="OptionTreeView.Option&lt;System.Drawing.Color&gt;" Scope="User">
+      <Value Profile="(Default)">Red|5_UI|3_Color Query|Determine the Query SectionView NoName foreground color</Value>
+    </Setting>
+    <Setting Name="QuerySectionViewNoName2ForeColor" Type="OptionTreeView.Option&lt;System.Drawing.Color&gt;" Scope="User">
+      <Value Profile="(Default)">HotPink|5_UI|3_Color Query|Determine the Query SectionView NoName2 foreground color</Value>
+    </Setting>
+    <Setting Name="QuerySectionViewItemCheck1BackColor" Type="OptionTreeView.Option&lt;System.Drawing.Color&gt;" Scope="User">
+      <Value Profile="(Default)">DarkSlateGray|5_UI|3_Color Query|Determine the Query SectionView ItemCheck1 background color</Value>
+    </Setting>
+    <Setting Name="QuerySectionViewItemCheck2BackColor" Type="OptionTreeView.Option&lt;System.Drawing.Color&gt;" Scope="User">
+      <Value Profile="(Default)">DarkGreen|5_UI|3_Color Query|Determine the Query SectionView ItemCheck2 background color</Value>
+    </Setting>
+    <Setting Name="HexEditorChangedFinishForeColor" Type="OptionTreeView.Option&lt;System.Drawing.Color&gt;" Scope="User">
+      <Value Profile="(Default)">LimeGreen|5_UI|4_Color HexEditor|Determine the HexEditor ChangedFinish foreground color</Value>
+    </Setting>
+    <Setting Name="HexEditorShadowSelectionColor" Type="OptionTreeView.Option&lt;System.Drawing.Color&gt;" Scope="User">
+      <Value Profile="(Default)">643CBCFF|5_UI|4_Color HexEditor|Determine the HexEditor ShadowSelection color</Value>
+    </Setting>
+    <Setting Name="HexEditorZeroBytesForeColor" Type="OptionTreeView.Option&lt;System.Drawing.Color&gt;" Scope="User">
+      <Value Profile="(Default)">DimGray|5_UI|4_Color HexEditor|Determine the HexEditor ZeroBytes foreground color</Value>
+    </Setting>
+    <Setting Name="PointerFinderStatusStrip1BackColor" Type="OptionTreeView.Option&lt;System.Drawing.Color&gt;" Scope="User">
+      <Value Profile="(Default)">DimGray|5_UI|5_Color PointerFinder|Determine the PointerFinder statusStrip1 background color</Value>
+    </Setting>
+    <Setting Name="PointerFinderScanBtnBackColor" Type="OptionTreeView.Option&lt;System.Drawing.Color&gt;" Scope="User">
+      <Value Profile="(Default)">SteelBlue|5_UI|5_Color PointerFinder|Determine the PointerFinder ScanBtn background color</Value>
+    </Setting>
+    <Setting Name="SendPayloadStatusStrip1BackColor" Type="OptionTreeView.Option&lt;System.Drawing.Color&gt;" Scope="User">
+      <Value Profile="(Default)">Silver|5_UI|6_Color SendPayload|Determine the SendPayload statusStrip1 background color</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

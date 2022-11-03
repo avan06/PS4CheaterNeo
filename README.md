@@ -2,7 +2,7 @@
 
 PS4CheaterNeo is a program to find game cheat codes, and it is based on [`ps4debug`](https://github.com/jogolden/ps4debug) and `.Net Framework 4.8`.
 
-Currently in `version 0.9.7.7-beta`
+Currently in `version 0.9.7.8-beta`
 
 
 ## Table of Contents
@@ -35,6 +35,7 @@ Currently in `version 0.9.7.7-beta`
 ## Description
 
 - User interface re-layout and design to `dark mode`.
+- Added support for `light theme` now.
 - The `cheat` window and the `query` window are separated.
 - `Hex Editor` can be opened from the `cheat` or `query` window.
 - `Pointer finder` can be executed from the `cheat` or `query` lists.
@@ -397,7 +398,70 @@ Determines the Interval of AutoRefreshTimer when AutoRefresh is enabled, in `mil
 - `HexInfoDash`:  
 Determines the delimited dash value that displays the current Hex value in the HexEditor. Default "-".  
 
+#### UI  
+- `ColorTheme`:  
+Determine color theme.  
+- `UiForeColor`:  
+Determine the UI foreground color.  
+- `UiBackColor`:  
+Determine the UI background color.  
+- `MainForeColor`:  
+Determine the Main foreground color.  
+- `MainBackColor`:  
+Determine the Main background color.  
+- `MainToolStrip1BackColor`:  
+Determine the Main ToolStrip1 background color.  
+- `MainCheatGridViewRowIndexForeColor`:  
+Determine the Main CheatGridView RowIndex foreground color.  
+- `MainCheatGridViewBackgroundColor`:  
+Determine the Main CheatGridView background color.  
+- `MainCheatGridViewBaseRowColor`:  
+Determine the Main CheatGridView base row color.  
+- `MainCheatGridViewGridColor`:  
+Determine the Main CheatGridView grid color.  
+- `MainCheatGridCellForeColor`:  
+Determine the Main dataGridViewCellStyle foreground color.  
+- `MainCheatGridCellBackColor`:  
+Determine the Main dataGridViewCellStyle background color.  
+- `QueryStatusStrip1BackColor`:  
+Determine the Query StatusStrip1 background color.  
+- `QueryAlignmentBoxForeColor`:  
+Determine the AlignmentBox foreground color.  
+- `QueryScanBtnBackColor`:  
+Determine the Query ScanBtn background color.  
+- `QuerySectionViewFilterForeColor`:  
+Determine the Query SectionView Filter foreground color.  
+- `QuerySectionViewFilterBackColor`:  
+Determine the Query SectionView Filter background color.  
+- `QuerySectionViewFilterSizeForeColor`:  
+Determine the Query SectionView FilterSize foreground color.  
+- `QuerySectionViewFilterSizeBackColor`:  
+Determine the Query SectionView FilterSize background color.  
+- `QuerySectionViewExecutableForeColor`:  
+Determine the Query SectionView executable foreground color.  
+- `QuerySectionViewNoNameForeColor`:  
+Determine the Query SectionView NoName foreground color.  
+- `QuerySectionViewNoName2ForeColor`:  
+Determine the Query SectionView NoName2 foreground color.  
+- `QuerySectionViewItemCheck1BackColor`:  
+Determine the Query SectionView ItemCheck1 background color.  
+- `QuerySectionViewItemCheck2BackColor`:  
+Determine the Query SectionView ItemCheck2 background color.  
+- `HexEditorChangedFinishForeColor`:  
+Determine the HexEditor ChangedFinish foreground color.  
+- `HexEditorShadowSelectionColor`:  
+Determine the HexEditor ShadowSelection color.  
+- `HexEditorZeroBytesForeColor`:  
+Determine the HexEditor ZeroBytes foreground color.  
+- `PointerFinderStatusStrip1BackColor`:  
+Determine the PointerFinder statusStrip1 background color.  
+- `PointerFinderScanBtnBackColor`:  
+Determine the PointerFinder ScanBtn background color.  
+- `SendPayloadStatusStrip1BackColor`:  
+Determine the SendPayload statusStrip1 background color.  
+
 ![option](assets/option.webp)
+![lightTheme](assets/lightTheme.webp)
 
 
 ## Reference
