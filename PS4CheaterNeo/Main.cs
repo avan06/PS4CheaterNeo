@@ -9,6 +9,7 @@ using System.Linq;
 using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static PS4CheaterNeo.SectionTool;
@@ -25,6 +26,7 @@ namespace PS4CheaterNeo
         public string ProcessName;
         public Main()
         {
+            Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture; //Avoid the case where CurrentCulture.NumberFormatInfo.NumberDecimalSeparator is not "."
             if ((Properties.Settings.Default.PS4IP.Value ?? "") == "") Properties.Settings.Default.Upgrade(); //Need to get the settings again when the AssemblyVersion is changed
             InitializeComponent();
             ApplyUI();
