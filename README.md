@@ -2,7 +2,7 @@
 
 PS4CheaterNeo is a program to find game cheat codes, and it is based on [`ps4debug`](https://github.com/jogolden/ps4debug) and `.Net Framework 4.8`.
 
-Currently in `version 0.9.7.9-beta`
+Currently in `version 0.9.7.10-beta`
 
 
 ## Table of Contents
@@ -312,6 +312,7 @@ AddrStart　　Prot　count　　　SIDv1　　　　　SID
 - Immediately show the changed position when `refreshing in the Hex editor`.
 - Support `auto refresh interval` when `Auto is enabled` in the `Hex editor`.(recommended for wired network, the current setting is every 2.5 seconds)
 - It is now possible to `swap bytes` to display the value of the current address in the Hex Editor.
+- Added support for find backward or forward feature in Hex editor, Default is find backward.
 
 ![hexeditor](assets/hexeditor5.webp)
 ![hexeditor](assets/hexeditor1.webp)
@@ -460,8 +461,17 @@ Determine the PointerFinder ScanBtn background color.
 - `SendPayloadStatusStrip1BackColor`:  
 Determine the SendPayload statusStrip1 background color.  
 
-![option](assets/option.webp)
-![lightTheme](assets/lightTheme.webp)
+#### ExoprtImport  
+- `Export`:  
+Export now.  
+- `Import`:  
+Import now.  
+- `Restore`:  
+Restore default.  
+
+![option1](assets/option1.webp)
+![option2](assets/option2.webp)
+![option3](assets/option3.webp)
 
 
 ## Reference

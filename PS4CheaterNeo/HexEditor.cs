@@ -3,7 +3,6 @@ using Be.Windows.Forms;
 using SharpDisasm;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
@@ -398,6 +397,7 @@ namespace PS4CheaterNeo
             try
             {
                 FindOptions findOptions = new FindOptions();
+                findOptions.FindDirection = ForwardBox.Checked ? Direction.Forward : Direction.Backward;
                 findOptions.Type = FindType.Hex;
 
                 if (HexBox.Checked) findOptions.Hex = ScanTool.ValueStringToByte(ScanType.Hex, InputBox.Text);

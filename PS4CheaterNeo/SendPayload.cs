@@ -119,6 +119,7 @@ namespace PS4CheaterNeo
             if ((Properties.Settings.Default.PS4IP.Value ?? "") != "") IpBox.Text = Properties.Settings.Default.PS4IP.Value;
             if (Properties.Settings.Default.PS4Port.Value != 0) PortBox.Text = Convert.ToString(Properties.Settings.Default.PS4Port.Value);
 
+            VersionBox.Text = defaultVer;
             VersionComboBox.SelectedIndex = VersionComboBox.Items.IndexOf(defaultVer);
         }
 
@@ -139,10 +140,7 @@ namespace PS4CheaterNeo
             }
         }
 
-        private void VersionComboBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            VersionBox.Text = (string)VersionComboBox.SelectedItem;
-        }
+        private void VersionComboBox_SelectedIndexChanged(object sender, EventArgs e) => VersionBox.Text = (string)VersionComboBox.SelectedItem;
 
         private void ToolStripMsg_MouseHover(object sender, EventArgs e)
         {
