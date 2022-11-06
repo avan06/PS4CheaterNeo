@@ -39,6 +39,7 @@ namespace PS4CheaterNeo
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle9 = new System.Windows.Forms.DataGridViewCellStyle();
             this.CheatGridMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.CheatGridMenuHexEditor = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
@@ -75,17 +76,18 @@ namespace PS4CheaterNeo
             this.ToolStripMsg = new System.Windows.Forms.ToolStripStatusLabel();
             this.panel1 = new System.Windows.Forms.Panel();
             this.CheatGridView = new GroupGridView.GroupGridView();
+            this.RefreshLock = new System.Windows.Forms.Timer(this.components);
+            this.OpenCheatDialog = new System.Windows.Forms.OpenFileDialog();
+            this.SaveCheatDialog = new System.Windows.Forms.SaveFileDialog();
             this.CheatGridViewDel = new System.Windows.Forms.DataGridViewButtonColumn();
             this.CheatGridViewAddress = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.CheatGridViewType = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.CheatGridViewActive = new System.Windows.Forms.DataGridViewButtonColumn();
             this.CheatGridViewValue = new GroupGridView.DataGridViewUpDownColumn();
             this.CheatGridViewSection = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.CheatGridViewSID = new GroupGridView.DataGridViewUpDownColumn();
             this.CheatGridViewLock = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.CheatGridViewDescription = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.RefreshLock = new System.Windows.Forms.Timer(this.components);
-            this.OpenCheatDialog = new System.Windows.Forms.OpenFileDialog();
-            this.SaveCheatDialog = new System.Windows.Forms.SaveFileDialog();
             this.CheatGridMenu.SuspendLayout();
             this.ToolStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
@@ -424,6 +426,7 @@ namespace PS4CheaterNeo
             this.CheatGridViewActive,
             this.CheatGridViewValue,
             this.CheatGridViewSection,
+            this.CheatGridViewSID,
             this.CheatGridViewLock,
             this.CheatGridViewDescription});
             this.CheatGridView.ContextMenuStrip = this.CheatGridMenu;
@@ -458,6 +461,12 @@ namespace PS4CheaterNeo
             this.CheatGridView.RowPostPaint += new System.Windows.Forms.DataGridViewRowPostPaintEventHandler(this.CheatGridView_RowPostPaint);
             this.CheatGridView.RowsRemoved += new System.Windows.Forms.DataGridViewRowsRemovedEventHandler(this.CheatGridView_RowsRemoved);
             // 
+            // RefreshLock
+            // 
+            this.RefreshLock.Enabled = true;
+            this.RefreshLock.Interval = 500;
+            this.RefreshLock.Tick += new System.EventHandler(this.RefreshLock_Tick);
+            // 
             // CheatGridViewDel
             // 
             dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
@@ -489,6 +498,7 @@ namespace PS4CheaterNeo
             this.CheatGridViewType.Name = "CheatGridViewType";
             this.CheatGridViewType.ReadOnly = true;
             this.CheatGridViewType.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.CheatGridViewType.Width = 60;
             // 
             // CheatGridViewActive
             // 
@@ -522,13 +532,24 @@ namespace PS4CheaterNeo
             this.CheatGridViewSection.ReadOnly = true;
             this.CheatGridViewSection.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             // 
-            // CheatGridViewLock
+            // CheatGridViewSID
             // 
-            dataGridViewCellStyle7.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
             dataGridViewCellStyle7.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             dataGridViewCellStyle7.ForeColor = System.Drawing.Color.White;
-            dataGridViewCellStyle7.NullValue = false;
-            this.CheatGridViewLock.DefaultCellStyle = dataGridViewCellStyle7;
+            this.CheatGridViewSID.DefaultCellStyle = dataGridViewCellStyle7;
+            this.CheatGridViewSID.HeaderText = "SID";
+            this.CheatGridViewSID.Name = "CheatGridViewSID";
+            this.CheatGridViewSID.ReadOnly = true;
+            this.CheatGridViewSID.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.CheatGridViewSID.Width = 20;
+            // 
+            // CheatGridViewLock
+            // 
+            dataGridViewCellStyle8.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle8.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            dataGridViewCellStyle8.ForeColor = System.Drawing.Color.White;
+            dataGridViewCellStyle8.NullValue = false;
+            this.CheatGridViewLock.DefaultCellStyle = dataGridViewCellStyle8;
             this.CheatGridViewLock.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.CheatGridViewLock.HeaderText = "Lock";
             this.CheatGridViewLock.Name = "CheatGridViewLock";
@@ -537,18 +558,12 @@ namespace PS4CheaterNeo
             // CheatGridViewDescription
             // 
             this.CheatGridViewDescription.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            dataGridViewCellStyle8.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            dataGridViewCellStyle8.ForeColor = System.Drawing.Color.White;
-            this.CheatGridViewDescription.DefaultCellStyle = dataGridViewCellStyle8;
+            dataGridViewCellStyle9.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            dataGridViewCellStyle9.ForeColor = System.Drawing.Color.White;
+            this.CheatGridViewDescription.DefaultCellStyle = dataGridViewCellStyle9;
             this.CheatGridViewDescription.HeaderText = "Description";
             this.CheatGridViewDescription.Name = "CheatGridViewDescription";
             this.CheatGridViewDescription.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // RefreshLock
-            // 
-            this.RefreshLock.Enabled = true;
-            this.RefreshLock.Interval = 500;
-            this.RefreshLock.Tick += new System.EventHandler(this.RefreshLock_Tick);
             // 
             // Main
             // 
@@ -618,6 +633,7 @@ namespace PS4CheaterNeo
         private System.Windows.Forms.DataGridViewButtonColumn CheatGridViewActive;
         private GroupGridView.DataGridViewUpDownColumn CheatGridViewValue;
         private System.Windows.Forms.DataGridViewTextBoxColumn CheatGridViewSection;
+        private GroupGridView.DataGridViewUpDownColumn CheatGridViewSID;
         private System.Windows.Forms.DataGridViewCheckBoxColumn CheatGridViewLock;
         private System.Windows.Forms.DataGridViewTextBoxColumn CheatGridViewDescription;
     }

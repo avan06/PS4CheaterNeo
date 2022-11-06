@@ -206,8 +206,8 @@ namespace PS4CheaterNeo
 
                         Section section = new Section();
                         section.PID = pMap.pid;
-                        section.SID = highBits * 10000000 + typeCode * 1000000 + v2.ProtCnt * 100000 + v2.sIdx * 100 + idx;
-                        section.SIDv1 = typeCode * 100000000 + v1.ProtCnt * 1000000 + v1.sIdx * 100 + idx;
+                        section.SIDv1 = idx + v1.sIdx * 100 + v1.ProtCnt * 1000000 + typeCode * 100000000;
+                        section.SID   = idx + v2.sIdx * 100 + v2.ProtCnt * 100000  + typeCode * 1000000  + highBits * 10000000;
                         section.Start = start;
                         section.Length = (int)curLength;
                         section.Name = entry.name + "[" + idx + "]";
@@ -229,7 +229,11 @@ namespace PS4CheaterNeo
                         v2.sIdx += idx / 100;
                     }
                     v1.sIdx++;
-                    v2.sIdx++;
+                    if (++v2.sIdx > 999) //v2.sIdx++;
+                    {
+                        v2.ProtCnt++;
+                        v2.sIdx = 0;
+                    }
                     tmp = (highBits, typeCode, entry.prot);
                 }
                 SectionList.Sort((s1, s2) => s1.start.CompareTo(s2.start));

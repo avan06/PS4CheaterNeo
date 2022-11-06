@@ -31,6 +31,24 @@ namespace PS4CheaterNeo
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Query));
+            this.ResultViewMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.ResultViewAddToCheatGrid = new System.Windows.Forms.ToolStripMenuItem();
+            this.ToolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.ResultViewHexEditor = new System.Windows.Forms.ToolStripMenuItem();
+            this.ResultViewCopyAddress = new System.Windows.Forms.ToolStripMenuItem();
+            this.ResultViewDump = new System.Windows.Forms.ToolStripMenuItem();
+            this.ToolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            this.ResultViewFindPointer = new System.Windows.Forms.ToolStripMenuItem();
+            this.SectionViewMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.SectionViewHexEditor = new System.Windows.Forms.ToolStripMenuItem();
+            this.SectionViewDump = new System.Windows.Forms.ToolStripMenuItem();
+            this.SectionViewImport = new System.Windows.Forms.ToolStripMenuItem();
+            this.ToolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.SectionViewCheck = new System.Windows.Forms.ToolStripMenuItem();
+            this.Panel1 = new System.Windows.Forms.Panel();
+            this.SlowMotionTimer = new System.Windows.Forms.Timer(this.components);
+            this.SaveDialog = new System.Windows.Forms.SaveFileDialog();
+            this.OpenDialog = new System.Windows.Forms.OpenFileDialog();
             this.SplitContainer1 = new PS4CheaterNeo.CollapsibleSplitContainer();
             this.StatusStrip1 = new System.Windows.Forms.StatusStrip();
             this.ToolStripMsg = new System.Windows.Forms.ToolStripStatusLabel();
@@ -40,14 +58,6 @@ namespace PS4CheaterNeo
             this.ResultViewValue = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.ResultViewHex = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.ResultViewSection = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.ResultViewMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.ResultViewAddToCheatGrid = new System.Windows.Forms.ToolStripMenuItem();
-            this.ToolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.ResultViewHexEditor = new System.Windows.Forms.ToolStripMenuItem();
-            this.ResultViewCopyAddress = new System.Windows.Forms.ToolStripMenuItem();
-            this.ResultViewDump = new System.Windows.Forms.ToolStripMenuItem();
-            this.ToolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
-            this.ResultViewFindPointer = new System.Windows.Forms.ToolStripMenuItem();
             this.SplitContainer2 = new PS4CheaterNeo.CollapsibleSplitContainer();
             this.PauseBtn = new System.Windows.Forms.Button();
             this.ResumeBtn = new System.Windows.Forms.Button();
@@ -66,12 +76,6 @@ namespace PS4CheaterNeo
             this.SectionViewSID = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.SectionViewOffset = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.SectionViewEnd = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.SectionViewMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.SectionViewHexEditor = new System.Windows.Forms.ToolStripMenuItem();
-            this.SectionViewDump = new System.Windows.Forms.ToolStripMenuItem();
-            this.SectionViewImport = new System.Windows.Forms.ToolStripMenuItem();
-            this.ToolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
-            this.SectionViewCheck = new System.Windows.Forms.ToolStripMenuItem();
             this.GetProcessesBtn = new System.Windows.Forms.Button();
             this.ProcessesBox = new PS4CheaterNeo.ComboItemBox();
             this.DoneResumeBox = new System.Windows.Forms.CheckBox();
@@ -98,25 +102,145 @@ namespace PS4CheaterNeo
             this.RefreshBtn = new System.Windows.Forms.Button();
             this.ScanBtn = new System.Windows.Forms.Button();
             this.CompareTypeBox = new System.Windows.Forms.ComboBox();
-            this.Panel1 = new System.Windows.Forms.Panel();
-            this.SlowMotionTimer = new System.Windows.Forms.Timer(this.components);
-            this.SaveDialog = new System.Windows.Forms.SaveFileDialog();
-            this.OpenDialog = new System.Windows.Forms.OpenFileDialog();
+            this.ResultViewMenu.SuspendLayout();
+            this.SectionViewMenu.SuspendLayout();
+            this.Panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SplitContainer1)).BeginInit();
             this.SplitContainer1.Panel1.SuspendLayout();
             this.SplitContainer1.Panel2.SuspendLayout();
             this.SplitContainer1.SuspendLayout();
             this.StatusStrip1.SuspendLayout();
-            this.ResultViewMenu.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SplitContainer2)).BeginInit();
             this.SplitContainer2.Panel1.SuspendLayout();
             this.SplitContainer2.Panel2.SuspendLayout();
             this.SplitContainer2.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
-            this.SectionViewMenu.SuspendLayout();
             this.TableLayoutPanel1.SuspendLayout();
-            this.Panel1.SuspendLayout();
             this.SuspendLayout();
+            // 
+            // ResultViewMenu
+            // 
+            this.ResultViewMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.ResultViewAddToCheatGrid,
+            this.ToolStripSeparator1,
+            this.ResultViewHexEditor,
+            this.ResultViewCopyAddress,
+            this.ResultViewDump,
+            this.ToolStripSeparator2,
+            this.ResultViewFindPointer});
+            this.ResultViewMenu.Name = "ResultViewMenu";
+            this.ResultViewMenu.Size = new System.Drawing.Size(177, 126);
+            // 
+            // ResultViewAddToCheatGrid
+            // 
+            this.ResultViewAddToCheatGrid.Name = "ResultViewAddToCheatGrid";
+            this.ResultViewAddToCheatGrid.Size = new System.Drawing.Size(176, 22);
+            this.ResultViewAddToCheatGrid.Text = "Add to Cheat Grid";
+            this.ResultViewAddToCheatGrid.Click += new System.EventHandler(this.ResultViewAddToCheatGrid_Click);
+            // 
+            // ToolStripSeparator1
+            // 
+            this.ToolStripSeparator1.Name = "ToolStripSeparator1";
+            this.ToolStripSeparator1.Size = new System.Drawing.Size(173, 6);
+            // 
+            // ResultViewHexEditor
+            // 
+            this.ResultViewHexEditor.Name = "ResultViewHexEditor";
+            this.ResultViewHexEditor.Size = new System.Drawing.Size(176, 22);
+            this.ResultViewHexEditor.Text = "Hex Editor";
+            this.ResultViewHexEditor.Click += new System.EventHandler(this.ResultViewHexEditor_Click);
+            // 
+            // ResultViewCopyAddress
+            // 
+            this.ResultViewCopyAddress.Name = "ResultViewCopyAddress";
+            this.ResultViewCopyAddress.Size = new System.Drawing.Size(176, 22);
+            this.ResultViewCopyAddress.Text = "Copy Address";
+            this.ResultViewCopyAddress.Click += new System.EventHandler(this.ResultViewCopyAddress_Click);
+            // 
+            // ResultViewDump
+            // 
+            this.ResultViewDump.Enabled = false;
+            this.ResultViewDump.Name = "ResultViewDump";
+            this.ResultViewDump.Size = new System.Drawing.Size(176, 22);
+            this.ResultViewDump.Text = "Dump";
+            this.ResultViewDump.Click += new System.EventHandler(this.ResultViewDump_Click);
+            // 
+            // ToolStripSeparator2
+            // 
+            this.ToolStripSeparator2.Name = "ToolStripSeparator2";
+            this.ToolStripSeparator2.Size = new System.Drawing.Size(173, 6);
+            // 
+            // ResultViewFindPointer
+            // 
+            this.ResultViewFindPointer.Name = "ResultViewFindPointer";
+            this.ResultViewFindPointer.Size = new System.Drawing.Size(176, 22);
+            this.ResultViewFindPointer.Text = "Find Pointer";
+            this.ResultViewFindPointer.Click += new System.EventHandler(this.ResultViewFindPointer_Click);
+            // 
+            // SectionViewMenu
+            // 
+            this.SectionViewMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.SectionViewHexEditor,
+            this.SectionViewDump,
+            this.SectionViewImport,
+            this.ToolStripSeparator3,
+            this.SectionViewCheck});
+            this.SectionViewMenu.Name = "SectionViewMenu";
+            this.SectionViewMenu.Size = new System.Drawing.Size(134, 98);
+            // 
+            // SectionViewHexEditor
+            // 
+            this.SectionViewHexEditor.Name = "SectionViewHexEditor";
+            this.SectionViewHexEditor.Size = new System.Drawing.Size(133, 22);
+            this.SectionViewHexEditor.Text = "Hex Editor";
+            this.SectionViewHexEditor.Click += new System.EventHandler(this.SectionViewHexEditor_Click);
+            // 
+            // SectionViewDump
+            // 
+            this.SectionViewDump.Name = "SectionViewDump";
+            this.SectionViewDump.Size = new System.Drawing.Size(133, 22);
+            this.SectionViewDump.Text = "Dump";
+            this.SectionViewDump.Click += new System.EventHandler(this.SectionViewDump_Click);
+            // 
+            // SectionViewImport
+            // 
+            this.SectionViewImport.Enabled = false;
+            this.SectionViewImport.Name = "SectionViewImport";
+            this.SectionViewImport.Size = new System.Drawing.Size(133, 22);
+            this.SectionViewImport.Text = "Import";
+            this.SectionViewImport.Visible = false;
+            this.SectionViewImport.Click += new System.EventHandler(this.SectionViewImport_Click);
+            // 
+            // ToolStripSeparator3
+            // 
+            this.ToolStripSeparator3.Name = "ToolStripSeparator3";
+            this.ToolStripSeparator3.Size = new System.Drawing.Size(130, 6);
+            // 
+            // SectionViewCheck
+            // 
+            this.SectionViewCheck.Name = "SectionViewCheck";
+            this.SectionViewCheck.Size = new System.Drawing.Size(133, 22);
+            this.SectionViewCheck.Text = "Check";
+            this.SectionViewCheck.Click += new System.EventHandler(this.SectionViewCheck_Click);
+            // 
+            // Panel1
+            // 
+            this.Panel1.Controls.Add(this.SplitContainer1);
+            this.Panel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.Panel1.Location = new System.Drawing.Point(0, 0);
+            this.Panel1.Name = "Panel1";
+            this.Panel1.Size = new System.Drawing.Size(800, 450);
+            this.Panel1.TabIndex = 2;
+            // 
+            // SlowMotionTimer
+            // 
+            this.SlowMotionTimer.Interval = 250;
+            this.SlowMotionTimer.Tick += new System.EventHandler(this.SlowMotionTimer_Tick);
+            // 
+            // OpenDialog
+            // 
+            this.OpenDialog.DefaultExt = "bin";
+            this.OpenDialog.Multiselect = true;
             // 
             // SplitContainer1
             // 
@@ -208,65 +332,6 @@ namespace PS4CheaterNeo
             // 
             this.ResultViewSection.Text = "Section";
             this.ResultViewSection.Width = 250;
-            // 
-            // ResultViewMenu
-            // 
-            this.ResultViewMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.ResultViewAddToCheatGrid,
-            this.ToolStripSeparator1,
-            this.ResultViewHexEditor,
-            this.ResultViewCopyAddress,
-            this.ResultViewDump,
-            this.ToolStripSeparator2,
-            this.ResultViewFindPointer});
-            this.ResultViewMenu.Name = "ResultViewMenu";
-            this.ResultViewMenu.Size = new System.Drawing.Size(177, 126);
-            // 
-            // ResultViewAddToCheatGrid
-            // 
-            this.ResultViewAddToCheatGrid.Name = "ResultViewAddToCheatGrid";
-            this.ResultViewAddToCheatGrid.Size = new System.Drawing.Size(176, 22);
-            this.ResultViewAddToCheatGrid.Text = "Add to Cheat Grid";
-            this.ResultViewAddToCheatGrid.Click += new System.EventHandler(this.ResultViewAddToCheatGrid_Click);
-            // 
-            // ToolStripSeparator1
-            // 
-            this.ToolStripSeparator1.Name = "ToolStripSeparator1";
-            this.ToolStripSeparator1.Size = new System.Drawing.Size(173, 6);
-            // 
-            // ResultViewHexEditor
-            // 
-            this.ResultViewHexEditor.Name = "ResultViewHexEditor";
-            this.ResultViewHexEditor.Size = new System.Drawing.Size(176, 22);
-            this.ResultViewHexEditor.Text = "Hex Editor";
-            this.ResultViewHexEditor.Click += new System.EventHandler(this.ResultViewHexEditor_Click);
-            // 
-            // ResultViewCopyAddress
-            // 
-            this.ResultViewCopyAddress.Name = "ResultViewCopyAddress";
-            this.ResultViewCopyAddress.Size = new System.Drawing.Size(176, 22);
-            this.ResultViewCopyAddress.Text = "Copy Address";
-            this.ResultViewCopyAddress.Click += new System.EventHandler(this.ResultViewCopyAddress_Click);
-            // 
-            // ResultViewDump
-            // 
-            this.ResultViewDump.Enabled = false;
-            this.ResultViewDump.Name = "ResultViewDump";
-            this.ResultViewDump.Size = new System.Drawing.Size(176, 22);
-            this.ResultViewDump.Text = "Dump";
-            this.ResultViewDump.Click += new System.EventHandler(this.ResultViewDump_Click);
-            // 
-            // ToolStripSeparator2
-            // 
-            this.ToolStripSeparator2.Name = "ToolStripSeparator2";
-            this.ToolStripSeparator2.Size = new System.Drawing.Size(173, 6);
-            // 
-            // ResultViewFindPointer
-            // 
-            this.ResultViewFindPointer.Name = "ResultViewFindPointer";
-            this.ResultViewFindPointer.Size = new System.Drawing.Size(176, 22);
-            this.ResultViewFindPointer.Text = "Find Pointer";
-            this.ResultViewFindPointer.Click += new System.EventHandler(this.ResultViewFindPointer_Click);
             // 
             // SplitContainer2
             // 
@@ -505,53 +570,7 @@ namespace PS4CheaterNeo
             // SectionViewEnd
             // 
             this.SectionViewEnd.Text = "End";
-            this.SectionViewEnd.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            // 
-            // SectionViewMenu
-            // 
-            this.SectionViewMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.SectionViewHexEditor,
-            this.SectionViewDump,
-            this.SectionViewImport,
-            this.ToolStripSeparator3,
-            this.SectionViewCheck});
-            this.SectionViewMenu.Name = "SectionViewMenu";
-            this.SectionViewMenu.Size = new System.Drawing.Size(134, 98);
-            // 
-            // SectionViewHexEditor
-            // 
-            this.SectionViewHexEditor.Name = "SectionViewHexEditor";
-            this.SectionViewHexEditor.Size = new System.Drawing.Size(133, 22);
-            this.SectionViewHexEditor.Text = "Hex Editor";
-            this.SectionViewHexEditor.Click += new System.EventHandler(this.SectionViewHexEditor_Click);
-            // 
-            // SectionViewDump
-            // 
-            this.SectionViewDump.Name = "SectionViewDump";
-            this.SectionViewDump.Size = new System.Drawing.Size(133, 22);
-            this.SectionViewDump.Text = "Dump";
-            this.SectionViewDump.Click += new System.EventHandler(this.SectionViewDump_Click);
-            // 
-            // SectionViewImport
-            // 
-            this.SectionViewImport.Enabled = false;
-            this.SectionViewImport.Name = "SectionViewImport";
-            this.SectionViewImport.Size = new System.Drawing.Size(133, 22);
-            this.SectionViewImport.Text = "Import";
-            this.SectionViewImport.Visible = false;
-            this.SectionViewImport.Click += new System.EventHandler(this.SectionViewImport_Click);
-            // 
-            // ToolStripSeparator3
-            // 
-            this.ToolStripSeparator3.Name = "ToolStripSeparator3";
-            this.ToolStripSeparator3.Size = new System.Drawing.Size(130, 6);
-            // 
-            // SectionViewCheck
-            // 
-            this.SectionViewCheck.Name = "SectionViewCheck";
-            this.SectionViewCheck.Size = new System.Drawing.Size(133, 22);
-            this.SectionViewCheck.Text = "Check";
-            this.SectionViewCheck.Click += new System.EventHandler(this.SectionViewCheck_Click);
+            this.SectionViewEnd.Width = 85;
             // 
             // GetProcessesBtn
             // 
@@ -899,25 +918,6 @@ namespace PS4CheaterNeo
             this.CompareTypeBox.TabIndex = 11;
             this.CompareTypeBox.SelectedIndexChanged += new System.EventHandler(this.CompareTypeBox_SelectedIndexChanged);
             // 
-            // Panel1
-            // 
-            this.Panel1.Controls.Add(this.SplitContainer1);
-            this.Panel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.Panel1.Location = new System.Drawing.Point(0, 0);
-            this.Panel1.Name = "Panel1";
-            this.Panel1.Size = new System.Drawing.Size(800, 450);
-            this.Panel1.TabIndex = 2;
-            // 
-            // SlowMotionTimer
-            // 
-            this.SlowMotionTimer.Interval = 250;
-            this.SlowMotionTimer.Tick += new System.EventHandler(this.SlowMotionTimer_Tick);
-            // 
-            // OpenDialog
-            // 
-            this.OpenDialog.DefaultExt = "bin";
-            this.OpenDialog.Multiselect = true;
-            // 
             // Query
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -930,6 +930,9 @@ namespace PS4CheaterNeo
             this.Text = "Query";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Query_FormClosing);
             this.Load += new System.EventHandler(this.Query_Load);
+            this.ResultViewMenu.ResumeLayout(false);
+            this.SectionViewMenu.ResumeLayout(false);
+            this.Panel1.ResumeLayout(false);
             this.SplitContainer1.Panel1.ResumeLayout(false);
             this.SplitContainer1.Panel1.PerformLayout();
             this.SplitContainer1.Panel2.ResumeLayout(false);
@@ -937,7 +940,6 @@ namespace PS4CheaterNeo
             this.SplitContainer1.ResumeLayout(false);
             this.StatusStrip1.ResumeLayout(false);
             this.StatusStrip1.PerformLayout();
-            this.ResultViewMenu.ResumeLayout(false);
             this.SplitContainer2.Panel1.ResumeLayout(false);
             this.SplitContainer2.Panel2.ResumeLayout(false);
             this.SplitContainer2.Panel2.PerformLayout();
@@ -945,10 +947,8 @@ namespace PS4CheaterNeo
             this.SplitContainer2.ResumeLayout(false);
             this.tableLayoutPanel2.ResumeLayout(false);
             this.tableLayoutPanel2.PerformLayout();
-            this.SectionViewMenu.ResumeLayout(false);
             this.TableLayoutPanel1.ResumeLayout(false);
             this.TableLayoutPanel1.PerformLayout();
-            this.Panel1.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }

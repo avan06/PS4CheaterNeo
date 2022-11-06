@@ -24,6 +24,7 @@ namespace PS4CheaterNeo
         private Brush cheatGridViewRowIndexForeBrush;
         public SectionTool sectionTool { get; private set; }
         public string ProcessName;
+        public int ProcessPid;
         public Main()
         {
             Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture; //Avoid the case where CurrentCulture.NumberFormatInfo.NumberDecimalSeparator is not "."
@@ -53,20 +54,22 @@ namespace PS4CheaterNeo
                 var MainCheatGridCellForeColor = Properties.Settings.Default.MainCheatGridCellForeColor.Value;
 
                 ToolStripMsg.ForeColor = MainCheatGridCellForeColor; //Color.White;
-                CheatGridViewDel.DefaultCellStyle.BackColor = MainCheatGridCellBackColor; //Color.FromArgb(64, 64, 64);
-                CheatGridViewDel.DefaultCellStyle.ForeColor = MainCheatGridCellForeColor; //Color.White;
-                CheatGridViewAddress.DefaultCellStyle.BackColor = MainCheatGridCellBackColor; //Color.FromArgb(64, 64, 64);
-                CheatGridViewAddress.DefaultCellStyle.ForeColor = MainCheatGridCellForeColor; //Color.White;
-                CheatGridViewType.DefaultCellStyle.BackColor = MainCheatGridCellBackColor; //Color.FromArgb(64, 64, 64);
-                CheatGridViewType.DefaultCellStyle.ForeColor = MainCheatGridCellForeColor; //Color.White;
-                CheatGridViewActive.DefaultCellStyle.BackColor = MainCheatGridCellBackColor; //Color.FromArgb(64, 64, 64);
-                CheatGridViewActive.DefaultCellStyle.ForeColor = MainCheatGridCellForeColor; //Color.White;
-                CheatGridViewValue.DefaultCellStyle.BackColor = MainCheatGridCellBackColor; //Color.FromArgb(64, 64, 64);
-                CheatGridViewValue.DefaultCellStyle.ForeColor = MainCheatGridCellForeColor; //Color.White;
-                CheatGridViewSection.DefaultCellStyle.BackColor = MainCheatGridCellBackColor; //Color.FromArgb(64, 64, 64);
-                CheatGridViewSection.DefaultCellStyle.ForeColor = MainCheatGridCellForeColor; //Color.White;
-                CheatGridViewLock.DefaultCellStyle.BackColor = MainCheatGridCellBackColor; //Color.FromArgb(64, 64, 64);
-                CheatGridViewLock.DefaultCellStyle.ForeColor = MainCheatGridCellForeColor; //Color.White;
+                CheatGridViewDel.DefaultCellStyle.BackColor         = MainCheatGridCellBackColor; //Color.FromArgb(64, 64, 64);
+                CheatGridViewDel.DefaultCellStyle.ForeColor         = MainCheatGridCellForeColor; //Color.White;
+                CheatGridViewAddress.DefaultCellStyle.BackColor     = MainCheatGridCellBackColor; //Color.FromArgb(64, 64, 64);
+                CheatGridViewAddress.DefaultCellStyle.ForeColor     = MainCheatGridCellForeColor; //Color.White;
+                CheatGridViewType.DefaultCellStyle.BackColor        = MainCheatGridCellBackColor; //Color.FromArgb(64, 64, 64);
+                CheatGridViewType.DefaultCellStyle.ForeColor        = MainCheatGridCellForeColor; //Color.White;
+                CheatGridViewActive.DefaultCellStyle.BackColor      = MainCheatGridCellBackColor; //Color.FromArgb(64, 64, 64);
+                CheatGridViewActive.DefaultCellStyle.ForeColor      = MainCheatGridCellForeColor; //Color.White;
+                CheatGridViewValue.DefaultCellStyle.BackColor       = MainCheatGridCellBackColor; //Color.FromArgb(64, 64, 64);
+                CheatGridViewValue.DefaultCellStyle.ForeColor       = MainCheatGridCellForeColor; //Color.White;
+                CheatGridViewSection.DefaultCellStyle.BackColor     = MainCheatGridCellBackColor; //Color.FromArgb(64, 64, 64);
+                CheatGridViewSection.DefaultCellStyle.ForeColor     = MainCheatGridCellForeColor; //Color.White;
+                CheatGridViewSID.DefaultCellStyle.BackColor         = MainCheatGridCellBackColor; //Color.FromArgb(64, 64, 64);
+                CheatGridViewSID.DefaultCellStyle.ForeColor         = MainCheatGridCellForeColor; //Color.White;
+                CheatGridViewLock.DefaultCellStyle.BackColor        = MainCheatGridCellBackColor; //Color.FromArgb(64, 64, 64);
+                CheatGridViewLock.DefaultCellStyle.ForeColor        = MainCheatGridCellForeColor; //Color.White;
                 CheatGridViewDescription.DefaultCellStyle.BackColor = MainCheatGridCellBackColor; //Color.FromArgb(64, 64, 64);
                 CheatGridViewDescription.DefaultCellStyle.ForeColor = MainCheatGridCellForeColor; //Color.White;
                 CheatGridView.GroupRefresh();
@@ -550,8 +553,9 @@ namespace PS4CheaterNeo
                     string sectionStr = "";
                     if (isPointer)
                     {
+                        uint sid = cheatRow.Cells[(int)ChertCol.CheatListSID].Value == null ? 0 : (uint)cheatRow.Cells[(int)ChertCol.CheatListSID].Value;
                         string[] sectionArr = cheatRow.Cells[(int)ChertCol.CheatListSection].Value.ToString().Split('|');
-                        newSection = sectionTool.GetSection(uint.Parse(sectionArr[0]), sectionArr[2], uint.Parse(sectionArr[3]));
+                        newSection = sectionTool.GetSection(sid, sectionArr[1], uint.Parse(sectionArr[2]));
                         addressStr = sectionArr[sectionArr.Length - 1];
                     }
                     else if (SaveCheatDialog.FilterIndex == 2 && isRelative)
@@ -683,12 +687,13 @@ namespace PS4CheaterNeo
                     #region  Refresh Section and offsetAddr
                     if (VerifySectionWhenRefresh)
                     {
+                        uint sid = cheatRow.Cells[(int)ChertCol.CheatListSID].Value == null ? 0 : (uint)cheatRow.Cells[(int)ChertCol.CheatListSID].Value;
                         string[] sectionArr = cheatRow.Cells[(int)ChertCol.CheatListSection].Value.ToString().Split('|');
                         string hexAddr = "";
                         bool isRelative = sectionArr[0].StartsWith("+");
                         bool isPointer = cheatRow.Cells[(int)ChertCol.CheatListAddress].Value.ToString().StartsWith("P->");
                         if (isRelative && preData.sid == 0) section = null;
-                        else (section, offsetAddr, hexAddr) = RefreshSection(sectionArr, offsetAddr, isPointer, preData, pointerCaches);
+                        else (section, offsetAddr, hexAddr) = RefreshSection(sid, sectionArr, offsetAddr, isPointer, preData, pointerCaches);
                         if (section == null)
                         {
                             ToolStripMsg.Text = string.Format("RefreshCheat Failed...CheatGrid({0}), section: {1}, offsetAddr: {2:X}", cIdx, string.Join("-", sectionArr), offsetAddr);
@@ -715,14 +720,14 @@ namespace PS4CheaterNeo
             return true;
         });
 
-        private (Section section, uint offsetAddr, string hexAddr) RefreshSection(string[] sectionArr, uint offsetAddr, bool isPointer, (uint sid, string name, uint prot, uint offsetAddr) preData, Dictionary<ulong, ulong> pointerCaches)
+        private (Section section, uint offsetAddr, string hexAddr) RefreshSection(uint sectionSid, string[] sectionArr, uint offsetAddr, bool isPointer, (uint sid, string name, uint prot, uint offsetAddr) preData, Dictionary<ulong, ulong> pointerCaches)
         {
             bool isRelative = sectionArr[0].StartsWith("+");
             int relativeOffset = isRelative ? int.Parse(sectionArr[0].Substring(1), NumberStyles.HexNumber) : -1;
 
-            uint sid = isRelative ? preData.sid : uint.Parse(sectionArr[0]);
-            string name = isRelative ? preData.name : sectionArr[2];
-            uint prot = isRelative ? preData.prot : uint.Parse(sectionArr[3], NumberStyles.HexNumber);
+            uint sid = isRelative ? preData.sid : sectionSid;
+            string name = isRelative ? preData.name : sectionArr[1];
+            uint prot = isRelative ? preData.prot : uint.Parse(sectionArr[2], NumberStyles.HexNumber);
             string hexAddr;
 
             Section section;
@@ -762,7 +767,7 @@ namespace PS4CheaterNeo
             if (!(ToolStripProcessInfo.Tag is bool) && ProcessName != (string)ToolStripProcessInfo.Tag)
             {
                 ToolStripProcessInfo.Tag = ProcessName;
-                ToolStripProcessInfo.Text = "Current Processes: " + (ProcessName == "" ? "Empty" : ProcessName);
+                ToolStripProcessInfo.Text = "Current Processes: " + (ProcessName == "" ? "Empty" : (ProcessName + (ProcessPid > 0 ? "(" + ProcessPid + ")" : "")));
             }
             if (!ToolStripLockEnable.Checked || CheatGridView.Rows.Count == 0 || (refreshLockTask != null && !refreshLockTask.IsCompleted)) return;
 
@@ -795,6 +800,7 @@ namespace PS4CheaterNeo
                     if (VerifySectionWhenLock)
                     {
                         string hexAddr;
+                        uint sid = cheatRow.Cells[(int)ChertCol.CheatListSID].Value == null ? 0 : (uint)cheatRow.Cells[(int)ChertCol.CheatListSID].Value;
                         string[] sectionArr = cheatRow.Cells[(int)ChertCol.CheatListSection].Value.ToString().Split('|');
                         bool isRelative = sectionArr[0].StartsWith("+");
                         bool isPointer = cheatRow.Cells[(int)ChertCol.CheatListAddress].Value.ToString().StartsWith("P->");
@@ -803,12 +809,13 @@ namespace PS4CheaterNeo
                             for (int idx = cIdx - 1; idx >= 0; idx--)
                             {
                                 DataGridViewRow checkRow = CheatGridView.Rows[idx];
+                                uint checkSid = checkRow.Cells[(int)ChertCol.CheatListSID].Value == null ? 0 : (uint)checkRow.Cells[(int)ChertCol.CheatListSID].Value;
                                 string[] checkSArr = checkRow.Cells[(int)ChertCol.CheatListSection].Value.ToString().Split('|');
                                 if (checkSArr[0].StartsWith("+")) continue;
 
                                 (Section section, uint offsetAddr) checkCheat = ((Section section, uint offsetAddr))checkRow.Tag;
                                 bool checkPointer = checkRow.Cells[(int)ChertCol.CheatListAddress].Value.ToString().StartsWith("P->");
-                                (Section section, uint offsetAddr, string hexAddr) checkSection = RefreshSection(checkSArr, checkCheat.offsetAddr, checkPointer, preData, pointerCaches);
+                                (Section section, uint offsetAddr, string hexAddr) checkSection = RefreshSection(checkSid, checkSArr, checkCheat.offsetAddr, checkPointer, preData, pointerCaches);
                                 if (checkSection.section == null)
                                 {
                                     ToolStripMsg.Text = string.Format("RefreshLock Failed...CheatGrid({0}), section: {1}, offsetAddr: {2:X}", cIdx, string.Join("-", sectionArr), offsetAddr);
@@ -820,7 +827,7 @@ namespace PS4CheaterNeo
                                 break;
                             }
                         }
-                        (section, offsetAddr, hexAddr) = RefreshSection(sectionArr, offsetAddr, isPointer, preData, pointerCaches);
+                        (section, offsetAddr, hexAddr) = RefreshSection(sid, sectionArr, offsetAddr, isPointer, preData, pointerCaches);
                         if (section == null)
                         {
                             ToolStripMsg.Text = string.Format("RefreshLock Failed...CheatGrid({0}), section: {1}, offsetAddr: {2:X}", cIdx, string.Join("-", sectionArr), offsetAddr);
@@ -1044,11 +1051,11 @@ namespace PS4CheaterNeo
                 if (isPointer)
                 {
                     offsetList = new List<long>();
+                    uint baseSID = cheatRow.Cells[(int)ChertCol.CheatListSID].Value == null ? 0 : (uint)cheatRow.Cells[(int)ChertCol.CheatListSID].Value;
                     string[] baseSectionArr = cheatRow.Cells[(int)ChertCol.CheatListSection].Value.ToString().Split('|');
-                    uint baseSID = uint.Parse(baseSectionArr[0]);
-                    long baseSectionStart = long.Parse(baseSectionArr[1], NumberStyles.HexNumber);
-                    string baseName = baseSectionArr[2];
-                    uint baseProt = uint.Parse(baseSectionArr[3], NumberStyles.HexNumber);
+                    long baseSectionStart = long.Parse(baseSectionArr[0], NumberStyles.HexNumber);
+                    string baseName = baseSectionArr[1];
+                    uint baseProt = uint.Parse(baseSectionArr[2], NumberStyles.HexNumber);
 
                     Section baseSection = sectionTool.GetSection(baseSID, baseName, baseProt);
                     string[] offsetArr = baseSectionArr[baseSectionArr.Length - 1].Split('_');
@@ -1079,9 +1086,14 @@ namespace PS4CheaterNeo
                         if (offsetStr == "|") offsetStr += (offset - (long)newAddress.BaseSection.Start).ToString("X");
                         else offsetStr += "_" + offset.ToString("X");
                     }
-                    cheatRow.Cells[(int)ChertCol.CheatListSection].Value = string.Format("{0}|{1}|{2}|{3}|{4}|{5}", newAddress.BaseSection.SID, newAddress.BaseSection.Start.ToString("X"), newAddress.BaseSection.Name, newAddress.BaseSection.Prot.ToString("X"), newAddress.BaseSection.Offset.ToString("X"), offsetStr);
+                    cheatRow.Cells[(int)ChertCol.CheatListSID].Value = newAddress.BaseSection.SID;
+                    cheatRow.Cells[(int)ChertCol.CheatListSection].Value = string.Format("{0}|{1}|{2}|{3}|{4}", newAddress.BaseSection.Start.ToString("X"), newAddress.BaseSection.Name, newAddress.BaseSection.Prot.ToString("X"), newAddress.BaseSection.Offset.ToString("X"), offsetStr);
                 }
-                else cheatRow.Cells[(int)ChertCol.CheatListSection].Value = string.Format("{0}|{1}|{2}|{3}|{4}", newAddress.AddrSection.SID, newAddress.AddrSection.Start.ToString("X"), newAddress.AddrSection.Name, newAddress.AddrSection.Prot.ToString("X"), newAddress.AddrSection.Offset.ToString("X"));
+                else
+                {
+                    cheatRow.Cells[(int)ChertCol.CheatListSID].Value = newAddress.AddrSection.SID;
+                    cheatRow.Cells[(int)ChertCol.CheatListSection].Value = string.Format("{0}|{1}|{2}|{3}", newAddress.AddrSection.Start.ToString("X"), newAddress.AddrSection.Name, newAddress.AddrSection.Prot.ToString("X"), newAddress.AddrSection.Offset.ToString("X"));
+                }
 
                 byte[] data = ScanTool.ValueStringToByte(newAddress.CheatType, newAddress.Value);
                 PS4Tool.WriteMemory(section.PID, offsetAddr + section.Start, data);
@@ -1215,7 +1227,11 @@ namespace PS4CheaterNeo
                 if (isFailed) cheatRow.DefaultCellStyle.ForeColor = Color.Red;
 
                 if (relativeOffset > -1) cheatRow.Cells[(int)ChertCol.CheatListSection].Value = "+" + relativeOffset.ToString("X");
-                else cheatRow.Cells[(int)ChertCol.CheatListSection].Value = string.Format("{0}|{1}|{2}|{3}|{4}", section.SID, section.Start.ToString("X"), section.Name, section.Prot.ToString("X"), section.Offset.ToString("X"));
+                else
+                {
+                    cheatRow.Cells[(int)ChertCol.CheatListSID].Value = section.SID;
+                    cheatRow.Cells[(int)ChertCol.CheatListSection].Value = string.Format("{0}|{1}|{2}|{3}", section.Start.ToString("X"), section.Name, section.Prot.ToString("X"), section.Offset.ToString("X"));
+                }
                 
                 if (isPointer)
                 {
@@ -1279,6 +1295,7 @@ namespace PS4CheaterNeo
                 if (pMap == null || sectionTool.SectionDict.Count >= pMap.entries.Length) return true; //當Process ID相同時，不再執行初始化
             }
 
+            ProcessPid = processInfo.pid;
             ProcessName = processInfo.name;
             sectionTool.InitSectionList(processInfo.pid, ProcessName);
 

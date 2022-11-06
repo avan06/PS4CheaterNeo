@@ -66,56 +66,56 @@ namespace PS4CheaterNeo
                 AlignmentBox.ForeColor = Properties.Settings.Default.QueryAlignmentBoxForeColor.Value; //Color.Silver;
                 ScanBtn.BackColor = Properties.Settings.Default.QueryScanBtnBackColor.Value; //Color.SteelBlue;
 
-                querySectionViewFilterForeColor = Properties.Settings.Default.QuerySectionViewFilterForeColor.Value;
-                querySectionViewFilterBackColor = Properties.Settings.Default.QuerySectionViewFilterBackColor.Value;
+                querySectionViewFilterForeColor     = Properties.Settings.Default.QuerySectionViewFilterForeColor.Value;
+                querySectionViewFilterBackColor     = Properties.Settings.Default.QuerySectionViewFilterBackColor.Value;
                 querySectionViewFilterSizeForeColor = Properties.Settings.Default.QuerySectionViewFilterSizeForeColor.Value;
                 querySectionViewFilterSizeBackColor = Properties.Settings.Default.QuerySectionViewFilterSizeBackColor.Value;
                 querySectionViewItemCheck1BackColor = Properties.Settings.Default.QuerySectionViewItemCheck1BackColor.Value;
                 querySectionViewItemCheck2BackColor = Properties.Settings.Default.QuerySectionViewItemCheck2BackColor.Value;
 
-                SplitContainer1.ForeColor = ForeColor;
                 ToolStripMsg.ForeColor = ForeColor;
+                SplitContainer1.ForeColor = ForeColor;
                 SplitContainer2.ForeColor = ForeColor;
 
-                SlowMotionBox.ForeColor = ForeColor;
-                SelectAllBox.ForeColor = ForeColor;
+                SlowMotionBox.ForeColor   = ForeColor;
+                SelectAllBox.ForeColor    = ForeColor;
                 IsFilterSizeBox.ForeColor = ForeColor;
-                IsFilterBox.ForeColor = ForeColor;
+                IsFilterBox.ForeColor     = ForeColor;
 
-                ResultView.ForeColor = ForeColor;
-                ResultView.BackColor = BackColor;
+                ResultView.ForeColor  = ForeColor;
+                ResultView.BackColor  = BackColor;
                 SectionView.ForeColor = ForeColor;
                 SectionView.BackColor = BackColor;
 
-                AddrMaxBox.ForeColor = ForeColor;
-                AddrMaxBox.BackColor = BackColor;
-                AddrMinBox.ForeColor = ForeColor;
-                AddrMinBox.BackColor = BackColor;
+                AddrMaxBox.ForeColor   = ForeColor;
+                AddrMaxBox.BackColor   = BackColor;
+                AddrMinBox.ForeColor   = ForeColor;
+                AddrMinBox.BackColor   = BackColor;
                 ProcessesBox.ForeColor = ForeColor;
                 ProcessesBox.BackColor = BackColor;
 
-                ScanTypeBox.ForeColor = ForeColor;
-                ScanTypeBox.BackColor = BackColor;
-                ValueBox.ForeColor = ForeColor;
-                ValueBox.BackColor = BackColor;
-                Value1Box.ForeColor = ForeColor;
-                Value1Box.BackColor = BackColor;
-                CompareTypeBox.ForeColor = ForeColor;
-                CompareTypeBox.BackColor = BackColor;
-                PauseBtn.ForeColor = ForeColor;
-                PauseBtn.BackColor = BackColor;
-                ResumeBtn.ForeColor = ForeColor;
-                ResumeBtn.BackColor = BackColor;
+                ScanTypeBox.ForeColor      = ForeColor;
+                ScanTypeBox.BackColor      = BackColor;
+                ValueBox.ForeColor         = ForeColor;
+                ValueBox.BackColor         = BackColor;
+                Value1Box.ForeColor        = ForeColor;
+                Value1Box.BackColor        = BackColor;
+                CompareTypeBox.ForeColor   = ForeColor;
+                CompareTypeBox.BackColor   = BackColor;
+                PauseBtn.ForeColor         = ForeColor;
+                PauseBtn.BackColor         = BackColor;
+                ResumeBtn.ForeColor        = ForeColor;
+                ResumeBtn.BackColor        = BackColor;
                 SectionSearchBtn.ForeColor = ForeColor;
                 SectionSearchBtn.BackColor = BackColor;
-                GetProcessesBtn.ForeColor = ForeColor;
-                GetProcessesBtn.BackColor = BackColor;
-                FilterRuleBtn.ForeColor = ForeColor;
-                FilterRuleBtn.BackColor = BackColor;
-                RedoBtn.BackColor = BackColor;
-                UndoBtn.BackColor = BackColor;
-                NewBtn.BackColor = BackColor;
-                RefreshBtn.BackColor = BackColor;
+                GetProcessesBtn.ForeColor  = ForeColor;
+                GetProcessesBtn.BackColor  = BackColor;
+                FilterRuleBtn.ForeColor    = ForeColor;
+                FilterRuleBtn.BackColor    = BackColor;
+                RedoBtn.BackColor          = BackColor;
+                UndoBtn.BackColor          = BackColor;
+                NewBtn.BackColor           = BackColor;
+                RefreshBtn.BackColor       = BackColor;
             }
             catch (Exception exception)
             {
@@ -181,6 +181,7 @@ namespace PS4CheaterNeo
 
                 ComboItem process = (ComboItem)ProcessesBox.SelectedItem;
                 sectionTool.InitSectionList((int)process.Value, (string)process.Text);
+                mainForm.ProcessPid = (int)process.Value;
                 mainForm.ProcessName = (string)process.Text;
 
                 Section[] sections = sectionTool.GetSectionSortByAddr();

@@ -29,6 +29,7 @@ namespace PS4CheaterNeo
         CheatListEnabled,
         CheatListValue,
         CheatListSection,
+        CheatListSID,
         CheatListLock,
         CheatListDesc,
     }

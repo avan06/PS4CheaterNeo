@@ -100,25 +100,25 @@ namespace PS4CheaterNeo
                 ForeColor = Properties.Settings.Default.UiForeColor.Value; //Color.White;
                 BackColor = Properties.Settings.Default.UiBackColor.Value; //Color.FromArgb(36, 36, 36);
 
-                label1.ForeColor = ForeColor;
-                label2.ForeColor = ForeColor;
-                label3.ForeColor = ForeColor;
-                label4.ForeColor = ForeColor;
-                LockBox.ForeColor = ForeColor;
+                label1.ForeColor     = ForeColor;
+                label2.ForeColor     = ForeColor;
+                label3.ForeColor     = ForeColor;
+                label4.ForeColor     = ForeColor;
+                LockBox.ForeColor    = ForeColor;
                 PointerBox.ForeColor = ForeColor;
 
-                AddressBox.ForeColor = ForeColor;
-                AddressBox.BackColor = BackColor;
-                ValueBox.ForeColor = ForeColor;
-                ValueBox.BackColor = BackColor;
-                ScanTypeBox.ForeColor = ForeColor;
-                ScanTypeBox.BackColor = BackColor;
+                AddressBox.ForeColor     = ForeColor;
+                AddressBox.BackColor     = BackColor;
+                ValueBox.ForeColor       = ForeColor;
+                ValueBox.BackColor       = BackColor;
+                ScanTypeBox.ForeColor    = ForeColor;
+                ScanTypeBox.BackColor    = BackColor;
                 DescriptionBox.ForeColor = ForeColor;
                 DescriptionBox.BackColor = BackColor;
-                SaveBtn.ForeColor = ForeColor;
-                SaveBtn.BackColor = BackColor;
-                CloseBtn.ForeColor = ForeColor;
-                CloseBtn.BackColor = BackColor;
+                SaveBtn.ForeColor        = ForeColor;
+                SaveBtn.BackColor        = BackColor;
+                CloseBtn.ForeColor       = ForeColor;
+                CloseBtn.BackColor       = BackColor;
             }
             catch (Exception exception)
             {

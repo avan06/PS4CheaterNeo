@@ -117,11 +117,14 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <metadata name="StatusStrip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>17, 17</value>
-  </metadata>
   <metadata name="ResultViewMenu.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>139, 17</value>
+  </metadata>
+  <metadata name="SectionViewMenu.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>288, 17</value>
+  </metadata>
+  <metadata name="StatusStrip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>17, 17</value>
   </metadata>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="PauseBtn.BackgroundImage" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
@@ -153,9 +156,6 @@
         XNaWvwVjcHGYgvm71WpdFqYQuGUTEPw7bBjGD/7P/+8HiloYAAAAAElFTkSuQmCC
 </value>
   </data>
-  <metadata name="SectionViewMenu.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>288, 17</value>
-  </metadata>
   <data name="RedoBtn.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
@@ -181,7 +181,7 @@
   <data name="SplitContainer2.SplitterButtonBitmap" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
-        wQAADsEBuJFr7QAAAGdJREFUOE9jIAa8f/9e4OvXrwFQLmkApPnbt28XXr9+/f/79+8JUGHiAExza2vr
+        vQAADr0BR/uQrQAAAGdJREFUOE9jIAa8f/9e4OvXrwFQLmkApPnbt28XXr9+/f/79+8JUGHiAExza2vr
         /+Tk5P8kGYKs2cnJ6b+vr+//K1euEGfASNQMAhQbAAKjhmACZENITsowADOELM0wADIEe3ZmYAAA/e0P
         NJCgSVgAAAAASUVORK5CYII=
 </value>
@@ -189,7 +189,7 @@
   <data name="SplitContainer1.SplitterButtonBitmap" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
-        wQAADsEBuJFr7QAAAGdJREFUOE9jIAa8f/9e4OvXrwFQLmkApPnbt28XXr9+/f/79+8JUGHiAExza2vr
+        vQAADr0BR/uQrQAAAGdJREFUOE9jIAa8f/9e4OvXrwFQLmkApPnbt28XXr9+/f/79+8JUGHiAExza2vr
         /+Tk5P8kGYKs2cnJ6b+vr+//K1euEGfASNQMAhQbAAKjhmACZENITsowADOELM0wADIEe3ZmYAAA/e0P
         NJCgSVgAAAAASUVORK5CYII=
 </value>

@@ -80,14 +80,14 @@
             this.InfoBoxD = new System.Windows.Forms.TextBox();
             this.label7 = new System.Windows.Forms.Label();
             this.InfoBox1S = new System.Windows.Forms.TextBox();
+            this.TableLayoutPanel7 = new System.Windows.Forms.TableLayoutPanel();
+            this.FindBtn = new System.Windows.Forms.Button();
+            this.ForwardBox = new System.Windows.Forms.CheckBox();
             this.TableLayoutPanel6 = new System.Windows.Forms.TableLayoutPanel();
             this.AssemblerBtn = new System.Windows.Forms.Button();
             this.GroupBoxAsm = new System.Windows.Forms.GroupBox();
             this.AsmBox1 = new System.Windows.Forms.RichTextBox();
             this.AutoRefreshTimer = new System.Windows.Forms.Timer(this.components);
-            this.FindBtn = new System.Windows.Forms.Button();
-            this.TableLayoutPanel7 = new System.Windows.Forms.TableLayoutPanel();
-            this.ForwardBox = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.SplitContainer1)).BeginInit();
             this.SplitContainer1.Panel1.SuspendLayout();
             this.SplitContainer1.Panel2.SuspendLayout();
@@ -104,9 +104,9 @@
             this.TableLayoutPanel3.SuspendLayout();
             this.InfoBoxPanel.SuspendLayout();
             this.TableLayoutPanel5.SuspendLayout();
+            this.TableLayoutPanel7.SuspendLayout();
             this.TableLayoutPanel6.SuspendLayout();
             this.GroupBoxAsm.SuspendLayout();
-            this.TableLayoutPanel7.SuspendLayout();
             this.SuspendLayout();
             // 
             // SplitContainer1
@@ -826,6 +826,48 @@
             this.InfoBox1S.Size = new System.Drawing.Size(152, 22);
             this.InfoBox1S.TabIndex = 13;
             // 
+            // TableLayoutPanel7
+            // 
+            this.TableLayoutPanel7.ColumnCount = 2;
+            this.TableLayoutPanel7.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 65F));
+            this.TableLayoutPanel7.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this.TableLayoutPanel7.Controls.Add(this.FindBtn, 1, 0);
+            this.TableLayoutPanel7.Controls.Add(this.ForwardBox, 0, 0);
+            this.TableLayoutPanel7.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.TableLayoutPanel7.Location = new System.Drawing.Point(0, 177);
+            this.TableLayoutPanel7.Margin = new System.Windows.Forms.Padding(0);
+            this.TableLayoutPanel7.Name = "TableLayoutPanel7";
+            this.TableLayoutPanel7.RowCount = 1;
+            this.TableLayoutPanel7.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.TableLayoutPanel7.Size = new System.Drawing.Size(225, 30);
+            this.TableLayoutPanel7.TabIndex = 18;
+            // 
+            // FindBtn
+            // 
+            this.FindBtn.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.FindBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.FindBtn.ForeColor = System.Drawing.Color.White;
+            this.FindBtn.Location = new System.Drawing.Point(65, 3);
+            this.FindBtn.Margin = new System.Windows.Forms.Padding(0, 3, 0, 3);
+            this.FindBtn.Name = "FindBtn";
+            this.FindBtn.Size = new System.Drawing.Size(160, 24);
+            this.FindBtn.TabIndex = 8;
+            this.FindBtn.Text = "Find";
+            this.FindBtn.UseVisualStyleBackColor = true;
+            this.FindBtn.Click += new System.EventHandler(this.FindBtn_Click);
+            // 
+            // ForwardBox
+            // 
+            this.ForwardBox.AutoSize = true;
+            this.ForwardBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ForwardBox.Location = new System.Drawing.Point(0, 0);
+            this.ForwardBox.Margin = new System.Windows.Forms.Padding(0);
+            this.ForwardBox.Name = "ForwardBox";
+            this.ForwardBox.Size = new System.Drawing.Size(65, 30);
+            this.ForwardBox.TabIndex = 9;
+            this.ForwardBox.Text = "Forward";
+            this.ForwardBox.UseVisualStyleBackColor = true;
+            // 
             // TableLayoutPanel6
             // 
             this.TableLayoutPanel6.AutoSize = true;
@@ -889,48 +931,6 @@
             this.AutoRefreshTimer.Interval = 2500;
             this.AutoRefreshTimer.Tick += new System.EventHandler(this.AutoRefreshTimer_Tick);
             // 
-            // FindBtn
-            // 
-            this.FindBtn.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.FindBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.FindBtn.ForeColor = System.Drawing.Color.White;
-            this.FindBtn.Location = new System.Drawing.Point(65, 3);
-            this.FindBtn.Margin = new System.Windows.Forms.Padding(0, 3, 0, 3);
-            this.FindBtn.Name = "FindBtn";
-            this.FindBtn.Size = new System.Drawing.Size(160, 24);
-            this.FindBtn.TabIndex = 8;
-            this.FindBtn.Text = "Find";
-            this.FindBtn.UseVisualStyleBackColor = true;
-            this.FindBtn.Click += new System.EventHandler(this.FindBtn_Click);
-            // 
-            // TableLayoutPanel7
-            // 
-            this.TableLayoutPanel7.ColumnCount = 2;
-            this.TableLayoutPanel7.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 65F));
-            this.TableLayoutPanel7.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.TableLayoutPanel7.Controls.Add(this.FindBtn, 1, 0);
-            this.TableLayoutPanel7.Controls.Add(this.ForwardBox, 0, 0);
-            this.TableLayoutPanel7.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.TableLayoutPanel7.Location = new System.Drawing.Point(0, 177);
-            this.TableLayoutPanel7.Margin = new System.Windows.Forms.Padding(0);
-            this.TableLayoutPanel7.Name = "TableLayoutPanel7";
-            this.TableLayoutPanel7.RowCount = 1;
-            this.TableLayoutPanel7.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.TableLayoutPanel7.Size = new System.Drawing.Size(225, 30);
-            this.TableLayoutPanel7.TabIndex = 18;
-            // 
-            // ForwardBox
-            // 
-            this.ForwardBox.AutoSize = true;
-            this.ForwardBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.ForwardBox.Location = new System.Drawing.Point(0, 0);
-            this.ForwardBox.Margin = new System.Windows.Forms.Padding(0);
-            this.ForwardBox.Name = "ForwardBox";
-            this.ForwardBox.Size = new System.Drawing.Size(65, 30);
-            this.ForwardBox.TabIndex = 9;
-            this.ForwardBox.Text = "Forward";
-            this.ForwardBox.UseVisualStyleBackColor = true;
-            // 
             // HexEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -967,10 +967,10 @@
             this.InfoBoxPanel.PerformLayout();
             this.TableLayoutPanel5.ResumeLayout(false);
             this.TableLayoutPanel5.PerformLayout();
-            this.TableLayoutPanel6.ResumeLayout(false);
-            this.GroupBoxAsm.ResumeLayout(false);
             this.TableLayoutPanel7.ResumeLayout(false);
             this.TableLayoutPanel7.PerformLayout();
+            this.TableLayoutPanel6.ResumeLayout(false);
+            this.GroupBoxAsm.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }

@@ -60,21 +60,21 @@ namespace PS4CheaterNeo
                 ScanBtn.BackColor = Properties.Settings.Default.PointerFinderScanBtnBackColor.Value; //Color.SteelBlue;
 
                 SplitContainer1.Panel1.ForeColor = ForeColor;
-                PointerListView.ForeColor = ForeColor;
-                PointerListView.BackColor = BackColor;
-                ScanTypeBox.ForeColor = ForeColor;
-                ScanTypeBox.BackColor = BackColor;
-                MaxRangeUpDown.ForeColor = ForeColor;
-                MaxRangeUpDown.BackColor = BackColor;
-                LevelUpdown.ForeColor = ForeColor;
-                LevelUpdown.BackColor = BackColor;
-                AddressBox.ForeColor = ForeColor;
-                AddressBox.BackColor = BackColor;
-                FilterSizeRuleBtn.BackColor = BackColor;
-                NewBtn.BackColor = BackColor;
-                LoadBtn.BackColor = BackColor;
-                SaveBtn.BackColor = BackColor;
-                FilterRuleBtn.BackColor = BackColor;
+                PointerListView.ForeColor        = ForeColor;
+                PointerListView.BackColor        = BackColor;
+                ScanTypeBox.ForeColor            = ForeColor;
+                ScanTypeBox.BackColor            = BackColor;
+                MaxRangeUpDown.ForeColor         = ForeColor;
+                MaxRangeUpDown.BackColor         = BackColor;
+                LevelUpdown.ForeColor            = ForeColor;
+                LevelUpdown.BackColor            = BackColor;
+                AddressBox.ForeColor             = ForeColor;
+                AddressBox.BackColor             = BackColor;
+                FilterSizeRuleBtn.BackColor      = BackColor;
+                NewBtn.BackColor                 = BackColor;
+                LoadBtn.BackColor                = BackColor;
+                SaveBtn.BackColor                = BackColor;
+                FilterRuleBtn.BackColor          = BackColor;
             }
             catch (Exception exception)
             {
