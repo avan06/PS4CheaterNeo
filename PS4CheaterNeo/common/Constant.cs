@@ -4,6 +4,7 @@ namespace PS4CheaterNeo
 {
     public enum SectionCol
     {
+        SectionViewID,
         SectionViewAddress,
         SectionViewName,
         SectionViewProt,

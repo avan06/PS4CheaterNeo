@@ -46,9 +46,6 @@ namespace PS4CheaterNeo
             this.ToolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.SectionViewCheck = new System.Windows.Forms.ToolStripMenuItem();
             this.Panel1 = new System.Windows.Forms.Panel();
-            this.SlowMotionTimer = new System.Windows.Forms.Timer(this.components);
-            this.SaveDialog = new System.Windows.Forms.SaveFileDialog();
-            this.OpenDialog = new System.Windows.Forms.OpenFileDialog();
             this.SplitContainer1 = new PS4CheaterNeo.CollapsibleSplitContainer();
             this.StatusStrip1 = new System.Windows.Forms.StatusStrip();
             this.ToolStripMsg = new System.Windows.Forms.ToolStripStatusLabel();
@@ -59,16 +56,15 @@ namespace PS4CheaterNeo
             this.ResultViewHex = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.ResultViewSection = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.SplitContainer2 = new PS4CheaterNeo.CollapsibleSplitContainer();
+            this.TableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
+            this.GetProcessesBtn = new System.Windows.Forms.Button();
+            this.TableLayoutPanel4 = new System.Windows.Forms.TableLayoutPanel();
+            this.ProcessesBox = new PS4CheaterNeo.ComboItemBox();
             this.PauseBtn = new System.Windows.Forms.Button();
-            this.ResumeBtn = new System.Windows.Forms.Button();
             this.SectionSearchBtn = new System.Windows.Forms.Button();
-            this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
-            this.SlowMotionBox = new System.Windows.Forms.CheckBox();
-            this.label4 = new System.Windows.Forms.Label();
-            this.label5 = new System.Windows.Forms.Label();
-            this.AddrMaxBox = new System.Windows.Forms.TextBox();
-            this.AddrMinBox = new System.Windows.Forms.TextBox();
+            this.ResumeBtn = new System.Windows.Forms.Button();
             this.SectionView = new System.Windows.Forms.ListView();
+            this.SectionViewID = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.SectionViewAddress = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.SectionViewName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.SectionViewProt = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -76,8 +72,12 @@ namespace PS4CheaterNeo
             this.SectionViewSID = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.SectionViewOffset = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.SectionViewEnd = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.GetProcessesBtn = new System.Windows.Forms.Button();
-            this.ProcessesBox = new PS4CheaterNeo.ComboItemBox();
+            this.TableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
+            this.SlowMotionBox = new System.Windows.Forms.CheckBox();
+            this.label4 = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
+            this.AddrMaxBox = new System.Windows.Forms.TextBox();
+            this.AddrMinBox = new System.Windows.Forms.TextBox();
             this.DoneResumeBox = new System.Windows.Forms.CheckBox();
             this.SimpleValuesBox = new System.Windows.Forms.CheckBox();
             this.AutoPauseBox = new System.Windows.Forms.CheckBox();
@@ -102,6 +102,9 @@ namespace PS4CheaterNeo
             this.RefreshBtn = new System.Windows.Forms.Button();
             this.ScanBtn = new System.Windows.Forms.Button();
             this.CompareTypeBox = new System.Windows.Forms.ComboBox();
+            this.SlowMotionTimer = new System.Windows.Forms.Timer(this.components);
+            this.SaveDialog = new System.Windows.Forms.SaveFileDialog();
+            this.OpenDialog = new System.Windows.Forms.OpenFileDialog();
             this.ResultViewMenu.SuspendLayout();
             this.SectionViewMenu.SuspendLayout();
             this.Panel1.SuspendLayout();
@@ -114,7 +117,9 @@ namespace PS4CheaterNeo
             this.SplitContainer2.Panel1.SuspendLayout();
             this.SplitContainer2.Panel2.SuspendLayout();
             this.SplitContainer2.SuspendLayout();
-            this.tableLayoutPanel2.SuspendLayout();
+            this.TableLayoutPanel3.SuspendLayout();
+            this.TableLayoutPanel4.SuspendLayout();
+            this.TableLayoutPanel2.SuspendLayout();
             this.TableLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -232,16 +237,6 @@ namespace PS4CheaterNeo
             this.Panel1.Size = new System.Drawing.Size(800, 450);
             this.Panel1.TabIndex = 2;
             // 
-            // SlowMotionTimer
-            // 
-            this.SlowMotionTimer.Interval = 250;
-            this.SlowMotionTimer.Tick += new System.EventHandler(this.SlowMotionTimer_Tick);
-            // 
-            // OpenDialog
-            // 
-            this.OpenDialog.DefaultExt = "bin";
-            this.OpenDialog.Multiselect = true;
-            // 
             // SplitContainer1
             // 
             this.SplitContainer1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
@@ -344,13 +339,7 @@ namespace PS4CheaterNeo
             // 
             // SplitContainer2.Panel1
             // 
-            this.SplitContainer2.Panel1.Controls.Add(this.PauseBtn);
-            this.SplitContainer2.Panel1.Controls.Add(this.ResumeBtn);
-            this.SplitContainer2.Panel1.Controls.Add(this.SectionSearchBtn);
-            this.SplitContainer2.Panel1.Controls.Add(this.tableLayoutPanel2);
-            this.SplitContainer2.Panel1.Controls.Add(this.SectionView);
-            this.SplitContainer2.Panel1.Controls.Add(this.GetProcessesBtn);
-            this.SplitContainer2.Panel1.Controls.Add(this.ProcessesBox);
+            this.SplitContainer2.Panel1.Controls.Add(this.TableLayoutPanel3);
             // 
             // SplitContainer2.Panel2
             // 
@@ -380,74 +369,217 @@ namespace PS4CheaterNeo
             this.SplitContainer2.SplitterDistance = 237;
             this.SplitContainer2.TabIndex = 0;
             // 
+            // TableLayoutPanel3
+            // 
+            this.TableLayoutPanel3.ColumnCount = 1;
+            this.TableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.TableLayoutPanel3.Controls.Add(this.GetProcessesBtn, 0, 0);
+            this.TableLayoutPanel3.Controls.Add(this.TableLayoutPanel4, 0, 1);
+            this.TableLayoutPanel3.Controls.Add(this.SectionView, 0, 3);
+            this.TableLayoutPanel3.Controls.Add(this.TableLayoutPanel2, 0, 2);
+            this.TableLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.TableLayoutPanel3.Location = new System.Drawing.Point(0, 0);
+            this.TableLayoutPanel3.Margin = new System.Windows.Forms.Padding(0);
+            this.TableLayoutPanel3.Name = "TableLayoutPanel3";
+            this.TableLayoutPanel3.RowCount = 4;
+            this.TableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.TableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.TableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.TableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.TableLayoutPanel3.Size = new System.Drawing.Size(287, 235);
+            this.TableLayoutPanel3.TabIndex = 1;
+            // 
+            // GetProcessesBtn
+            // 
+            this.GetProcessesBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(36)))), ((int)(((byte)(36)))));
+            this.GetProcessesBtn.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.GetProcessesBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.GetProcessesBtn.ForeColor = System.Drawing.Color.White;
+            this.GetProcessesBtn.Location = new System.Drawing.Point(3, 3);
+            this.GetProcessesBtn.Name = "GetProcessesBtn";
+            this.GetProcessesBtn.Size = new System.Drawing.Size(281, 25);
+            this.GetProcessesBtn.TabIndex = 1;
+            this.GetProcessesBtn.Text = "Refresh Processes";
+            this.GetProcessesBtn.UseVisualStyleBackColor = false;
+            this.GetProcessesBtn.Click += new System.EventHandler(this.GetProcessesBtn_Click);
+            // 
+            // TableLayoutPanel4
+            // 
+            this.TableLayoutPanel4.AutoSize = true;
+            this.TableLayoutPanel4.ColumnCount = 4;
+            this.TableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.TableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this.TableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this.TableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this.TableLayoutPanel4.Controls.Add(this.ProcessesBox, 0, 0);
+            this.TableLayoutPanel4.Controls.Add(this.PauseBtn, 1, 0);
+            this.TableLayoutPanel4.Controls.Add(this.SectionSearchBtn, 3, 0);
+            this.TableLayoutPanel4.Controls.Add(this.ResumeBtn, 2, 0);
+            this.TableLayoutPanel4.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.TableLayoutPanel4.Location = new System.Drawing.Point(0, 31);
+            this.TableLayoutPanel4.Margin = new System.Windows.Forms.Padding(0);
+            this.TableLayoutPanel4.Name = "TableLayoutPanel4";
+            this.TableLayoutPanel4.RowCount = 1;
+            this.TableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.TableLayoutPanel4.Size = new System.Drawing.Size(287, 29);
+            this.TableLayoutPanel4.TabIndex = 33;
+            // 
+            // ProcessesBox
+            // 
+            this.ProcessesBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(36)))), ((int)(((byte)(36)))));
+            this.ProcessesBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ProcessesBox.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
+            this.ProcessesBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.ProcessesBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.ProcessesBox.ForeColor = System.Drawing.Color.White;
+            this.ProcessesBox.FormattingEnabled = true;
+            this.ProcessesBox.Location = new System.Drawing.Point(3, 3);
+            this.ProcessesBox.Margin = new System.Windows.Forms.Padding(3, 3, 0, 3);
+            this.ProcessesBox.Name = "ProcessesBox";
+            this.ProcessesBox.Size = new System.Drawing.Size(218, 23);
+            this.ProcessesBox.TabIndex = 0;
+            this.ProcessesBox.SelectedIndexChanged += new System.EventHandler(this.ProcessesBox_SelectedIndexChanged);
+            // 
             // PauseBtn
             // 
-            this.PauseBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.PauseBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(36)))), ((int)(((byte)(36)))));
             this.PauseBtn.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("PauseBtn.BackgroundImage")));
             this.PauseBtn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.PauseBtn.Dock = System.Windows.Forms.DockStyle.Fill;
             this.PauseBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.PauseBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.PauseBtn.ForeColor = System.Drawing.Color.White;
-            this.PauseBtn.Location = new System.Drawing.Point(212, 28);
+            this.PauseBtn.Location = new System.Drawing.Point(224, 3);
+            this.PauseBtn.Margin = new System.Windows.Forms.Padding(3, 3, 0, 3);
             this.PauseBtn.Name = "PauseBtn";
-            this.PauseBtn.Size = new System.Drawing.Size(20, 20);
+            this.PauseBtn.Size = new System.Drawing.Size(20, 23);
             this.PauseBtn.TabIndex = 31;
             this.PauseBtn.UseVisualStyleBackColor = false;
             this.PauseBtn.Click += new System.EventHandler(this.PauseBtn_Click);
             // 
-            // ResumeBtn
-            // 
-            this.ResumeBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.ResumeBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(36)))), ((int)(((byte)(36)))));
-            this.ResumeBtn.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("ResumeBtn.BackgroundImage")));
-            this.ResumeBtn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-            this.ResumeBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.ResumeBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.ResumeBtn.ForeColor = System.Drawing.Color.White;
-            this.ResumeBtn.Location = new System.Drawing.Point(231, 28);
-            this.ResumeBtn.Name = "ResumeBtn";
-            this.ResumeBtn.Size = new System.Drawing.Size(20, 20);
-            this.ResumeBtn.TabIndex = 32;
-            this.ResumeBtn.UseVisualStyleBackColor = false;
-            this.ResumeBtn.Click += new System.EventHandler(this.ResumeBtn_Click);
-            // 
             // SectionSearchBtn
             // 
-            this.SectionSearchBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.SectionSearchBtn.BackColor = System.Drawing.SystemColors.Desktop;
             this.SectionSearchBtn.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("SectionSearchBtn.BackgroundImage")));
             this.SectionSearchBtn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.SectionSearchBtn.Dock = System.Windows.Forms.DockStyle.Fill;
             this.SectionSearchBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.SectionSearchBtn.ForeColor = System.Drawing.Color.White;
-            this.SectionSearchBtn.Location = new System.Drawing.Point(250, 28);
+            this.SectionSearchBtn.Location = new System.Drawing.Point(264, 3);
+            this.SectionSearchBtn.Margin = new System.Windows.Forms.Padding(0, 3, 3, 3);
             this.SectionSearchBtn.Name = "SectionSearchBtn";
-            this.SectionSearchBtn.Size = new System.Drawing.Size(33, 20);
+            this.SectionSearchBtn.Size = new System.Drawing.Size(20, 23);
             this.SectionSearchBtn.TabIndex = 3;
             this.SectionSearchBtn.UseVisualStyleBackColor = false;
             this.SectionSearchBtn.Click += new System.EventHandler(this.SectionSearchBtn_Click);
             // 
-            // tableLayoutPanel2
+            // ResumeBtn
             // 
-            this.tableLayoutPanel2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.tableLayoutPanel2.ColumnCount = 5;
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 35F));
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 35F));
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.tableLayoutPanel2.Controls.Add(this.SlowMotionBox, 4, 0);
-            this.tableLayoutPanel2.Controls.Add(this.label4, 0, 0);
-            this.tableLayoutPanel2.Controls.Add(this.label5, 2, 0);
-            this.tableLayoutPanel2.Controls.Add(this.AddrMaxBox, 3, 0);
-            this.tableLayoutPanel2.Controls.Add(this.AddrMinBox, 1, 0);
-            this.tableLayoutPanel2.Location = new System.Drawing.Point(-1, 204);
-            this.tableLayoutPanel2.Name = "tableLayoutPanel2";
-            this.tableLayoutPanel2.RowCount = 1;
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel2.Size = new System.Drawing.Size(287, 28);
-            this.tableLayoutPanel2.TabIndex = 4;
+            this.ResumeBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(36)))), ((int)(((byte)(36)))));
+            this.ResumeBtn.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("ResumeBtn.BackgroundImage")));
+            this.ResumeBtn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.ResumeBtn.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ResumeBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.ResumeBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.ResumeBtn.ForeColor = System.Drawing.Color.White;
+            this.ResumeBtn.Location = new System.Drawing.Point(244, 3);
+            this.ResumeBtn.Margin = new System.Windows.Forms.Padding(0, 3, 0, 3);
+            this.ResumeBtn.Name = "ResumeBtn";
+            this.ResumeBtn.Size = new System.Drawing.Size(20, 23);
+            this.ResumeBtn.TabIndex = 32;
+            this.ResumeBtn.UseVisualStyleBackColor = false;
+            this.ResumeBtn.Click += new System.EventHandler(this.ResumeBtn_Click);
+            // 
+            // SectionView
+            // 
+            this.SectionView.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(36)))), ((int)(((byte)(36)))));
+            this.SectionView.CheckBoxes = true;
+            this.SectionView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.SectionViewID,
+            this.SectionViewAddress,
+            this.SectionViewName,
+            this.SectionViewProt,
+            this.SectionViewLength,
+            this.SectionViewSID,
+            this.SectionViewOffset,
+            this.SectionViewEnd});
+            this.SectionView.ContextMenuStrip = this.SectionViewMenu;
+            this.SectionView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.SectionView.ForeColor = System.Drawing.Color.White;
+            this.SectionView.HideSelection = false;
+            this.SectionView.Location = new System.Drawing.Point(0, 88);
+            this.SectionView.Margin = new System.Windows.Forms.Padding(0);
+            this.SectionView.Name = "SectionView";
+            this.SectionView.Size = new System.Drawing.Size(287, 166);
+            this.SectionView.TabIndex = 2;
+            this.SectionView.UseCompatibleStateImageBehavior = false;
+            this.SectionView.View = System.Windows.Forms.View.Details;
+            this.SectionView.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.SectionView_ItemCheck);
+            // 
+            // SectionViewID
+            // 
+            this.SectionViewID.Text = "";
+            this.SectionViewID.Width = 23;
+            // 
+            // SectionViewAddress
+            // 
+            this.SectionViewAddress.Text = "Address";
+            this.SectionViewAddress.Width = 85;
+            // 
+            // SectionViewName
+            // 
+            this.SectionViewName.Text = "Name";
+            this.SectionViewName.Width = 95;
+            // 
+            // SectionViewProt
+            // 
+            this.SectionViewProt.Text = "Prot";
+            this.SectionViewProt.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.SectionViewProt.Width = 24;
+            // 
+            // SectionViewLength
+            // 
+            this.SectionViewLength.Text = "Length";
+            this.SectionViewLength.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.SectionViewLength.Width = 65;
+            // 
+            // SectionViewSID
+            // 
+            this.SectionViewSID.Text = "SID";
+            this.SectionViewSID.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.SectionViewSID.Width = 70;
+            // 
+            // SectionViewOffset
+            // 
+            this.SectionViewOffset.Text = "Offset";
+            this.SectionViewOffset.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            // 
+            // SectionViewEnd
+            // 
+            this.SectionViewEnd.Text = "End";
+            this.SectionViewEnd.Width = 85;
+            // 
+            // TableLayoutPanel2
+            // 
+            this.TableLayoutPanel2.ColumnCount = 5;
+            this.TableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 35F));
+            this.TableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.TableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 35F));
+            this.TableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.TableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this.TableLayoutPanel2.Controls.Add(this.SlowMotionBox, 4, 0);
+            this.TableLayoutPanel2.Controls.Add(this.label4, 0, 0);
+            this.TableLayoutPanel2.Controls.Add(this.label5, 2, 0);
+            this.TableLayoutPanel2.Controls.Add(this.AddrMaxBox, 3, 0);
+            this.TableLayoutPanel2.Controls.Add(this.AddrMinBox, 1, 0);
+            this.TableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.TableLayoutPanel2.Location = new System.Drawing.Point(0, 60);
+            this.TableLayoutPanel2.Margin = new System.Windows.Forms.Padding(0);
+            this.TableLayoutPanel2.Name = "TableLayoutPanel2";
+            this.TableLayoutPanel2.RowCount = 1;
+            this.TableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.TableLayoutPanel2.Size = new System.Drawing.Size(287, 28);
+            this.TableLayoutPanel2.TabIndex = 4;
             // 
             // SlowMotionBox
             // 
@@ -507,101 +639,6 @@ namespace PS4CheaterNeo
             this.AddrMinBox.Name = "AddrMinBox";
             this.AddrMinBox.Size = new System.Drawing.Size(77, 22);
             this.AddrMinBox.TabIndex = 18;
-            // 
-            // SectionView
-            // 
-            this.SectionView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.SectionView.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(36)))), ((int)(((byte)(36)))));
-            this.SectionView.CheckBoxes = true;
-            this.SectionView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.SectionViewAddress,
-            this.SectionViewName,
-            this.SectionViewProt,
-            this.SectionViewLength,
-            this.SectionViewSID,
-            this.SectionViewOffset,
-            this.SectionViewEnd});
-            this.SectionView.ContextMenuStrip = this.SectionViewMenu;
-            this.SectionView.ForeColor = System.Drawing.Color.White;
-            this.SectionView.HideSelection = false;
-            this.SectionView.Location = new System.Drawing.Point(3, 53);
-            this.SectionView.Name = "SectionView";
-            this.SectionView.Size = new System.Drawing.Size(283, 151);
-            this.SectionView.TabIndex = 2;
-            this.SectionView.UseCompatibleStateImageBehavior = false;
-            this.SectionView.View = System.Windows.Forms.View.Details;
-            this.SectionView.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.SectionView_ItemCheck);
-            // 
-            // SectionViewAddress
-            // 
-            this.SectionViewAddress.Text = "Address";
-            this.SectionViewAddress.Width = 85;
-            // 
-            // SectionViewName
-            // 
-            this.SectionViewName.Text = "Name";
-            this.SectionViewName.Width = 95;
-            // 
-            // SectionViewProt
-            // 
-            this.SectionViewProt.Text = "Prot";
-            this.SectionViewProt.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            this.SectionViewProt.Width = 24;
-            // 
-            // SectionViewLength
-            // 
-            this.SectionViewLength.Text = "Length";
-            this.SectionViewLength.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            this.SectionViewLength.Width = 65;
-            // 
-            // SectionViewSID
-            // 
-            this.SectionViewSID.Text = "SID";
-            this.SectionViewSID.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            this.SectionViewSID.Width = 70;
-            // 
-            // SectionViewOffset
-            // 
-            this.SectionViewOffset.Text = "Offset";
-            this.SectionViewOffset.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            // 
-            // SectionViewEnd
-            // 
-            this.SectionViewEnd.Text = "End";
-            this.SectionViewEnd.Width = 85;
-            // 
-            // GetProcessesBtn
-            // 
-            this.GetProcessesBtn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.GetProcessesBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(36)))), ((int)(((byte)(36)))));
-            this.GetProcessesBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.GetProcessesBtn.ForeColor = System.Drawing.Color.White;
-            this.GetProcessesBtn.Location = new System.Drawing.Point(3, 3);
-            this.GetProcessesBtn.Name = "GetProcessesBtn";
-            this.GetProcessesBtn.Size = new System.Drawing.Size(280, 20);
-            this.GetProcessesBtn.TabIndex = 1;
-            this.GetProcessesBtn.Text = "Refresh Processes";
-            this.GetProcessesBtn.UseVisualStyleBackColor = false;
-            this.GetProcessesBtn.Click += new System.EventHandler(this.GetProcessesBtn_Click);
-            // 
-            // ProcessesBox
-            // 
-            this.ProcessesBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.ProcessesBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(36)))), ((int)(((byte)(36)))));
-            this.ProcessesBox.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
-            this.ProcessesBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.ProcessesBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.ProcessesBox.ForeColor = System.Drawing.Color.White;
-            this.ProcessesBox.FormattingEnabled = true;
-            this.ProcessesBox.Location = new System.Drawing.Point(3, 28);
-            this.ProcessesBox.Name = "ProcessesBox";
-            this.ProcessesBox.Size = new System.Drawing.Size(207, 23);
-            this.ProcessesBox.TabIndex = 0;
-            this.ProcessesBox.SelectedIndexChanged += new System.EventHandler(this.ProcessesBox_SelectedIndexChanged);
             // 
             // DoneResumeBox
             // 
@@ -918,6 +955,16 @@ namespace PS4CheaterNeo
             this.CompareTypeBox.TabIndex = 11;
             this.CompareTypeBox.SelectedIndexChanged += new System.EventHandler(this.CompareTypeBox_SelectedIndexChanged);
             // 
+            // SlowMotionTimer
+            // 
+            this.SlowMotionTimer.Interval = 250;
+            this.SlowMotionTimer.Tick += new System.EventHandler(this.SlowMotionTimer_Tick);
+            // 
+            // OpenDialog
+            // 
+            this.OpenDialog.DefaultExt = "bin";
+            this.OpenDialog.Multiselect = true;
+            // 
             // Query
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -945,8 +992,11 @@ namespace PS4CheaterNeo
             this.SplitContainer2.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SplitContainer2)).EndInit();
             this.SplitContainer2.ResumeLayout(false);
-            this.tableLayoutPanel2.ResumeLayout(false);
-            this.tableLayoutPanel2.PerformLayout();
+            this.TableLayoutPanel3.ResumeLayout(false);
+            this.TableLayoutPanel3.PerformLayout();
+            this.TableLayoutPanel4.ResumeLayout(false);
+            this.TableLayoutPanel2.ResumeLayout(false);
+            this.TableLayoutPanel2.PerformLayout();
             this.TableLayoutPanel1.ResumeLayout(false);
             this.TableLayoutPanel1.PerformLayout();
             this.ResumeLayout(false);
@@ -963,7 +1013,6 @@ namespace PS4CheaterNeo
         private System.Windows.Forms.ColumnHeader ResultViewValue;
         private System.Windows.Forms.ColumnHeader ResultViewHex;
         private System.Windows.Forms.ColumnHeader ResultViewSection;
-        private System.Windows.Forms.Button SectionSearchBtn;
         private System.Windows.Forms.ListView SectionView;
         private System.Windows.Forms.Button GetProcessesBtn;
         private ComboItemBox ProcessesBox;
@@ -997,7 +1046,7 @@ namespace PS4CheaterNeo
         private System.Windows.Forms.TextBox AddrMaxBox;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
+        private System.Windows.Forms.TableLayoutPanel TableLayoutPanel2;
         private System.Windows.Forms.ToolStripMenuItem ResultViewCopyAddress;
         private System.Windows.Forms.CheckBox IsFilterSizeBox;
         private System.Windows.Forms.ColumnHeader SectionViewEnd;
@@ -1026,5 +1075,9 @@ namespace PS4CheaterNeo
         private System.Windows.Forms.ComboBox CompareTypeBox;
         private System.Windows.Forms.CheckBox DoneResumeBox;
         private System.Windows.Forms.CheckBox SimpleValuesBox;
+        private System.Windows.Forms.ColumnHeader SectionViewID;
+        private System.Windows.Forms.TableLayoutPanel TableLayoutPanel3;
+        private System.Windows.Forms.TableLayoutPanel TableLayoutPanel4;
+        private System.Windows.Forms.Button SectionSearchBtn;
     }
 }

@@ -181,7 +181,7 @@ namespace PS4CheaterNeo
                         bool isRelative = cheatElements[5].StartsWith("+");
                         bool isRelativeV1a = cheatElements[5].StartsWith("++");
                         if (isRelativeV1a) cheatElements[5] = cheatElements[5].Substring(1);
-                        bool isPointer = cheatElements[5].Contains("_");
+                        bool isPointer = !cheatElements[5].Contains("[") && Regex.IsMatch(cheatElements[5], "[0-9A-F]+_", RegexOptions.IgnoreCase);
                         uint sid = isRelative ? preData.sid : uint.Parse(cheatElements[0]);
                         string name = isRelative ? preData.name : cheatElements[2];
                         uint prot = isRelative ? preData.prot : uint.Parse(cheatElements[3], NumberStyles.HexNumber);

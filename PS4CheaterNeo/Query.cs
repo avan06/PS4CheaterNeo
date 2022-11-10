@@ -194,7 +194,8 @@ namespace PS4CheaterNeo
 
                     string start = String.Format("{0:X9}", section.Start);
                     int itemIdx = SectionView.Items.Count;
-                    SectionView.Items.Add(sectionIdx.ToString(), start, 0);
+                    SectionView.Items.Add(sectionIdx.ToString(), sectionIdx.ToString(), 0);
+                    SectionView.Items[itemIdx].SubItems.Add(start);
                     SectionView.Items[itemIdx].SubItems.Add(section.Name);
                     SectionView.Items[itemIdx].SubItems.Add(section.Prot.ToString("X"));
                     SectionView.Items[itemIdx].SubItems.Add((section.Length / 1024).ToString() + "KB");

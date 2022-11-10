@@ -67,6 +67,7 @@ namespace PS4CheaterNeo
         public HexEditor(Main mainForm, Section section, int baseAddr) : this(mainForm)
         {
             if (section == null || section.SID == 0) throw new ArgumentNullException("Init HexEditor failed, section is null.");
+            if (baseAddr < 0) throw new ArgumentNullException("Init HexEditor failed, baseAddr is invalid.");
 
             this.section = section;
             Page = baseAddr / PageSize;
