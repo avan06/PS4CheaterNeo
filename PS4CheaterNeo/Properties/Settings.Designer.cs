@@ -12,7 +12,7 @@ namespace PS4CheaterNeo.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.3.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.4.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -64,12 +64,12 @@ namespace PS4CheaterNeo.Properties {
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True|1_General|2_UI|Determines whether to enable collapsible split container ui i" +
             "n Query and HexEditor and PointerFinder windows. Default enabled")]
-        public global::OptionTreeView.Option<bool> EnableCollapsibleContainer {
+        public global::OptionTreeView.Option<bool> CollapsibleContainer {
             get {
-                return ((global::OptionTreeView.Option<bool>)(this["EnableCollapsibleContainer"]));
+                return ((global::OptionTreeView.Option<bool>)(this["CollapsibleContainer"]));
             }
             set {
-                this["EnableCollapsibleContainer"] = value;
+                this["CollapsibleContainer"] = value;
             }
         }
         
@@ -90,12 +90,12 @@ namespace PS4CheaterNeo.Properties {
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True|2_Cheat|Cheat|Determines whether to enable cheat lock in the main window. De" +
             "fault enabled")]
-        public global::OptionTreeView.Option<bool> EnableCheatLock {
+        public global::OptionTreeView.Option<bool> CheatLock {
             get {
-                return ((global::OptionTreeView.Option<bool>)(this["EnableCheatLock"]));
+                return ((global::OptionTreeView.Option<bool>)(this["CheatLock"]));
             }
             set {
-                this["EnableCheatLock"] = value;
+                this["CheatLock"] = value;
             }
         }
         
@@ -209,12 +209,12 @@ namespace PS4CheaterNeo.Properties {
         [global::System.Configuration.DefaultSettingValueAttribute("True|3_Query|1_Query|Determines whether to enable undo scan(revert to the previou" +
             "s scan result), if enabled, more memory needs to be used during scanning. Defaul" +
             "t enable")]
-        public global::OptionTreeView.Option<bool> EnableUndoScan {
+        public global::OptionTreeView.Option<bool> UndoScan {
             get {
-                return ((global::OptionTreeView.Option<bool>)(this["EnableUndoScan"]));
+                return ((global::OptionTreeView.Option<bool>)(this["UndoScan"]));
             }
             set {
-                this["EnableUndoScan"] = value;
+                this["UndoScan"] = value;
             }
         }
         
@@ -222,12 +222,12 @@ namespace PS4CheaterNeo.Properties {
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False|3_Query|1_Query|Determines whether to automatically pause the game when sta" +
             "rting the scan in query. Default disabled")]
-        public global::OptionTreeView.Option<bool> EnableScanAutoPause {
+        public global::OptionTreeView.Option<bool> ScanAutoPause {
             get {
-                return ((global::OptionTreeView.Option<bool>)(this["EnableScanAutoPause"]));
+                return ((global::OptionTreeView.Option<bool>)(this["ScanAutoPause"]));
             }
             set {
-                this["EnableScanAutoPause"] = value;
+                this["ScanAutoPause"] = value;
             }
         }
         
@@ -235,12 +235,12 @@ namespace PS4CheaterNeo.Properties {
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False|3_Query|1_Query|Determines whether to automatically resume the game when th" +
             "e scan is complete in query. Default disabled")]
-        public global::OptionTreeView.Option<bool> EnableScanDoneResume {
+        public global::OptionTreeView.Option<bool> ScanAutoResume {
             get {
-                return ((global::OptionTreeView.Option<bool>)(this["EnableScanDoneResume"]));
+                return ((global::OptionTreeView.Option<bool>)(this["ScanAutoResume"]));
             }
             set {
-                this["EnableScanDoneResume"] = value;
+                this["ScanAutoResume"] = value;
             }
         }
         
@@ -248,12 +248,12 @@ namespace PS4CheaterNeo.Properties {
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True|3_Query|1_Query|Determines whether to show search size message when FirstSca" +
             "n. Default enabled")]
-        public global::OptionTreeView.Option<bool> EnableShowSearchSizeFirstScan {
+        public global::OptionTreeView.Option<bool> ShowSearchSizeFirstScan {
             get {
-                return ((global::OptionTreeView.Option<bool>)(this["EnableShowSearchSizeFirstScan"]));
+                return ((global::OptionTreeView.Option<bool>)(this["ShowSearchSizeFirstScan"]));
             }
             set {
-                this["EnableShowSearchSizeFirstScan"] = value;
+                this["ShowSearchSizeFirstScan"] = value;
             }
         }
         
@@ -262,12 +262,12 @@ namespace PS4CheaterNeo.Properties {
         [global::System.Configuration.DefaultSettingValueAttribute("True|3_Query|2_Floating|Determines whether to make the calculation result of Floa" +
             "ting(float, double) completely exact in query window, there can be 0.0001 differ" +
             "ence in the old mechanism. Default enabled")]
-        public global::OptionTreeView.Option<bool> EnableFloatingResultExact {
+        public global::OptionTreeView.Option<bool> FloatingResultExact {
             get {
-                return ((global::OptionTreeView.Option<bool>)(this["EnableFloatingResultExact"]));
+                return ((global::OptionTreeView.Option<bool>)(this["FloatingResultExact"]));
             }
             set {
-                this["EnableFloatingResultExact"] = value;
+                this["FloatingResultExact"] = value;
             }
         }
         
@@ -289,12 +289,12 @@ namespace PS4CheaterNeo.Properties {
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True|3_Query|3_Filter|Determine whether to enable filtering Sections when opening" +
             " the query window. Default enabled")]
-        public global::OptionTreeView.Option<bool> EnableFilterQuery {
+        public global::OptionTreeView.Option<bool> FilterQuery {
             get {
-                return ((global::OptionTreeView.Option<bool>)(this["EnableFilterQuery"]));
+                return ((global::OptionTreeView.Option<bool>)(this["FilterQuery"]));
             }
             set {
-                this["EnableFilterQuery"] = value;
+                this["FilterQuery"] = value;
             }
         }
         
@@ -316,12 +316,12 @@ namespace PS4CheaterNeo.Properties {
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False|3_Query|3_Filter|Determine whether to enable filtering Sections by size whe" +
             "n opening the query window. Default disabled")]
-        public global::OptionTreeView.Option<bool> EnableFilterSizeQuery {
+        public global::OptionTreeView.Option<bool> FilterSizeQuery {
             get {
-                return ((global::OptionTreeView.Option<bool>)(this["EnableFilterSizeQuery"]));
+                return ((global::OptionTreeView.Option<bool>)(this["FilterSizeQuery"]));
             }
             set {
-                this["EnableFilterSizeQuery"] = value;
+                this["FilterSizeQuery"] = value;
             }
         }
         
@@ -356,12 +356,12 @@ namespace PS4CheaterNeo.Properties {
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False|4_HexEditor|Hex|Determines whether to enable Auto Refresh in HexEditor. Def" +
             "ault disabled")]
-        public global::OptionTreeView.Option<bool> EnableAutoRefresh {
+        public global::OptionTreeView.Option<bool> AutoRefresh {
             get {
-                return ((global::OptionTreeView.Option<bool>)(this["EnableAutoRefresh"]));
+                return ((global::OptionTreeView.Option<bool>)(this["AutoRefresh"]));
             }
             set {
-                this["EnableAutoRefresh"] = value;
+                this["AutoRefresh"] = value;
             }
         }
         

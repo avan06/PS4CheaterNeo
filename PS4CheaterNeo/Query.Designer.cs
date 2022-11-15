@@ -73,13 +73,13 @@ namespace PS4CheaterNeo
             this.SectionViewOffset = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.SectionViewEnd = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.TableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
-            this.SlowMotionBox = new System.Windows.Forms.CheckBox();
             this.label4 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.AddrMaxBox = new System.Windows.Forms.TextBox();
             this.AddrMinBox = new System.Windows.Forms.TextBox();
-            this.DoneResumeBox = new System.Windows.Forms.CheckBox();
             this.SimpleValuesBox = new System.Windows.Forms.CheckBox();
+            this.SlowMotionBox = new System.Windows.Forms.CheckBox();
+            this.AutoResumeBox = new System.Windows.Forms.CheckBox();
             this.AutoPauseBox = new System.Windows.Forms.CheckBox();
             this.RedoBtn = new System.Windows.Forms.Button();
             this.UndoBtn = new System.Windows.Forms.Button();
@@ -343,8 +343,9 @@ namespace PS4CheaterNeo
             // 
             // SplitContainer2.Panel2
             // 
-            this.SplitContainer2.Panel2.Controls.Add(this.DoneResumeBox);
             this.SplitContainer2.Panel2.Controls.Add(this.SimpleValuesBox);
+            this.SplitContainer2.Panel2.Controls.Add(this.SlowMotionBox);
+            this.SplitContainer2.Panel2.Controls.Add(this.AutoResumeBox);
             this.SplitContainer2.Panel2.Controls.Add(this.AutoPauseBox);
             this.SplitContainer2.Panel2.Controls.Add(this.RedoBtn);
             this.SplitContainer2.Panel2.Controls.Add(this.UndoBtn);
@@ -375,8 +376,8 @@ namespace PS4CheaterNeo
             this.TableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.TableLayoutPanel3.Controls.Add(this.GetProcessesBtn, 0, 0);
             this.TableLayoutPanel3.Controls.Add(this.TableLayoutPanel4, 0, 1);
-            this.TableLayoutPanel3.Controls.Add(this.SectionView, 0, 3);
-            this.TableLayoutPanel3.Controls.Add(this.TableLayoutPanel2, 0, 2);
+            this.TableLayoutPanel3.Controls.Add(this.SectionView, 0, 2);
+            this.TableLayoutPanel3.Controls.Add(this.TableLayoutPanel2, 0, 3);
             this.TableLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
             this.TableLayoutPanel3.Location = new System.Drawing.Point(0, 0);
             this.TableLayoutPanel3.Margin = new System.Windows.Forms.Padding(0);
@@ -384,7 +385,7 @@ namespace PS4CheaterNeo
             this.TableLayoutPanel3.RowCount = 4;
             this.TableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.TableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.TableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.TableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.TableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.TableLayoutPanel3.Size = new System.Drawing.Size(287, 235);
             this.TableLayoutPanel3.TabIndex = 1;
@@ -507,10 +508,10 @@ namespace PS4CheaterNeo
             this.SectionView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.SectionView.ForeColor = System.Drawing.Color.White;
             this.SectionView.HideSelection = false;
-            this.SectionView.Location = new System.Drawing.Point(0, 88);
+            this.SectionView.Location = new System.Drawing.Point(0, 60);
             this.SectionView.Margin = new System.Windows.Forms.Padding(0);
             this.SectionView.Name = "SectionView";
-            this.SectionView.Size = new System.Drawing.Size(287, 166);
+            this.SectionView.Size = new System.Drawing.Size(287, 147);
             this.SectionView.TabIndex = 2;
             this.SectionView.UseCompatibleStateImageBehavior = false;
             this.SectionView.View = System.Windows.Forms.View.Details;
@@ -519,7 +520,7 @@ namespace PS4CheaterNeo
             // SectionViewID
             // 
             this.SectionViewID.Text = "";
-            this.SectionViewID.Width = 23;
+            this.SectionViewID.Width = 40;
             // 
             // SectionViewAddress
             // 
@@ -561,40 +562,24 @@ namespace PS4CheaterNeo
             // 
             // TableLayoutPanel2
             // 
-            this.TableLayoutPanel2.ColumnCount = 5;
+            this.TableLayoutPanel2.ColumnCount = 4;
             this.TableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 35F));
             this.TableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.TableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 35F));
             this.TableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.TableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.TableLayoutPanel2.Controls.Add(this.SlowMotionBox, 4, 0);
+            this.TableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.TableLayoutPanel2.Controls.Add(this.label4, 0, 0);
             this.TableLayoutPanel2.Controls.Add(this.label5, 2, 0);
             this.TableLayoutPanel2.Controls.Add(this.AddrMaxBox, 3, 0);
             this.TableLayoutPanel2.Controls.Add(this.AddrMinBox, 1, 0);
             this.TableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.TableLayoutPanel2.Location = new System.Drawing.Point(0, 60);
+            this.TableLayoutPanel2.Location = new System.Drawing.Point(0, 207);
             this.TableLayoutPanel2.Margin = new System.Windows.Forms.Padding(0);
             this.TableLayoutPanel2.Name = "TableLayoutPanel2";
             this.TableLayoutPanel2.RowCount = 1;
             this.TableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.TableLayoutPanel2.Size = new System.Drawing.Size(287, 28);
             this.TableLayoutPanel2.TabIndex = 4;
-            // 
-            // SlowMotionBox
-            // 
-            this.SlowMotionBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.SlowMotionBox.AutoSize = true;
-            this.SlowMotionBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.SlowMotionBox.ForeColor = System.Drawing.Color.White;
-            this.SlowMotionBox.Location = new System.Drawing.Point(240, 3);
-            this.SlowMotionBox.Name = "SlowMotionBox";
-            this.SlowMotionBox.Size = new System.Drawing.Size(44, 16);
-            this.SlowMotionBox.TabIndex = 33;
-            this.SlowMotionBox.Text = "Slow";
-            this.SlowMotionBox.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.SlowMotionBox.UseVisualStyleBackColor = true;
-            this.SlowMotionBox.CheckedChanged += new System.EventHandler(this.SlowMotionBox_CheckedChanged);
             // 
             // label4
             // 
@@ -610,7 +595,7 @@ namespace PS4CheaterNeo
             // 
             this.label5.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(121, 8);
+            this.label5.Location = new System.Drawing.Point(146, 8);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(29, 12);
             this.label5.TabIndex = 20;
@@ -623,9 +608,9 @@ namespace PS4CheaterNeo
             this.AddrMaxBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(36)))), ((int)(((byte)(36)))));
             this.AddrMaxBox.ForeColor = System.Drawing.Color.White;
             this.AddrMaxBox.ImeMode = System.Windows.Forms.ImeMode.Off;
-            this.AddrMaxBox.Location = new System.Drawing.Point(156, 3);
+            this.AddrMaxBox.Location = new System.Drawing.Point(181, 3);
             this.AddrMaxBox.Name = "AddrMaxBox";
-            this.AddrMaxBox.Size = new System.Drawing.Size(77, 22);
+            this.AddrMaxBox.Size = new System.Drawing.Size(103, 22);
             this.AddrMaxBox.TabIndex = 19;
             // 
             // AddrMinBox
@@ -637,19 +622,8 @@ namespace PS4CheaterNeo
             this.AddrMinBox.ImeMode = System.Windows.Forms.ImeMode.Off;
             this.AddrMinBox.Location = new System.Drawing.Point(38, 3);
             this.AddrMinBox.Name = "AddrMinBox";
-            this.AddrMinBox.Size = new System.Drawing.Size(77, 22);
+            this.AddrMinBox.Size = new System.Drawing.Size(102, 22);
             this.AddrMinBox.TabIndex = 18;
-            // 
-            // DoneResumeBox
-            // 
-            this.DoneResumeBox.AutoSize = true;
-            this.DoneResumeBox.Location = new System.Drawing.Point(72, 22);
-            this.DoneResumeBox.Margin = new System.Windows.Forms.Padding(0, 3, 0, 0);
-            this.DoneResumeBox.Name = "DoneResumeBox";
-            this.DoneResumeBox.Size = new System.Drawing.Size(86, 16);
-            this.DoneResumeBox.TabIndex = 21;
-            this.DoneResumeBox.Text = "DoneResume";
-            this.DoneResumeBox.UseVisualStyleBackColor = true;
             // 
             // SimpleValuesBox
             // 
@@ -661,6 +635,30 @@ namespace PS4CheaterNeo
             this.SimpleValuesBox.TabIndex = 12;
             this.SimpleValuesBox.Text = "SimpleValues";
             this.SimpleValuesBox.UseVisualStyleBackColor = true;
+            // 
+            // SlowMotionBox
+            // 
+            this.SlowMotionBox.AutoSize = true;
+            this.SlowMotionBox.ForeColor = System.Drawing.Color.White;
+            this.SlowMotionBox.Location = new System.Drawing.Point(155, 22);
+            this.SlowMotionBox.Name = "SlowMotionBox";
+            this.SlowMotionBox.Size = new System.Drawing.Size(47, 16);
+            this.SlowMotionBox.TabIndex = 33;
+            this.SlowMotionBox.Text = "Slow";
+            this.SlowMotionBox.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.SlowMotionBox.UseVisualStyleBackColor = true;
+            this.SlowMotionBox.CheckedChanged += new System.EventHandler(this.SlowMotionBox_CheckedChanged);
+            // 
+            // AutoResumeBox
+            // 
+            this.AutoResumeBox.AutoSize = true;
+            this.AutoResumeBox.Location = new System.Drawing.Point(73, 22);
+            this.AutoResumeBox.Margin = new System.Windows.Forms.Padding(0, 3, 0, 0);
+            this.AutoResumeBox.Name = "AutoResumeBox";
+            this.AutoResumeBox.Size = new System.Drawing.Size(84, 16);
+            this.AutoResumeBox.TabIndex = 21;
+            this.AutoResumeBox.Text = "AutoResume";
+            this.AutoResumeBox.UseVisualStyleBackColor = true;
             // 
             // AutoPauseBox
             // 
@@ -777,7 +775,7 @@ namespace PS4CheaterNeo
             this.AlignmentBox.Checked = true;
             this.AlignmentBox.CheckState = System.Windows.Forms.CheckState.Checked;
             this.AlignmentBox.ForeColor = System.Drawing.Color.Silver;
-            this.AlignmentBox.Location = new System.Drawing.Point(72, 3);
+            this.AlignmentBox.Location = new System.Drawing.Point(73, 3);
             this.AlignmentBox.Name = "AlignmentBox";
             this.AlignmentBox.Size = new System.Drawing.Size(73, 16);
             this.AlignmentBox.TabIndex = 1;
@@ -1073,7 +1071,7 @@ namespace PS4CheaterNeo
         private System.Windows.Forms.Button RefreshBtn;
         private System.Windows.Forms.Button ScanBtn;
         private System.Windows.Forms.ComboBox CompareTypeBox;
-        private System.Windows.Forms.CheckBox DoneResumeBox;
+        private System.Windows.Forms.CheckBox AutoResumeBox;
         private System.Windows.Forms.CheckBox SimpleValuesBox;
         private System.Windows.Forms.ColumnHeader SectionViewID;
         private System.Windows.Forms.TableLayoutPanel TableLayoutPanel3;

@@ -35,7 +35,7 @@ namespace PS4CheaterNeo
             ApplyUI();
 
             delimitedDash = Properties.Settings.Default.HexInfoDash.Value;
-            if (!Properties.Settings.Default.EnableCollapsibleContainer.Value)
+            if (!Properties.Settings.Default.CollapsibleContainer.Value)
             {
                 SplitContainer1.SplitterButtonStyle = ButtonStyle.None;
                 SplitContainer2.SplitterButtonStyle = ButtonStyle.None;
@@ -347,7 +347,7 @@ namespace PS4CheaterNeo
                     data = new byte[endPos - startPos];
                     Array.Copy(buffer, startPos, data, 0, endPos - startPos);
                 }
-                PS4Tool.WriteMemory(section.PID, (ulong)(address + HexView.LineInfoOffset), data);
+                PS4Tool.WriteMemory(mainForm.ProcessPid, (ulong)(address + HexView.LineInfoOffset), data);
             }
             changedPosDic.Clear();
             HexView.ChangedPosSetFinish();
@@ -498,7 +498,7 @@ namespace PS4CheaterNeo
             HexView.LineInfoOffset = (long)section.Start + (long)(PageSize * page);
             if (section.Length - PageSize * page < memSize) memSize = section.Length - PageSize * page;
 
-            byte[] dst = PS4Tool.ReadMemory(section.PID, section.Start + (ulong)page * PageSize, (int)memSize);
+            byte[] dst = PS4Tool.ReadMemory(mainForm.ProcessPid, section.Start + (ulong)page * PageSize, (int)memSize);
 
             HashSet<long> changedPosSet = new HashSet<long>();
             if (HexView.ByteProvider != null)

@@ -100,6 +100,7 @@
       <DependentUpon>HexEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="common\InputBox.cs" />
+    <Compile Include="common\ListViewColumnSorter.cs" />
     <Compile Include="Main.cs">
       <SubType>Form</SubType>
     </Compile>

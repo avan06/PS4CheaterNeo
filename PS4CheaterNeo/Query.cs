@@ -37,7 +37,7 @@ namespace PS4CheaterNeo
             InitializeComponent();
             ApplyUI();
 
-            if (!Properties.Settings.Default.EnableCollapsibleContainer.Value)
+            if (!Properties.Settings.Default.CollapsibleContainer.Value)
             {
                 SplitContainer1.SplitterButtonStyle = ButtonStyle.None;
                 SplitContainer2.SplitterButtonStyle = ButtonStyle.None;
@@ -47,11 +47,11 @@ namespace PS4CheaterNeo
             sectionTool = new SectionTool();
             bitsDictDict = new Dictionary<uint, BitsDictionary>();
             bitsDictDictUndo = new Dictionary<uint, BitsDictionary>();
-            IsFilterBox.Checked = Properties.Settings.Default.EnableFilterQuery.Value;
-            IsFilterSizeBox.Checked = Properties.Settings.Default.EnableFilterSizeQuery.Value;
-            enableUndoScan = Properties.Settings.Default.EnableUndoScan.Value;
-            AutoPauseBox.Checked = Properties.Settings.Default.EnableScanAutoPause.Value;
-            DoneResumeBox.Checked = Properties.Settings.Default.EnableScanDoneResume.Value;
+            IsFilterBox.Checked = Properties.Settings.Default.FilterQuery.Value;
+            IsFilterSizeBox.Checked = Properties.Settings.Default.FilterSizeQuery.Value;
+            enableUndoScan = Properties.Settings.Default.UndoScan.Value;
+            AutoPauseBox.Checked = Properties.Settings.Default.ScanAutoPause.Value;
+            AutoResumeBox.Checked = Properties.Settings.Default.ScanAutoResume.Value;
         }
 
         public void ApplyUI()
@@ -235,7 +235,7 @@ namespace PS4CheaterNeo
                     MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                 {
                     scanSource.Cancel();
-                    if (DoneResumeBox.Checked) ResumeBtn.PerformClick();
+                    if (AutoResumeBox.Checked) ResumeBtn.PerformClick();
                 }
                 else return;
             }
@@ -311,10 +311,10 @@ namespace PS4CheaterNeo
                         MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                     {
                         scanSource.Cancel();
-                        if (DoneResumeBox.Checked) ResumeBtn.PerformClick();
+                        if (AutoResumeBox.Checked) ResumeBtn.PerformClick();
                     }
                 }
-                else if (Properties.Settings.Default.EnableShowSearchSizeFirstScan.Value && ResultView.Items.Count == 0 && MessageBox.Show("search size:" + (sectionTool.TotalMemorySize / (1024 * 1024)).ToString() + "MB", "First Scan",
+                else if (Properties.Settings.Default.ShowSearchSizeFirstScan.Value && ResultView.Items.Count == 0 && MessageBox.Show("search size:" + (sectionTool.TotalMemorySize / (1024 * 1024)).ToString() + "MB", "First Scan",
                     MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) return;
                 else
                 {
@@ -322,7 +322,7 @@ namespace PS4CheaterNeo
                     ComboItem process = (ComboItem)ProcessesBox.SelectedItem;
                     int pid = (int)process.Value;
 
-                    enableFloatingResultExact = Properties.Settings.Default.EnableFloatingResultExact.Value;
+                    enableFloatingResultExact = Properties.Settings.Default.FloatingResultExact.Value;
                     floatingSimpleValueExponents = Properties.Settings.Default.FloatingSimpleValueExponents.Value;
                     floatingSimpleValueExponents = (floatingSimpleValueExponents > 1 && floatingSimpleValueExponents < 51) ? (byte)(floatingSimpleValueExponents - 1) : (byte)10;
 
@@ -362,7 +362,7 @@ namespace PS4CheaterNeo
                     scanSource = new CancellationTokenSource();
                     scanTask = ScanTask(alignment, isFilter, isFilterSize, AddrMin, AddrMax);
                     scanTask.ContinueWith(t => TaskCompleted())
-                        .ContinueWith(t => Invoke(new MethodInvoker(() => { if (DoneResumeBox.Checked) ResumeBtn.PerformClick(); })));
+                        .ContinueWith(t => Invoke(new MethodInvoker(() => { if (AutoResumeBox.Checked) ResumeBtn.PerformClick(); })));
 
                     ScanTypeBox.Enabled = false;
                     AlignmentBox.Enabled = false;
@@ -372,7 +372,7 @@ namespace PS4CheaterNeo
             catch (Exception exception)
             {
                 MessageBox.Show(exception.Message + "\n" + exception.StackTrace, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
-                if (DoneResumeBox.Checked) ResumeBtn.PerformClick();
+                if (AutoResumeBox.Checked) ResumeBtn.PerformClick();
             }
         }
 

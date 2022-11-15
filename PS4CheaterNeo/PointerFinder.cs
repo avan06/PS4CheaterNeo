@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -17,6 +16,7 @@ namespace PS4CheaterNeo
         readonly Main mainForm;
         readonly string processName;
         readonly SectionTool sectionTool;
+        ListViewColumnSorter columnSorter;
         Dictionary<uint, List<Pointer>> addrPointerDict;
         Dictionary<uint, List<Pointer>> valuePointerDict;
         List<((uint BaseSID, uint BasePos, List<long> Offsets) pointer, List<Pointer> pathPointers)> pointerResults;
@@ -26,7 +26,9 @@ namespace PS4CheaterNeo
         {
             InitializeComponent();
             ApplyUI();
-            if (!Properties.Settings.Default.EnableCollapsibleContainer.Value) SplitContainer1.SplitterButtonStyle = ButtonStyle.None;
+            columnSorter = new ListViewColumnSorter(0, SortOrder.Ascending);
+            PointerListView.ListViewItemSorter = columnSorter; // Create an instance of a ListView column sorter and assign it to the ListView control.
+            if (!Properties.Settings.Default.CollapsibleContainer.Value) SplitContainer1.SplitterButtonStyle = ButtonStyle.None;
             this.mainForm = mainForm;
             sectionTool = new SectionTool();
             processName = mainForm.ProcessName;
@@ -44,8 +46,8 @@ namespace PS4CheaterNeo
                 ScanTypeBox.Items.Add(new ComboItem(filterEnum.GetDescription(), filterEnum));
                 if (scanType == filterEnum) ScanTypeBox.SelectedIndex = ScanTypeBox.Items.Count - 1;
             }
-            IsFilterBox.Checked = Properties.Settings.Default.EnableFilterQuery.Value;
-            IsFilterSizeBox.Checked = Properties.Settings.Default.EnableFilterSizeQuery.Value;
+            IsFilterBox.Checked = Properties.Settings.Default.FilterQuery.Value;
+            IsFilterSizeBox.Checked = Properties.Settings.Default.FilterSizeQuery.Value;
         }
 
         public void ApplyUI()
@@ -271,6 +273,22 @@ namespace PS4CheaterNeo
             {
                 MessageBox.Show(exception.Message + "\n" + exception.StackTrace, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
+        }
+
+        /// <summary>
+        /// https://learn.microsoft.com/en-us/troubleshoot/developer/visualstudio/csharp/language-compilers/sort-listview-by-column
+        /// </summary>
+        private void PointerListView_ColumnClick(object sender, ColumnClickEventArgs e)
+        {
+            // Determine if clicked column is already the column that is being sorted.
+            if (columnSorter.SortColumn == e.Column)
+                columnSorter.Order = columnSorter.Order == SortOrder.Ascending ? SortOrder.Descending : SortOrder.Ascending; // Reverse the current sort direction for this column.
+            else
+            {
+                columnSorter.SortColumn = e.Column; // Set the column number that is to be sorted; default to ascending.
+                columnSorter.Order = SortOrder.Ascending;
+            }
+            PointerListView.Sort(); // Perform the sort with these new sort options.
         }
 
         Task<bool> pointerTask;

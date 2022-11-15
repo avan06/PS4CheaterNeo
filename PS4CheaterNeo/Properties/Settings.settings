@@ -11,13 +11,13 @@
     <Setting Name="PS4FWVersion" Type="OptionTreeView.Option&lt;string&gt;" Scope="User">
       <Value Profile="(Default)">|1_General|1_SendPayload|Enter PS4 FW Version (Confirm the fw version only when perform sendpayload)</Value>
     </Setting>
-    <Setting Name="EnableCollapsibleContainer" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
+    <Setting Name="CollapsibleContainer" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
       <Value Profile="(Default)">True|1_General|2_UI|Determines whether to enable collapsible split container ui in Query and HexEditor and PointerFinder windows. Default enabled</Value>
     </Setting>
     <Setting Name="UIOpacity" Type="OptionTreeView.Option&lt;float&gt;" Scope="User">
       <Value Profile="(Default)">0.95|1_General|2_UI|Determines the opacity of the window, the maximum is 1 (opaque), the default is 0.95|0.2|1</Value>
     </Setting>
-    <Setting Name="EnableCheatLock" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
+    <Setting Name="CheatLock" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
       <Value Profile="(Default)">True|2_Cheat|Cheat|Determines whether to enable cheat lock in the main window. Default enabled</Value>
     </Setting>
     <Setting Name="VerifySectionWhenLock" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
@@ -44,31 +44,31 @@
     <Setting Name="MinResultAccessFactor" Type="OptionTreeView.Option&lt;sbyte&gt;" Scope="User">
       <Value Profile="(Default)">50|3_Query|1_Query|Access value directly by address when the number of query results for the same Section is less than this factor, used to control whether to read Section data completely, or directly access the value by address. Default value is 50</Value>
     </Setting>
-    <Setting Name="EnableUndoScan" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
+    <Setting Name="UndoScan" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
       <Value Profile="(Default)">True|3_Query|1_Query|Determines whether to enable undo scan(revert to the previous scan result), if enabled, more memory needs to be used during scanning. Default enable</Value>
     </Setting>
-    <Setting Name="EnableScanAutoPause" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
+    <Setting Name="ScanAutoPause" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
       <Value Profile="(Default)">False|3_Query|1_Query|Determines whether to automatically pause the game when starting the scan in query. Default disabled</Value>
     </Setting>
-    <Setting Name="EnableScanDoneResume" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
+    <Setting Name="ScanAutoResume" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
       <Value Profile="(Default)">False|3_Query|1_Query|Determines whether to automatically resume the game when the scan is complete in query. Default disabled</Value>
     </Setting>
-    <Setting Name="EnableShowSearchSizeFirstScan" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
+    <Setting Name="ShowSearchSizeFirstScan" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
       <Value Profile="(Default)">True|3_Query|1_Query|Determines whether to show search size message when FirstScan. Default enabled</Value>
     </Setting>
-    <Setting Name="EnableFloatingResultExact" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
+    <Setting Name="FloatingResultExact" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
       <Value Profile="(Default)">True|3_Query|2_Floating|Determines whether to make the calculation result of Floating(float, double) completely exact in query window, there can be 0.0001 difference in the old mechanism. Default enabled</Value>
     </Setting>
     <Setting Name="FloatingSimpleValueExponents" Type="OptionTreeView.Option&lt;byte&gt;" Scope="User">
       <Value Profile="(Default)">11|3_Query|2_Floating|Determine the exponents value of the simple value of floating. Cheat Engine is set to 11 (2 to the 11th power = 2^11 = plus or minus 2048). Default value is 11</Value>
     </Setting>
-    <Setting Name="EnableFilterQuery" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
+    <Setting Name="FilterQuery" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
       <Value Profile="(Default)">True|3_Query|3_Filter|Determine whether to enable filtering Sections when opening the query window. Default enabled</Value>
     </Setting>
     <Setting Name="SectionFilterKeys" Type="OptionTreeView.Option&lt;string&gt;" Scope="User">
       <Value Profile="(Default)">libSce,libc.prx,SceShell,SceLib,SceNp,SceVoice,SceFios,libkernel,SceVdec|3_Query|3_Filter|Enter the filter value, the filter will be set here when listing Sections</Value>
     </Setting>
-    <Setting Name="EnableFilterSizeQuery" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
+    <Setting Name="FilterSizeQuery" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
       <Value Profile="(Default)">False|3_Query|3_Filter|Determine whether to enable filtering Sections by size when opening the query window. Default disabled</Value>
     </Setting>
     <Setting Name="SectionFilterSize" Type="OptionTreeView.Option&lt;uint&gt;" Scope="User">
@@ -77,7 +77,7 @@
     <Setting Name="MaxResultShow" Type="OptionTreeView.Option&lt;uint&gt;" Scope="User">
       <Value Profile="(Default)">0x2000|3_Query|4_Result|Enter the maximum number of displayed query results. will only affect the number of results displayed in the ResultView. Default value is 8192</Value>
     </Setting>
-    <Setting Name="EnableAutoRefresh" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
+    <Setting Name="AutoRefresh" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
       <Value Profile="(Default)">False|4_HexEditor|Hex|Determines whether to enable Auto Refresh in HexEditor. Default disabled</Value>
     </Setting>
     <Setting Name="AutoRefreshTimerInterval" Type="OptionTreeView.Option&lt;uint&gt;" Scope="User">

@@ -30,6 +30,7 @@ namespace PS4CheaterNeo
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(PointerFinder));
             this.SplitContainer1 = new PS4CheaterNeo.CollapsibleSplitContainer();
             this.PointerListView = new System.Windows.Forms.ListView();
             this.PointerListViewMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
@@ -102,6 +103,7 @@ namespace PS4CheaterNeo
             this.SplitContainer1.Panel2.Controls.Add(this.AddressBox);
             this.SplitContainer1.Panel2.Controls.Add(this.label1);
             this.SplitContainer1.Size = new System.Drawing.Size(800, 450);
+            this.SplitContainer1.SplitterButtonBitmap = ((System.Drawing.Bitmap)(resources.GetObject("SplitContainer1.SplitterButtonBitmap")));
             this.SplitContainer1.SplitterButtonLocation = PS4CheaterNeo.ButtonLocation.Panel1;
             this.SplitContainer1.SplitterButtonSize = 13;
             this.SplitContainer1.SplitterButtonStyle = PS4CheaterNeo.ButtonStyle.SingleImage;
@@ -119,9 +121,11 @@ namespace PS4CheaterNeo
             this.PointerListView.Location = new System.Drawing.Point(0, 0);
             this.PointerListView.Name = "PointerListView";
             this.PointerListView.Size = new System.Drawing.Size(670, 426);
+            this.PointerListView.Sorting = System.Windows.Forms.SortOrder.Ascending;
             this.PointerListView.TabIndex = 3;
             this.PointerListView.UseCompatibleStateImageBehavior = false;
             this.PointerListView.View = System.Windows.Forms.View.Details;
+            this.PointerListView.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.PointerListView_ColumnClick);
             this.PointerListView.DoubleClick += new System.EventHandler(this.PointerListView_DoubleClick);
             // 
             // PointerListViewMenu
