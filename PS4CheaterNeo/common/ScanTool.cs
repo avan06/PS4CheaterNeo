@@ -23,6 +23,8 @@ namespace PS4CheaterNeo
         Float_,
         [Description("Double")]
         Double_,
+        [Description("Auto determine numeric")]
+        AutoNumeric,
         [Description("String")]
         String_,
         Hex,
@@ -60,6 +62,7 @@ namespace PS4CheaterNeo
             [ScanType.Bytes_8] = 8,
             [ScanType.Float_] = 4,
             [ScanType.Double_] = 8,
+            [ScanType.AutoNumeric] = 8,
         };
 
         public static byte[] ValueStringToByte(ScanType scanType, string value)
@@ -91,6 +94,7 @@ namespace PS4CheaterNeo
                     break;
                 case ScanType.Hex:
                     value = value.Replace(" ", "").Replace("-", "").Replace("_", "");
+                    if (value.Length % 2 == 1) value = "0" + value;
                     bytes = new byte[value.Length / 2];
                     for (int idx = 0; idx < bytes.Length; idx++) bytes[idx] = Convert.ToByte(value.Substring(idx * 2, 2), 16);
                     break;
@@ -98,6 +102,9 @@ namespace PS4CheaterNeo
                     bytes = Encoding.Default.GetBytes(value);
                     break;
                 case ScanType.Group:
+                    break;
+                case ScanType.AutoNumeric:
+                    bytes = BitConverter.GetBytes(ulong.Parse(value));
                     break;
                 default:
                     throw new Exception("ScanType verification failed");
@@ -159,6 +166,11 @@ namespace PS4CheaterNeo
                     break;
                 case ScanType.Group:
                     break;
+                case ScanType.AutoNumeric:
+                    if (isHex) hexFormat = "X16";
+                    Array.Resize(ref value, 8);
+                    result = BitConverter.ToUInt64(value, 0).ToString(hexFormat);
+                    break;
                 default:
                     throw new Exception("ScanType verification failed");
             }
@@ -204,7 +216,7 @@ namespace PS4CheaterNeo
         public static bool ComparerExact(ComparerTool comparerTool, byte[] newValue, byte[] inputValue0, object groupScanType = null)
         {
             bool result;
-            ScanType exactScanType = groupScanType == null ? comparerTool.scanType : (ScanType)groupScanType;
+            ScanType exactScanType = groupScanType == null ? comparerTool.ScanType_ : (ScanType)groupScanType;
             switch (exactScanType)
             {
                 case ScanType.Bytes_8:
@@ -221,7 +233,7 @@ namespace PS4CheaterNeo
                     if (inputValue0.Length != newValue.Length) throw new ArgumentException("Comparer String length verification failed");
                     for (int idx = 0; idx < inputValue0.Length; ++idx)
                     {
-                        if ((comparerTool.value0ByteWildcards == null || !comparerTool.value0ByteWildcards.Contains(idx)) &&
+                        if ((comparerTool.Value0ByteWildcards == null || !comparerTool.Value0ByteWildcards.Contains(idx)) &&
                             (inputValue0[idx] != newValue[idx])) return false;
                     }
                     result = true;
@@ -230,20 +242,20 @@ namespace PS4CheaterNeo
                     var newDouble = BitConverter.ToDouble(newValue, 0);
                     var input0Double = BitConverter.ToDouble(inputValue0, 0);
                     result = Math.Abs(newDouble - input0Double) < 1;
-                    if (result && comparerTool.isFloatingSimpleValues)
+                    if (result && comparerTool.IsFloatingSimpleValues)
                     {
                         ulong newVar = BitConverter.ToUInt64(newValue, 0);
-                        if (newVar > 0 && Math.Abs(1023 - (int)(((long)newVar >> 52) & 0x7ffL)) > comparerTool.floatingSimpleValueExponents) return false;
+                        if (newVar > 0 && Math.Abs(1023 - (int)(((long)newVar >> 52) & 0x7ffL)) > comparerTool.FloatingSimpleValueExponents) return false;
                     }
                     break;
                 case ScanType.Float_:
                     var newFloat = BitConverter.ToSingle(newValue, 0);
                     var input0Float = BitConverter.ToSingle(inputValue0, 0);
                     result = Math.Abs(newFloat - input0Float) < 1;
-                    if (result && comparerTool.isFloatingSimpleValues)
+                    if (result && comparerTool.IsFloatingSimpleValues)
                     {
                         uint newVar = BitConverter.ToUInt32(newValue, 0);
-                        if (newVar > 0 && Math.Abs(127 - (int)(((int)newVar >> 23) & 0xffL)) > comparerTool.floatingSimpleValueExponents) return false;
+                        if (newVar > 0 && Math.Abs(127 - (int)(((int)newVar >> 23) & 0xffL)) > comparerTool.FloatingSimpleValueExponents) return false;
                     }
                     break;
                 default:
@@ -267,7 +279,7 @@ namespace PS4CheaterNeo
         /// <param name="comparerTool">comparison tool</param>
         /// <param name="newData">new value in memory</param>
         /// <param name="oldData">previous result value</param>
-        public static bool Comparer(ComparerTool comparerTool, ulong newData, ulong oldData)
+        public static bool Comparer(ComparerTool comparerTool, ref ulong newData, ulong oldData)
         {
             bool result = false;
 
@@ -289,7 +301,11 @@ namespace PS4CheaterNeo
             float newFloat = 0;
             float oldFloat = 0;
 
-            switch (comparerTool.scanType)
+            bool newFloatValid = false;
+            bool newDoubleValid = false;
+            ulong newDataTmp = newData;
+
+            switch (comparerTool.ScanType_)
             {
                 case ScanType.Bytes_8:
                     newUInt64 = newData;
@@ -315,55 +331,126 @@ namespace PS4CheaterNeo
                     newFloat = BitConverter.ToSingle(BitConverter.GetBytes(newData), 0);
                     oldFloat = BitConverter.ToSingle(BitConverter.GetBytes(oldData), 0);
                     break;
+                case ScanType.AutoNumeric:
+                    if (comparerTool.AutoNumericValid.Float)
+                    {
+                        newFloat = BitConverter.ToSingle(BitConverter.GetBytes((UInt32)newData), 0);
+                        oldFloat = BitConverter.ToSingle(BitConverter.GetBytes((UInt32)oldData), 0);
+                        newFloatValid = (newFloat == 0 && comparerTool.Input0UInt64 == 0) || newFloat != 0;
+                    }
+                    if (comparerTool.AutoNumericValid.Double)
+                    {
+                        newDouble = BitConverter.ToDouble(BitConverter.GetBytes(newData), 0);
+                        oldDouble = BitConverter.ToDouble(BitConverter.GetBytes(oldData), 0);
+                        newDoubleValid = (newDouble == 0 && comparerTool.Input0UInt64 == 0) || newDouble != 0;
+                    }
+                    if (comparerTool.AutoNumericValid.UInt)
+                    {
+                        if (comparerTool.IsUnknownInitial)
+                        {
+                            if (oldData == 0) { }
+                            else if (oldData <= 0xFF) newDataTmp = BitConverter.GetBytes(newDataTmp)[0]; //255
+                            else if (oldData <= 0xFFFF) newDataTmp = (UInt16)newDataTmp; //65535
+                            else if (oldData <= 0xFFFFFFFF) newDataTmp = (UInt32)newDataTmp; //4294967295
+                        }
+                        else if (comparerTool.Input0UInt64 <= 0xFF) newDataTmp = BitConverter.GetBytes(newDataTmp)[0]; //255
+                        else if (comparerTool.Input0UInt64 <= 0xFFFF) newDataTmp = (UInt16)newDataTmp; //65535
+                        else if (comparerTool.Input0UInt64 <= 0xFFFFFFFF) newDataTmp = (UInt32)newDataTmp; //4294967295
+                    }
+                    break;
                 default:
                     throw new Exception("Unknown scanType type.");
             }
 
-            if (comparerTool.compareType == CompareType.Exact)
+            if (comparerTool.CompareType_ == CompareType.Exact)
             {
-                switch (comparerTool.scanType)
+                switch (comparerTool.ScanType_)
                 {
                     case ScanType.Bytes_8:
-                        result = newUInt64 == comparerTool.input0UInt64;
+                        result = newUInt64 == comparerTool.Input0UInt64;
                         break;
                     case ScanType.Bytes_4:
-                        result = newUInt32 == comparerTool.input0UInt32;
+                        result = newUInt32 == comparerTool.Input0UInt32;
                         break;
                     case ScanType.Bytes_2:
-                        result = newUInt16 == comparerTool.input0UInt16;
+                        result = newUInt16 == comparerTool.Input0UInt16;
                         break;
                     case ScanType.Byte_:
-                        result = newByte == comparerTool.input0Byte;
+                        result = newByte == comparerTool.Input0Byte;
                         break;
                     case ScanType.Double_:
-                        double valD = Math.Abs(newDouble - comparerTool.input0Double);
-                        result = comparerTool.enableFloatingResultExact ? valD == 0 : valD < 0.0001;
+                        double valD = Math.Abs(newDouble - comparerTool.Input0Double);
+                        result = comparerTool.EnableFloatingResultExact ? valD == 0 : valD < 0.0001;
                         break;
                     case ScanType.Float_:
-                        float valF = Math.Abs(newFloat - comparerTool.input0Float);
-                        result = comparerTool.enableFloatingResultExact ? valF == 0 : valF < 0.0001;
+                        float valF = Math.Abs(newFloat - comparerTool.Input0Float);
+                        result = comparerTool.EnableFloatingResultExact ? valF == 0 : valF < 0.0001;
+                        break;
+                    case ScanType.AutoNumeric:
+                        if (comparerTool.AutoNumericValid.UInt && !comparerTool.IsUnknownInitial)
+                        {
+                            result = newDataTmp == comparerTool.Input0UInt64;
+                            if (result) newData = newDataTmp;
+                        }
+                        if (!result && comparerTool.AutoNumericValid.Float && newFloatValid)
+                        {
+                            valF = Math.Abs(newFloat - comparerTool.Input0Float);
+                            result = comparerTool.EnableFloatingResultExact ? valF == 0 : valF < 0.0001;
+                        }
+                        if (!result && comparerTool.AutoNumericValid.Double && newDoubleValid)
+                        {
+                            valD = Math.Abs(newDouble - comparerTool.Input0Double);
+                            result = comparerTool.EnableFloatingResultExact ? valD == 0 : valD < 0.0001;
+                        }
+                        if (!result && comparerTool.AutoNumericValid.UInt && comparerTool.IsUnknownInitial)
+                        {
+                            if (comparerTool.Input0UInt64 > 0xFFFFFFFF) { }
+                            else if (comparerTool.Input0UInt64 > 0xFFFF) newDataTmp = (UInt32)newDataTmp;
+                            else if (comparerTool.Input0UInt64 > 0xFF) newDataTmp = (UInt16)newDataTmp;
+                            else newDataTmp = (byte)newDataTmp;
+                            result = newDataTmp == comparerTool.Input0UInt64;
+                            if (result) newData = newDataTmp;
+                        }
                         break;
                     default:
                         throw new Exception("Unknown scanType type.");
                 }
             }
-            else if (comparerTool.compareType == CompareType.Fuzzy)
+            else if (comparerTool.CompareType_ == CompareType.Fuzzy)
             {
-                switch (comparerTool.scanType)
+                switch (comparerTool.ScanType_)
                 {
                     case ScanType.Double_:
-                        result = Math.Abs(newDouble - comparerTool.input0Double) < 1;
+                        result = Math.Abs(newDouble - comparerTool.Input0Double) < 1;
                         break;
                     case ScanType.Float_:
-                        result = Math.Abs(newFloat - comparerTool.input0Float) < 1;
+                        result = Math.Abs(newFloat - comparerTool.Input0Float) < 1;
+                        break;
+                    case ScanType.AutoNumeric:
+                        if (comparerTool.AutoNumericValid.UInt && !comparerTool.IsUnknownInitial)
+                        {
+                            result = newDataTmp == comparerTool.Input0UInt64;
+                            if (result) newData = newDataTmp;
+                        }
+                        if (!result && comparerTool.AutoNumericValid.Float && newFloatValid) result = Math.Abs(newFloat - comparerTool.Input0Float) < 1;
+                        if (!result && comparerTool.AutoNumericValid.Double && newDoubleValid) result = Math.Abs(newDouble - comparerTool.Input0Double) < 1;
+                        if (!result && comparerTool.AutoNumericValid.UInt && comparerTool.IsUnknownInitial)
+                        {
+                            if (comparerTool.Input0UInt64 > 0xFFFFFFFF) { }
+                            else if (comparerTool.Input0UInt64 > 0xFFFF) newDataTmp = (UInt32)newDataTmp;
+                            else if (comparerTool.Input0UInt64 > 0xFF) newDataTmp = (UInt16)newDataTmp;
+                            else newDataTmp = (byte)newDataTmp;
+                            result = newDataTmp == comparerTool.Input0UInt64;
+                            if (result) newData = newDataTmp;
+                        }
                         break;
                     default:
                         throw new Exception("Unknown scanType type.");
                 }
             }
-            else if (comparerTool.compareType == CompareType.Increased)
+            else if (comparerTool.CompareType_ == CompareType.Increased)
             {
-                switch (comparerTool.scanType)
+                switch (comparerTool.ScanType_)
                 {
                     case ScanType.Bytes_8:
                         result = newUInt64 > oldUInt64;
@@ -383,41 +470,86 @@ namespace PS4CheaterNeo
                     case ScanType.Float_:
                         result = newFloat > oldFloat;
                         break;
+                    case ScanType.AutoNumeric:
+                        if (comparerTool.AutoNumericValid.UInt && !comparerTool.IsUnknownInitial)
+                        {
+                            result = newDataTmp > oldData;
+                            if (result) newData = newDataTmp;
+                        }
+                        if (!result && comparerTool.AutoNumericValid.Float && newFloatValid) result = newFloat > oldFloat;
+                        if (!result && comparerTool.AutoNumericValid.Double && newDoubleValid) result = newDouble > oldDouble;
+                        if (!result && comparerTool.AutoNumericValid.UInt && comparerTool.IsUnknownInitial)
+                        {
+                            if (oldData > 0xFFFFFFFF) { }
+                            else if (oldData > 0xFFFF) newDataTmp = (UInt32)newDataTmp;
+                            else if (oldData > 0xFF) newDataTmp = (UInt16)newDataTmp;
+                            else newDataTmp = (byte)newDataTmp;
+                            result = newDataTmp > oldData;
+                            if (result) newData = newDataTmp;
+                        }
+                        break;
                     default:
                         throw new Exception("Unknown scanType type.");
                 }
             }
-            else if (comparerTool.compareType == CompareType.IncreasedBy)
+            else if (comparerTool.CompareType_ == CompareType.IncreasedBy)
             {
-                switch (comparerTool.scanType)
+                switch (comparerTool.ScanType_)
                 {
                     case ScanType.Bytes_8:
-                        result = newUInt64 == oldUInt64 + comparerTool.input0UInt64;
+                        result = newUInt64 == oldUInt64 + comparerTool.Input0UInt64;
                         break;
                     case ScanType.Bytes_4:
-                        result = newUInt32 == oldUInt32 + comparerTool.input0UInt32;
+                        result = newUInt32 == oldUInt32 + comparerTool.Input0UInt32;
                         break;
                     case ScanType.Bytes_2:
-                        result = newUInt16 == oldUInt16 + comparerTool.input0UInt16;
+                        result = newUInt16 == oldUInt16 + comparerTool.Input0UInt16;
                         break;
                     case ScanType.Byte_:
-                        result = newByte == oldByte + comparerTool.input0Byte;
+                        result = newByte == oldByte + comparerTool.Input0Byte;
                         break;
                     case ScanType.Double_:
-                        double valD = Math.Abs(newDouble - oldDouble - comparerTool.input0Double);
-                        result = comparerTool.enableFloatingResultExact ? valD == 0 : valD < 0.0001;
+                        double valD = Math.Abs(newDouble - oldDouble - comparerTool.Input0Double);
+                        result = comparerTool.EnableFloatingResultExact ? valD == 0 : valD < 0.0001;
                         break;
                     case ScanType.Float_:
-                        float valF = Math.Abs(newFloat - oldFloat - comparerTool.input0Float);
-                        result = comparerTool.enableFloatingResultExact ? valF == 0 : valF < 0.0001;
+                        float valF = Math.Abs(newFloat - oldFloat - comparerTool.Input0Float);
+                        result = comparerTool.EnableFloatingResultExact ? valF == 0 : valF < 0.0001;
+                        break;
+                    case ScanType.AutoNumeric:
+                        ulong oldDataB = oldData + comparerTool.Input0UInt64;
+                        if (comparerTool.AutoNumericValid.UInt && !comparerTool.IsUnknownInitial)
+                        {
+                            result = newDataTmp == oldDataB;
+                            if (result) newData = newDataTmp;
+                        }
+                        if (!result && comparerTool.AutoNumericValid.Float && newFloatValid)
+                        {
+                            valF = Math.Abs(newFloat - oldFloat - comparerTool.Input0Float);
+                            result = comparerTool.EnableFloatingResultExact ? valF == 0 : valF < 0.0001;
+                        }
+                        if (!result && comparerTool.AutoNumericValid.Double && newDoubleValid)
+                        {
+                            valD = Math.Abs(newDouble - oldDouble - comparerTool.Input0Double);
+                            result = comparerTool.EnableFloatingResultExact ? valD == 0 : valD < 0.0001;
+                        }
+                        if (!result && comparerTool.AutoNumericValid.UInt && comparerTool.IsUnknownInitial)
+                        {
+                            if (oldDataB > 0xFFFFFFFF) { }
+                            else if (oldDataB > 0xFFFF) newDataTmp = (UInt32)newDataTmp;
+                            else if(oldDataB > 0xFF) newDataTmp = (UInt16)newDataTmp;
+                            else newDataTmp = (byte)newDataTmp;
+                            result = newDataTmp == oldDataB;
+                            if (result) newData = newDataTmp;
+                        }
                         break;
                     default:
                         throw new Exception("Unknown scanType type.");
                 }
             }
-            else if (comparerTool.compareType == CompareType.Decreased)
+            else if (comparerTool.CompareType_ == CompareType.Decreased)
             {
-                switch (comparerTool.scanType)
+                switch (comparerTool.ScanType_)
                 {
                     case ScanType.Bytes_8:
                         result = newUInt64 < oldUInt64;
@@ -437,93 +569,174 @@ namespace PS4CheaterNeo
                     case ScanType.Float_:
                         result = newFloat < oldFloat;
                         break;
+                    case ScanType.AutoNumeric:
+                        if (comparerTool.AutoNumericValid.UInt && !comparerTool.IsUnknownInitial)
+                        {
+                            result = newDataTmp < oldData;
+                            if (result) newData = newDataTmp;
+                        }
+                        if (!result && comparerTool.AutoNumericValid.Float && newFloatValid) result = newFloat < oldFloat;
+                        if (!result && comparerTool.AutoNumericValid.Double && newDoubleValid) result = newDouble < oldDouble;
+                        if (!result && comparerTool.AutoNumericValid.UInt && comparerTool.IsUnknownInitial)
+                        {
+                            if (oldData > 0xFFFFFFFF) { }
+                            else if (oldData > 0xFFFF) newDataTmp = (UInt32)newDataTmp;
+                            else if (oldData > 0xFF) newDataTmp = (UInt16)newDataTmp;
+                            else newDataTmp = (byte)newDataTmp;
+                            result = newDataTmp < oldData;
+                            if (result) newData = newDataTmp;
+                        }
+                        break;
                     default:
                         throw new Exception("Unknown scanType type.");
                 }
             }
-            else if (comparerTool.compareType == CompareType.DecreasedBy)
+            else if (comparerTool.CompareType_ == CompareType.DecreasedBy)
             {
-                switch (comparerTool.scanType)
+                switch (comparerTool.ScanType_)
                 {
                     case ScanType.Bytes_8:
-                        result = newUInt64 == oldUInt64 - comparerTool.input0UInt64;
+                        result = newUInt64 == oldUInt64 - comparerTool.Input0UInt64;
                         break;
                     case ScanType.Bytes_4:
-                        result = newUInt32 == oldUInt32 - comparerTool.input0UInt32;
+                        result = newUInt32 == oldUInt32 - comparerTool.Input0UInt32;
                         break;
                     case ScanType.Bytes_2:
-                        result = newUInt16 == oldUInt16 - comparerTool.input0UInt16;
+                        result = newUInt16 == oldUInt16 - comparerTool.Input0UInt16;
                         break;
                     case ScanType.Byte_:
-                        result = newByte == oldByte - comparerTool.input0Byte;
+                        result = newByte == oldByte - comparerTool.Input0Byte;
                         break;
                     case ScanType.Double_:
-                        double valD = Math.Abs(newDouble - oldDouble + comparerTool.input0Double);
-                        result = comparerTool.enableFloatingResultExact ? valD == 0 : valD < 0.0001;
+                        double valD = Math.Abs(newDouble - oldDouble + comparerTool.Input0Double);
+                        result = comparerTool.EnableFloatingResultExact ? valD == 0 : valD < 0.0001;
                         break;
                     case ScanType.Float_:
-                        float valF = Math.Abs(newFloat - oldFloat + comparerTool.input0Float);
-                        result = comparerTool.enableFloatingResultExact ? valF == 0 : valF < 0.0001;
+                        float valF = Math.Abs(newFloat - oldFloat + comparerTool.Input0Float);
+                        result = comparerTool.EnableFloatingResultExact ? valF == 0 : valF < 0.0001;
+                        break;
+                    case ScanType.AutoNumeric:
+                        ulong oldDataB = oldData - comparerTool.Input0UInt64;
+                        if (comparerTool.AutoNumericValid.UInt && !comparerTool.IsUnknownInitial)
+                        {
+                            result = newDataTmp == oldDataB;
+                            if (result) newData = newDataTmp;
+                        }
+                        if (!result && comparerTool.AutoNumericValid.Float && newFloatValid)
+                        {
+                            valF = Math.Abs(newFloat - oldFloat + comparerTool.Input0Float);
+                            result = comparerTool.EnableFloatingResultExact ? valF == 0 : valF < 0.0001;
+                        }
+                        if (!result && comparerTool.AutoNumericValid.Double && newDoubleValid)
+                        {
+                            valD = Math.Abs(newDouble - oldDouble + comparerTool.Input0Double);
+                            result = comparerTool.EnableFloatingResultExact ? valD == 0 : valD < 0.0001;
+                        }
+                        if (!result && comparerTool.AutoNumericValid.UInt && comparerTool.IsUnknownInitial)
+                        {
+                            if (oldDataB > 0xFFFFFFFF) { }
+                            else if(oldDataB > 0xFFFF) newDataTmp = (UInt32)newDataTmp;
+                            else if (oldDataB > 0xFF) newDataTmp = (UInt16)newDataTmp;
+                            else newDataTmp = (byte)newDataTmp;
+                            result = newDataTmp == oldDataB;
+                            if (result) newData = newDataTmp;
+                        }
                         break;
                     default:
                         throw new Exception("Unknown scanType type.");
                 }
             }
-            else if (comparerTool.compareType == CompareType.BiggerThan)
+            else if (comparerTool.CompareType_ == CompareType.BiggerThan)
             {
-                switch (comparerTool.scanType)
+                switch (comparerTool.ScanType_)
                 {
                     case ScanType.Bytes_8:
-                        result = newUInt64 > comparerTool.input0UInt64;
+                        result = newUInt64 > comparerTool.Input0UInt64;
                         break;
                     case ScanType.Bytes_4:
-                        result = newUInt32 > comparerTool.input0UInt32;
+                        result = newUInt32 > comparerTool.Input0UInt32;
                         break;
                     case ScanType.Bytes_2:
-                        result = newUInt16 > comparerTool.input0UInt16;
+                        result = newUInt16 > comparerTool.Input0UInt16;
                         break;
                     case ScanType.Byte_:
-                        result = newByte > comparerTool.input0Byte;
+                        result = newByte > comparerTool.Input0Byte;
                         break;
                     case ScanType.Double_:
-                        result = newDouble > comparerTool.input0Double;
+                        result = newDouble > comparerTool.Input0Double;
                         break;
                     case ScanType.Float_:
-                        result = newFloat > comparerTool.input0Float;
+                        result = newFloat > comparerTool.Input0Float;
+                        break;
+                    case ScanType.AutoNumeric:
+                        if (comparerTool.AutoNumericValid.UInt && !comparerTool.IsUnknownInitial)
+                        {
+                            result = newDataTmp > comparerTool.Input0UInt64;
+                            if (result) newData = newDataTmp;
+                        }
+                        if (!result && comparerTool.AutoNumericValid.Float && newFloatValid) result = newFloat > comparerTool.Input0Float;
+                        if (!result && comparerTool.AutoNumericValid.Double && newDoubleValid) result = newDouble > comparerTool.Input0Double;
+                        if (!result && comparerTool.AutoNumericValid.UInt && comparerTool.IsUnknownInitial)
+                        {
+                            if (comparerTool.Input0UInt64 > 0xFFFFFFFF) { }
+                            else if (comparerTool.Input0UInt64 > 0xFFFF) newDataTmp = (UInt32)newDataTmp;
+                            else if (comparerTool.Input0UInt64 > 0xFF) newDataTmp = (UInt16)newDataTmp;
+                            else newDataTmp = (byte)newDataTmp;
+                            result = newDataTmp > comparerTool.Input0UInt64;
+                            if (result) newData = newDataTmp;
+                        }
                         break;
                     default:
                         throw new Exception("Unknown scanType type.");
                 }
             }
-            else if (comparerTool.compareType == CompareType.SmallerThan)
+            else if (comparerTool.CompareType_ == CompareType.SmallerThan)
             {
-                switch (comparerTool.scanType)
+                switch (comparerTool.ScanType_)
                 {
                     case ScanType.Bytes_8:
-                        result = newUInt64 < comparerTool.input0UInt64;
+                        result = newUInt64 < comparerTool.Input0UInt64;
                         break;
                     case ScanType.Bytes_4:
-                        result = newUInt32 < comparerTool.input0UInt32;
+                        result = newUInt32 < comparerTool.Input0UInt32;
                         break;
                     case ScanType.Bytes_2:
-                        result = newUInt16 < comparerTool.input0UInt16;
+                        result = newUInt16 < comparerTool.Input0UInt16;
                         break;
                     case ScanType.Byte_:
-                        result = newByte < comparerTool.input0Byte;
+                        result = newByte < comparerTool.Input0Byte;
                         break;
                     case ScanType.Double_:
-                        result = newDouble < comparerTool.input0Double;
+                        result = newDouble < comparerTool.Input0Double;
                         break;
                     case ScanType.Float_:
-                        result = newFloat < comparerTool.input0Float;
+                        result = newFloat < comparerTool.Input0Float;
+                        break;
+                    case ScanType.AutoNumeric:
+                        if (comparerTool.AutoNumericValid.UInt && !comparerTool.IsUnknownInitial)
+                        {
+                            result = newDataTmp < comparerTool.Input0UInt64;
+                            if (result) newData = newDataTmp;
+                        }
+                        if (!result && comparerTool.AutoNumericValid.Float && newFloatValid) result = newFloat < comparerTool.Input0Float;
+                        if (!result && comparerTool.AutoNumericValid.Double && newDoubleValid) result = newDouble < comparerTool.Input0Double;
+                        if (!result && comparerTool.AutoNumericValid.UInt && comparerTool.IsUnknownInitial)
+                        {
+                            if (comparerTool.Input0UInt64 > 0xFFFFFFFF) { }
+                            else if (comparerTool.Input0UInt64 > 0xFFFF) newDataTmp = (UInt32)newDataTmp;
+                            else if (comparerTool.Input0UInt64 > 0xFF) newDataTmp = (UInt16)newDataTmp;
+                            else newDataTmp = (byte)newDataTmp;
+                            result = newDataTmp < comparerTool.Input0UInt64;
+                            if (result) newData = newDataTmp;
+                        }
                         break;
                     default:
                         throw new Exception("Unknown scanType type.");
                 }
             }
-            else if (comparerTool.compareType == CompareType.Changed)
+            else if (comparerTool.CompareType_ == CompareType.Changed)
             {
-                switch (comparerTool.scanType)
+                switch (comparerTool.ScanType_)
                 {
                     case ScanType.Bytes_8:
                         result = newUInt64 != oldUInt64;
@@ -539,19 +752,45 @@ namespace PS4CheaterNeo
                         break;
                     case ScanType.Double_:
                         double valD = Math.Abs(newDouble - oldDouble);
-                        result = comparerTool.enableFloatingResultExact ? valD != 0 : valD >= 0.0001;
+                        result = comparerTool.EnableFloatingResultExact ? valD != 0 : valD >= 0.0001;
                         break;
                     case ScanType.Float_:
                         float valF = Math.Abs(newFloat - oldFloat);
-                        result = comparerTool.enableFloatingResultExact ? valF != 0 : valF >= 0.0001;
+                        result = comparerTool.EnableFloatingResultExact ? valF != 0 : valF >= 0.0001;
+                        break;
+                    case ScanType.AutoNumeric:
+                        if (comparerTool.AutoNumericValid.UInt && !comparerTool.IsUnknownInitial)
+                        {
+                            result = newDataTmp != oldData;
+                            if (result) newData = newDataTmp;
+                        }
+                        if (!result && comparerTool.AutoNumericValid.Float && newFloatValid)
+                        {
+                            valF = Math.Abs(newFloat - oldFloat);
+                            result = comparerTool.EnableFloatingResultExact ? valF != 0 : valF >= 0.0001;
+                        }
+                        if (!result && comparerTool.AutoNumericValid.Double && newDoubleValid)
+                        {
+                            valD = Math.Abs(newDouble - oldDouble);
+                            result = comparerTool.EnableFloatingResultExact ? valD != 0 : valD >= 0.0001;
+                        }
+                        if (!result && comparerTool.AutoNumericValid.UInt && comparerTool.IsUnknownInitial)
+                        {
+                            if (oldData > 0xFFFFFFFF) { }
+                            else if (oldData > 0xFFFF) newDataTmp = (UInt32)newDataTmp;
+                            else if (oldData > 0xFF) newDataTmp = (UInt16)newDataTmp;
+                            else newDataTmp = (byte)newDataTmp;
+                            result = newDataTmp != oldData;
+                            if (result) newData = newDataTmp;
+                        }
                         break;
                     default:
                         throw new Exception("Unknown scanType type.");
                 }
             }
-            else if (comparerTool.compareType == CompareType.Unchanged)
+            else if (comparerTool.CompareType_ == CompareType.Unchanged)
             {
-                switch (comparerTool.scanType)
+                switch (comparerTool.ScanType_)
                 {
                     case ScanType.Bytes_8:
                         result = newUInt64 == oldUInt64;
@@ -566,46 +805,90 @@ namespace PS4CheaterNeo
                         result = newByte == oldByte;
                         break;
                     case ScanType.Double_:
-                        Double valD = Math.Abs(newDouble - oldDouble);
-                        result = comparerTool.enableFloatingResultExact ? valD == 0 : valD < 0.0001;
+                        double valD = Math.Abs(newDouble - oldDouble);
+                        result = comparerTool.EnableFloatingResultExact ? valD == 0 : valD < 0.0001;
                         break;
                     case ScanType.Float_:
                         float valF = Math.Abs(newFloat - oldFloat);
-                        result = comparerTool.enableFloatingResultExact ? valF == 0 : valF < 0.0001;
+                        result = comparerTool.EnableFloatingResultExact ? valF == 0 : valF < 0.0001;
+                        break;
+                    case ScanType.AutoNumeric:
+                        if (comparerTool.AutoNumericValid.UInt && !comparerTool.IsUnknownInitial)
+                        {
+                            result = newDataTmp == oldData;
+                            if (result) newData = newDataTmp;
+                        }
+                        if (!result && comparerTool.AutoNumericValid.Float && newFloatValid)
+                        {
+                            valF = Math.Abs(newFloat - oldFloat);
+                            result = comparerTool.EnableFloatingResultExact ? valF == 0 : valF < 0.0001;
+                        }
+                        if (!result && comparerTool.AutoNumericValid.Double && newDoubleValid)
+                        {
+                            valD = Math.Abs(newDouble - oldDouble);
+                            result = comparerTool.EnableFloatingResultExact ? valD == 0 : valD < 0.0001;
+                        }
+                        if (!result && comparerTool.AutoNumericValid.UInt && comparerTool.IsUnknownInitial)
+                        {
+                            if (oldData > 0xFFFFFFFF) { }
+                            else if (oldData > 0xFFFF) newDataTmp = (UInt32)newDataTmp;
+                            else if (oldData > 0xFF) newDataTmp = (UInt16)newDataTmp;
+                            else newDataTmp = (byte)newDataTmp;
+                            result = newDataTmp == oldData;
+                            if (result) newData = newDataTmp;
+                        }
                         break;
                     default:
                         throw new Exception("Unknown scanType type.");
                 }
             }
-            else if (comparerTool.compareType == CompareType.Between)
+            else if (comparerTool.CompareType_ == CompareType.Between)
             {
-                switch (comparerTool.scanType)
+                switch (comparerTool.ScanType_)
                 {
                     case ScanType.Bytes_8:
-                        result = newUInt64 <= comparerTool.input1UInt64 && newUInt64 >= comparerTool.input0UInt64;
+                        result = newUInt64 <= comparerTool.Input1UInt64 && newUInt64 >= comparerTool.Input0UInt64;
                         break;
                     case ScanType.Bytes_4:
-                        result = newUInt32 <= comparerTool.input1UInt32 && newUInt32 >= comparerTool.input0UInt32;
+                        result = newUInt32 <= comparerTool.Input1UInt32 && newUInt32 >= comparerTool.Input0UInt32;
                         break;
                     case ScanType.Bytes_2:
-                        result = newUInt16 <= comparerTool.input1UInt16 && newUInt16 >= comparerTool.input0UInt16;
+                        result = newUInt16 <= comparerTool.Input1UInt16 && newUInt16 >= comparerTool.Input0UInt16;
                         break;
                     case ScanType.Byte_:
-                        result = newByte <= comparerTool.input1Byte && newByte >= comparerTool.input0Byte;
+                        result = newByte <= comparerTool.Input1Byte && newByte >= comparerTool.Input0Byte;
                         break;
                     case ScanType.Double_:
-                        result = newDouble <= comparerTool.input1Double && newDouble >= comparerTool.input0Double;
+                        result = newDouble <= comparerTool.Input1Double && newDouble >= comparerTool.Input0Double;
                         break;
                     case ScanType.Float_:
-                        result = newFloat <= comparerTool.input1Float && newFloat >= comparerTool.input0Float;
+                        result = newFloat <= comparerTool.Input1Float && newFloat >= comparerTool.Input0Float;
+                        break;
+                    case ScanType.AutoNumeric:
+                        if (comparerTool.AutoNumericValid.UInt && !comparerTool.IsUnknownInitial)
+                        {
+                            result = newDataTmp <= comparerTool.Input1UInt64 && newDataTmp >= comparerTool.Input0UInt64;
+                            if (result) newData = newDataTmp;
+                        }
+                        if (!result && comparerTool.AutoNumericValid.Float && newFloatValid) result = newFloat <= comparerTool.Input1Float && newFloat >= comparerTool.Input0Float;
+                        if (!result && comparerTool.AutoNumericValid.Double && newDoubleValid) result = newDouble <= comparerTool.Input1Double && newDouble >= comparerTool.Input0Double;
+                        if (!result && comparerTool.AutoNumericValid.UInt && comparerTool.IsUnknownInitial)
+                        {
+                            if (comparerTool.Input1UInt64 > 0xFFFFFFFF) { }
+                            else if (comparerTool.Input1UInt64 > 0xFFFF) newDataTmp = (UInt32)newDataTmp;
+                            else if (comparerTool.Input1UInt64 > 0xFF) newDataTmp = (UInt16)newDataTmp;
+                            else newDataTmp = (byte)newDataTmp;
+                            result = newDataTmp <= comparerTool.Input1UInt64 && newDataTmp >= comparerTool.Input0UInt64;
+                            if (result) newData = newDataTmp;
+                        }
                         break;
                     default:
                         throw new Exception("Unknown scanType type.");
                 }
             }
-            else if (comparerTool.compareType == CompareType.UnknownInitial)
+            else if (comparerTool.CompareType_ == CompareType.UnknownInitial)
             {
-                switch (comparerTool.scanType)
+                switch (comparerTool.ScanType_)
                 {
                     case ScanType.Bytes_8:
                         result = newUInt64 != 0;
@@ -625,27 +908,32 @@ namespace PS4CheaterNeo
                     case ScanType.Float_:
                         result = newFloat != 0;
                         break;
+                    case ScanType.AutoNumeric:
+                        if (comparerTool.AutoNumericValid.UInt) result = newDataTmp != 0;
+                        if (!result && comparerTool.AutoNumericValid.Float && newFloatValid) result = newFloat != 0;
+                        if (!result && comparerTool.AutoNumericValid.Double && newDoubleValid) result = newDouble != 0;
+                        break;
                     default:
                         throw new Exception("Unknown scanType type.");
                 }
             }
 
-            if (result && comparerTool.isFloatingSimpleValues && newData > 0)
+            if (result && comparerTool.IsFloatingSimpleValues && newDataTmp > 0)
             {
-                if (comparerTool.scanType == ScanType.Double_)
+                if (comparerTool.ScanType_ == ScanType.Double_)
                 {
-                    if (Math.Abs(1023 - (int)(((long)newData >> 52) & 0x7ffL)) > comparerTool.floatingSimpleValueExponents) result = false;
+                    if (Math.Abs(1023 - (int)(((long)newDataTmp >> 52) & 0x7ffL)) > comparerTool.FloatingSimpleValueExponents) result = false;
                 }
-                else if (comparerTool.scanType == ScanType.Float_)
+                else if (comparerTool.ScanType_ == ScanType.Float_)
                 {
-                    if (Math.Abs(127 - (int)(((int)newData >> 23) & 0xffL)) > comparerTool.floatingSimpleValueExponents) result = false;
+                    if (Math.Abs(127 - (int)(((int)newDataTmp >> 23) & 0xffL)) > comparerTool.FloatingSimpleValueExponents) result = false;
                 }
             }
 
-            if (comparerTool.isNot &&
-                comparerTool.compareType != CompareType.IncreasedBy &&
-                comparerTool.compareType != CompareType.DecreasedBy &&
-                comparerTool.compareType != CompareType.UnknownInitial) result ^= comparerTool.isNot; //result XOR true
+            if (comparerTool.IsNot &&
+                comparerTool.CompareType_ != CompareType.IncreasedBy &&
+                comparerTool.CompareType_ != CompareType.DecreasedBy &&
+                comparerTool.CompareType_ != CompareType.UnknownInitial) result ^= comparerTool.IsNot; //result XOR true
 
             return result;
         }
@@ -870,108 +1158,177 @@ namespace PS4CheaterNeo
     public class ComparerTool
     {
         /// <summary>scan type</summary>
-        public ScanType scanType { get; }
-        public CompareType compareType { get; }
+        public ScanType ScanType_ { get; }
+        public CompareType CompareType_ { get; }
         /// <summary>the length of the query value</summary>
-        public int scanTypeLength { get; }
+        public int ScanTypeLength { get; }
         /// <summary>the length of the first query value for group query</summary>
-        public int groupFirstLength { get; }
+        public int GroupFirstLength { get; }
         /// <summary>input value for ScanType:Hex、String</summary>
-        public byte[] value0Byte { get; }
+        public byte[] Value0Byte { get; }
         /// <summary>Specifies the index position of wildcards when searching for hex</summary>
-        public HashSet<int> value0ByteWildcards { get; }
+        public HashSet<int> Value0ByteWildcards { get; }
         /// <summary>input value for comparison</summary>
-        public ulong value0Long { get; }
+        public ulong Value0Long { get; }
         /// <summary>used for the second input value of compare type between</summary>
-        public ulong value1Long { get; }
+        public ulong Value1Long { get; }
         /// <summary>input values for group query</summary>
-        public List<byte[]> groupValues { get; }
+        public List<byte[]> GroupValues { get; }
         /// <summary>input types for group query</summary>
-        public List<(ScanType scanType, int groupTypeLength, bool isAny)> groupTypes { get; }
+        public List<(ScanType scanType, int groupTypeLength, bool isAny)> GroupTypes { get; }
         /// <summary>input value for comparison</summary>
-        public string value0 { get; }
+        public string Value0 { get; }
         /// <summary>used for the second input value of compare type between</summary>
-        public string value1 { get; }
+        public string Value1 { get; }
         /// <summary>whether to invert the comparison result</summary>
-        public bool isNot { get; }
+        public bool IsNot { get; }
         /// <summary>whether to compare only simple values when the type is Floating-Point</summary>
-        public bool isFloatingSimpleValues { get; }
+        public bool IsFloatingSimpleValues { get; }
         /// <summary>Determines whether to make the calculation result of Floating(float, double) completely exact in query window, there can be 0.0001 difference in the old mechanism. Default enabled</summary>
-        public bool enableFloatingResultExact { get; }
+        public bool EnableFloatingResultExact { get; }
         /// <summary>Determine the exponents value of the simple value of floating. Cheat Engine is set to 11 (2 to the 11th power = 2^11 = plus or minus 2048). Default value is 11</summary>
-        public byte floatingSimpleValueExponents { get; }
+        public byte FloatingSimpleValueExponents { get; }
+        public bool IsUnknownInitial { get; }
 
-        public UInt64 input0UInt64 { get; }
-        public UInt64 input1UInt64 { get; }
+        public UInt64 Input0UInt64 { get; }
+        public UInt64 Input1UInt64 { get; }
 
-        public UInt32 input0UInt32 { get; }
-        public UInt32 input1UInt32 { get; }
+        public UInt32 Input0UInt32 { get; }
+        public UInt32 Input1UInt32 { get; }
 
-        public UInt16 input0UInt16 { get; }
-        public UInt16 input1UInt16 { get; }
+        public UInt16 Input0UInt16 { get; }
+        public UInt16 Input1UInt16 { get; }
 
-        public byte input0Byte { get; }
-        public byte input1Byte { get; }
+        public byte Input0Byte { get; }
+        public byte Input1Byte { get; }
 
-        public double input0Double { get; }
-        public double input1Double { get; }
+        public double Input0Double { get; }
+        public double Input1Double { get; }
 
-        public float input0Float { get; }
-        public float input1Float { get; }
+        public float Input0Float { get; }
+        public float Input1Float { get; }
 
-        public ComparerTool(ScanType scanType, CompareType compareType, string value0, string value1, bool isHex, bool isNot, bool isFloatingSimpleValues, bool enableFloatingResultExact, byte floatingSimpleValueExponents)
+        public (bool UInt, bool Double, bool Float) AutoNumericValid => autoNumericValid;
+
+        private (bool UInt, bool Double, bool Float) autoNumericValid = (false, false, false);
+
+        public ComparerTool(ScanType scanType, CompareType compareType, string value0, string value1, bool isHex, bool isNot, bool isFloatingSimpleValues, bool enableFloatingResultExact, byte floatingSimpleValueExponents, bool isUnknownInitial)
         {
-            this.scanType = scanType;
-            this.compareType = compareType;
-            this.value0 = value0;
-            this.value1 = value1;
-            this.isNot = isNot;
-            this.isFloatingSimpleValues = isFloatingSimpleValues;
-            this.enableFloatingResultExact = enableFloatingResultExact;
-            this.floatingSimpleValueExponents = floatingSimpleValueExponents;
+            ScanType_ = scanType;
+            CompareType_ = compareType;
+            Value0 = value0;
+            Value1 = value1;
+            IsNot = isNot;
+            IsFloatingSimpleValues = isFloatingSimpleValues;
+            EnableFloatingResultExact = enableFloatingResultExact;
+            FloatingSimpleValueExponents = floatingSimpleValueExponents;
+            IsUnknownInitial = isUnknownInitial;
+
+            byte[] input0Data = isHex ? ScanTool.ValueStringToByte(ScanType.Hex, value0) : default; //Little-Endian
+            byte[] input1Data = isHex ? ScanTool.ValueStringToByte(ScanType.Hex, value1) : default;
 
             switch (scanType)
             {
                 case ScanType.Bytes_8:
-                    input0UInt64 = (isHex && value0 != "0") ? BitConverter.ToUInt64(ScanTool.ValueStringToByte(ScanType.Hex, value0), 0) : ulong.Parse(value0.Replace(",","")); //Big-Endian
-                    input1UInt64 = (isHex && value1 != "0") ? BitConverter.ToUInt64(ScanTool.ValueStringToByte(ScanType.Hex, value1), 0) : ulong.Parse(value1.Replace(",", ""));
-                    //input0UInt64 = isHex ? ulong.Parse(value0, NumberStyles.HexNumber) : ulong.Parse(value0); //Little-Endian
+                    Input0UInt64 = input0Data != default ? BitConverter.ToUInt64(input0Data, 0) : ulong.Parse(value0.Replace(",",""));
+                    Input1UInt64 = input1Data != default ? BitConverter.ToUInt64(input1Data, 0) : ulong.Parse(value1.Replace(",", ""));
+                    //input0UInt64 = isHex ? ulong.Parse(value0, NumberStyles.HexNumber) : ulong.Parse(value0); //Big-Endian
                     //input1UInt64 = isHex ? ulong.Parse(value1, NumberStyles.HexNumber) : ulong.Parse(value1);
                     break;
                 case ScanType.Bytes_4:
-                    input0UInt32 = (isHex && value0 != "0") ? BitConverter.ToUInt32(ScanTool.ValueStringToByte(ScanType.Hex, value0), 0) : uint.Parse(value0.Replace(",", ""));
-                    input1UInt32 = (isHex && value1 != "0") ? BitConverter.ToUInt32(ScanTool.ValueStringToByte(ScanType.Hex, value1), 0) : uint.Parse(value1.Replace(",", ""));
+                    Input0UInt32 = input0Data != default ? BitConverter.ToUInt32(input0Data, 0) : uint.Parse(value0.Replace(",", ""));
+                    Input1UInt32 = input1Data != default ? BitConverter.ToUInt32(input1Data, 0) : uint.Parse(value1.Replace(",", ""));
                     //input0UInt32 = isHex ? uint.Parse(value0, NumberStyles.HexNumber) : uint.Parse(value0);
                     //input1UInt32 = isHex ? uint.Parse(value1, NumberStyles.HexNumber) : uint.Parse(value1);
                     break;
                 case ScanType.Bytes_2:
-                    input0UInt16 = (isHex && value0 != "0") ? BitConverter.ToUInt16(ScanTool.ValueStringToByte(ScanType.Hex, value0), 0) : ushort.Parse(value0.Replace(",", ""));
-                    input1UInt16 = (isHex && value1 != "0") ? BitConverter.ToUInt16(ScanTool.ValueStringToByte(ScanType.Hex, value1), 0) : ushort.Parse(value1.Replace(",", ""));
+                    Input0UInt16 = input0Data != default ? BitConverter.ToUInt16(input0Data, 0) : ushort.Parse(value0.Replace(",", ""));
+                    Input1UInt16 = input1Data != default ? BitConverter.ToUInt16(input1Data, 0) : ushort.Parse(value1.Replace(",", ""));
                     //input0UInt16 = isHex ? ushort.Parse(value0, NumberStyles.HexNumber) : ushort.Parse(value0);
                     //input1UInt16 = isHex ? ushort.Parse(value1, NumberStyles.HexNumber) : ushort.Parse(value1);
                     break;
                 case ScanType.Byte_:
-                    input0Byte = (isHex && value0 != "0") ? ScanTool.ValueStringToByte(ScanType.Hex, value0)[0] : byte.Parse(value0.Replace(",", ""));
-                    input1Byte = (isHex && value1 != "0") ? ScanTool.ValueStringToByte(ScanType.Hex, value1)[1] : byte.Parse(value1.Replace(",", ""));
+                    Input0Byte = input0Data != default ? input0Data[0] : byte.Parse(value0.Replace(",", ""));
+                    Input1Byte = input1Data != default ? input1Data[1] : byte.Parse(value1.Replace(",", ""));
                     //input0Byte = isHex ? byte.Parse(value0, NumberStyles.HexNumber) : byte.Parse(value0);
                     //input1Byte = isHex ? byte.Parse(value1, NumberStyles.HexNumber) : byte.Parse(value1);
                     break;
                 case ScanType.Double_:
-                    input0Double = (isHex && value0 != "0") ? BitConverter.ToDouble(ScanTool.ValueStringToByte(ScanType.Hex, value0), 0) : double.Parse(value0.Replace(",", ""));
-                    input1Double = (isHex && value1 != "0") ? BitConverter.ToDouble(ScanTool.ValueStringToByte(ScanType.Hex, value1), 0) : double.Parse(value1.Replace(",", ""));
+                    Input0Double = input0Data != default ? BitConverter.ToDouble(input0Data, 0) : double.Parse(value0.Replace(",", ""));
+                    Input1Double = input1Data != default ? BitConverter.ToDouble(input1Data, 0) : double.Parse(value1.Replace(",", ""));
                     break;
                 case ScanType.Float_:
-                    input0Float = (isHex && value0 != "0") ? BitConverter.ToSingle(ScanTool.ValueStringToByte(ScanType.Hex, value0), 0) : float.Parse(value0.Replace(",", ""));
-                    input1Float = (isHex && value1 != "0") ? BitConverter.ToSingle(ScanTool.ValueStringToByte(ScanType.Hex, value1), 0) : float.Parse(value1.Replace(",", ""));
+                    Input0Float = input0Data != default ? BitConverter.ToSingle(input0Data, 0) : float.Parse(value0.Replace(",", ""));
+                    Input1Float = input1Data != default ? BitConverter.ToSingle(input1Data, 0) : float.Parse(value1.Replace(",", ""));
+                    break;
+                case ScanType.AutoNumeric:
+                    autoNumericValid.UInt = true;
+                    autoNumericValid.Double = true;
+                    autoNumericValid.Float = true;
+
+                    if (input0Data != default)
+                    {
+                        if (input0Data.Length >= 4) Input0Float = BitConverter.ToSingle(input0Data, 0);
+                        else autoNumericValid.Float = false;
+                        if (input0Data.Length >= 8) Input0Double = BitConverter.ToDouble(input0Data, 0);
+                        else autoNumericValid.Double = false;
+
+                        if (input0Data.Length == 1) Input0UInt64 = input0Data[0];
+                        else if(input0Data.Length == 2) Input0UInt64 = BitConverter.ToUInt16(input0Data, 0);
+                        else if (input0Data.Length == 4) Input0UInt64 = BitConverter.ToUInt32(input0Data, 0);
+                        else if (input0Data.Length == 8) Input0UInt64 = BitConverter.ToUInt64(input0Data, 0);
+                    }
+                    else
+                    {
+                        Input0Double = double.Parse(value0.Replace(",", ""));
+                        Input0Float = float.Parse(value0.Replace(",", ""));
+                        if (Math.Abs(Input0Double - Input0Float) > 5)
+                        { //The input value has become an inaccurate value after being converted to float, it may be double
+                            autoNumericValid.Float = false;
+                            Input0Float = 0;
+                        }
+                        if (ulong.TryParse(value0.Replace(",", ""), out ulong value0Ulong)) Input0UInt64 = value0Ulong;
+                        else
+                        {
+                            autoNumericValid.UInt = false;
+                            Input0UInt64 = BitConverter.ToUInt64(BitConverter.GetBytes(Input0Double), 0);
+                        }
+                    }
+
+                    if (autoNumericValid.UInt && Input0Double == 0 && Input0UInt64 > 0) autoNumericValid.Double = false;
+                    if (autoNumericValid.UInt && Input0Float == 0 && Input0UInt64 > 0) autoNumericValid.Float = false;
+
+                    if (string.IsNullOrWhiteSpace(value1)) break;
+
+                    if (input1Data != default)
+                    {
+                        if (input1Data.Length >= 8) Input1Double = BitConverter.ToDouble(input1Data, 0);
+                        if (input1Data.Length >= 4) Input1Float = BitConverter.ToSingle(input1Data, 0);
+
+                        if (input1Data.Length == 1) Input1UInt64 = input1Data[0];
+                        else if (input1Data.Length == 2) Input1UInt64 = BitConverter.ToUInt16(input1Data, 0);
+                        else if (input1Data.Length == 4) Input1UInt64 = BitConverter.ToUInt32(input1Data, 0);
+                        else if (input1Data.Length == 8) Input1UInt64 = BitConverter.ToUInt64(input1Data, 0);
+                    }
+                    else
+                    {
+                        Input1Double = double.Parse(value1.Replace(",", ""));
+                        Input1Float = float.Parse(value1.Replace(",", ""));
+                        if (Math.Abs(Input1Double - Input1Float) > 5) Input1Float = 0; //The input value has become an inaccurate value after being converted to float, it may be double
+
+                        if (ulong.TryParse(value1.Replace(",", ""), out ulong value1Ulong)) Input1UInt64 = value1Ulong;
+                        else Input1UInt64 = BitConverter.ToUInt64(BitConverter.GetBytes(Input1Double), 0);
+                    }
+
                     break;
             }
 
-            if (scanType == ScanType.Group) (groupTypes, groupValues, groupFirstLength, scanTypeLength) = ScanTool.GenerateGroupList(value0);
+            if (scanType == ScanType.Group) (GroupTypes, GroupValues, GroupFirstLength, ScanTypeLength) = ScanTool.GenerateGroupList(value0);
             else if (!isHex && ScanTool.ScanTypeLengthDict.TryGetValue(scanType, out int scanTypeLength))
             {
-                this.scanTypeLength = scanTypeLength;
-                value0Long = ScanTool.ValueStringToULong(scanType, value0.Replace(",", ""));
-                if (!string.IsNullOrWhiteSpace(value1)) value1Long = ScanTool.ValueStringToULong(scanType, value1.Replace(",", ""));
+                this.ScanTypeLength = scanTypeLength;
+                Value0Long = scanType == ScanType.AutoNumeric ? Input0UInt64 : ScanTool.ValueStringToULong(scanType, value0.Replace(",", ""));
+                if (!string.IsNullOrWhiteSpace(value1)) Value1Long = scanType == ScanType.AutoNumeric ? Input1UInt64 : ScanTool.ValueStringToULong(scanType, value1.Replace(",", ""));
             }
             else
             { //for ScanType:Hex、String
@@ -984,11 +1341,11 @@ namespace PS4CheaterNeo
                         if (val == "*") newValue0 += "**";
                         else newValue0 += byte.Parse(val).ToString("X2");
                     }
-                    this.value0 = value0 = newValue0;
+                    this.Value0 = value0 = newValue0;
                 }
                 if (scanType == ScanType.Hex && (value0.Contains("*") || value0.Contains("?")))
                 { //Handling hex with wildcards
-                    value0ByteWildcards = new HashSet<int>();
+                    Value0ByteWildcards = new HashSet<int>();
 
                     value0 = value0.Replace(" ", "").Replace("-", "").Replace("_", "").Replace("?", "*");
                     for (int idx = 0; idx < value0.Length / 2; idx++)
@@ -996,12 +1353,12 @@ namespace PS4CheaterNeo
                         string str = value0.Substring(idx * 2, 2);
                         if (!str.Contains("*")) continue;
                         if (str != "**") throw new Exception("Search hex with wildcard format typo");
-                        value0ByteWildcards.Add(idx);
+                        Value0ByteWildcards.Add(idx);
                     }
                     value0 = value0.Replace("*", "0");
                 }
-                value0Byte = isHex ? ScanTool.ValueStringToByte(ScanType.Hex, value0) : ScanTool.ValueStringToByte(scanType, value0);
-                this.scanTypeLength = value0Byte.Length;
+                Value0Byte = input0Data != default ? input0Data : ScanTool.ValueStringToByte(scanType, value0);
+                this.ScanTypeLength = Value0Byte.Length;
             }
         }
     }

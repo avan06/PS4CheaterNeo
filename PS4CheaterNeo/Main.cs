@@ -74,9 +74,9 @@ namespace PS4CheaterNeo
                 CheatGridViewDescription.DefaultCellStyle.ForeColor = MainCheatGridCellForeColor; //Color.White;
                 CheatGridView.GroupRefresh();
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
-                MessageBox.Show(exception.Message + "\n" + exception.StackTrace, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
 
@@ -239,9 +239,9 @@ namespace PS4CheaterNeo
 
                 ToolStripMsg.Text = string.Format("Successfully loaded {0} cheat items.", count);
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
-                MessageBox.Show(exception.Message + "\n" + exception.StackTrace, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
 
@@ -602,9 +602,9 @@ namespace PS4CheaterNeo
                 NewAddress newAddress = new NewAddress(this, null, 0, ScanType.Bytes_4, null, false, "", false);
                 if (newAddress.ShowDialog() != DialogResult.OK) return;
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
-                MessageBox.Show(exception.Message + "\n" + exception.StackTrace, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
 
@@ -651,9 +651,9 @@ namespace PS4CheaterNeo
                 HexEditor hexEdit = new HexEditor(this, section, (int)offsetAddr);
                 hexEdit.Show(this);
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
-                MessageBox.Show(exception.Message + "\n" + exception.StackTrace, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
 
@@ -888,9 +888,9 @@ namespace PS4CheaterNeo
                         break;
                 }
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
-                MessageBox.Show(exception.Message + "\n" + exception.StackTrace, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
 
@@ -903,10 +903,10 @@ namespace PS4CheaterNeo
                 ScanType scanType = this.ParseFromDescription<ScanType>(editedRow.Cells[(int)ChertCol.CheatListType].Value.ToString());
                 ScanTool.ValueStringToULong(scanType, (string)e.FormattedValue);
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
                 e.Cancel = true;
-                MessageBox.Show(exception.Message + "\n" + exception.StackTrace, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
 
@@ -922,9 +922,9 @@ namespace PS4CheaterNeo
                 PS4Tool.WriteMemory(section.PID, offsetAddr + section.Start, data);
                 editedRow.Tag = (section, offsetAddr);
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
-                MessageBox.Show(exception.Message + "\n" + exception.StackTrace, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
 
@@ -977,9 +977,9 @@ namespace PS4CheaterNeo
                 HexEditor hexEdit = new HexEditor(this, section, (int)offsetAddr);
                 hexEdit.Show(this);
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
-                MessageBox.Show(exception.Message + "\n" + exception.StackTrace, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
 
@@ -1099,9 +1099,9 @@ namespace PS4CheaterNeo
                 PS4Tool.WriteMemory(section.PID, offsetAddr + section.Start, data);
                 cheatRow.Cells[(int)ChertCol.CheatListValue].Value = newAddress.Value;
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
-                MessageBox.Show(exception.Message + "\n" + exception.StackTrace, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
 
@@ -1257,9 +1257,9 @@ namespace PS4CheaterNeo
                 cheatRow.Cells[(int)ChertCol.CheatListLock].Value = cheatLock;
                 cheatRow.Cells[(int)ChertCol.CheatListDesc].Value = cheatDesc;
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
-                MessageBox.Show(exception.Message + "\n" + exception.StackTrace, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
             return cheatRow;
         }

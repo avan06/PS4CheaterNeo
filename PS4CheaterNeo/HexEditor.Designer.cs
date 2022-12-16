@@ -149,6 +149,7 @@
             this.HexView.Font = new System.Drawing.Font("Microsoft JhengHei UI", 9F);
             this.HexView.ForeColor = System.Drawing.Color.White;
             this.HexView.GroupSeparatorVisible = true;
+            this.HexView.KeyDownControlCContentType = Be.Windows.Forms.HexBox.StringContentType.Hex;
             this.HexView.LineInfoOffsetLength = 10;
             this.HexView.LineInfoVisible = true;
             this.HexView.Location = new System.Drawing.Point(0, 0);
@@ -859,6 +860,8 @@
             // ForwardBox
             // 
             this.ForwardBox.AutoSize = true;
+            this.ForwardBox.Checked = true;
+            this.ForwardBox.CheckState = System.Windows.Forms.CheckState.Checked;
             this.ForwardBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ForwardBox.Location = new System.Drawing.Point(0, 0);
             this.ForwardBox.Margin = new System.Windows.Forms.Padding(0);

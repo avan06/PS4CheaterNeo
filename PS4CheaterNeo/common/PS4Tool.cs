@@ -85,7 +85,7 @@ namespace PS4CheaterNeo
                     else result = ps4s[idx].IsConnected ? true : ps4s[idx].Connect(connectTimeout, sendTimeout, receiveTimeout);
                 }
             }
-            catch (Exception exception) { msg = exception.Message; }
+            catch (Exception ex) { msg = ex.Message; }
             finally { mutex.ReleaseMutex(); }
             return result;
         }

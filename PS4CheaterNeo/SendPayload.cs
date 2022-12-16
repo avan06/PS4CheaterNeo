@@ -41,9 +41,9 @@ namespace PS4CheaterNeo
                 VersionBox.ForeColor      = ForeColor;
                 VersionBox.BackColor      = BackColor;
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
-                MessageBox.Show(exception.Message + "\n" + exception.StackTrace, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
 
@@ -95,10 +95,10 @@ namespace PS4CheaterNeo
                 ToolStripMsg.ForeColor = Color.Green;
                 ToolStripMsg.Text = "ps4debug.bin injected successfully!";
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
                 ToolStripMsg.ForeColor = Color.Red;
-                ToolStripMsg.Text = exception.Message;
+                ToolStripMsg.Text = ex.Message;
             }
         }
 
@@ -132,11 +132,11 @@ namespace PS4CheaterNeo
                 if ((PortBox.Text ?? "") != "") Properties.Settings.Default.PS4Port.Value = Convert.ToUInt16(PortBox.Text);
                 Properties.Settings.Default.Save();
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
                 if (ToolStripMsg.ForeColor != Color.Red) e.Cancel = true;
                 ToolStripMsg.ForeColor = Color.Red;
-                ToolStripMsg.Text = exception.Message;
+                ToolStripMsg.Text = ex.Message;
             }
         }
 

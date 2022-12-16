@@ -78,9 +78,9 @@ namespace PS4CheaterNeo
                 SaveBtn.BackColor                = BackColor;
                 FilterRuleBtn.BackColor          = BackColor;
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
-                MessageBox.Show(exception.Message + "\n" + exception.StackTrace, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
 
@@ -135,9 +135,9 @@ namespace PS4CheaterNeo
                 File.WriteAllLines(SaveDialog.FileName, lines);
                 GC.Collect();
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
-                MessageBox.Show("Save memory failed, " + exception.Message, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show("Save memory failed, " + ex.Message, ex.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
 
@@ -243,9 +243,9 @@ namespace PS4CheaterNeo
                 ToolStripMsg.Text = String.Format("Loaded {0} address-value results, elapsed: {1}", resultCnt, ticker.Elapsed.TotalSeconds);
                 ScanBtn.PerformClick();
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
-                MessageBox.Show("Save memory failed, " + exception.Message, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show("Save memory failed, " + ex.Message, ex.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
 
@@ -269,9 +269,9 @@ namespace PS4CheaterNeo
                 NewAddress newAddress = new NewAddress(mainForm, null, baseSection, 0, scanType, null, false, "", offsetList, false);
                 if (newAddress.ShowDialog() != DialogResult.OK) return;
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
-                MessageBox.Show(exception.Message + "\n" + exception.StackTrace, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
 
@@ -331,9 +331,9 @@ namespace PS4CheaterNeo
                     pointerTask.ContinueWith(t => TaskComparer(queryAddress, maxOffsetLevel, maxOffsetRange, 150, tickerMajor)).ContinueWith(t => TaskCompleted(tickerMajor));
                 }
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
-                MessageBox.Show(exception.Message + "\n" + exception.StackTrace, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
 
@@ -381,9 +381,9 @@ namespace PS4CheaterNeo
                     });
                     mainForm.AddToCheatGrid(baseSection, 0, scanType, "0", false, msg, pointerOffsets, pointerCaches); //FIXME oldValue is 0
                 }
-                catch (Exception exception)
+                catch (Exception ex)
                 {
-                    ToolStripMsg.Text = string.Format("Add Pointer To CheatGrid failed...{0}, {1}", exception.Message, exception.StackTrace);
+                    ToolStripMsg.Text = string.Format("Add Pointer To CheatGrid failed...{0}, {1}", ex.Message, ex.StackTrace);
                 }
             }
         }
@@ -618,17 +618,17 @@ namespace PS4CheaterNeo
                 }
                 #endregion
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
-                if (exception.InnerException is OperationCanceledException)
+                if (ex.InnerException is OperationCanceledException)
                 {
                     Invoke(new MethodInvoker(() => {
                         ProgBar.Value = 100;
                         IsInitScan.Checked = true;
-                        ToolStripMsg.Text = string.Format("Scan elapsed:{0}s. ScanTask canceled. {1}", tickerMajor.Elapsed.TotalSeconds, exception.InnerException.Message);
+                        ToolStripMsg.Text = string.Format("Scan elapsed:{0}s. ScanTask canceled. {1}", tickerMajor.Elapsed.TotalSeconds, ex.InnerException.Message);
                     }));
                 }
-                else MessageBox.Show(exception.Message + "\n" + exception.StackTrace, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                else MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
             finally { }
 

@@ -143,9 +143,9 @@ namespace PS4CheaterNeo
                 AsmBox1.ForeColor         = ForeColor;
                 AsmBox1.BackColor         = BackColor;
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
-                MessageBox.Show(exception.Message + "\n" + exception.StackTrace, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
 
@@ -255,7 +255,7 @@ namespace PS4CheaterNeo
             InfoBox2U.Text  = string.Format("{0:N0} | ", info2) + InfoBox2U.Text;
             InfoBox3U.Text  = string.Format("{0:N0} | ", info4) + InfoBox3U.Text;
             InfoBox4U.Text  = string.Format("{0:N0} | ", info8) + InfoBox4U.Text;
-            InfoBoxF.Text  = string.Format("{0}", infoF);
+            InfoBoxF.Text  = string.Format("{0}", (double)infoF); //float which maps to System.Single simply does not have enough precision／https://stackoverflow.com/a/69849989
             InfoBoxD.Text  = string.Format("{0}", infoD);
             InfoBox1S.Text = string.Format("{0:N0} | ", info1S) + InfoBox1S.Text;
             InfoBox2S.Text = string.Format("{0:N0} | ", info2S) + InfoBox2S.Text;
@@ -397,29 +397,42 @@ namespace PS4CheaterNeo
         {
             try
             {
+                long selectionStart = HexView.SelectionStart;
+
                 FindOptions findOptions = new FindOptions();
                 findOptions.FindDirection = ForwardBox.Checked ? Direction.Forward : Direction.Backward;
                 findOptions.Type = FindType.Hex;
 
-                if (HexBox.Checked) findOptions.Hex = ScanTool.ValueStringToByte(ScanType.Hex, InputBox.Text);
-                else if (Regex.IsMatch(InputBox.Text, @"\d+\.\d+"))
+                byte[] doubleBytes = null;
+                string inputValue = InputBox.Text.Replace("0x", "").Replace(",", "");
+
+                if (HexBox.Checked) findOptions.Hex = ScanTool.ValueStringToByte(ScanType.Hex, inputValue);
+                else if (Regex.IsMatch(inputValue, @"\d+\.\d+"))
                 {
-                    if (float.TryParse(InputBox.Text, out float resultF)) findOptions.Hex = ScanTool.ValueStringToByte(ScanType.Float_, InputBox.Text);
-                    else if (double.TryParse(InputBox.Text, out double resultD)) findOptions.Hex = ScanTool.ValueStringToByte(ScanType.Double_, InputBox.Text);
+                    float.TryParse(inputValue, out float resultF);
+                    double.TryParse(inputValue, out double resultD);
+                    doubleBytes = ScanTool.ValueStringToByte(ScanType.Double_, inputValue);
+                    if (Math.Abs(resultD - resultF) < 1) findOptions.Hex = ScanTool.ValueStringToByte(ScanType.Float_, inputValue);
+                    else findOptions.Hex = doubleBytes;
                 }
-                else if (UInt64.TryParse(InputBox.Text, out ulong result))
+                else if (UInt64.TryParse(inputValue, out ulong result))
                 {
-                    if (result <= 0xFF) findOptions.Hex = ScanTool.ValueStringToByte(ScanType.Byte_, InputBox.Text); //255
-                    else if (result <= 0xFFFF) findOptions.Hex = ScanTool.ValueStringToByte(ScanType.Bytes_2, InputBox.Text); //65535
-                    else if (result <= 0xFFFFFF) findOptions.Hex = ScanTool.ValueStringToByte(ScanType.Bytes_4, InputBox.Text); //16777215
-                    else if (result <= 0xFFFFFFFF) findOptions.Hex = ScanTool.ValueStringToByte(ScanType.Bytes_8, InputBox.Text); //4294967295
+                    if (result <= 0xFF) findOptions.Hex = ScanTool.ValueStringToByte(ScanType.Byte_, inputValue); //255
+                    else if (result <= 0xFFFF) findOptions.Hex = ScanTool.ValueStringToByte(ScanType.Bytes_2, inputValue); //65535
+                    else if (result <= 0xFFFFFFFF) findOptions.Hex = ScanTool.ValueStringToByte(ScanType.Bytes_4, inputValue); //4294967295
+                    else findOptions.Hex = ScanTool.ValueStringToByte(ScanType.Bytes_8, inputValue);
                 }
                 
-                HexView.Find(findOptions);
+                if (HexView.Find(findOptions) == -1 && doubleBytes != null && findOptions.Hex.Length < 8)
+                {
+                    HexView.SelectionStart = selectionStart;
+                    findOptions.Hex = doubleBytes;
+                    HexView.Find(findOptions);
+                }
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
-                MessageBox.Show(exception.Message + "\n" + exception.StackTrace, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
 

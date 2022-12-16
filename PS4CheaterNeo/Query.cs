@@ -29,6 +29,9 @@ namespace PS4CheaterNeo
         bool enableFloatingResultExact = true;
         byte floatingSimpleValueExponents = 10;
 
+        //Confirm whether the compare type starts with UnknownInitial
+        bool isUnknownInitial = false;
+
         Dictionary<uint, BitsDictionary> bitsDictDict;
         Dictionary<uint, BitsDictionary> bitsDictDictUndo;
 
@@ -117,9 +120,9 @@ namespace PS4CheaterNeo
                 NewBtn.BackColor           = BackColor;
                 RefreshBtn.BackColor       = BackColor;
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
-                MessageBox.Show(exception.Message + "\n" + exception.StackTrace, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
 
@@ -166,9 +169,9 @@ namespace PS4CheaterNeo
                 }
                 ProcessesBox.SelectedIndex = selectedIdx;
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
-                MessageBox.Show(exception.Message + "\n" + exception.StackTrace, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
 
@@ -221,9 +224,9 @@ namespace PS4CheaterNeo
                 }
                 SectionView.EndUpdate();
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
-                if (!exception.Message.Contains("Map is null")) MessageBox.Show(exception.Message + "\n" + exception.StackTrace, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                if (!ex.Message.Contains("Map is null")) MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
 
@@ -244,6 +247,7 @@ namespace PS4CheaterNeo
             if (bitsDictDict != null) bitsDictDict.Clear();
             if (bitsDictDictUndo != null) bitsDictDictUndo.Clear();
 
+            comparerTool = null;
             bitsDictDict = new Dictionary<uint, BitsDictionary>();
             bitsDictDictUndo = new Dictionary<uint, BitsDictionary>();
             GC.Collect();
@@ -254,6 +258,7 @@ namespace PS4CheaterNeo
             NewBtn.Enabled = false;
             UndoBtn.Enabled = false;
             RedoBtn.Enabled = false;
+            isUnknownInitial = false;
         }
 
         private void UndoBtn_Click(object sender, EventArgs e)
@@ -345,16 +350,17 @@ namespace PS4CheaterNeo
                     if (value1 == "") value1 = "0";
                     if (isHex)
                     {
-                        value0 = value0.Replace(" ", "").Replace("-", "").Replace("_", "");
-                        value1 = value1.Replace(" ", "").Replace("-", "").Replace("_", "");
+                        value0 = value0.Replace("0x", "").Replace(" ", "").Replace("-", "").Replace("_", "");
+                        value1 = value1.Replace("0x", "").Replace(" ", "").Replace("-", "").Replace("_", "");
                     }
 
-                    comparerTool = new ComparerTool(scanType, compareType, value0, value1, isHex, isNot, isFloatingSimpleValues, enableFloatingResultExact, floatingSimpleValueExponents);
+                    if (!isUnknownInitial) isUnknownInitial = compareType == CompareType.UnknownInitial;
+                    comparerTool = new ComparerTool(scanType, compareType, value0, value1, isHex, isNot, isFloatingSimpleValues, enableFloatingResultExact, floatingSimpleValueExponents, isUnknownInitial);
 
                     if (scanType == ScanType.Hex && !isHex)
                     { //ComparerTool has converted decimal to hex
                         HexBox.Checked = true;
-                        ValueBox.Text = comparerTool.value0;
+                        ValueBox.Text = comparerTool.Value0;
                     }
 
                     ScanBtn.Text = "Stop";
@@ -369,9 +375,9 @@ namespace PS4CheaterNeo
                     NewBtn.Enabled = true;
                 }
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
-                MessageBox.Show(exception.Message + "\n" + exception.StackTrace, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
                 if (AutoResumeBox.Checked) ResumeBtn.PerformClick();
             }
         }
@@ -407,16 +413,16 @@ namespace PS4CheaterNeo
             {
                 if (enableUndoScan && bitsDictDict.Count > 0)
                 {
-                    Invoke(new MethodInvoker(() => { ToolStripMsg.Text = string.Format("Scan elapsed:{0}s. Start backup of current query results", tickerMajor.Elapsed.TotalSeconds);}));
+                    Invoke(new MethodInvoker(() => { ToolStripMsg.Text = string.Format("Scan elapsed:{0}s. Start backup of current query results", tickerMajor.Elapsed.TotalSeconds); }));
                     bitsDictDictUndo.Clear();
                     foreach (KeyValuePair<uint, BitsDictionary> bitsDict in bitsDictDict) bitsDictDictUndo.Add(bitsDict.Key, (BitsDictionary)bitsDict.Value.Clone());
                     Invoke(new MethodInvoker(() => { UndoBtn.Enabled = true; ToolStripMsg.Text = string.Format("Scan elapsed:{0}s. Complete backup of current query results", tickerMajor.Elapsed.TotalSeconds); }));
                 }
 
                 ulong hitCnt = 0;
-                int scanStep = (comparerTool.scanType == ScanType.Hex || comparerTool.scanType == ScanType.String_) ? 1 :
-                    alignment ? (comparerTool.scanTypeLength > 4 ? 4 : comparerTool.scanTypeLength) : 1;
-                
+                int scanStep = (comparerTool.ScanType_ == ScanType.Hex || comparerTool.ScanType_ == ScanType.String_) ? 1 :
+                    alignment ? (comparerTool.ScanTypeLength > 4 ? 4 : comparerTool.ScanTypeLength) : 1;
+
                 Invoke(new MethodInvoker(() => { ToolStripBar.Value = 1; }));
 
                 Mutex mutex = new Mutex();
@@ -520,14 +526,14 @@ namespace PS4CheaterNeo
 
                                 scanSource.Token.ThrowIfCancellationRequested();
                                 Byte[] subBuffer = null;
-                                if (!bitsDictDict.TryGetValue(addrSection.SID, out BitsDictionary bitsDict)) bitsDict = new BitsDictionary(scanStep, comparerTool.scanTypeLength);
+                                if (!bitsDictDict.TryGetValue(addrSection.SID, out BitsDictionary bitsDict)) bitsDict = new BitsDictionary(scanStep, comparerTool.ScanTypeLength);
                                 if (buffer != null)//bitsDict.Count == 0 || bitsDict.Count > MinResultAccessFactor)
                                 {
                                     subBuffer = new Byte[addrSection.Length];
                                     Buffer.BlockCopy(buffer, (int)scanOffset, subBuffer, 0, addrSection.Length);
                                 }
 
-                                bitsDict = comparerTool.groupTypes == null ? Comparer(subBuffer, addrSection, scanStep, AddrMin, AddrMax, bitsDict) : ComparerGroup(subBuffer, addrSection, scanStep, AddrMin, AddrMax, bitsDict);
+                                bitsDict = comparerTool.GroupTypes == null ? Comparer(subBuffer, addrSection, scanStep, AddrMin, AddrMax, bitsDict) : ComparerGroup(subBuffer, addrSection, scanStep, AddrMin, AddrMax, bitsDict);
 
                                 if (bitsDict != null && bitsDict.Count > 0)
                                 {
@@ -579,16 +585,16 @@ namespace PS4CheaterNeo
 
                 GC.Collect();
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
-                if (exception.InnerException is OperationCanceledException)
+                if (ex.InnerException is OperationCanceledException)
                 {
                     Invoke(new MethodInvoker(() => {
                         ToolStripBar.Value = 100;
-                        ToolStripMsg.Text = string.Format("Scan elapsed:{0}s. ScanTask canceled. {1}", tickerMajor.Elapsed.TotalSeconds, exception.InnerException.Message);
+                        ToolStripMsg.Text = string.Format("Scan elapsed:{0}s. ScanTask canceled. {1}", tickerMajor.Elapsed.TotalSeconds, ex.InnerException.Message);
                     }));
                 }
-                else MessageBox.Show(exception.Message + "\n" + exception.StackTrace, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                else MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
             finally
             {
@@ -602,24 +608,28 @@ namespace PS4CheaterNeo
         {
             if (ResultView.Items.Count == 0)
             {
-                for (int scanIdx = 0; scanIdx + comparerTool.scanTypeLength < buffer.LongLength; scanIdx += scanStep)
+                for (int scanIdx = 0; scanIdx + comparerTool.ScanTypeLength < buffer.LongLength; scanIdx += scanStep)
                 {
                     if (section.Start + (ulong)scanIdx < AddrMin || section.Start + (ulong)scanIdx > AddrMax) continue;
                     if (scanSource.Token.IsCancellationRequested) break;
 
-                    byte[] newValue = new byte[comparerTool.scanTypeLength];
-                    Buffer.BlockCopy(buffer, scanIdx, newValue, 0, comparerTool.scanTypeLength);
-                    if (comparerTool.value0Byte == null)
+                    byte[] newValue = new byte[comparerTool.ScanTypeLength];
+                    Buffer.BlockCopy(buffer, scanIdx, newValue, 0, comparerTool.ScanTypeLength);
+                    if (comparerTool.Value0Byte == null)
                     {
                         ulong longValue = ScanTool.BytesToULong(newValue);
-                        if (ScanTool.Comparer(comparerTool, longValue, 0)) bitsDict.Add((uint)scanIdx, newValue);
+                        if (ScanTool.Comparer(comparerTool, ref longValue, 0))
+                        {
+                            if (comparerTool.ScanType_ == ScanType.AutoNumeric && longValue < 0xFFFFFFFF) newValue = BitConverter.GetBytes(longValue);
+                            bitsDict.Add((uint)scanIdx, newValue);
+                        }
                     }
-                    else if (ScanTool.ComparerExact(comparerTool, newValue, comparerTool.value0Byte)) bitsDict.Add((uint)scanIdx, newValue);
+                    else if (ScanTool.ComparerExact(comparerTool, newValue, comparerTool.Value0Byte)) bitsDict.Add((uint)scanIdx, newValue);
                 }
             }
             else
             {
-                BitsDictionary newBitsDict = new BitsDictionary(scanStep, comparerTool.scanTypeLength);
+                BitsDictionary newBitsDict = new BitsDictionary(scanStep, comparerTool.ScanTypeLength);
 
                 bitsDict.Begin();
                 for (int idx = 0; idx < bitsDict.Count; idx++)
@@ -633,18 +643,22 @@ namespace PS4CheaterNeo
                     byte[] newValue;
                     if (buffer != null && buffer.Length > 0)
                     {
-                        newValue = new byte[comparerTool.scanTypeLength];
-                        Buffer.BlockCopy(buffer, (int)offsetAddr, newValue, 0, comparerTool.scanTypeLength);
+                        newValue = new byte[comparerTool.ScanTypeLength];
+                        Buffer.BlockCopy(buffer, (int)offsetAddr, newValue, 0, comparerTool.ScanTypeLength);
                     }
-                    else newValue = PS4Tool.ReadMemory(section.PID, address, comparerTool.scanTypeLength);
+                    else newValue = PS4Tool.ReadMemory(section.PID, address, comparerTool.ScanTypeLength);
 
-                    if (comparerTool.value0Byte == null)
+                    if (comparerTool.Value0Byte == null)
                     {
                         ulong oldData = ScanTool.BytesToULong(oldBytes);
                         ulong newData = ScanTool.BytesToULong(newValue);
-                        if (ScanTool.Comparer(comparerTool, newData, oldData)) newBitsDict.Add(offsetAddr, newValue);
+                        if (ScanTool.Comparer(comparerTool, ref newData, oldData))
+                        {
+                            if (comparerTool.ScanType_ == ScanType.AutoNumeric && newData < 0xFFFFFFFF) newValue = BitConverter.GetBytes(newData);
+                            newBitsDict.Add(offsetAddr, newValue);
+                        }
                     }
-                    else if (ScanTool.ComparerExact(comparerTool, newValue, comparerTool.value0Byte)) newBitsDict.Add(offsetAddr, newValue);
+                    else if (ScanTool.ComparerExact(comparerTool, newValue, comparerTool.Value0Byte)) newBitsDict.Add(offsetAddr, newValue);
                 }
                 bitsDict.Clear();
                 bitsDict = newBitsDict;
@@ -656,20 +670,20 @@ namespace PS4CheaterNeo
         {
             if (ResultView.Items.Count == 0)
             {
-                for (int scanIdx = 0; scanIdx + comparerTool.groupFirstLength < buffer.LongLength; scanIdx += scanStep)
+                for (int scanIdx = 0; scanIdx + comparerTool.GroupFirstLength < buffer.LongLength; scanIdx += scanStep)
                 {
                     if (scanSource.Token.IsCancellationRequested) break;
                     if (section.Start + (ulong)scanIdx < AddrMin || section.Start + (ulong)scanIdx > AddrMax) continue;
 
                     int firstScanIdx = scanIdx;
-                    for (int gIdx = 0; gIdx < comparerTool.groupTypes.Count; gIdx++)
+                    for (int gIdx = 0; gIdx < comparerTool.GroupTypes.Count; gIdx++)
                     {
-                        (ScanType groupScanType, int groupTypeLength, bool isAny) = comparerTool.groupTypes[gIdx];
+                        (ScanType groupScanType, int groupTypeLength, bool isAny) = comparerTool.GroupTypes[gIdx];
                         if (scanIdx + groupTypeLength > buffer.LongLength) break;
                         bool comparer = false;
                         if (!isAny)
                         {
-                            byte[] valueBytes = comparerTool.groupValues[gIdx];
+                            byte[] valueBytes = comparerTool.GroupValues[gIdx];
                             byte[] newGroupBytes = new byte[groupTypeLength];
                             Buffer.BlockCopy(buffer, scanIdx, newGroupBytes, 0, groupTypeLength);
                             comparer = ScanTool.ComparerExact(comparerTool, newGroupBytes, valueBytes, groupScanType);
@@ -682,7 +696,7 @@ namespace PS4CheaterNeo
                         }
                         else
                         {
-                            if (isAny && comparerTool.isFloatingSimpleValues && (groupScanType == ScanType.Double_ || groupScanType == ScanType.Float_))
+                            if (isAny && comparerTool.IsFloatingSimpleValues && (groupScanType == ScanType.Double_ || groupScanType == ScanType.Float_))
                             {
                                 byte[] newGroupBytes = new byte[groupTypeLength];
                                 Buffer.BlockCopy(buffer, scanIdx, newGroupBytes, 0, groupTypeLength);
@@ -705,10 +719,10 @@ namespace PS4CheaterNeo
                                     }
                                 }
                             }
-                            if (gIdx == comparerTool.groupTypes.Count - 1)
+                            if (gIdx == comparerTool.GroupTypes.Count - 1)
                             {
-                                byte[] newBytes = new byte[comparerTool.scanTypeLength];
-                                Buffer.BlockCopy(buffer, firstScanIdx, newBytes, 0, comparerTool.scanTypeLength);
+                                byte[] newBytes = new byte[comparerTool.ScanTypeLength];
+                                Buffer.BlockCopy(buffer, firstScanIdx, newBytes, 0, comparerTool.ScanTypeLength);
                                 bitsDict.Add((uint)firstScanIdx, newBytes);
                                 if (scanStep < groupTypeLength) scanIdx += groupTypeLength - scanStep;
                                 break;
@@ -720,7 +734,7 @@ namespace PS4CheaterNeo
             }
             else
             {
-                BitsDictionary newBitsDict = new BitsDictionary(scanStep, comparerTool.scanTypeLength);
+                BitsDictionary newBitsDict = new BitsDictionary(scanStep, comparerTool.ScanTypeLength);
 
                 bitsDict.Begin();
                 for (int idx = 0; idx < bitsDict.Count; idx++)
@@ -732,20 +746,20 @@ namespace PS4CheaterNeo
                     byte[] newBytes;
                     if (buffer != null && buffer.Length > 0)
                     {
-                        newBytes = new byte[comparerTool.scanTypeLength];
-                        Buffer.BlockCopy(buffer, (int)offsetAddr, newBytes, 0, comparerTool.scanTypeLength);
+                        newBytes = new byte[comparerTool.ScanTypeLength];
+                        Buffer.BlockCopy(buffer, (int)offsetAddr, newBytes, 0, comparerTool.ScanTypeLength);
                     }
-                    else newBytes = PS4Tool.ReadMemory(section.PID, offsetAddr + section.Start, comparerTool.scanTypeLength);
+                    else newBytes = PS4Tool.ReadMemory(section.PID, offsetAddr + section.Start, comparerTool.ScanTypeLength);
 
                     int scanOffset = 0;
-                    for (int gIdx = 0; gIdx < comparerTool.groupTypes.Count; gIdx++)
+                    for (int gIdx = 0; gIdx < comparerTool.GroupTypes.Count; gIdx++)
                     {
-                        (ScanType groupScanType, int groupTypeLength, bool isAny) = comparerTool.groupTypes[gIdx];
-                        byte[] valueBytes = comparerTool.groupValues[gIdx];
+                        (ScanType groupScanType, int groupTypeLength, bool isAny) = comparerTool.GroupTypes[gIdx];
+                        byte[] valueBytes = comparerTool.GroupValues[gIdx];
                         byte[] newGroupBytes = new byte[groupTypeLength];
                         Buffer.BlockCopy(newBytes, scanOffset, newGroupBytes, 0, groupTypeLength);
                         if (!isAny && !ScanTool.ComparerExact(comparerTool, newGroupBytes, valueBytes, groupScanType)) break;
-                        else if (isAny && comparerTool.isFloatingSimpleValues && (groupScanType == ScanType.Double_ || groupScanType == ScanType.Float_))
+                        else if (isAny && comparerTool.IsFloatingSimpleValues && (groupScanType == ScanType.Double_ || groupScanType == ScanType.Float_))
                         {
                             if (groupScanType == ScanType.Double_)
                             {
@@ -758,7 +772,7 @@ namespace PS4CheaterNeo
                                 if (newVar > 0 && Math.Abs(127 - (int)(((int)newVar >> 23) & 0xffL)) > floatingSimpleValueExponents) break;
                             }
                         }
-                        if (gIdx == comparerTool.groupTypes.Count - 1) newBitsDict.Add(offsetAddr, newBytes);
+                        if (gIdx == comparerTool.GroupTypes.Count - 1) newBitsDict.Add(offsetAddr, newBytes);
                         scanOffset += groupTypeLength;
                     }
                 }
@@ -804,11 +818,68 @@ namespace PS4CheaterNeo
 
                     (uint offsetAddr, byte[] oldBytes) = bitsDict.Get();
 
-                    if (comparerTool.scanType != ScanType.Group)
+                    if (comparerTool.ScanType_ != ScanType.Group)
                     {
-                        string typeStr = comparerTool.scanType.GetDescription();
-                        string valueStr = ScanTool.BytesToString(comparerTool.scanType, oldBytes);
-                        string valueHex = ScanTool.BytesToString(comparerTool.scanType, oldBytes, true);
+                        string typeStr = "";
+                        string valueStr = "";
+                        string valueHex = "";
+
+                        if (comparerTool.ScanType_ == ScanType.AutoNumeric)
+                        {
+                            bool isHit = false;
+                            ScanType valueType = comparerTool.ScanType_;
+                            if (comparerTool.AutoNumericValid.UInt)
+                            {
+                                ulong valueUlong = ScanTool.BytesToULong(oldBytes);
+                                if (isUnknownInitial)
+                                {
+                                    if (valueUlong <= 0xFF) valueType = ScanType.Byte_;
+                                    else if (valueUlong <= 0xFFFF) valueType = ScanType.Bytes_2;
+                                    else if (valueUlong <= 0xFFFFFFFF) valueType = ScanType.Bytes_4;
+                                    else valueType = ScanType.Bytes_8;
+                                }
+                                else if(comparerTool.Input0UInt64 <= 0xFF) //255
+                                {
+                                    valueType = ScanType.Byte_;
+                                    valueUlong = BitConverter.GetBytes(valueUlong)[0];
+                                }
+                                else if (comparerTool.Input0UInt64 <= 0xFFFF) //65535
+                                {
+                                    valueType = ScanType.Bytes_2;
+                                    valueUlong = (UInt16)valueUlong;
+                                }
+                                else if (comparerTool.Input0UInt64 <= 0xFFFFFFFF) //4294967295
+                                {
+                                    valueType = ScanType.Bytes_4;
+                                    valueUlong = (UInt32)valueUlong;
+                                }
+                                else valueType = ScanType.Bytes_8;
+
+                                if (valueUlong - comparerTool.Input0UInt64 == 0 || isUnknownInitial)
+                                {
+                                    isHit = true;
+                                    valueStr = valueUlong.ToString();
+                                }
+                            }
+                            if(!isHit && comparerTool.AutoNumericValid.Double && BitConverter.ToDouble(oldBytes, 0) is double valueDouble && Math.Abs(valueDouble - comparerTool.Input0Double) < 1)
+                            {
+                                valueType = ScanType.Double_;
+                                valueStr = valueDouble.ToString();
+                            }
+                            else if (!isHit && comparerTool.AutoNumericValid.Float && BitConverter.ToSingle(oldBytes, 0) is float valueFloat && Math.Abs(valueFloat - comparerTool.Input0Float) < 1)
+                            {
+                                valueType = ScanType.Float_;
+                                valueStr = ((double)valueFloat).ToString();
+                            }
+                            typeStr = valueType.GetDescription();
+                            valueHex = ScanTool.BytesToString(valueType, oldBytes, true);
+                        }
+                        else
+                        {
+                            typeStr = comparerTool.ScanType_.GetDescription();
+                            valueStr = ScanTool.BytesToString(comparerTool.ScanType_, oldBytes);
+                            valueHex = ScanTool.BytesToString(comparerTool.ScanType_, oldBytes, true);
+                        }
 
                         Invoke(new MethodInvoker(() => {
                             int itemIdx = ResultView.Items.Count;
@@ -824,9 +895,9 @@ namespace PS4CheaterNeo
 
                     int scanOffset = 0;
                     backColor = backColor == default ? Color.DarkSlateGray : default;
-                    for (int gIdx = 0; gIdx < comparerTool.groupTypes.Count; gIdx++)
+                    for (int gIdx = 0; gIdx < comparerTool.GroupTypes.Count; gIdx++)
                     {
-                        (ScanType scanType, int groupTypeLength, bool isAny) group = comparerTool.groupTypes[gIdx];
+                        (ScanType scanType, int groupTypeLength, bool isAny) group = comparerTool.GroupTypes[gIdx];
                         byte[] oldGroupBytes = new byte[group.groupTypeLength];
                         Buffer.BlockCopy(oldBytes, scanOffset, oldGroupBytes, 0, group.groupTypeLength);
                         string typeStr = group.scanType.GetDescription();
@@ -871,9 +942,9 @@ namespace PS4CheaterNeo
                 refreshTask = RefreshTask(IsFilterBox.Checked, IsFilterSizeBox.Checked);
                 refreshTask.ContinueWith(t => TaskCompleted());
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
-                MessageBox.Show(exception.Message + "\n" + exception.StackTrace, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
 
@@ -1006,10 +1077,10 @@ namespace PS4CheaterNeo
                                     byte[] newBytes = null;
                                     if (subBuffer != null && subBuffer.Length > 0)
                                     {
-                                        newBytes = new byte[comparerTool.scanTypeLength];
-                                        Buffer.BlockCopy(subBuffer, (int)offsetAddr, newBytes, 0, comparerTool.scanTypeLength);
+                                        newBytes = new byte[comparerTool.ScanTypeLength];
+                                        Buffer.BlockCopy(subBuffer, (int)offsetAddr, newBytes, 0, comparerTool.ScanTypeLength);
                                     }
-                                    else newBytes = PS4Tool.ReadMemory(addrSection.PID, offsetAddr + addrSection.Start, comparerTool.scanTypeLength);
+                                    else newBytes = PS4Tool.ReadMemory(addrSection.PID, offsetAddr + addrSection.Start, comparerTool.ScanTypeLength);
                                     bitsDict.Set(newBytes);
                                 }
                                 Invoke(new MethodInvoker(() =>
@@ -1036,16 +1107,16 @@ namespace PS4CheaterNeo
                     ToolStripMsg.Text = string.Format("Refresh elapsed:{0}s. {1}", tickerMajor.Elapsed.TotalSeconds, string.Format("Count: {0}", hitCnt));
                 }));
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
-                if (exception.InnerException is OperationCanceledException)
+                if (ex.InnerException is OperationCanceledException)
                 {
                     Invoke(new MethodInvoker(() => {
                         ToolStripBar.Value = 100;
-                        ToolStripMsg.Text = string.Format("Refresh elapsed:{0}s. RefreshTask canceled. {1}", tickerMajor.Elapsed.TotalSeconds, exception.InnerException.Message);
+                        ToolStripMsg.Text = string.Format("Refresh elapsed:{0}s. RefreshTask canceled. {1}", tickerMajor.Elapsed.TotalSeconds, ex.InnerException.Message);
                     }));
                 }
-                else MessageBox.Show(exception.Message + "\n" + exception.StackTrace, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                else MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
             finally
             {
@@ -1077,6 +1148,7 @@ namespace PS4CheaterNeo
                     break;
                 case ScanType.Double_:
                 case ScanType.Float_:
+                case ScanType.AutoNumeric:
                     if (ResultView.Items.Count == 0) CompareTypeBox.Items.AddRange(Constant.SearchByFloatFirst);
                     else CompareTypeBox.Items.AddRange(Constant.SearchByFloatNext);
                     break;
@@ -1095,11 +1167,8 @@ namespace PS4CheaterNeo
                         HexBox.Enabled = false;
                         HexBox.Checked = false;
                     }
-                    if (scanType != ScanType.Group)
-                    {
-                        AlignmentBox.Enabled = false;
-                        AlignmentBox.Checked = false;
-                    }
+                    AlignmentBox.Enabled = scanType != ScanType.Group ? false : true;
+                    AlignmentBox.Checked = false;
                     CompareTypeBox.Items.AddRange(Constant.SearchByHex);
                     break;
                 default:
@@ -1352,7 +1421,7 @@ namespace PS4CheaterNeo
                     File.WriteAllBytes(path, subBuffer);
                     dumpSize += subBuffer.Length;
                 }
-                
+
                 MessageBox.Show(string.Format("SectionViewDump success, dump size: {0}MB", Math.Round(dumpSize / 1024 / 1024, 2)), "SectionViewDump", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }

@@ -1,5 +1,4 @@
-﻿using libdebug;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
@@ -120,9 +119,9 @@ namespace PS4CheaterNeo
                 CloseBtn.ForeColor       = ForeColor;
                 CloseBtn.BackColor       = BackColor;
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
-                MessageBox.Show(exception.Message + "\n" + exception.StackTrace, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
 
@@ -163,9 +162,9 @@ namespace PS4CheaterNeo
                 DialogResult = DialogResult.OK;
                 Close();
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
-                MessageBox.Show(exception.Message + "\n" + exception.StackTrace, exception.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
 
@@ -294,19 +293,26 @@ namespace PS4CheaterNeo
             var newCheatType = (ScanType)((ComboItem)(ScanTypeBox.SelectedItem)).Value;
             if (newCheatType == ScanType.String_) return;
 
-            var newValue = ScanTool.ValueStringToULong(CheatType, ValueBox.Text);
-            if (newValue == 0) return;
+            try
+            {
+                var newValue = ScanTool.ValueStringToULong(CheatType, ValueBox.Text);
+                if (newValue == 0) return;
 
-            if (newCheatType == ScanType.Byte_ && newValue > byte.MaxValue) return;
-            else if (newCheatType == ScanType.Bytes_2 && newValue > UInt16.MaxValue) return;
-            else if (newCheatType == ScanType.Bytes_4 && newValue > UInt32.MaxValue) return;
+                if (newCheatType == ScanType.Byte_ && newValue > byte.MaxValue) return;
+                else if (newCheatType == ScanType.Bytes_2 && newValue > UInt16.MaxValue) return;
+                else if (newCheatType == ScanType.Bytes_4 && newValue > UInt32.MaxValue) return;
 
-            var newText = ScanTool.ULongToString(newCheatType, newValue);
-            if (newText == "0") return;
+                var newText = ScanTool.ULongToString(newCheatType, newValue);
+                if (newText == "0") return;
 
-            Value = newValue.ToString();
+                Value = newValue.ToString();
+                ValueBox.Text = newText;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+            }
             CheatType = newCheatType;
-            ValueBox.Text = newText;
         }
 
         private void RefreshPointerChecker_Tick(object sender, EventArgs e)
