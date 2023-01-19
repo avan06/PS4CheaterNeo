@@ -2,7 +2,7 @@
 
 PS4CheaterNeo is a program to find game cheat codes, and it is based on [`ps4debug`](https://github.com/jogolden/ps4debug) and [`.Net Framework 4.8`](https://support.microsoft.com/en-us/topic/microsoft-net-framework-4-8-offline-installer-for-windows-9d23f658-3b97-68ab-d013-aa3c3e7495e0).
 
-Currently in `version 0.9.8.3-beta`
+Currently in `version 0.9.8.4-beta`
 
 
 ## Table of Contents
@@ -184,30 +184,39 @@ Cheat format used by PS4 Trainer and GoldHEN Cheat (0.9.6.0)
 ## Scan Type	[🔼](#table-of-contents)
 
 - Depending on the length of the data, there are different results in the query, you need to use the scan type to specify the type of target data
-- Currently integers only implement the Unsigned type
+- Integer types now support unsigned and signed (Can enter negative values)(0.9.8.4)
+- Experimental feature, auto set the integer to signed when a negative value is entered(0.9.8.4)
 - [Integral numeric types (C# reference)](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/integral-numeric-types)
 - [Floating-point numeric types (C# reference)](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/floating-point-numeric-types)
 
 
 ### Scan Type: Byte
 
-- Unsigned 8-bit integer
-- Range: 0 to 0xFF (255)
+- Unsigned 8-bit integer  
+Range: 0 to 0xFF (255)
+- Signed 8-bit integer  
+Range: -0x80 to 0x7F (-128 to 127)
 
 ### Scan Type: 2 Bytes
 
-- Unsigned 16-bit integer
-- Range: 0 to 0xFFFF (65,535)
+- Unsigned 16-bit integer  
+Range: 0 to 0xFFFF (65,535)
+- Signed 16-bit integer  
+Range: -0x8000 to 0x7FFF (-32,768 to 32,767)
 
 ### Scan Type: 4 Bytes
 
-- Unsigned 32-bit integer
-- Range: 0 to 0xFFFFFFFF (4,294,967,295)
+- Unsigned 32-bit integer  
+Range: 0 to 0xFFFFFFFF (4,294,967,295)
+- Signed 32-bit integer  
+Range: -0x80000000 to 0x7FFFFFFF (-2,147,483,648 to 2,147,483,647)
 
 ### Scan Type: 8 Bytes
 
-- Unsigned 64-bit integer
-- Range: 0 to 0xFFFFFFFFFFFFFFFF (18,446,744,073,709,551,615)
+- Unsigned 64-bit integer  
+Range: 0 to 0xFFFFFFFFFFFFFFFF (18,446,744,073,709,551,615)
+- Signed 64-bit integer  
+Range: -0x8000000000000000 to 0x7FFFFFFFFFFFFFFF (-9,223,372,036,854,775,808 to 9,223,372,036,854,775,807)
 
 ### Scan Type: Float
 

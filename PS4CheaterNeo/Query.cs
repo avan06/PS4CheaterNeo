@@ -678,7 +678,7 @@ namespace PS4CheaterNeo
                     int firstScanIdx = scanIdx;
                     for (int gIdx = 0; gIdx < comparerTool.GroupTypes.Count; gIdx++)
                     {
-                        (ScanType groupScanType, int groupTypeLength, bool isAny) = comparerTool.GroupTypes[gIdx];
+                        (ScanType groupScanType, int groupTypeLength, bool isAny, _) = comparerTool.GroupTypes[gIdx];
                         if (scanIdx + groupTypeLength > buffer.LongLength) break;
                         bool comparer = false;
                         if (!isAny)
@@ -754,7 +754,7 @@ namespace PS4CheaterNeo
                     int scanOffset = 0;
                     for (int gIdx = 0; gIdx < comparerTool.GroupTypes.Count; gIdx++)
                     {
-                        (ScanType groupScanType, int groupTypeLength, bool isAny) = comparerTool.GroupTypes[gIdx];
+                        (ScanType groupScanType, int groupTypeLength, bool isAny, _) = comparerTool.GroupTypes[gIdx];
                         byte[] valueBytes = comparerTool.GroupValues[gIdx];
                         byte[] newGroupBytes = new byte[groupTypeLength];
                         Buffer.BlockCopy(newBytes, scanOffset, newGroupBytes, 0, groupTypeLength);
@@ -827,6 +827,7 @@ namespace PS4CheaterNeo
                         if (comparerTool.ScanType_ == ScanType.AutoNumeric)
                         {
                             bool isHit = false;
+                            string signString = "";
                             ScanType valueType = comparerTool.ScanType_;
                             if (comparerTool.AutoNumericValid.UInt)
                             {
@@ -838,27 +839,34 @@ namespace PS4CheaterNeo
                                     else if (valueUlong <= 0xFFFFFFFF) valueType = ScanType.Bytes_4;
                                     else valueType = ScanType.Bytes_8;
                                 }
-                                else if(comparerTool.Input0UInt64 <= 0xFF) //255
+                                else if (comparerTool.Input0UInt64 <= 0xFF) //255
                                 {
                                     valueType = ScanType.Byte_;
                                     valueUlong = BitConverter.GetBytes(valueUlong)[0];
+                                    if (comparerTool.IsValue0Signed) signString = ((sbyte)valueUlong).ToString();
                                 }
                                 else if (comparerTool.Input0UInt64 <= 0xFFFF) //65535
                                 {
                                     valueType = ScanType.Bytes_2;
                                     valueUlong = (UInt16)valueUlong;
+                                    if (comparerTool.IsValue0Signed) signString = ((Int16)valueUlong).ToString();
                                 }
                                 else if (comparerTool.Input0UInt64 <= 0xFFFFFFFF) //4294967295
                                 {
                                     valueType = ScanType.Bytes_4;
                                     valueUlong = (UInt32)valueUlong;
+                                    if (comparerTool.IsValue0Signed) signString = ((Int32)valueUlong).ToString();
                                 }
-                                else valueType = ScanType.Bytes_8;
+                                else
+                                {
+                                    valueType = ScanType.Bytes_8;
+                                    if (comparerTool.IsValue0Signed) signString = ((Int64)valueUlong).ToString();
+                                }
 
                                 if (valueUlong - comparerTool.Input0UInt64 == 0 || isUnknownInitial)
                                 {
                                     isHit = true;
-                                    valueStr = valueUlong.ToString();
+                                    valueStr = comparerTool.IsValue0Signed ? signString : valueUlong.ToString();
                                 }
                             }
                             if(!isHit && comparerTool.AutoNumericValid.Double && BitConverter.ToDouble(oldBytes, 0) is double valueDouble && Math.Abs(valueDouble - comparerTool.Input0Double) < 1)
@@ -872,13 +880,13 @@ namespace PS4CheaterNeo
                                 valueStr = ((double)valueFloat).ToString();
                             }
                             typeStr = valueType.GetDescription();
-                            valueHex = ScanTool.BytesToString(valueType, oldBytes, true);
+                            valueHex = ScanTool.BytesToString(valueType, oldBytes, true, false);
                         }
                         else
                         {
                             typeStr = comparerTool.ScanType_.GetDescription();
-                            valueStr = ScanTool.BytesToString(comparerTool.ScanType_, oldBytes);
-                            valueHex = ScanTool.BytesToString(comparerTool.ScanType_, oldBytes, true);
+                            valueStr = ScanTool.BytesToString(comparerTool.ScanType_, oldBytes, false, comparerTool.IsValue0Signed);
+                            valueHex = ScanTool.BytesToString(comparerTool.ScanType_, oldBytes, true, false);
                         }
 
                         Invoke(new MethodInvoker(() => {
@@ -897,12 +905,12 @@ namespace PS4CheaterNeo
                     backColor = backColor == default ? Color.DarkSlateGray : default;
                     for (int gIdx = 0; gIdx < comparerTool.GroupTypes.Count; gIdx++)
                     {
-                        (ScanType scanType, int groupTypeLength, bool isAny) group = comparerTool.GroupTypes[gIdx];
+                        (ScanType scanType, int groupTypeLength, bool isAny, bool isSign) group = comparerTool.GroupTypes[gIdx];
                         byte[] oldGroupBytes = new byte[group.groupTypeLength];
                         Buffer.BlockCopy(oldBytes, scanOffset, oldGroupBytes, 0, group.groupTypeLength);
                         string typeStr = group.scanType.GetDescription();
-                        string valueStr = ScanTool.BytesToString(group.scanType, oldGroupBytes);
-                        string valueHex = ScanTool.BytesToString(group.scanType, oldGroupBytes, true);
+                        string valueStr = ScanTool.BytesToString(group.scanType, oldGroupBytes, false, group.isSign);
+                        string valueHex = ScanTool.BytesToString(group.scanType, oldGroupBytes, true, false);
 
                         Invoke(new MethodInvoker(() => {
                             int groupIdx = ResultView.Items.Count;

@@ -406,7 +406,7 @@ namespace PS4CheaterNeo
                 if (code.vtype != ScanType.Float_ && code.vtype != ScanType.Double_ && code.vtype != ScanType.Hex)
                 {
                     byte[] valueBytes = ScanTool.ValueStringToByte(ScanType.Hex, code.value);
-                    code.value = ScanTool.BytesToString(code.vtype, valueBytes);
+                    code.value = ScanTool.BytesToString(code.vtype, valueBytes, false, code.value.StartsWith("-"));
                 }
             }
 
@@ -504,7 +504,7 @@ namespace PS4CheaterNeo
                     if (scanType != ScanType.Hex)
                     {
                         byte[] bytes = ScanTool.ValueStringToByte(scanType, on);
-                        on = ScanTool.BytesToString(scanType, bytes, true);
+                        on = ScanTool.BytesToString(scanType, bytes, true, on.StartsWith("-"));
                         on = ScanTool.ReverseHexString(on);
                     }
                     string off = on;
@@ -708,12 +708,13 @@ namespace PS4CheaterNeo
                     }
                     #endregion
                     ScanType scanType = this.ParseFromDescription<ScanType>(cheatRow.Cells[(int)ChertCol.CheatListType].Value.ToString());
+                    bool isSign = cheatRow.Cells[(int)ChertCol.CheatListType].Tag != null && (bool)cheatRow.Cells[(int)ChertCol.CheatListType].Tag;
                     int scanTypeLength = 0;
                     if (scanType != ScanType.Hex && scanType != ScanType.String_) ScanTool.ScanTypeLengthDict.TryGetValue(scanType, out scanTypeLength);
                     else scanTypeLength = ScanTool.ValueStringToByte(scanType, cheatRow.Cells[(int)ChertCol.CheatListValue].Value.ToString()).Length;
                     byte[] newData = PS4Tool.ReadMemory(section.PID, offsetAddr + section.Start, scanTypeLength);
                     cheatRow.Tag = (section, offsetAddr);
-                    cheatRow.Cells[(int)ChertCol.CheatListValue].Value = ScanTool.BytesToString(scanType, newData);
+                    cheatRow.Cells[(int)ChertCol.CheatListValue].Value = ScanTool.BytesToString(scanType, newData, false, isSign);
                 }
                 catch (Exception) { preData = (0, "", 0, 0); }
             }
@@ -1035,7 +1036,7 @@ namespace PS4CheaterNeo
                         ScanType rowScanType = this.ParseFromDescription<ScanType>(cheatRow.Cells[(int)ChertCol.CheatListType].Value.ToString());
                         byte[] rowData = ScanTool.ValueStringToByte(rowScanType, inputValue);
                         PS4Tool.WriteMemory(row.section.PID, row.offsetAddr + row.section.Start, rowData);
-                        cheatRow.Cells[(int)ChertCol.CheatListValue].Value = ScanTool.BytesToString(rowScanType, rowData);
+                        cheatRow.Cells[(int)ChertCol.CheatListValue].Value = ScanTool.BytesToString(rowScanType, rowData, false, inputValue.StartsWith("-"));
                     }
                     return;
                 }
@@ -1253,6 +1254,7 @@ namespace PS4CheaterNeo
                     cheatRow.Cells[(int)ChertCol.CheatListAddress].Value = (offsetAddr + (section != null ? section.Start : 0)).ToString("X8");
                 }
                 cheatRow.Cells[(int)ChertCol.CheatListType].Value = scanType.GetDescription();
+                cheatRow.Cells[(int)ChertCol.CheatListType].Tag = oldValue.StartsWith("-"); //IsSign
                 cheatRow.Cells[(int)ChertCol.CheatListValue].Value = oldValue;
                 cheatRow.Cells[(int)ChertCol.CheatListLock].Value = cheatLock;
                 cheatRow.Cells[(int)ChertCol.CheatListDesc].Value = cheatDesc;

@@ -388,7 +388,7 @@ namespace PS4CheaterNeo
                     scanType = ScanType.Bytes_4;
                     break;
             }
-            NewAddress newAddress = new NewAddress(mainForm, section, address, scanType, ScanTool.BytesToString(scanType, value), false, "", false);
+            NewAddress newAddress = new NewAddress(mainForm, section, address, scanType, ScanTool.BytesToString(scanType, value, false, false), false, "", false);
             if (newAddress.ShowDialog() != DialogResult.OK)
                 return;
         }
@@ -407,7 +407,7 @@ namespace PS4CheaterNeo
                 string inputValue = InputBox.Text.Replace("0x", "").Replace(",", "");
 
                 if (HexBox.Checked) findOptions.Hex = ScanTool.ValueStringToByte(ScanType.Hex, inputValue);
-                else if (Regex.IsMatch(inputValue, @"\d+\.\d+"))
+                else if (Regex.IsMatch(inputValue, @"[-]*\d+\.\d+"))
                 {
                     float.TryParse(inputValue, out float resultF);
                     double.TryParse(inputValue, out double resultD);
@@ -422,7 +422,17 @@ namespace PS4CheaterNeo
                     else if (result <= 0xFFFFFFFF) findOptions.Hex = ScanTool.ValueStringToByte(ScanType.Bytes_4, inputValue); //4294967295
                     else findOptions.Hex = ScanTool.ValueStringToByte(ScanType.Bytes_8, inputValue);
                 }
-                
+                else if (Int64.TryParse(inputValue, out long resultSign))
+                {
+                    if (resultSign < 0 && resultSign >= -0x80) findOptions.Hex = ScanTool.ValueStringToByte(ScanType.Byte_, inputValue); //-128
+                    else if (resultSign < 0 && resultSign >= -0x8000) findOptions.Hex = ScanTool.ValueStringToByte(ScanType.Bytes_2, inputValue); //-32768
+                    else if (resultSign < 0 && resultSign >= -0x80000000) findOptions.Hex = ScanTool.ValueStringToByte(ScanType.Bytes_4, inputValue); //-2147483648
+                    else if (Math.Abs(resultSign) <= 0xFF) findOptions.Hex = ScanTool.ValueStringToByte(ScanType.Byte_, inputValue); //255
+                    else if (Math.Abs(resultSign) <= 0xFFFF) findOptions.Hex = ScanTool.ValueStringToByte(ScanType.Bytes_2, inputValue); //65535
+                    else if (Math.Abs(resultSign) <= 0xFFFFFFFF) findOptions.Hex = ScanTool.ValueStringToByte(ScanType.Bytes_4, inputValue); //4294967295
+                    else findOptions.Hex = ScanTool.ValueStringToByte(ScanType.Bytes_8, inputValue);
+                }
+
                 if (HexView.Find(findOptions) == -1 && doubleBytes != null && findOptions.Hex.Length < 8)
                 {
                     HexView.SelectionStart = selectionStart;

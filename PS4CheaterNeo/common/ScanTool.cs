@@ -74,16 +74,16 @@ namespace PS4CheaterNeo
             switch (scanType)
             {
                 case ScanType.Bytes_8:
-                    bytes = BitConverter.GetBytes(ulong.Parse(value));
+                    bytes = BitConverter.GetBytes(value.StartsWith("-") ? (ulong)long.Parse(value) : ulong.Parse(value));
                     break;
                 case ScanType.Bytes_4:
-                    bytes = BitConverter.GetBytes(uint.Parse(value));
+                    bytes = BitConverter.GetBytes(value.StartsWith("-") ? (uint)int.Parse(value) : uint.Parse(value));
                     break;
                 case ScanType.Bytes_2:
-                    bytes = BitConverter.GetBytes(UInt16.Parse(value));
+                    bytes = BitConverter.GetBytes(value.StartsWith("-") ? (UInt16)Int16.Parse(value) : UInt16.Parse(value));
                     break;
                 case ScanType.Byte_:
-                    bytes = BitConverter.GetBytes(Byte.Parse(value));
+                    bytes = BitConverter.GetBytes(value.StartsWith("-") ? (byte)sbyte.Parse(value) : byte.Parse(value));
                     Array.Resize(ref bytes, 1);
                     break;
                 case ScanType.Double_:
@@ -104,7 +104,14 @@ namespace PS4CheaterNeo
                 case ScanType.Group:
                     break;
                 case ScanType.AutoNumeric:
-                    bytes = BitConverter.GetBytes(ulong.Parse(value));
+                    if (value.StartsWith("-"))
+                    {
+                        if (sbyte.TryParse(value, out sbyte resultSByte)) bytes = BitConverter.GetBytes(resultSByte);
+                        else if (Int16.TryParse(value, out Int16 resultInt16)) bytes = BitConverter.GetBytes(resultInt16);
+                        else if (Int32.TryParse(value, out Int32 resultInt32)) bytes = BitConverter.GetBytes(resultInt32);
+                        else if (Int64.TryParse(value, out Int64 resultInt64)) bytes = BitConverter.GetBytes(resultInt64);
+                    }
+                    if (bytes == null) bytes = BitConverter.GetBytes(ulong.Parse(value));
                     break;
                 default:
                     throw new Exception("ScanType verification failed");
@@ -127,7 +134,7 @@ namespace PS4CheaterNeo
             return valueUlong;
         }
 
-        public static string BytesToString(ScanType scanType, Byte[] value, bool isHex = false)
+        public static string BytesToString(ScanType scanType, Byte[] value, bool isHex = false, bool isSign = false)
         {
             string result = "";
             string hexFormat = "";
@@ -135,19 +142,23 @@ namespace PS4CheaterNeo
             {
                 case ScanType.Bytes_8:
                     if (isHex) hexFormat = "X16";
-                    result = BitConverter.ToUInt64(value, 0).ToString(hexFormat);
+                    if (isSign) result = BitConverter.ToInt64(value, 0).ToString(hexFormat);
+                    else result = BitConverter.ToUInt64(value, 0).ToString(hexFormat);
                     break;
                 case ScanType.Bytes_4:
                     if (isHex) hexFormat = "X8";
-                    result = BitConverter.ToUInt32(value, 0).ToString(hexFormat);
+                    if (isSign) result = BitConverter.ToInt32(value, 0).ToString(hexFormat);
+                    else result = BitConverter.ToUInt32(value, 0).ToString(hexFormat);
                     break;
                 case ScanType.Bytes_2:
                     if (isHex) hexFormat = "X4";
-                    result = BitConverter.ToUInt16(value, 0).ToString(hexFormat);
+                    if (isSign) result = BitConverter.ToInt16(value, 0).ToString(hexFormat);
+                    else result = BitConverter.ToUInt16(value, 0).ToString(hexFormat);
                     break;
                 case ScanType.Byte_:
                     if (isHex) hexFormat = "X2";
-                    result = value[0].ToString(hexFormat);
+                    if (isSign) result = ((sbyte)value[0]).ToString(hexFormat);
+                    else result = value[0].ToString(hexFormat);
                     break;
                 case ScanType.Double_:
                     if (isHex) result = BitConverter.ToInt64(value, 0).ToString("X16");
@@ -169,7 +180,8 @@ namespace PS4CheaterNeo
                 case ScanType.AutoNumeric:
                     if (isHex) hexFormat = "X16";
                     Array.Resize(ref value, 8);
-                    result = BitConverter.ToUInt64(value, 0).ToString(hexFormat);
+                    if (isSign) result = BitConverter.ToInt64(value, 0).ToString(hexFormat);
+                    else result = BitConverter.ToUInt64(value, 0).ToString(hexFormat);
                     break;
                 default:
                     throw new Exception("ScanType verification failed");
@@ -177,10 +189,10 @@ namespace PS4CheaterNeo
             return result;
         }
 
-        public static string ULongToString(ScanType scanType, ulong value, bool isHex = false)
+        public static string ULongToString(ScanType scanType, ulong value, bool isHex = false, bool isSign = false)
         {
             byte[] valueBytes = BitConverter.GetBytes(value);
-            string result = BytesToString(scanType, valueBytes, isHex);
+            string result = BytesToString(scanType, valueBytes, isHex, isSign);
             return result;
         }
 
@@ -972,11 +984,12 @@ namespace PS4CheaterNeo
             }
         }
 
-        public static (List<(ScanType scanType, int groupTypeLength, bool isAny)> groupTypes, List<byte[]> groupValues, int groupFirstLength, int scanTypeLength) GenerateGroupList(string value0)
+        public static (List<(ScanType scanType, int groupTypeLength, bool isAny, bool isSign)> groupTypes, 
+            List<byte[]> groupValues, int groupFirstLength, int scanTypeLength) GenerateGroupList(string value0)
         {
             int scanTypeLength = 0;
             int groupFirstLength = 1;
-            var groupTypes = new List<(ScanType scanType, int groupTypeLength, bool isAny)>();
+            var groupTypes = new List<(ScanType scanType, int groupTypeLength, bool isAny, bool isSign)>();
             var groupValues = new List<byte[]>();
             var cmd = new Dictionary<string, string>();
             value0 = value0.ToUpper().Trim();
@@ -1051,7 +1064,7 @@ namespace PS4CheaterNeo
                     if (!ScanTypeLengthDict.TryGetValue(scanType, out int groupTypeLength)) groupTypeLength = valueBytes.Length;
                     else if (groupTypes.Count == 0) groupFirstLength = groupTypeLength;
                     scanTypeLength += groupTypeLength;
-                    groupTypes.Add((scanType, groupTypeLength, isAny));
+                    groupTypes.Add((scanType, groupTypeLength, isAny, scanVal.StartsWith("-")));
                     groupValues.Add(valueBytes);
                     cmd = new Dictionary<string, string>();
                 }
@@ -1175,7 +1188,7 @@ namespace PS4CheaterNeo
         /// <summary>input values for group query</summary>
         public List<byte[]> GroupValues { get; }
         /// <summary>input types for group query</summary>
-        public List<(ScanType scanType, int groupTypeLength, bool isAny)> GroupTypes { get; }
+        public List<(ScanType scanType, int groupTypeLength, bool isAny, bool isSign)> GroupTypes { get; }
         /// <summary>input value for comparison</summary>
         public string Value0 { get; }
         /// <summary>used for the second input value of compare type between</summary>
@@ -1189,6 +1202,10 @@ namespace PS4CheaterNeo
         /// <summary>Determine the exponents value of the simple value of floating. Cheat Engine is set to 11 (2 to the 11th power = 2^11 = plus or minus 2048). Default value is 11</summary>
         public byte FloatingSimpleValueExponents { get; }
         public bool IsUnknownInitial { get; }
+
+        public bool IsValue0Signed { get; }
+
+        public bool IsValue1Signed { get; }
 
         public UInt64 Input0UInt64 { get; }
         public UInt64 Input1UInt64 { get; }
@@ -1224,32 +1241,35 @@ namespace PS4CheaterNeo
             FloatingSimpleValueExponents = floatingSimpleValueExponents;
             IsUnknownInitial = isUnknownInitial;
 
+            if (value0 != null && value0.StartsWith("-")) IsValue0Signed = true;
+            if (value1 != null && value1.StartsWith("-")) IsValue1Signed = true;
+
             byte[] input0Data = isHex ? ScanTool.ValueStringToByte(ScanType.Hex, value0) : default; //Little-Endian
             byte[] input1Data = isHex ? ScanTool.ValueStringToByte(ScanType.Hex, value1) : default;
 
             switch (scanType)
             {
                 case ScanType.Bytes_8:
-                    Input0UInt64 = input0Data != default ? BitConverter.ToUInt64(input0Data, 0) : ulong.Parse(value0.Replace(",",""));
-                    Input1UInt64 = input1Data != default ? BitConverter.ToUInt64(input1Data, 0) : ulong.Parse(value1.Replace(",", ""));
+                    Input0UInt64 = input0Data != default ? BitConverter.ToUInt64(input0Data, 0) : (IsValue0Signed ? (ulong)long.Parse(value0.Replace(",", "")) : ulong.Parse(value0.Replace(",", "")));
+                    Input1UInt64 = input1Data != default ? BitConverter.ToUInt64(input1Data, 0) : (IsValue1Signed ? (ulong)long.Parse(value1.Replace(",", "")) : ulong.Parse(value1.Replace(",", "")));
                     //input0UInt64 = isHex ? ulong.Parse(value0, NumberStyles.HexNumber) : ulong.Parse(value0); //Big-Endian
                     //input1UInt64 = isHex ? ulong.Parse(value1, NumberStyles.HexNumber) : ulong.Parse(value1);
                     break;
                 case ScanType.Bytes_4:
-                    Input0UInt32 = input0Data != default ? BitConverter.ToUInt32(input0Data, 0) : uint.Parse(value0.Replace(",", ""));
-                    Input1UInt32 = input1Data != default ? BitConverter.ToUInt32(input1Data, 0) : uint.Parse(value1.Replace(",", ""));
+                    Input0UInt32 = input0Data != default ? BitConverter.ToUInt32(input0Data, 0) : (IsValue0Signed ? (uint)int.Parse(value0.Replace(",", "")) : uint.Parse(value0.Replace(",", "")));
+                    Input1UInt32 = input1Data != default ? BitConverter.ToUInt32(input1Data, 0) : (IsValue1Signed ? (uint)int.Parse(value1.Replace(",", "")) : uint.Parse(value1.Replace(",", "")));
                     //input0UInt32 = isHex ? uint.Parse(value0, NumberStyles.HexNumber) : uint.Parse(value0);
                     //input1UInt32 = isHex ? uint.Parse(value1, NumberStyles.HexNumber) : uint.Parse(value1);
                     break;
                 case ScanType.Bytes_2:
-                    Input0UInt16 = input0Data != default ? BitConverter.ToUInt16(input0Data, 0) : ushort.Parse(value0.Replace(",", ""));
-                    Input1UInt16 = input1Data != default ? BitConverter.ToUInt16(input1Data, 0) : ushort.Parse(value1.Replace(",", ""));
+                    Input0UInt16 = input0Data != default ? BitConverter.ToUInt16(input0Data, 0) : (IsValue0Signed ? (ushort)short.Parse(value0.Replace(",", "")) : ushort.Parse(value0.Replace(",", "")));
+                    Input1UInt16 = input1Data != default ? BitConverter.ToUInt16(input1Data, 0) : (IsValue1Signed ? (ushort)short.Parse(value1.Replace(",", "")) : ushort.Parse(value1.Replace(",", "")));
                     //input0UInt16 = isHex ? ushort.Parse(value0, NumberStyles.HexNumber) : ushort.Parse(value0);
                     //input1UInt16 = isHex ? ushort.Parse(value1, NumberStyles.HexNumber) : ushort.Parse(value1);
                     break;
                 case ScanType.Byte_:
-                    Input0Byte = input0Data != default ? input0Data[0] : byte.Parse(value0.Replace(",", ""));
-                    Input1Byte = input1Data != default ? input1Data[1] : byte.Parse(value1.Replace(",", ""));
+                    Input0Byte = input0Data != default ? input0Data[0] : (IsValue0Signed ? (byte)sbyte.Parse(value0.Replace(",", "")) : byte.Parse(value0.Replace(",", "")));
+                    Input1Byte = input1Data != default ? input1Data[1] : (IsValue0Signed ? (byte)sbyte.Parse(value1.Replace(",", "")) : byte.Parse(value1.Replace(",", "")));
                     //input0Byte = isHex ? byte.Parse(value0, NumberStyles.HexNumber) : byte.Parse(value0);
                     //input1Byte = isHex ? byte.Parse(value1, NumberStyles.HexNumber) : byte.Parse(value1);
                     break;
@@ -1288,6 +1308,13 @@ namespace PS4CheaterNeo
                             Input0Float = 0;
                         }
                         if (ulong.TryParse(value0.Replace(",", ""), out ulong value0Ulong)) Input0UInt64 = value0Ulong;
+                        else if (IsValue0Signed && long.TryParse(value0.Replace(",", ""), out long value0long))
+                        {
+                            Input0UInt64 = (ulong)value0long;
+                            if (value0long < 0 && value0long >= -0x80) Input0UInt64 &= 0xFF; //-128
+                            else if (value0long < 0 && value0long >= -0x8000) Input0UInt64 &= 0xFFFF; //-32768
+                            else if (value0long < 0 && value0long >= -0x80000000) Input0UInt64 &= 0xFFFFFFFF; //-2147483648
+                        }
                         else
                         {
                             autoNumericValid.UInt = false;
@@ -1317,6 +1344,13 @@ namespace PS4CheaterNeo
                         if (Math.Abs(Input1Double - Input1Float) > 5) Input1Float = 0; //The input value has become an inaccurate value after being converted to float, it may be double
 
                         if (ulong.TryParse(value1.Replace(",", ""), out ulong value1Ulong)) Input1UInt64 = value1Ulong;
+                        else if (IsValue1Signed && long.TryParse(value1.Replace(",", ""), out long value1Long))
+                        {
+                            Input1UInt64 = (ulong)value1Long;
+                            if (value1Long < 0 && value1Long >= -0x80) Input1UInt64 &= 0xFF; //-128
+                            else if (value1Long < 0 && value1Long >= -0x8000) Input1UInt64 &= 0xFFFF; //-32768
+                            else if (value1Long < 0 && value1Long >= -0x80000000) Input1UInt64 &= 0xFFFFFFFF; //-2147483648
+                        }
                         else Input1UInt64 = BitConverter.ToUInt64(BitConverter.GetBytes(Input1Double), 0);
                     }
 
