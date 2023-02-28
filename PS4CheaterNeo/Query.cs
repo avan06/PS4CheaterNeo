@@ -1568,7 +1568,8 @@ namespace PS4CheaterNeo
         #endregion
 
         #region SlowMotion
-        int slowMotionInterval = 200;
+        int slowMotionPauseInterval = 100;
+        int slowMotionResumeInterval = 100;
         ProcessStatus processStatus;
         Task<bool> slowMotionTask;
         private void SlowMotionTimer_Tick(object sender, EventArgs e)
@@ -1583,10 +1584,10 @@ namespace PS4CheaterNeo
         private async Task<bool> SlowMotionTask() => await Task.Run(() =>
         {
             Invoke(new MethodInvoker(() => { PauseBtn.PerformClick(); }));
-            Thread.Sleep(slowMotionInterval);
+            Thread.Sleep(slowMotionPauseInterval);
 
             Invoke(new MethodInvoker(() => { ResumeBtn.PerformClick(); }));
-            Thread.Sleep(slowMotionInterval > 200 ? 200 : slowMotionInterval);
+            Thread.Sleep(slowMotionResumeInterval);
 
             return true;
         });
@@ -1595,17 +1596,27 @@ namespace PS4CheaterNeo
         {
             if (SlowMotionBox.Checked)
             {
-                string intervalStr = "200";
+                string pauseIntervalStr = "100 100";
+                string resumeIntervalStr = "100";
                 ComboItem process = (ComboItem)ProcessesBox.SelectedItem;
-                if (InputBox.Show("SlowMotion", "Enter the SlowMotion interval (in milliseconds, larger intervals will be slower)", ref intervalStr) != DialogResult.OK ||
+                if (InputBox.Show("SlowMotion", "Enter the SlowMotion pause and resume interval (in milliseconds, larger intervals will be slower)", ref pauseIntervalStr) != DialogResult.OK ||
                     !PS4Tool.AttachDebugger((int)process.Value, (string)process.Text, processStatus))
                 {
                     SlowMotionBox.Checked = false;
                     return;
                 }
-                if (!int.TryParse(intervalStr, out slowMotionInterval)) slowMotionInterval = 200;
-                if (slowMotionInterval < 100) slowMotionInterval = 100;
-                SlowMotionTimer.Interval = 100;
+                string[] intervals = pauseIntervalStr.Split(new char[] { ' ', ',', ';' }, StringSplitOptions.RemoveEmptyEntries);
+                if (intervals.Length > 1)
+                {
+                    pauseIntervalStr = intervals[0];
+                    resumeIntervalStr = intervals[1];
+                }
+                if (!int.TryParse(pauseIntervalStr, out slowMotionPauseInterval)) slowMotionPauseInterval = 100;
+                if (!int.TryParse(resumeIntervalStr, out slowMotionResumeInterval)) slowMotionResumeInterval = 100;
+                if (slowMotionPauseInterval < 50) slowMotionPauseInterval = 50;
+                if (slowMotionResumeInterval < 50) slowMotionResumeInterval = 50;
+
+                SlowMotionTimer.Interval = 50;
                 SlowMotionTimer.Enabled = true;
             }
             else

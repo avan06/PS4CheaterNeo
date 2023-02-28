@@ -394,6 +394,20 @@ namespace PS4CheaterNeo.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True|4_HexEditor|Find|Determines whether to enable automatic selection of the val" +
+            "ue change position closest to the current location when there is no input value " +
+            "for the find value. Default enabled")]
+        public global::OptionTreeView.Option<bool> AutoFindClosestChangedPosition {
+            get {
+                return ((global::OptionTreeView.Option<bool>)(this["AutoFindClosestChangedPosition"]));
+            }
+            set {
+                this["AutoFindClosestChangedPosition"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("0|5_UI|1_Color Theme|Determine color theme")]
         public global::OptionTreeView.Option<PS4CheaterNeo.ColorTheme> ColorTheme {
             get {

@@ -2,7 +2,7 @@
 
 PS4CheaterNeo is a program to find game cheat codes, and it is based on [`ps4debug`](https://github.com/jogolden/ps4debug) and [`.Net Framework 4.8`](https://support.microsoft.com/en-us/topic/microsoft-net-framework-4-8-offline-installer-for-windows-9d23f658-3b97-68ab-d013-aa3c3e7495e0).
 
-Currently in `version 0.9.8.4-beta`
+Currently in `version 0.9.8.5-beta`
 
 
 ## Table of Contents
@@ -156,7 +156,7 @@ Cheat format used by PS4 Trainer and GoldHEN Cheat (0.9.6.0)
 - game process can be pause or resume or SlowMotion in query window (0.9.5.2)
 - Pause or resume requires `Attach ps4 Debugging` when using the original ps4debug payload
 - After Attach ps4 Debugging, be sure to `close query window before closing the game`, otherwise the PS4 will `crash`.
-- Performing `SlowMotion` will require Enter the `SlowMotion interval` (in `milliseconds`, larger intervals will be slower)
+- Performing `SlowMotion` will require Enter the `SlowMotion pause and resume interval` (in `milliseconds`, larger intervals will be slower, default `100 100`)
 - Using ctn123's ps4debug payload will use `ProcessExt's pause and resume` instead of Attach ps4 Debugging (0.9.6.5)
 
 ![slowmotion](assets/slowmotion.webp)
@@ -302,6 +302,7 @@ Range: -0x8000000000000000 to 0x7FFFFFFFFFFFFFFF (-9,223,372,036,854,775,808 to 
 - Support `auto refresh interval` when `Auto is enabled` in the `Hex editor`.(recommended for wired network, the default setting is every 2.5 seconds)(0.9.7.1)
 - It is now possible to `swap bytes` to display the value of the current address in the Hex Editor. (0.9.7.7)
 - Added support for find forward or backward feature in Hex editor, Default is find forward. (0.9.7.10)
+- Added support for automatic selection of the value change position closest to the current location (red and green value positions) when there is no input value for the find value, when the option "AutoFindClosestChangedPosition" is enabled (enabled by default). (0.9.8.5)
 
 ![hexeditor](assets/hexeditor5.webp)
 ![hexeditor](assets/hexeditor1.webp)

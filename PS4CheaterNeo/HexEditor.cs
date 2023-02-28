@@ -61,6 +61,8 @@ namespace PS4CheaterNeo
 
             for (int idx = 0; idx <= 0x10; idx++) HexViewMenuGroupSize.Items.Add("GroupSize:" + idx);
             HexViewMenuGroupSize.SelectedIndex = HexView.GroupSize;
+
+            AutoRefreshBox.Checked = Properties.Settings.Default.AutoRefresh.Value;
             AutoRefreshTimer.Interval = (int)Properties.Settings.Default.AutoRefreshTimerInterval.Value;
         }
 
@@ -405,6 +407,20 @@ namespace PS4CheaterNeo
 
                 byte[] doubleBytes = null;
                 string inputValue = InputBox.Text.Replace("0x", "").Replace(",", "");
+
+                if (inputValue == "" && Properties.Settings.Default.AutoFindClosestChangedPosition.Value)
+                {
+                    List<long> changedAndFinishPosSetSet = HexView.GetChangedFinishPosList();
+                    changedAndFinishPosSetSet.Sort((a, b) => ForwardBox.Checked ? a.CompareTo(b) : b.CompareTo(a));
+
+                    foreach (long pos in changedAndFinishPosSetSet)
+                    {
+                        if ((ForwardBox.Checked || pos >= selectionStart) && (!ForwardBox.Checked || pos <= selectionStart)) continue;
+                        HexView.Select(pos, 1);
+                        break;
+                    }
+                    return;
+                }
 
                 if (HexBox.Checked) findOptions.Hex = ScanTool.ValueStringToByte(ScanType.Hex, inputValue);
                 else if (Regex.IsMatch(inputValue, @"[-]*\d+\.\d+"))
