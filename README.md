@@ -2,7 +2,7 @@
 
 PS4CheaterNeo is a program to find game cheat codes, and it is based on [`ps4debug`](https://github.com/jogolden/ps4debug) and [`.Net Framework 4.8`](https://support.microsoft.com/en-us/topic/microsoft-net-framework-4-8-offline-installer-for-windows-9d23f658-3b97-68ab-d013-aa3c3e7495e0).
 
-Currently in `version 0.9.8.5-beta`
+Currently in `version 0.9.8.6-beta`
 
 
 ## Table of Contents
@@ -302,7 +302,7 @@ Range: -0x8000000000000000 to 0x7FFFFFFFFFFFFFFF (-9,223,372,036,854,775,808 to 
 - Support `auto refresh interval` when `Auto is enabled` in the `Hex editor`.(recommended for wired network, the default setting is every 2.5 seconds)(0.9.7.1)
 - It is now possible to `swap bytes` to display the value of the current address in the Hex Editor. (0.9.7.7)
 - Added support for find forward or backward feature in Hex editor, Default is find forward. (0.9.7.10)
-- Added support for automatic selection of the value change position closest to the current location (red and green value positions) when there is no input value for the find value, when the option "AutoFindClosestChangedPosition" is enabled (enabled by default). (0.9.8.5)
+- Added support for automatic selection of the value change (`red` and `green` value) position closest to the current location when there is no input value for the find value, when the option "AutoFindClosestChangedPosition" is enabled (enabled by default). (0.9.8.5)
 
 ![hexeditor](assets/hexeditor5.webp)
 ![hexeditor](assets/hexeditor1.webp)
@@ -475,6 +475,8 @@ Determines whether to enable `Auto Refresh` in HexEditor. `Default disabled`. (0
 Determines the Interval of AutoRefreshTimer when AutoRefresh is enabled, in `milliseconds`, HexEditor needs to be restarted after this value is changed. `Default 2500`. (0.9.7.3)  
 - `HexInfoDash`:  
 Determines the delimited dash value that displays the current Hex value in the HexEditor. Default "-". (0.9.7.7)  
+- `AutoFindClosestChangedPosition`:  
+Determines whether to enable automatic selection of the value change (`red` and `green` value) position closest to the current location when there is no input value for the find value. `Default enabled`. (0.9.8.5)  
 
 ### UI  
 - `ColorTheme`:  

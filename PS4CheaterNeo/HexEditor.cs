@@ -411,14 +411,12 @@ namespace PS4CheaterNeo
                 if (inputValue == "" && Properties.Settings.Default.AutoFindClosestChangedPosition.Value)
                 {
                     List<long> changedAndFinishPosSetSet = HexView.GetChangedFinishPosList();
-                    changedAndFinishPosSetSet.Sort((a, b) => ForwardBox.Checked ? a.CompareTo(b) : b.CompareTo(a));
-
-                    foreach (long pos in changedAndFinishPosSetSet)
-                    {
-                        if ((ForwardBox.Checked || pos >= selectionStart) && (!ForwardBox.Checked || pos <= selectionStart)) continue;
-                        HexView.Select(pos, 1);
-                        break;
-                    }
+                    if (!changedAndFinishPosSetSet.Contains(selectionStart)) changedAndFinishPosSetSet.Add(selectionStart);
+                    changedAndFinishPosSetSet.Sort();
+                    int idx = changedAndFinishPosSetSet.IndexOf(selectionStart);
+                    if (ForwardBox.Checked) idx++;
+                    else if (idx > 0) idx--;
+                    if (idx < changedAndFinishPosSetSet.Count) HexView.Select(changedAndFinishPosSetSet[idx], 1);
                     return;
                 }
 
