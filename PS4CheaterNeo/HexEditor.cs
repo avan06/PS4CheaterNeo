@@ -48,6 +48,7 @@ namespace PS4CheaterNeo
                 HexViewMenu.Items.Add(builtInMenu.GetCopyHexToolStripMenuItem());
                 HexViewMenu.Items.Add(builtInMenu.GetCopyToolStripMenuItem());
                 HexViewMenu.Items.Add(builtInMenu.GetPasteToolStripMenuItem());
+                HexViewMenu.Items.Add(builtInMenu.GetPasteHexToolStripMenuItem());
                 HexViewMenu.Items.Add(builtInMenu.GetSelectAllToolStripMenuItem());
             }
             catch (Exception ex)
@@ -287,7 +288,7 @@ namespace PS4CheaterNeo
             foreach (Instruction instruction in instructions) yield return instruction;
         }
 
-        private void HexEditor_Load(object sender, EventArgs e) => PageBox.SelectedIndex = Page;
+        private void HexEditor_Load(object sender, EventArgs e) => PageBox.SelectedIndex = PageBox.Items.Count > Page ? Page : PageBox.Items.Count - 1;
 
         private void PageBox_SelectedIndexChanged(object sender, EventArgs e)
         {

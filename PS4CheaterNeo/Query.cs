@@ -805,8 +805,14 @@ namespace PS4CheaterNeo
             Color backColor = default;
             for (int sectionIdx = 0; sectionIdx < sectionKeys.Count; sectionIdx++)
             {
-                Section section = sectionTool.SectionDict[sectionKeys[sectionIdx]];
-                bitsDictDict.TryGetValue(section.SID, out BitsDictionary bitsDict);
+                uint dictKey = sectionKeys[sectionIdx];
+                Section section = null;
+                BitsDictionary bitsDict = null;
+                if (sectionTool.SectionDict.ContainsKey(dictKey))
+                {
+                    section = sectionTool.SectionDict[sectionKeys[sectionIdx]];
+                    bitsDictDict.TryGetValue(section.SID, out bitsDict);
+                }
                 if (bitsDict == null || bitsDict.Count == 0) continue;
 
                 hitCnt += bitsDict.Count;
