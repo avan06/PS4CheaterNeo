@@ -191,7 +191,7 @@ namespace PS4CheaterNeo
             this.ToolStripSeparator3,
             this.SectionViewCheck});
             this.SectionViewMenu.Name = "SectionViewMenu";
-            this.SectionViewMenu.Size = new System.Drawing.Size(134, 98);
+            this.SectionViewMenu.Size = new System.Drawing.Size(181, 120);
             // 
             // SectionViewHexEditor
             // 
@@ -209,11 +209,9 @@ namespace PS4CheaterNeo
             // 
             // SectionViewImport
             // 
-            this.SectionViewImport.Enabled = false;
             this.SectionViewImport.Name = "SectionViewImport";
-            this.SectionViewImport.Size = new System.Drawing.Size(133, 22);
+            this.SectionViewImport.Size = new System.Drawing.Size(180, 22);
             this.SectionViewImport.Text = "Import";
-            this.SectionViewImport.Visible = false;
             this.SectionViewImport.Click += new System.EventHandler(this.SectionViewImport_Click);
             // 
             // ToolStripSeparator3

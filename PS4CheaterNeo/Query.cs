@@ -259,6 +259,7 @@ namespace PS4CheaterNeo
             UndoBtn.Enabled = false;
             RedoBtn.Enabled = false;
             isUnknownInitial = false;
+            ScanTypeBox_SelectedIndexChanged(null, null);
         }
 
         private void UndoBtn_Click(object sender, EventArgs e)
@@ -1431,7 +1432,7 @@ namespace PS4CheaterNeo
                     Section section = sectionTool.GetSection(sid);
                     byte[] subBuffer = PS4Tool.ReadMemory(section.PID, section.Start, section.Length);
 
-                    string path = string.Format("{0}{1}{2}_{3}_{4}_{5}.bin", savePath, Path.DirectorySeparatorChar, processName, sectionAddr, sectionName, sid);
+                    string path = string.Format("{0}{1}{2}_{3}_{4}_{5}.bin", savePath, Path.DirectorySeparatorChar, processName, sid, sectionAddr, sectionName);
                     File.WriteAllBytes(path, subBuffer);
                     dumpSize += subBuffer.Length;
                 }
@@ -1449,6 +1450,7 @@ namespace PS4CheaterNeo
 
                 if (OpenDialog.ShowDialog() != DialogResult.OK) return;
 
+                double importSize = 0;
                 foreach (String file in OpenDialog.FileNames)
                 {
                     byte[] bin = File.ReadAllBytes(file);
@@ -1458,15 +1460,17 @@ namespace PS4CheaterNeo
                     if (names.Length < 4) continue;
 
                     string processName = names[0];
-                    ulong sectionAddr = ulong.Parse(names[1], NumberStyles.HexNumber);
-                    string sectionName = names[2];
-                    uint.TryParse(names[3], out uint sid);
+                    uint.TryParse(names[1], out uint sid);
+                    ulong sectionAddr = ulong.Parse(names[2], NumberStyles.HexNumber);
+                    string sectionName = names[3];
                     Section section = sectionTool.GetSection(sid);
                     if (section == null || section.Length != bin.Length) continue;
 
                     PS4Tool.WriteMemory(section.PID, section.Start, bin);
+                    importSize += bin.Length;
                 }
 
+                MessageBox.Show(string.Format("SectionViewImport success, Import dump size: {0}MB", Math.Round(importSize / 1024 / 1024, 2)), "SectionViewImport", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
