@@ -10,7 +10,7 @@ namespace PS4CheaterNeo
     /// </summary>
     public class InputBox
     {
-        public static DialogResult Show(string title, string promptText, ref string value, int textHeight = 20, InputBoxValidation validation = null)
+        public static DialogResult Show(string title, string promptText, ref string value, int textHeight = 20, InputBoxValidation validation = null, int boxWidth = 400)
         {
             Form form = new Form();
             Label label = new Label();
@@ -29,24 +29,25 @@ namespace PS4CheaterNeo
             buttonOk.DialogResult = DialogResult.OK;
             buttonCancel.DialogResult = DialogResult.Cancel;
 
-            label.SetBounds(9, 20, 372, 13);
-            textBox.SetBounds(12, 36, 372, textHeight);
-            buttonOk.SetBounds(228, textHeight + 52, 75, 23);
-            buttonCancel.SetBounds(309, textHeight + 52, 75, 23);
+            label.SetBounds(9, 20, boxWidth - 24, 13);
+            textBox.SetBounds(12, 36, boxWidth - 24, textHeight);
+            buttonOk.SetBounds(boxWidth - 24 - 75 - 75, textHeight + 52, 75, 23);
+            buttonCancel.SetBounds(boxWidth - 24 - 75 + 10, textHeight + 52, 75, 23);
 
             label.AutoSize = true;
-            textBox.Anchor = textBox.Anchor | AnchorStyles.Right;
+            label.Anchor = AnchorStyles.Left | AnchorStyles.Top | AnchorStyles.Right;
+            textBox.ScrollBars = ScrollBars.Vertical;
+            textBox.Anchor = AnchorStyles.Left | AnchorStyles.Top | AnchorStyles.Right | AnchorStyles.Bottom;
             buttonOk.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             buttonCancel.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
 
             textBox.ImeMode = ImeMode.Off;
             textBox.Multiline = true;
 
-
-            form.ClientSize = new Size(396, textHeight + 90);
+            form.ClientSize = new Size(boxWidth, textHeight + 90);
             form.Controls.AddRange(new Control[] { label, textBox, buttonOk, buttonCancel });
-            form.ClientSize = new Size(Math.Max(300, label.Right + 10), form.ClientSize.Height);
-            form.FormBorderStyle = FormBorderStyle.FixedDialog;
+            form.ClientSize = new Size(Math.Max(boxWidth, label.Right + 10), form.ClientSize.Height);
+            form.FormBorderStyle = FormBorderStyle.Sizable;
             form.StartPosition = FormStartPosition.CenterScreen;
             form.MinimizeBox = false;
             form.MaximizeBox = false;

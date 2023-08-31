@@ -76,7 +76,7 @@ namespace PS4CheaterNeo
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source + ":ApplyUI", MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
 
@@ -241,7 +241,7 @@ namespace PS4CheaterNeo
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source + ":ToolStripOpen_Click", MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
 
@@ -604,7 +604,7 @@ namespace PS4CheaterNeo
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source + ":ToolStripAdd_Click", MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
 
@@ -653,7 +653,7 @@ namespace PS4CheaterNeo
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source + ":ToolStripHexView_Click", MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
 
@@ -891,7 +891,7 @@ namespace PS4CheaterNeo
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source + ":CheatGridView_CellContentClick", MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
 
@@ -925,7 +925,7 @@ namespace PS4CheaterNeo
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source + ":CheatGridView_CellEndEdit", MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
 
@@ -980,7 +980,7 @@ namespace PS4CheaterNeo
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source + ":CheatGridMenuHexEditor_Click", MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
 
@@ -1102,7 +1102,7 @@ namespace PS4CheaterNeo
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source + ":CheatGridMenuEdit_Click", MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
 
@@ -1261,7 +1261,7 @@ namespace PS4CheaterNeo
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source + ":AddToCheatGrid", MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
             return cheatRow;
         }

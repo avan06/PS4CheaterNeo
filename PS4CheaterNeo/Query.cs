@@ -122,7 +122,7 @@ namespace PS4CheaterNeo
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source + ":ApplyUI", MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
 
@@ -171,7 +171,7 @@ namespace PS4CheaterNeo
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source + ":GetProcessesBtn_Click", MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
 
@@ -226,7 +226,7 @@ namespace PS4CheaterNeo
             }
             catch (Exception ex)
             {
-                if (!ex.Message.Contains("Map is null")) MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                if (!ex.Message.Contains("Map is null")) MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source + ":ProcessesBox_SelectedIndexChanged", MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
 
@@ -368,8 +368,16 @@ namespace PS4CheaterNeo
                     if (scanSource != null) scanSource.Dispose();
                     scanSource = new CancellationTokenSource();
                     scanTask = ScanTask(alignment, isFilter, isFilterSize, AddrMin, AddrMax);
-                    scanTask.ContinueWith(t => TaskCompleted())
-                        .ContinueWith(t => Invoke(new MethodInvoker(() => { if (AutoResumeBox.Checked) ResumeBtn.PerformClick(); })));
+
+                    scanTask.ContinueWith(t => {
+                        if (t.Exception != null)
+                        {
+                            string errMsg = t.Exception.ToString();
+                            InputBox.Show("ScanTask Exception", "", ref errMsg, 100);
+                        }
+                    }, TaskContinuationOptions.OnlyOnFaulted)
+                    .ContinueWith(t => TaskCompleted())
+                    .ContinueWith(t => Invoke(new MethodInvoker(() => { if (AutoResumeBox.Checked) ResumeBtn.PerformClick(); })));
 
                     ScanTypeBox.Enabled = false;
                     AlignmentBox.Enabled = false;
@@ -378,7 +386,7 @@ namespace PS4CheaterNeo
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source + ":ScanBtn_Click", MessageBoxButtons.OK, MessageBoxIcon.Hand);
                 if (AutoResumeBox.Checked) ResumeBtn.PerformClick();
             }
         }
@@ -409,6 +417,7 @@ namespace PS4CheaterNeo
         //Invoke(new MethodInvoker(() => { }));
         private async Task<bool> ScanTask(bool alignment, bool isFilter, bool isFilterSize, ulong AddrMin, ulong AddrMax) => await Task.Run(() =>
         {
+            string errInfo = "";
             System.Diagnostics.Stopwatch tickerMajor = System.Diagnostics.Stopwatch.StartNew();
             try
             {
@@ -559,6 +568,11 @@ namespace PS4CheaterNeo
                                 }));
                             }
                         }
+                        catch (Exception ex)
+                        {
+                            errInfo += ex.Message + ", trace: " + ex.StackTrace + "\n\n";
+                            throw ex;
+                        }
                         finally
                         {
                             semaphore.Release();
@@ -595,13 +609,14 @@ namespace PS4CheaterNeo
                         ToolStripMsg.Text = string.Format("Scan elapsed:{0}s. ScanTask canceled. {1}", tickerMajor.Elapsed.TotalSeconds, ex.InnerException.Message);
                     }));
                 }
-                else MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                else errInfo += ex.Message + ", trace: " + ex.StackTrace + "\n\n";
             }
             finally
             {
                 if (scanSource != null) scanSource.Dispose();
                 tickerMajor.Stop();
             }
+            if (errInfo != "") throw new Exception(errInfo);
             return true;
         });
 
@@ -959,7 +974,7 @@ namespace PS4CheaterNeo
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source + ":RefreshBtn_Click", MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
 
@@ -1131,7 +1146,7 @@ namespace PS4CheaterNeo
                         ToolStripMsg.Text = string.Format("Refresh elapsed:{0}s. RefreshTask canceled. {1}", tickerMajor.Elapsed.TotalSeconds, ex.InnerException.Message);
                     }));
                 }
-                else MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                else MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source + ":RefreshTask", MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
             finally
             {
@@ -1474,7 +1489,7 @@ namespace PS4CheaterNeo
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source + ":SectionViewImport_Click", MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
 
