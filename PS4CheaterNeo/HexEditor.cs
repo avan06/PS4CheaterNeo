@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Runtime.InteropServices;
+using System.Security.AccessControl;
+using System.Security.Principal;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
@@ -23,13 +25,23 @@ namespace PS4CheaterNeo
         const int PageSize = 8 * 1024 * 1024;
         readonly Main mainForm;
         readonly Section section;
+        /// <summary>
+        /// good pattern for using a Global Mutex in C#
+        /// https://stackoverflow.com/a/229567
+        /// </summary>
+        private readonly MutexAccessRule allowEveryoneRule;
+        private readonly MutexSecurity mSec;
         private readonly Mutex mutex;
 
         private HexEditor(Main mainForm)
         {
             this.mainForm = mainForm;
             changedPosDic = new Dictionary<long, long>();
-            mutex = new Mutex();
+
+            allowEveryoneRule = new MutexAccessRule(new SecurityIdentifier(WellKnownSidType.WorldSid, null), MutexRights.FullControl, AccessControlType.Allow);
+            mSec = new MutexSecurity();
+            mSec.AddAccessRule(allowEveryoneRule);
+            mutex = new Mutex(false, "HexEditor", out _, mSec);
 
             InitializeComponent();
             ApplyUI();

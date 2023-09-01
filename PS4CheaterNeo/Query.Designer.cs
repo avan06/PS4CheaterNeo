@@ -191,7 +191,7 @@ namespace PS4CheaterNeo
             this.ToolStripSeparator3,
             this.SectionViewCheck});
             this.SectionViewMenu.Name = "SectionViewMenu";
-            this.SectionViewMenu.Size = new System.Drawing.Size(181, 120);
+            this.SectionViewMenu.Size = new System.Drawing.Size(134, 98);
             // 
             // SectionViewHexEditor
             // 
@@ -210,7 +210,7 @@ namespace PS4CheaterNeo
             // SectionViewImport
             // 
             this.SectionViewImport.Name = "SectionViewImport";
-            this.SectionViewImport.Size = new System.Drawing.Size(180, 22);
+            this.SectionViewImport.Size = new System.Drawing.Size(133, 22);
             this.SectionViewImport.Text = "Import";
             this.SectionViewImport.Click += new System.EventHandler(this.SectionViewImport_Click);
             // 
@@ -341,6 +341,7 @@ namespace PS4CheaterNeo
             // 
             // SplitContainer2.Panel2
             // 
+            this.SplitContainer2.Panel2.Controls.Add(this.ToolStripBar);
             this.SplitContainer2.Panel2.Controls.Add(this.SimpleValuesBox);
             this.SplitContainer2.Panel2.Controls.Add(this.SlowMotionBox);
             this.SplitContainer2.Panel2.Controls.Add(this.AutoResumeBox);
@@ -355,7 +356,6 @@ namespace PS4CheaterNeo
             this.SplitContainer2.Panel2.Controls.Add(this.AlignmentBox);
             this.SplitContainer2.Panel2.Controls.Add(this.TableLayoutPanel1);
             this.SplitContainer2.Panel2.Controls.Add(this.NewBtn);
-            this.SplitContainer2.Panel2.Controls.Add(this.ToolStripBar);
             this.SplitContainer2.Panel2.Controls.Add(this.RefreshBtn);
             this.SplitContainer2.Panel2.Controls.Add(this.ScanBtn);
             this.SplitContainer2.Panel2.Controls.Add(this.CompareTypeBox);

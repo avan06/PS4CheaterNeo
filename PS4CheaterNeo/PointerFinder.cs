@@ -425,196 +425,198 @@ namespace PS4CheaterNeo
                 {
                     Invoke(new MethodInvoker(() => { IsInitScan.Checked = false; }));
 
-                    Mutex mutex = new Mutex();
-                    byte MaxQueryThreads = Properties.Settings.Default.MaxQueryThreads.Value;
-                    MaxQueryThreads = MaxQueryThreads == (byte)0 ? (byte)1 : MaxQueryThreads;
-                    string SectionFilterKeys = Properties.Settings.Default.SectionFilterKeys.Value;
-                    uint SectionFilterSize = Properties.Settings.Default.SectionFilterSize.Value;
-                    uint QueryBufferSize = Properties.Settings.Default.QueryBufferSize.Value;
-                    SectionFilterKeys = Regex.Replace(SectionFilterKeys, " *[,;] *", "|");
-
-                    int readCnt = 0;
-                    long processedMemoryLen = 0;
-                    ulong minLength = QueryBufferSize * 1024 * 1024; //set the minimum read size in bytes
-
-                    List<Pointer> addrValueList = new List<Pointer>();
-                    Section[] sections = sectionTool.GetSectionSortByAddr();
-                    SemaphoreSlim semaphore = new SemaphoreSlim(MaxQueryThreads);
-                    List<Task<bool>> tasks = new List<Task<bool>>();
-                    List<(int start, int end)> rangeList = new List<(int start, int end)>();
-
-                    bool isFilter = IsFilterBox.Checked;
-                    bool isFilterSize = IsFilterSizeBox.Checked;
-                    (int start, int end) rangeIdx = (-1, -1);
-                    for (int sectionIdx = 0; sectionIdx < sections.Length; sectionIdx++)
+                    using(Mutex mutex = new Mutex())
                     {
-                        bool isContinue = false;
-                        Section currentSection = sections[sectionIdx];
+                        byte MaxQueryThreads = Properties.Settings.Default.MaxQueryThreads.Value;
+                        MaxQueryThreads = MaxQueryThreads == (byte)0 ? (byte)1 : MaxQueryThreads;
+                        string SectionFilterKeys = Properties.Settings.Default.SectionFilterKeys.Value;
+                        uint SectionFilterSize = Properties.Settings.Default.SectionFilterSize.Value;
+                        uint QueryBufferSize = Properties.Settings.Default.QueryBufferSize.Value;
+                        SectionFilterKeys = Regex.Replace(SectionFilterKeys, " *[,;] *", "|");
 
-                        if (!isFilter && currentSection.Name.StartsWith("libSce") ||
-                        isFilter && sectionTool.SectionIsFilter(currentSection.Name, SectionFilterKeys) ||
-                        isFilterSize && currentSection.Length < SectionFilterSize)
-                        {
-                            readCnt++;
-                            isContinue = true; //Check if section is not scanned
-                        }
-                        else if ((ulong)currentSection.Length > minLength)
-                        {
-                            rangeList.Add((sectionIdx, sectionIdx));
-                            isContinue = true;
-                        }
+                        int readCnt = 0;
+                        long processedMemoryLen = 0;
+                        ulong minLength = QueryBufferSize * 1024 * 1024; //set the minimum read size in bytes
 
-                        if (isContinue)
+                        List<Pointer> addrValueList = new List<Pointer>();
+                        Section[] sections = sectionTool.GetSectionSortByAddr();
+                        SemaphoreSlim semaphore = new SemaphoreSlim(MaxQueryThreads);
+                        List<Task<bool>> tasks = new List<Task<bool>>();
+                        List<(int start, int end)> rangeList = new List<(int start, int end)>();
+
+                        bool isFilter = IsFilterBox.Checked;
+                        bool isFilterSize = IsFilterSizeBox.Checked;
+                        (int start, int end) rangeIdx = (-1, -1);
+                        for (int sectionIdx = 0; sectionIdx < sections.Length; sectionIdx++)
                         {
-                            if (rangeIdx.start != -1) //add rangeIdx when the start index is set
+                            bool isContinue = false;
+                            Section currentSection = sections[sectionIdx];
+
+                            if (!isFilter && currentSection.Name.StartsWith("libSce") ||
+                            isFilter && sectionTool.SectionIsFilter(currentSection.Name, SectionFilterKeys) ||
+                            isFilterSize && currentSection.Length < SectionFilterSize)
                             {
-                                rangeList.Add(rangeIdx);
-                                rangeIdx = (-1, -1);
+                                readCnt++;
+                                isContinue = true; //Check if section is not scanned
                             }
-                            continue;
-                        }
-                        else if (rangeIdx.start == -1) rangeIdx = (sectionIdx, sectionIdx);//set start and end index when not set
-
-                        Section startSection = sections[rangeIdx.start];
-                        ulong bufferSize = currentSection.Start + (ulong)currentSection.Length - startSection.Start;
-                        if (bufferSize >= int.MaxValue) //check the size of the scan to be executed, whether the scan size has been reached the upper limit
-                        {
-                            if (rangeIdx.start != -1) //add rangeIdx when the start index is set
+                            else if ((ulong)currentSection.Length > minLength)
                             {
-                                rangeList.Add(rangeIdx);
-                                rangeIdx = (-1, -1);
+                                rangeList.Add((sectionIdx, sectionIdx));
+                                isContinue = true;
                             }
-                            rangeIdx = (sectionIdx, sectionIdx);
-                            continue;
-                        }
-                        else if (bufferSize < minLength && (sectionIdx != sections.Length - 1))
-                        {
-                            rangeIdx.end = sectionIdx;//update end index
-                            continue;
-                        }
 
-                        rangeIdx.end = sectionIdx;//update end index
-                        rangeList.Add(rangeIdx);
-                        rangeIdx = (-1, -1); //initialize start and end index for non-isPerform scan
-                    }
-
-                    for (int idx = 0; idx < rangeList.Count; idx++)
-                    {
-                        var range = rangeList[idx];
-                        tasks.Add(Task.Run<bool>(() =>
-                        {
-                            try
+                            if (isContinue)
                             {
-                                semaphore.Wait();
-                                pointerSource.Token.ThrowIfCancellationRequested();
-                                Section sectionStart = sections[range.start];
-                                Section sectionEnd = sections[range.end];
-                                readCnt += range.end - range.start + 1;
-                                Invoke(new MethodInvoker(() =>
+                                if (rangeIdx.start != -1) //add rangeIdx when the start index is set
                                 {
-                                    ProgBar.Value = (int)(((float)(readCnt) / sections.Length) * 50);
-                                    ToolStripMsg.Text = string.Format("Scan elapsed:{0}s. Current: {1}/{2}, read memory...{3}MB", tickerMajor.Elapsed.TotalSeconds, readCnt, sections.Length, processedMemoryLen / (1024 * 1024));
-                                }));
-
-                                ulong bufferSize = sectionEnd.Start + (ulong)sectionEnd.Length - sectionStart.Start;
-                                byte[] buffer = PS4Tool.ReadMemory(sectionStart.PID, sectionStart.Start, (int)bufferSize);
-                                processedMemoryLen += buffer.Length;
-
-                                for (int rIdx = range.start; rIdx <= range.end; rIdx++)
-                                {
-                                    Section addrSection = sections[rIdx];
-                                    int scanOffset = (int)(addrSection.Start - sectionStart.Start);
-
-                                    pointerSource.Token.ThrowIfCancellationRequested();
-
-                                    List<Pointer> pointers = new List<Pointer>();
-                                    Section valueSection = null;
-                                    for (int scanIdx = scanOffset; scanIdx + 8 < scanOffset + addrSection.Length; scanIdx += 8)
-                                    {
-                                        pointerSource.Token.ThrowIfCancellationRequested();
-                                        uint valueSID = 0;
-                                        ulong mappedValue = BitConverter.ToUInt64(buffer, scanIdx);
-                                        if (mappedValue > 0 && valueSection != null && mappedValue >= valueSection.Start && mappedValue <= (valueSection.Start + (ulong)valueSection.Length)) valueSID = valueSection.SID;
-                                        else valueSID = sectionTool.GetSectionID(mappedValue);
-                                        if (valueSID == 0) continue; //-1(int) => 0(uint)
-
-                                        valueSection = sectionTool.GetSection(valueSID);
-                                        int startOffset = scanIdx - scanOffset;
-                                        pointers.Add(new Pointer(addrSection.SID, (uint)startOffset, valueSID, (uint)(mappedValue - valueSection.Start)));
-                                    }
-                                    mutex.WaitOne();
-                                    addrValueList.AddRange(pointers);
-                                    mutex.ReleaseMutex();
+                                    rangeList.Add(rangeIdx);
+                                    rangeIdx = (-1, -1);
                                 }
+                                continue;
                             }
-                            finally
-                            {
-                                semaphore.Release();
-                            }
-                            return true;
-                        }));
-                    }
-                    Task whenTasks = Task.WhenAll(tasks);
-                    whenTasks.Wait();
-                    semaphore.Dispose();
-                    whenTasks.Dispose();
-                    GC.Collect();
-                    if (addrValueList == null || addrValueList.Count <= 0) return true;
+                            else if (rangeIdx.start == -1) rangeIdx = (sectionIdx, sectionIdx);//set start and end index when not set
 
-                    if (addrPointerDict != null) addrPointerDict.Clear();
-                    if (valuePointerDict != null) valuePointerDict.Clear();
-                    addrPointerDict = new Dictionary<uint, List<Pointer>>();
-                    valuePointerDict = new Dictionary<uint, List<Pointer>>();
-
-                    uint tmpAddrSID = 0;
-                    List<Pointer> addrPointerList = null;
-                    addrValueList.Sort((p1, p2) => p1.AddrSID.CompareTo(p2.AddrSID));
-                    for (int idx = 0; idx < addrValueList.Count; idx++)
-                    {
-                        Pointer pointer = addrValueList[idx];
-                        if (tmpAddrSID == 0 || tmpAddrSID != pointer.AddrSID)
-                        {
-                            if (addrPointerList != null)
+                            Section startSection = sections[rangeIdx.start];
+                            ulong bufferSize = currentSection.Start + (ulong)currentSection.Length - startSection.Start;
+                            if (bufferSize >= int.MaxValue) //check the size of the scan to be executed, whether the scan size has been reached the upper limit
                             {
-                                addrPointerList.Sort((p1, p2) => p1.AddrPos.CompareTo(p2.AddrPos));
-                                addrPointerDict[tmpAddrSID] = addrPointerList;
+                                if (rangeIdx.start != -1) //add rangeIdx when the start index is set
+                                {
+                                    rangeList.Add(rangeIdx);
+                                    rangeIdx = (-1, -1);
+                                }
+                                rangeIdx = (sectionIdx, sectionIdx);
+                                continue;
                             }
-                            if (!addrPointerDict.TryGetValue(pointer.AddrSID, out addrPointerList)) addrPointerList = new List<Pointer>();
+                            else if (bufferSize < minLength && (sectionIdx != sections.Length - 1))
+                            {
+                                rangeIdx.end = sectionIdx;//update end index
+                                continue;
+                            }
+
+                            rangeIdx.end = sectionIdx;//update end index
+                            rangeList.Add(rangeIdx);
+                            rangeIdx = (-1, -1); //initialize start and end index for non-isPerform scan
                         }
-                        addrPointerList.Add(pointer);
-                        tmpAddrSID = pointer.AddrSID;
-                    }
-                    if (addrPointerList != null && !addrPointerDict.ContainsKey(tmpAddrSID))
-                    {
-                        addrPointerList.Sort((p1, p2) => p1.AddrPos.CompareTo(p2.AddrPos));
-                        addrPointerDict[tmpAddrSID] = addrPointerList;
-                    }
 
-                    uint tmpValueSID = 0;
-                    List<Pointer> valuePointerList = null;
-                    addrValueList.Sort((p1, p2) => p1.ValueSID.CompareTo(p2.ValueSID));
-                    for (int idx = 0; idx < addrValueList.Count; idx++)
-                    {
-                        Pointer pointer = addrValueList[idx];
-                        if (tmpValueSID == 0 || tmpValueSID != pointer.ValueSID)
+                        for (int idx = 0; idx < rangeList.Count; idx++)
                         {
-                            if (valuePointerList != null)
+                            var range = rangeList[idx];
+                            tasks.Add(Task.Run<bool>(() =>
                             {
-                                valuePointerList.Sort((p1, p2) => p1.ValuePos.CompareTo(p2.ValuePos));
-                                valuePointerDict[tmpValueSID] = valuePointerList;
-                            }
-                            if (!valuePointerDict.TryGetValue(pointer.ValueSID, out valuePointerList)) valuePointerList = new List<Pointer>();
+                                try
+                                {
+                                    semaphore.Wait();
+                                    pointerSource.Token.ThrowIfCancellationRequested();
+                                    Section sectionStart = sections[range.start];
+                                    Section sectionEnd = sections[range.end];
+                                    readCnt += range.end - range.start + 1;
+                                    Invoke(new MethodInvoker(() =>
+                                    {
+                                        ProgBar.Value = (int)(((float)(readCnt) / sections.Length) * 50);
+                                        ToolStripMsg.Text = string.Format("Scan elapsed:{0}s. Current: {1}/{2}, read memory...{3}MB", tickerMajor.Elapsed.TotalSeconds, readCnt, sections.Length, processedMemoryLen / (1024 * 1024));
+                                    }));
+
+                                    ulong bufferSize = sectionEnd.Start + (ulong)sectionEnd.Length - sectionStart.Start;
+                                    byte[] buffer = PS4Tool.ReadMemory(sectionStart.PID, sectionStart.Start, (int)bufferSize);
+                                    processedMemoryLen += buffer.Length;
+
+                                    for (int rIdx = range.start; rIdx <= range.end; rIdx++)
+                                    {
+                                        Section addrSection = sections[rIdx];
+                                        int scanOffset = (int)(addrSection.Start - sectionStart.Start);
+
+                                        pointerSource.Token.ThrowIfCancellationRequested();
+
+                                        List<Pointer> pointers = new List<Pointer>();
+                                        Section valueSection = null;
+                                        for (int scanIdx = scanOffset; scanIdx + 8 < scanOffset + addrSection.Length; scanIdx += 8)
+                                        {
+                                            pointerSource.Token.ThrowIfCancellationRequested();
+                                            uint valueSID = 0;
+                                            ulong mappedValue = BitConverter.ToUInt64(buffer, scanIdx);
+                                            if (mappedValue > 0 && valueSection != null && mappedValue >= valueSection.Start && mappedValue <= (valueSection.Start + (ulong)valueSection.Length)) valueSID = valueSection.SID;
+                                            else valueSID = sectionTool.GetSectionID(mappedValue);
+                                            if (valueSID == 0) continue; //-1(int) => 0(uint)
+
+                                            valueSection = sectionTool.GetSection(valueSID);
+                                            int startOffset = scanIdx - scanOffset;
+                                            pointers.Add(new Pointer(addrSection.SID, (uint)startOffset, valueSID, (uint)(mappedValue - valueSection.Start)));
+                                        }
+                                        mutex.WaitOne();
+                                        addrValueList.AddRange(pointers);
+                                        mutex.ReleaseMutex();
+                                    }
+                                }
+                                finally
+                                {
+                                    semaphore.Release();
+                                }
+                                return true;
+                            }));
                         }
-                        valuePointerList.Add(pointer);
-                        tmpValueSID = pointer.ValueSID;
+                        Task whenTasks = Task.WhenAll(tasks);
+                        whenTasks.Wait();
+                        semaphore.Dispose();
+                        whenTasks.Dispose();
+                        GC.Collect();
+                        if (addrValueList == null || addrValueList.Count <= 0) return true;
+
+                        if (addrPointerDict != null) addrPointerDict.Clear();
+                        if (valuePointerDict != null) valuePointerDict.Clear();
+                        addrPointerDict = new Dictionary<uint, List<Pointer>>();
+                        valuePointerDict = new Dictionary<uint, List<Pointer>>();
+
+                        uint tmpAddrSID = 0;
+                        List<Pointer> addrPointerList = null;
+                        addrValueList.Sort((p1, p2) => p1.AddrSID.CompareTo(p2.AddrSID));
+                        for (int idx = 0; idx < addrValueList.Count; idx++)
+                        {
+                            Pointer pointer = addrValueList[idx];
+                            if (tmpAddrSID == 0 || tmpAddrSID != pointer.AddrSID)
+                            {
+                                if (addrPointerList != null)
+                                {
+                                    addrPointerList.Sort((p1, p2) => p1.AddrPos.CompareTo(p2.AddrPos));
+                                    addrPointerDict[tmpAddrSID] = addrPointerList;
+                                }
+                                if (!addrPointerDict.TryGetValue(pointer.AddrSID, out addrPointerList)) addrPointerList = new List<Pointer>();
+                            }
+                            addrPointerList.Add(pointer);
+                            tmpAddrSID = pointer.AddrSID;
+                        }
+                        if (addrPointerList != null && !addrPointerDict.ContainsKey(tmpAddrSID))
+                        {
+                            addrPointerList.Sort((p1, p2) => p1.AddrPos.CompareTo(p2.AddrPos));
+                            addrPointerDict[tmpAddrSID] = addrPointerList;
+                        }
+
+                        uint tmpValueSID = 0;
+                        List<Pointer> valuePointerList = null;
+                        addrValueList.Sort((p1, p2) => p1.ValueSID.CompareTo(p2.ValueSID));
+                        for (int idx = 0; idx < addrValueList.Count; idx++)
+                        {
+                            Pointer pointer = addrValueList[idx];
+                            if (tmpValueSID == 0 || tmpValueSID != pointer.ValueSID)
+                            {
+                                if (valuePointerList != null)
+                                {
+                                    valuePointerList.Sort((p1, p2) => p1.ValuePos.CompareTo(p2.ValuePos));
+                                    valuePointerDict[tmpValueSID] = valuePointerList;
+                                }
+                                if (!valuePointerDict.TryGetValue(pointer.ValueSID, out valuePointerList)) valuePointerList = new List<Pointer>();
+                            }
+                            valuePointerList.Add(pointer);
+                            tmpValueSID = pointer.ValueSID;
+                        }
+                        if (valuePointerList != null && !valuePointerDict.ContainsKey(tmpValueSID))
+                        {
+                            valuePointerList.Sort((p1, p2) => p1.ValuePos.CompareTo(p2.ValuePos));
+                            valuePointerDict[tmpValueSID] = valuePointerList;
+                        }
+                        addrValueList = null;
+                        GC.Collect();
                     }
-                    if (valuePointerList != null && !valuePointerDict.ContainsKey(tmpValueSID))
-                    {
-                        valuePointerList.Sort((p1, p2) => p1.ValuePos.CompareTo(p2.ValuePos));
-                        valuePointerDict[tmpValueSID] = valuePointerList;
-                    }
-                    addrValueList = null;
-                    GC.Collect();
                 }
                 #endregion
             }

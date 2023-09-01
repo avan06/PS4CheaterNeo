@@ -1,6 +1,8 @@
 ﻿using libdebug;
 using System;
 using System.Collections.Generic;
+using System.Security.AccessControl;
+using System.Security.Principal;
 using System.Text.RegularExpressions;
 using System.Threading;
 
@@ -8,8 +10,24 @@ namespace PS4CheaterNeo
 {
     public class SectionTool
     {
-        private readonly Mutex mutex = new Mutex();
         public ulong TotalMemorySize;
+
+        /// <summary>
+        /// good pattern for using a Global Mutex in C#
+        /// https://stackoverflow.com/a/229567
+        /// </summary>
+        private readonly MutexAccessRule allowEveryoneRule;
+        private readonly MutexSecurity mSec;
+        private readonly Mutex mutex;
+
+        public SectionTool()
+        {
+            allowEveryoneRule = new MutexAccessRule(new SecurityIdentifier(WellKnownSidType.WorldSid, null), MutexRights.FullControl, AccessControlType.Allow);
+            mSec = new MutexSecurity();
+            mSec.AddAccessRule(allowEveryoneRule);
+            mutex = new Mutex(false, "SectionTool", out _, mSec);
+        }
+
         public int PID { get; private set; }
         public ulong MemoryStart { get; private set; }
         public ulong MemoryEnd { get; private set; }

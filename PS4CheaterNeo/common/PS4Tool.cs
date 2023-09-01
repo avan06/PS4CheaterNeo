@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
+using System.Security.AccessControl;
+using System.Security.Principal;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -14,10 +16,31 @@ namespace PS4CheaterNeo
         private static int currentIdx1 = initIdx1;
         private static int currentIdx2 = initIdx2;
         private static int reTrySocket = 0;
-        private static readonly Mutex mutex = new Mutex();
-        private static readonly Mutex[] mutexs = new Mutex[4];
-        private static readonly PS4DBG[] ps4s = new PS4DBG[mutexs.Length];
+
+        /// <summary>
+        /// Good pattern for using a Global Mutex in C#
+        /// https://stackoverflow.com/a/229567
+        /// </summary>
+        private static readonly string mutexId;
+        private static readonly MutexAccessRule allowEveryoneRule;
+        private static readonly MutexSecurity mSec;
+
+        private static readonly Mutex mutex;
+        private static readonly Mutex[] mutexs;
+        private static readonly PS4DBG[] ps4s;
         private static System.Diagnostics.Stopwatch tickerMajor = System.Diagnostics.Stopwatch.StartNew();
+
+        static PS4Tool()
+        {
+            mutexId = "PS4ToolMutex";
+            allowEveryoneRule = new MutexAccessRule(new SecurityIdentifier(WellKnownSidType.WorldSid, null), MutexRights.FullControl, AccessControlType.Allow);
+            mSec = new MutexSecurity();
+            mSec.AddAccessRule(allowEveryoneRule);
+            mutex = new Mutex(false, mutexId, out _, mSec);
+
+            mutexs = new Mutex[4];
+            ps4s = new PS4DBG[mutexs.Length];
+        }
 
         private static int CurrentIdx1()
         {
@@ -63,7 +86,7 @@ namespace PS4CheaterNeo
                 for (int idx = 0; idx < ps4s.Length; idx++)
                 {
                     if (mutexs[idx] != null) mutexs[idx].Dispose();
-                    mutexs[idx] = new Mutex();
+                    mutexs[idx] = new Mutex(false, mutexId + "_" + idx, out _, mSec);
                     if (ps4s[idx] != null && (!ps4s[idx].IsConnected || reCreateInstance))
                     {
                         try { ps4s[idx].Disconnect(); } catch (Exception ex) { Console.WriteLine(ex.Message + "\n" + ex.StackTrace); }

@@ -435,170 +435,172 @@ namespace PS4CheaterNeo
 
                 Invoke(new MethodInvoker(() => { ToolStripBar.Value = 1; }));
 
-                Mutex mutex = new Mutex();
-                byte MaxQueryThreads = Properties.Settings.Default.MaxQueryThreads.Value;
-                uint QueryBufferSize = Properties.Settings.Default.QueryBufferSize.Value;
-                uint SectionFilterSize = Properties.Settings.Default.SectionFilterSize.Value;
-                string SectionFilterKeys = Properties.Settings.Default.SectionFilterKeys.Value;
-                sbyte MinResultAccessFactor = Properties.Settings.Default.MinResultAccessFactor.Value;
-                MaxQueryThreads = MaxQueryThreads == (byte)0 ? (byte)1 : MaxQueryThreads;
-                SectionFilterKeys = Regex.Replace(SectionFilterKeys, " *[,;] *", "|");
-
-                int readCnt = 0;
-                long processedMemoryLen = 0;
-                ulong minLength = QueryBufferSize * 1024 * 1024; //set the minimum read size in bytes
-
-                Section[] sectionKeys = sectionTool.GetSectionSortByAddr();
-                SemaphoreSlim semaphore = new SemaphoreSlim(MaxQueryThreads);
-                List<Task<bool>> tasks = new List<Task<bool>>();
-                List<(int start, int end)> rangeList = new List<(int start, int end)>();
-                (int start, int end) rangeIdx = (-1, -1);
-                for (int sectionIdx = 0; sectionIdx < sectionKeys.Length; sectionIdx++)
+                using (Mutex mutex = new Mutex())
                 {
-                    readCnt++;
-                    bool isContinue = false;
-                    Section currentSection = sectionKeys[sectionIdx];
-                    if (!currentSection.Check || isFilter && currentSection.IsFilter || isFilterSize && currentSection.IsFilterSize ||
-                        currentSection.Start + (ulong)currentSection.Length < AddrMin || currentSection.Start > AddrMax) isContinue = true; //Check if section is not scanned
-                    else if (bitsDictDict.Count > 0 && bitsDictDict.ContainsKey(currentSection.SID) && bitsDictDict[currentSection.SID].Count is int chkCnt && chkCnt > 0 && chkCnt < MinResultAccessFactor)
-                    { //Access value directly by address when the number of query results for the same Section is less than this MinResultAccessFactor
-                        rangeList.Add((-1, sectionIdx));
-                        isContinue = true;
-                    }
-                    else if ((ulong)currentSection.Length > minLength)
-                    {
-                        rangeList.Add((sectionIdx, sectionIdx));
-                        isContinue = true;
-                    }
+                    byte MaxQueryThreads = Properties.Settings.Default.MaxQueryThreads.Value;
+                    uint QueryBufferSize = Properties.Settings.Default.QueryBufferSize.Value;
+                    uint SectionFilterSize = Properties.Settings.Default.SectionFilterSize.Value;
+                    string SectionFilterKeys = Properties.Settings.Default.SectionFilterKeys.Value;
+                    sbyte MinResultAccessFactor = Properties.Settings.Default.MinResultAccessFactor.Value;
+                    MaxQueryThreads = MaxQueryThreads == (byte)0 ? (byte)1 : MaxQueryThreads;
+                    SectionFilterKeys = Regex.Replace(SectionFilterKeys, " *[,;] *", "|");
 
-                    if (isContinue)
-                    {
-                        if (rangeIdx.start != -1) //add rangeIdx when the start index is set
-                        {
-                            rangeList.Add(rangeIdx);
-                            rangeIdx = (-1, -1);
-                        }
-                        continue;
-                    }
-                    else if (rangeIdx.start == -1) rangeIdx = (sectionIdx, sectionIdx);//set start and end index when not set
+                    int readCnt = 0;
+                    long processedMemoryLen = 0;
+                    ulong minLength = QueryBufferSize * 1024 * 1024; //set the minimum read size in bytes
 
-                    Section startSection = sectionKeys[rangeIdx.start];
-                    ulong bufferSize = currentSection.Start + (ulong)currentSection.Length - startSection.Start;
-                    if (bufferSize >= int.MaxValue) //check the size of the scan to be executed, whether the scan size has been reached the upper limit
+                    Section[] sectionKeys = sectionTool.GetSectionSortByAddr();
+                    SemaphoreSlim semaphore = new SemaphoreSlim(MaxQueryThreads);
+                    List<Task<bool>> tasks = new List<Task<bool>>();
+                    List<(int start, int end)> rangeList = new List<(int start, int end)>();
+                    (int start, int end) rangeIdx = (-1, -1);
+                    for (int sectionIdx = 0; sectionIdx < sectionKeys.Length; sectionIdx++)
                     {
-                        if (rangeIdx.start != -1) //add rangeIdx when the start index is set
-                        {
-                            rangeList.Add(rangeIdx);
-                            rangeIdx = (-1, -1);
+                        readCnt++;
+                        bool isContinue = false;
+                        Section currentSection = sectionKeys[sectionIdx];
+                        if (!currentSection.Check || isFilter && currentSection.IsFilter || isFilterSize && currentSection.IsFilterSize ||
+                            currentSection.Start + (ulong)currentSection.Length < AddrMin || currentSection.Start > AddrMax) isContinue = true; //Check if section is not scanned
+                        else if (bitsDictDict.Count > 0 && bitsDictDict.ContainsKey(currentSection.SID) && bitsDictDict[currentSection.SID].Count is int chkCnt && chkCnt > 0 && chkCnt < MinResultAccessFactor)
+                        { //Access value directly by address when the number of query results for the same Section is less than this MinResultAccessFactor
+                            rangeList.Add((-1, sectionIdx));
+                            isContinue = true;
                         }
-                        rangeIdx = (sectionIdx, sectionIdx);
-                        continue;
-                    }
-                    else if (bufferSize < minLength && (sectionIdx != sectionKeys.Length - 1))
-                    {
+                        else if ((ulong)currentSection.Length > minLength)
+                        {
+                            rangeList.Add((sectionIdx, sectionIdx));
+                            isContinue = true;
+                        }
+
+                        if (isContinue)
+                        {
+                            if (rangeIdx.start != -1) //add rangeIdx when the start index is set
+                            {
+                                rangeList.Add(rangeIdx);
+                                rangeIdx = (-1, -1);
+                            }
+                            continue;
+                        }
+                        else if (rangeIdx.start == -1) rangeIdx = (sectionIdx, sectionIdx);//set start and end index when not set
+
+                        Section startSection = sectionKeys[rangeIdx.start];
+                        ulong bufferSize = currentSection.Start + (ulong)currentSection.Length - startSection.Start;
+                        if (bufferSize >= int.MaxValue) //check the size of the scan to be executed, whether the scan size has been reached the upper limit
+                        {
+                            if (rangeIdx.start != -1) //add rangeIdx when the start index is set
+                            {
+                                rangeList.Add(rangeIdx);
+                                rangeIdx = (-1, -1);
+                            }
+                            rangeIdx = (sectionIdx, sectionIdx);
+                            continue;
+                        }
+                        else if (bufferSize < minLength && (sectionIdx != sectionKeys.Length - 1))
+                        {
+                            rangeIdx.end = sectionIdx;//update end index
+                            continue;
+                        }
+
                         rangeIdx.end = sectionIdx;//update end index
-                        continue;
+                        rangeList.Add(rangeIdx);
+                        rangeIdx = (-1, -1); //initialize start and end index for non-isPerform scan
                     }
 
-                    rangeIdx.end = sectionIdx;//update end index
-                    rangeList.Add(rangeIdx);
-                    rangeIdx = (-1, -1); //initialize start and end index for non-isPerform scan
-                }
-
-                for (int idx = 0; idx < rangeList.Count; idx++)
-                {
-                    var range = rangeList[idx];
-                    tasks.Add(Task.Run<bool>(() =>
+                    for (int idx = 0; idx < rangeList.Count; idx++)
                     {
-                        try
+                        var range = rangeList[idx];
+                        tasks.Add(Task.Run<bool>(() =>
                         {
-                            semaphore.Wait();
-                            scanSource.Token.ThrowIfCancellationRequested();
-                            byte[] buffer = null;
-                            Section sectionStart = range.start == -1 ? null : sectionKeys[range.start];
-                            Section sectionEnd = sectionKeys[range.end];
-
-                            if (sectionStart != null)
+                            try
                             {
-                                ulong bufferSize = sectionEnd.Start + (ulong)sectionEnd.Length - sectionStart.Start;
-                                buffer = PS4Tool.ReadMemory(sectionStart.PID, sectionStart.Start, (int)bufferSize);
-                            }
-                            if (range.start == -1)
-                            {
-                                range.start = range.end;
-                                sectionStart = sectionEnd;
-                            }
-
-                            for (int rIdx = range.start; rIdx <= range.end; rIdx++)
-                            {
-                                Section addrSection = sectionKeys[rIdx];
-                                int scanOffset = (int)(addrSection.Start - sectionStart.Start);
-
+                                semaphore.Wait();
                                 scanSource.Token.ThrowIfCancellationRequested();
-                                Byte[] subBuffer = null;
-                                if (!bitsDictDict.TryGetValue(addrSection.SID, out BitsDictionary bitsDict)) bitsDict = new BitsDictionary(scanStep, comparerTool.ScanTypeLength);
-                                if (buffer != null)//bitsDict.Count == 0 || bitsDict.Count > MinResultAccessFactor)
+                                byte[] buffer = null;
+                                Section sectionStart = range.start == -1 ? null : sectionKeys[range.start];
+                                Section sectionEnd = sectionKeys[range.end];
+
+                                if (sectionStart != null)
                                 {
-                                    subBuffer = new Byte[addrSection.Length];
-                                    Buffer.BlockCopy(buffer, (int)scanOffset, subBuffer, 0, addrSection.Length);
+                                    ulong bufferSize = sectionEnd.Start + (ulong)sectionEnd.Length - sectionStart.Start;
+                                    buffer = PS4Tool.ReadMemory(sectionStart.PID, sectionStart.Start, (int)bufferSize);
+                                }
+                                if (range.start == -1)
+                                {
+                                    range.start = range.end;
+                                    sectionStart = sectionEnd;
                                 }
 
-                                bitsDict = comparerTool.GroupTypes == null ? Comparer(subBuffer, addrSection, scanStep, AddrMin, AddrMax, bitsDict) : ComparerGroup(subBuffer, addrSection, scanStep, AddrMin, AddrMax, bitsDict);
-
-                                if (bitsDict != null && bitsDict.Count > 0)
+                                for (int rIdx = range.start; rIdx <= range.end; rIdx++)
                                 {
-                                    try
+                                    Section addrSection = sectionKeys[rIdx];
+                                    int scanOffset = (int)(addrSection.Start - sectionStart.Start);
+
+                                    scanSource.Token.ThrowIfCancellationRequested();
+                                    Byte[] subBuffer = null;
+                                    if (!bitsDictDict.TryGetValue(addrSection.SID, out BitsDictionary bitsDict)) bitsDict = new BitsDictionary(scanStep, comparerTool.ScanTypeLength);
+                                    if (buffer != null)//bitsDict.Count == 0 || bitsDict.Count > MinResultAccessFactor)
                                     {
-                                        mutex.WaitOne();
-                                        hitCnt += (ulong)bitsDict.Count;
-                                        bitsDictDict[addrSection.SID] = bitsDict;
+                                        subBuffer = new Byte[addrSection.Length];
+                                        Buffer.BlockCopy(buffer, (int)scanOffset, subBuffer, 0, addrSection.Length);
                                     }
-                                    finally
+
+                                    bitsDict = comparerTool.GroupTypes == null ? Comparer(subBuffer, addrSection, scanStep, AddrMin, AddrMax, bitsDict) : ComparerGroup(subBuffer, addrSection, scanStep, AddrMin, AddrMax, bitsDict);
+
+                                    if (bitsDict != null && bitsDict.Count > 0)
                                     {
-                                        mutex.ReleaseMutex();
+                                        try
+                                        {
+                                            mutex.WaitOne();
+                                            hitCnt += (ulong)bitsDict.Count;
+                                            bitsDictDict[addrSection.SID] = bitsDict;
+                                        }
+                                        finally
+                                        {
+                                            mutex.ReleaseMutex();
+                                        }
                                     }
+                                    else addrSection.Check = false;
+
+                                    processedMemoryLen += addrSection.Length;
+                                    Invoke(new MethodInvoker(() =>
+                                    {
+                                        ToolStripBar.Value = (int)(((float)processedMemoryLen / sectionTool.TotalMemorySize) * 100);
+                                        ToolStripMsg.Text = string.Format("Scan elapsed:{0}s. {1}MB, Count: {2}", tickerMajor.Elapsed.TotalSeconds, processedMemoryLen / (1024 * 1024), hitCnt);
+                                    }));
                                 }
-                                else addrSection.Check = false;
-
-                                processedMemoryLen += addrSection.Length;
-                                Invoke(new MethodInvoker(() =>
-                                {
-                                    ToolStripBar.Value = (int)(((float)processedMemoryLen / sectionTool.TotalMemorySize) * 100);
-                                    ToolStripMsg.Text = string.Format("Scan elapsed:{0}s. {1}MB, Count: {2}", tickerMajor.Elapsed.TotalSeconds, processedMemoryLen / (1024 * 1024), hitCnt);
-                                }));
                             }
-                        }
-                        catch (Exception ex)
-                        {
-                            errInfo += ex.Message + ", trace: " + ex.StackTrace + "\n\n";
-                            throw ex;
-                        }
-                        finally
-                        {
-                            semaphore.Release();
-                        }
-                        return true;
-                    }));
-                }
-                Task whenTasks = Task.WhenAll(tasks);
-                whenTasks.Wait();
-                semaphore.Dispose();
-                whenTasks.Dispose();
-                GC.Collect();
-                Invoke(new MethodInvoker(() => {
-                    for (int sectionIdx = 0; sectionIdx < SectionView.Items.Count; ++sectionIdx)
-                    {
-                        ListViewItem sectionItem = SectionView.Items[sectionIdx];
-                        if (!sectionItem.Checked) continue;
-
-                        uint sid = uint.Parse(sectionItem.SubItems[(int)SectionCol.SectionViewSID].Text);
-                        Section section = sectionTool.GetSection(sid);
-                        if (section.Check == false) sectionItem.Checked = false;
+                            catch (Exception ex)
+                            {
+                                errInfo += ex.ToString() + "\n\n";
+                                throw ex;
+                            }
+                            finally
+                            {
+                                semaphore.Release();
+                            }
+                            return true;
+                        }));
                     }
-                    ToolStripBar.Value = 100;
-                }));
+                    Task whenTasks = Task.WhenAll(tasks);
+                    whenTasks.Wait();
+                    semaphore.Dispose();
+                    whenTasks.Dispose();
+                    GC.Collect();
+                    Invoke(new MethodInvoker(() => {
+                        for (int sectionIdx = 0; sectionIdx < SectionView.Items.Count; ++sectionIdx)
+                        {
+                            ListViewItem sectionItem = SectionView.Items[sectionIdx];
+                            if (!sectionItem.Checked) continue;
 
-                GC.Collect();
+                            uint sid = uint.Parse(sectionItem.SubItems[(int)SectionCol.SectionViewSID].Text);
+                            Section section = sectionTool.GetSection(sid);
+                            if (section.Check == false) sectionItem.Checked = false;
+                        }
+                        ToolStripBar.Value = 100;
+                    }));
+
+                    GC.Collect();
+                }
             }
             catch (Exception ex)
             {
@@ -609,7 +611,7 @@ namespace PS4CheaterNeo
                         ToolStripMsg.Text = string.Format("Scan elapsed:{0}s. ScanTask canceled. {1}", tickerMajor.Elapsed.TotalSeconds, ex.InnerException.Message);
                     }));
                 }
-                else errInfo += ex.Message + ", trace: " + ex.StackTrace + "\n\n";
+                else errInfo += ex.ToString() + "\n\n";
             }
             finally
             {
@@ -990,7 +992,6 @@ namespace PS4CheaterNeo
 
                 Invoke(new MethodInvoker(() => { ToolStripBar.Value = 1; }));
 
-                Mutex mutex = new Mutex();
                 byte MaxQueryThreads = Properties.Settings.Default.MaxQueryThreads.Value;
                 uint QueryBufferSize = Properties.Settings.Default.QueryBufferSize.Value;
                 uint MaxResultShow = Properties.Settings.Default.MaxResultShow.Value;
