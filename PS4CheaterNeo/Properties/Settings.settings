@@ -89,6 +89,12 @@
     <Setting Name="AutoFindClosestChangedPosition" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
       <Value Profile="(Default)">True|4_HexEditor|Find|Determines whether to enable automatic selection of the value change position closest to the current location when there is no input value for the find value. Default enabled</Value>
     </Setting>
+    <Setting Name="InputIsHexFormat" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
+      <Value Profile="(Default)">True|4_HexEditor|Find|Determines whether to enable the input format for searching as Hex in the HexEditor window. Default enabled</Value>
+    </Setting>
+    <Setting Name="UsingLittleEndian" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
+      <Value Profile="(Default)">False|4_HexEditor|Find|Determines whether to enable using LittleEndian endianness, when the input format for the search is Hex, in the HexEditor window, if this option is not checked, it will use BigEndian. Default disabled</Value>
+    </Setting>
     <Setting Name="ColorTheme" Type="OptionTreeView.Option&lt;PS4CheaterNeo.ColorTheme&gt;" Scope="User">
       <Value Profile="(Default)">0|5_UI|1_Color Theme|Determine color theme</Value>
     </Setting>

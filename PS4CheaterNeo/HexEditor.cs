@@ -77,6 +77,8 @@ namespace PS4CheaterNeo
 
             AutoRefreshBox.Checked = Properties.Settings.Default.AutoRefresh.Value;
             AutoRefreshTimer.Interval = (int)Properties.Settings.Default.AutoRefreshTimerInterval.Value;
+            HexBox.Checked = Properties.Settings.Default.InputIsHexFormat.Value;
+            LittleEndianBox.Checked = Properties.Settings.Default.UsingLittleEndian.Value;
         }
 
         public HexEditor(Main mainForm, Section section, int baseAddr) : this(mainForm)
@@ -433,7 +435,11 @@ namespace PS4CheaterNeo
                     return;
                 }
 
-                if (HexBox.Checked) findOptions.Hex = ScanTool.ValueStringToByte(ScanType.Hex, inputValue);
+                if (HexBox.Checked)
+                {
+                    findOptions.Hex = ScanTool.ValueStringToByte(ScanType.Hex, inputValue);
+                    if (LittleEndianBox.Checked) Array.Reverse(findOptions.Hex);
+                }
                 else if (Regex.IsMatch(inputValue, @"[-]*\d+\.\d+"))
                 {
                     float.TryParse(inputValue, out float resultF);
@@ -537,6 +543,11 @@ namespace PS4CheaterNeo
         }
 
         private void SwapBytesBox_CheckedChanged(object sender, EventArgs e) => HexView_SelectionStartChanged(HexView, e);
+
+        private void HexBox_CheckedChanged(object sender, EventArgs e)
+        {
+            LittleEndianBox.Visible = HexBox.Checked;
+        }
         #endregion
 
         private int DivUP(int sum, int div) => sum / div + ((sum % div != 0) ? 1 : 0);

@@ -54,7 +54,7 @@
             this.optionTreeView1.OptionRightCollapsed = false;
             this.optionTreeView1.OptionRightLabelSize = 200F;
             this.optionTreeView1.OptionRightMinSize = 25;
-            this.optionTreeView1.ShowToolTipDuration = 25000;
+            this.optionTreeView1.ShowToolTipDuration = 100000;
             this.optionTreeView1.Size = new System.Drawing.Size(609, 450);
             this.optionTreeView1.SortGroupBeforeUnderline = true;
             this.optionTreeView1.SortTreeBeforeUnderline = true;

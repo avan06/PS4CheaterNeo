@@ -12,7 +12,7 @@ namespace PS4CheaterNeo.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.4.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.7.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -403,6 +403,33 @@ namespace PS4CheaterNeo.Properties {
             }
             set {
                 this["AutoFindClosestChangedPosition"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True|4_HexEditor|Find|Determines whether to enable the input format for searching" +
+            " as Hex in the HexEditor window. Default enabled")]
+        public global::OptionTreeView.Option<bool> InputIsHexFormat {
+            get {
+                return ((global::OptionTreeView.Option<bool>)(this["InputIsHexFormat"]));
+            }
+            set {
+                this["InputIsHexFormat"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False|4_HexEditor|Find|Determines whether to enable using LittleEndian endianness" +
+            ", when the input format for the search is Hex, in the HexEditor window, if this " +
+            "option is not checked, it will use BigEndian. Default disabled")]
+        public global::OptionTreeView.Option<bool> UsingLittleEndian {
+            get {
+                return ((global::OptionTreeView.Option<bool>)(this["UsingLittleEndian"]));
+            }
+            set {
+                this["UsingLittleEndian"] = value;
             }
         }
         

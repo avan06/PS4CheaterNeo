@@ -44,6 +44,7 @@
             this.TableLayoutPanel4 = new System.Windows.Forms.TableLayoutPanel();
             this.InputBox = new System.Windows.Forms.TextBox();
             this.HexBox = new System.Windows.Forms.CheckBox();
+            this.LittleEndianBox = new System.Windows.Forms.CheckBox();
             this.CommitBtn = new System.Windows.Forms.Button();
             this.AddToCheatGridBtn = new System.Windows.Forms.Button();
             this.TableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
@@ -254,7 +255,7 @@
             this.InfoBox0Panel.Controls.Add(this.SwapBytesBox);
             this.InfoBox0Panel.Controls.Add(this.InfoBox0);
             this.InfoBox0Panel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.InfoBox0Panel.Location = new System.Drawing.Point(0, 207);
+            this.InfoBox0Panel.Location = new System.Drawing.Point(0, 227);
             this.InfoBox0Panel.Margin = new System.Windows.Forms.Padding(0);
             this.InfoBox0Panel.Name = "InfoBox0Panel";
             this.InfoBox0Panel.Size = new System.Drawing.Size(225, 20);
@@ -295,13 +296,15 @@
             this.TableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.TableLayoutPanel4.Controls.Add(this.InputBox, 1, 0);
             this.TableLayoutPanel4.Controls.Add(this.HexBox, 0, 0);
+            this.TableLayoutPanel4.Controls.Add(this.LittleEndianBox, 0, 1);
             this.TableLayoutPanel4.Dock = System.Windows.Forms.DockStyle.Fill;
             this.TableLayoutPanel4.Location = new System.Drawing.Point(0, 152);
             this.TableLayoutPanel4.Margin = new System.Windows.Forms.Padding(0, 3, 0, 3);
             this.TableLayoutPanel4.Name = "TableLayoutPanel4";
-            this.TableLayoutPanel4.RowCount = 1;
+            this.TableLayoutPanel4.RowCount = 2;
             this.TableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.TableLayoutPanel4.Size = new System.Drawing.Size(225, 22);
+            this.TableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.TableLayoutPanel4.Size = new System.Drawing.Size(225, 42);
             this.TableLayoutPanel4.TabIndex = 11;
             // 
             // InputBox
@@ -326,6 +329,18 @@
             this.HexBox.TabIndex = 10;
             this.HexBox.Text = "Hex";
             this.HexBox.UseVisualStyleBackColor = true;
+            this.HexBox.CheckedChanged += new System.EventHandler(this.HexBox_CheckedChanged);
+            // 
+            // LittleEndianBox
+            // 
+            this.LittleEndianBox.AutoSize = true;
+            this.TableLayoutPanel4.SetColumnSpan(this.LittleEndianBox, 2);
+            this.LittleEndianBox.Location = new System.Drawing.Point(3, 25);
+            this.LittleEndianBox.Name = "LittleEndianBox";
+            this.LittleEndianBox.Size = new System.Drawing.Size(81, 14);
+            this.LittleEndianBox.TabIndex = 11;
+            this.LittleEndianBox.Text = "LittleEndian";
+            this.LittleEndianBox.UseVisualStyleBackColor = true;
             // 
             // CommitBtn
             // 
@@ -463,9 +478,9 @@
             this.InfoBoxPanel.AutoScroll = true;
             this.InfoBoxPanel.Controls.Add(this.TableLayoutPanel5);
             this.InfoBoxPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.InfoBoxPanel.Location = new System.Drawing.Point(3, 230);
+            this.InfoBoxPanel.Location = new System.Drawing.Point(3, 250);
             this.InfoBoxPanel.Name = "InfoBoxPanel";
-            this.InfoBoxPanel.Size = new System.Drawing.Size(219, 139);
+            this.InfoBoxPanel.Size = new System.Drawing.Size(219, 119);
             this.InfoBoxPanel.TabIndex = 17;
             // 
             // TableLayoutPanel5
@@ -835,7 +850,7 @@
             this.TableLayoutPanel7.Controls.Add(this.FindBtn, 1, 0);
             this.TableLayoutPanel7.Controls.Add(this.ForwardBox, 0, 0);
             this.TableLayoutPanel7.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.TableLayoutPanel7.Location = new System.Drawing.Point(0, 177);
+            this.TableLayoutPanel7.Location = new System.Drawing.Point(0, 197);
             this.TableLayoutPanel7.Margin = new System.Windows.Forms.Padding(0);
             this.TableLayoutPanel7.Name = "TableLayoutPanel7";
             this.TableLayoutPanel7.RowCount = 1;
@@ -1038,5 +1053,6 @@
         private System.Windows.Forms.TableLayoutPanel TableLayoutPanel7;
         private System.Windows.Forms.Button FindBtn;
         private System.Windows.Forms.CheckBox ForwardBox;
+        private System.Windows.Forms.CheckBox LittleEndianBox;
     }
 }
