@@ -41,20 +41,25 @@ namespace PS4CheaterNeo
             this.ResultViewFindPointer = new System.Windows.Forms.ToolStripMenuItem();
             this.SectionViewMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.SectionViewHexEditor = new System.Windows.Forms.ToolStripMenuItem();
+            this.ToolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
+            this.SectionViewCheck = new System.Windows.Forms.ToolStripMenuItem();
+            this.ToolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
+            this.SectionViewCheckAll = new System.Windows.Forms.ToolStripMenuItem();
+            this.SectionViewUnCheckAll = new System.Windows.Forms.ToolStripMenuItem();
+            this.SectionViewInvertChecked = new System.Windows.Forms.ToolStripMenuItem();
+            this.ToolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.SectionViewDump = new System.Windows.Forms.ToolStripMenuItem();
             this.SectionViewImport = new System.Windows.Forms.ToolStripMenuItem();
-            this.ToolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
-            this.SectionViewCheck = new System.Windows.Forms.ToolStripMenuItem();
             this.Panel1 = new System.Windows.Forms.Panel();
             this.SplitContainer1 = new PS4CheaterNeo.CollapsibleSplitContainer();
-            this.StatusStrip1 = new System.Windows.Forms.StatusStrip();
-            this.ToolStripMsg = new System.Windows.Forms.ToolStripStatusLabel();
             this.ResultView = new System.Windows.Forms.ListView();
             this.ResultViewAddress = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.ResultViewType = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.ResultViewValue = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.ResultViewHex = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.ResultViewSection = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.StatusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.ToolStripMsg = new System.Windows.Forms.ToolStripStatusLabel();
             this.SplitContainer2 = new PS4CheaterNeo.CollapsibleSplitContainer();
             this.TableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
             this.GetProcessesBtn = new System.Windows.Forms.Button();
@@ -186,45 +191,81 @@ namespace PS4CheaterNeo
             // 
             this.SectionViewMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.SectionViewHexEditor,
-            this.SectionViewDump,
-            this.SectionViewImport,
             this.ToolStripSeparator3,
-            this.SectionViewCheck});
+            this.SectionViewCheck,
+            this.ToolStripSeparator4,
+            this.SectionViewCheckAll,
+            this.SectionViewUnCheckAll,
+            this.SectionViewInvertChecked,
+            this.ToolStripSeparator5,
+            this.SectionViewDump,
+            this.SectionViewImport});
             this.SectionViewMenu.Name = "SectionViewMenu";
-            this.SectionViewMenu.Size = new System.Drawing.Size(134, 98);
+            this.SectionViewMenu.Size = new System.Drawing.Size(158, 176);
             // 
             // SectionViewHexEditor
             // 
             this.SectionViewHexEditor.Name = "SectionViewHexEditor";
-            this.SectionViewHexEditor.Size = new System.Drawing.Size(133, 22);
+            this.SectionViewHexEditor.Size = new System.Drawing.Size(157, 22);
             this.SectionViewHexEditor.Text = "Hex Editor";
             this.SectionViewHexEditor.Click += new System.EventHandler(this.SectionViewHexEditor_Click);
+            // 
+            // ToolStripSeparator4
+            // 
+            this.ToolStripSeparator4.Name = "ToolStripSeparator4";
+            this.ToolStripSeparator4.Size = new System.Drawing.Size(154, 6);
+            // 
+            // SectionViewCheck
+            // 
+            this.SectionViewCheck.Name = "SectionViewCheck";
+            this.SectionViewCheck.Size = new System.Drawing.Size(157, 22);
+            this.SectionViewCheck.Text = "Check";
+            this.SectionViewCheck.Click += new System.EventHandler(this.SectionViewCheck_Click);
+            // 
+            // ToolStripSeparator5
+            // 
+            this.ToolStripSeparator5.Name = "ToolStripSeparator5";
+            this.ToolStripSeparator5.Size = new System.Drawing.Size(154, 6);
+            // 
+            // SectionViewCheckAll
+            // 
+            this.SectionViewCheckAll.Name = "SectionViewCheckAll";
+            this.SectionViewCheckAll.Size = new System.Drawing.Size(157, 22);
+            this.SectionViewCheckAll.Text = "Check All";
+            this.SectionViewCheckAll.Click += new System.EventHandler(this.SectionViewCheckAll_Click);
+            // 
+            // SectionViewUnCheckAll
+            // 
+            this.SectionViewUnCheckAll.Name = "SectionViewUnCheckAll";
+            this.SectionViewUnCheckAll.Size = new System.Drawing.Size(157, 22);
+            this.SectionViewUnCheckAll.Text = "Un-Check All";
+            this.SectionViewUnCheckAll.Click += new System.EventHandler(this.SectionViewUnCheckAll_Click);
+            // 
+            // SectionViewInvertChecked
+            // 
+            this.SectionViewInvertChecked.Name = "SectionViewInvertChecked";
+            this.SectionViewInvertChecked.Size = new System.Drawing.Size(157, 22);
+            this.SectionViewInvertChecked.Text = "Invert Checked";
+            this.SectionViewInvertChecked.Click += new System.EventHandler(this.SectionViewInvertChecked_Click);
+            // 
+            // ToolStripSeparator3
+            // 
+            this.ToolStripSeparator3.Name = "ToolStripSeparator3";
+            this.ToolStripSeparator3.Size = new System.Drawing.Size(154, 6);
             // 
             // SectionViewDump
             // 
             this.SectionViewDump.Name = "SectionViewDump";
-            this.SectionViewDump.Size = new System.Drawing.Size(133, 22);
+            this.SectionViewDump.Size = new System.Drawing.Size(157, 22);
             this.SectionViewDump.Text = "Dump";
             this.SectionViewDump.Click += new System.EventHandler(this.SectionViewDump_Click);
             // 
             // SectionViewImport
             // 
             this.SectionViewImport.Name = "SectionViewImport";
-            this.SectionViewImport.Size = new System.Drawing.Size(133, 22);
+            this.SectionViewImport.Size = new System.Drawing.Size(157, 22);
             this.SectionViewImport.Text = "Import";
             this.SectionViewImport.Click += new System.EventHandler(this.SectionViewImport_Click);
-            // 
-            // ToolStripSeparator3
-            // 
-            this.ToolStripSeparator3.Name = "ToolStripSeparator3";
-            this.ToolStripSeparator3.Size = new System.Drawing.Size(130, 6);
-            // 
-            // SectionViewCheck
-            // 
-            this.SectionViewCheck.Name = "SectionViewCheck";
-            this.SectionViewCheck.Size = new System.Drawing.Size(133, 22);
-            this.SectionViewCheck.Text = "Check";
-            this.SectionViewCheck.Click += new System.EventHandler(this.SectionViewCheck_Click);
             // 
             // Panel1
             // 
@@ -259,28 +300,6 @@ namespace PS4CheaterNeo
             this.SplitContainer1.SplitterDistance = 507;
             this.SplitContainer1.TabIndex = 0;
             // 
-            // StatusStrip1
-            // 
-            this.StatusStrip1.BackColor = System.Drawing.Color.DimGray;
-            this.StatusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.ToolStripMsg});
-            this.StatusStrip1.Location = new System.Drawing.Point(0, 426);
-            this.StatusStrip1.Name = "StatusStrip1";
-            this.StatusStrip1.Size = new System.Drawing.Size(505, 22);
-            this.StatusStrip1.SizingGrip = false;
-            this.StatusStrip1.TabIndex = 0;
-            this.StatusStrip1.Text = "statusStrip1";
-            // 
-            // ToolStripMsg
-            // 
-            this.ToolStripMsg.AutoToolTip = true;
-            this.ToolStripMsg.BackColor = System.Drawing.Color.Transparent;
-            this.ToolStripMsg.ForeColor = System.Drawing.Color.White;
-            this.ToolStripMsg.Name = "ToolStripMsg";
-            this.ToolStripMsg.Size = new System.Drawing.Size(490, 17);
-            this.ToolStripMsg.Spring = true;
-            this.ToolStripMsg.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
             // ResultView
             // 
             this.ResultView.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(36)))), ((int)(((byte)(36)))));
@@ -297,7 +316,7 @@ namespace PS4CheaterNeo
             this.ResultView.HideSelection = false;
             this.ResultView.Location = new System.Drawing.Point(0, 0);
             this.ResultView.Name = "ResultView";
-            this.ResultView.Size = new System.Drawing.Size(505, 448);
+            this.ResultView.Size = new System.Drawing.Size(505, 426);
             this.ResultView.TabIndex = 0;
             this.ResultView.UseCompatibleStateImageBehavior = false;
             this.ResultView.View = System.Windows.Forms.View.Details;
@@ -325,6 +344,28 @@ namespace PS4CheaterNeo
             // 
             this.ResultViewSection.Text = "Section";
             this.ResultViewSection.Width = 250;
+            // 
+            // StatusStrip1
+            // 
+            this.StatusStrip1.BackColor = System.Drawing.Color.DimGray;
+            this.StatusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.ToolStripMsg});
+            this.StatusStrip1.Location = new System.Drawing.Point(0, 426);
+            this.StatusStrip1.Name = "StatusStrip1";
+            this.StatusStrip1.Size = new System.Drawing.Size(505, 22);
+            this.StatusStrip1.SizingGrip = false;
+            this.StatusStrip1.TabIndex = 0;
+            this.StatusStrip1.Text = "statusStrip1";
+            // 
+            // ToolStripMsg
+            // 
+            this.ToolStripMsg.AutoToolTip = true;
+            this.ToolStripMsg.BackColor = System.Drawing.Color.Transparent;
+            this.ToolStripMsg.ForeColor = System.Drawing.Color.White;
+            this.ToolStripMsg.Name = "ToolStripMsg";
+            this.ToolStripMsg.Size = new System.Drawing.Size(490, 17);
+            this.ToolStripMsg.Spring = true;
+            this.ToolStripMsg.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // SplitContainer2
             // 
@@ -1075,5 +1116,10 @@ namespace PS4CheaterNeo
         private System.Windows.Forms.TableLayoutPanel TableLayoutPanel3;
         private System.Windows.Forms.TableLayoutPanel TableLayoutPanel4;
         private System.Windows.Forms.Button SectionSearchBtn;
+        private System.Windows.Forms.ToolStripSeparator ToolStripSeparator4;
+        private System.Windows.Forms.ToolStripMenuItem SectionViewUnCheckAll;
+        private System.Windows.Forms.ToolStripMenuItem SectionViewInvertChecked;
+        private System.Windows.Forms.ToolStripSeparator ToolStripSeparator5;
+        private System.Windows.Forms.ToolStripMenuItem SectionViewCheckAll;
     }
 }

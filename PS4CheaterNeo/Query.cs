@@ -1524,6 +1524,34 @@ namespace PS4CheaterNeo
             return System.Text.RegularExpressions.Regex.Replace(name, invalidRegStr, "_");
         }
 
+        private void SectionViewCheckAll_Click(object sender, EventArgs e)
+        {
+            if (SectionView.Items.Count == 0) return;
+
+            if (!SelectAllBox.Checked) SelectAllBox.Checked = true;
+            else for (int idx = 0; idx < SectionView.Items.Count; ++idx) if (!SectionView.Items[idx].Checked) SectionView.Items[idx].Checked = true;
+        }
+
+        private void SectionViewUnCheckAll_Click(object sender, EventArgs e)
+        {
+            if (SectionView.Items.Count == 0) return;
+
+            if (SelectAllBox.Checked) SelectAllBox.Checked = false;
+            else
+            {
+                for (int idx = 0; idx < SectionView.Items.Count; ++idx) if (SectionView.Items[idx].Checked) SectionView.Items[idx].Checked = false;
+                AddrMinBox.Text = "";
+                AddrMaxBox.Text = "";
+            }
+        }
+
+        private void SectionViewInvertChecked_Click(object sender, EventArgs e)
+        {
+            if (SectionView.Items.Count == 0) return;
+
+            for (int idx = 0; idx < SectionView.Items.Count; ++idx) SectionView.Items[idx].Checked = !SectionView.Items[idx].Checked;
+        }
+
         private void SectionViewCheck_Click(object sender, EventArgs e)
         {
             ListView.SelectedListViewItemCollection items = SectionView.SelectedItems;
