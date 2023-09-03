@@ -2,7 +2,7 @@
 
 PS4CheaterNeo is a program to find game cheat codes, and it is based on [`ps4debug`](https://github.com/jogolden/ps4debug) and [`.Net Framework 4.8`](https://support.microsoft.com/en-us/topic/microsoft-net-framework-4-8-offline-installer-for-windows-9d23f658-3b97-68ab-d013-aa3c3e7495e0).
 
-Currently in `version 0.9.9.1-beta`
+Currently in `version 0.9.9.2-beta`
 
 
 ## Table of Contents
@@ -155,6 +155,7 @@ Cheat format used by PS4 Trainer and GoldHEN Cheat (0.9.6.0)
 ![query_5](assets/query_5.webp)
 
 - Added the display of section-related count numbers in the Query window. (0.9.9.1)
+- Added support to immediately display the current count of sections in the status bar when the Query window is opened. (0.9.9.2)
 
 ![query_section_count_1](assets/query_section_count_1.webp)
 ![query_section_count_2](assets/query_section_count_2.webp)

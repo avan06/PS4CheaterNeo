@@ -223,6 +223,9 @@ namespace PS4CheaterNeo
                     else if (section.Name.Contains("NoName")) SectionView.Items[itemIdx].ForeColor = Properties.Settings.Default.QuerySectionViewNoNameForeColor.Value; //Color.Red;
                     else if (Regex.IsMatch(section.Name, @"^\[\d+\]$")) SectionView.Items[itemIdx].ForeColor = Properties.Settings.Default.QuerySectionViewNoName2ForeColor.Value; //Color.HotPink;
                 }
+
+                ToolStripMsg.Text = string.Format("Total section: {0}, Selected section: {1}, Search size: {2}MB", SectionView.Items.Count, sectionTool.TotalSelected, sectionTool.TotalMemorySize / (1024 * 1024));
+
                 SectionView.EndUpdate();
             }
             catch (Exception ex)
@@ -312,7 +315,7 @@ namespace PS4CheaterNeo
         {
             try
             {
-                if (scanTask != null && !scanTask.IsCompleted)
+                if (ScanBtn.Text == "Stop") //scanTask != null && !scanTask.IsCompleted
                 {
                     if (MessageBox.Show("Still in the scanning, Do you want to stop scan?", "Scan",
                         MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
@@ -387,7 +390,8 @@ namespace PS4CheaterNeo
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source + ":ScanBtn_Click", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                if (!ex.Message.Contains("CancellationTokenSource"))
+                    MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source + ":ScanBtn_Click", MessageBoxButtons.OK, MessageBoxIcon.Hand);
                 if (AutoResumeBox.Checked) ResumeBtn.PerformClick();
             }
         }
@@ -577,8 +581,11 @@ namespace PS4CheaterNeo
                             }
                             catch (Exception ex)
                             {
-                                errInfo += ex.ToString() + "\n\n";
-                                throw ex;
+                                if (!(ex is OperationCanceledException))
+                                {
+                                    errInfo += ex.ToString() + "\n\n";
+                                    throw ex;
+                                }
                             }
                             finally
                             {
