@@ -2,7 +2,7 @@
 
 PS4CheaterNeo is a program to find game cheat codes, and it is based on [`ps4debug`](https://github.com/jogolden/ps4debug) and [`.Net Framework 4.8`](https://support.microsoft.com/en-us/topic/microsoft-net-framework-4-8-offline-installer-for-windows-9d23f658-3b97-68ab-d013-aa3c3e7495e0).
 
-Currently in `version 0.9.9.0-beta`
+Currently in `version 0.9.9.1-beta`
 
 
 ## Table of Contents
@@ -57,6 +57,7 @@ Currently in `version 0.9.9.0-beta`
 - The `cheat` window and the `query` window are separated.
 - `Hex Editor` can be opened from the `cheat` or `query` window.
 - `Pointer finder` can be executed from the `cheat` or `query` lists.
+- Added support for attempting to re-establish the connection when PS4Tool's ConnectedCheck detects that PS4DBG is not connected. (0.9.9.1)
 
 
 ## SendPayload	[🔼](#table-of-contents)
@@ -145,11 +146,18 @@ Cheat format used by PS4 Trainer and GoldHEN Cheat (0.9.6.0)
 - Added Not CheckBox in the query window. When this feature is enabled, the scanning logic can be reversed. For example, if the compare type is exact and Not is enabled, it becomes not exact. (0.9.7.3)
 - Added AutoPause and DoneResume CheckBox in the query window, you can determine whether to enable or not. (0.9.7.3)
 - Added ScanType that supports Auto determine numeric (AutoNumeric) in Query. (0.9.8.3)
+- Added support for FullRowSelect in the SectionView of the Query window, this feature requires enabling `SectionViewFullRowSelect` in the Query of the Options window. (0.9.9.1)
+- Added support for "Check All", "Uncheck All", and "Invert Checked" in the right-click context menu of the SectionView in the Query window.  (0.9.9.1)
 
 ![query_1](assets/query_1.webp)
 ![query_2](assets/query_2.webp)
 ![query_3](assets/query_3.webp)
 ![query_5](assets/query_5.webp)
+
+- Added the display of section-related count numbers in the Query window. (0.9.9.1)
+
+![query_section_count_1](assets/query_section_count_1.webp)
+![query_section_count_2](assets/query_section_count_2.webp)
 
 
 ### Query window: SlowMotion and Pause
@@ -317,6 +325,7 @@ Range: -0x8000000000000000 to 0x7FFFFFFFFFFFFFFF (-9,223,372,036,854,775,808 to 
 ![hexeditor](assets/hexeditor1.webp)
 ![hexeditor](assets/hexeditor2.webp)
 ![experimental2](assets/experimental2.webp)
+![hexeditor_LittleEndian](assets/hexeditor_LittleEndian.webp)
 
 
 ### Hex editor: displaying decimal, float, and double
@@ -476,6 +485,9 @@ Determines whether to show search size message when FirstScan. `Default enabled`
 Determines whether to make the calculation result of `Floating(float, double) completely exact` in query window, there can be `0.0001 difference` in the old mechanism. `Default enabled`. (0.9.7.5)  
 - `FloatingSimpleValueExponents`:  
 Determine the `exponents value of the simple value of floating`. this option value is used in the query window when SimpleValues for floating point numbers is enabled. Cheat Engine is set to 11 (2 to the 11th power = 2^11 = plus or minus 2048). `Default value is 11`. (0.9.7.3)  
+- `SectionViewFullRowSelect`:
+Determine whether to enable the `FullRowSelect` feature in the `SectionView` of the Query window. `Default disabled`. (0.9.9.1)  
+
 
 ### HexEditor  
 - `AutoRefresh`:  
