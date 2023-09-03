@@ -55,6 +55,7 @@ namespace PS4CheaterNeo
             enableUndoScan = Properties.Settings.Default.UndoScan.Value;
             AutoPauseBox.Checked = Properties.Settings.Default.ScanAutoPause.Value;
             AutoResumeBox.Checked = Properties.Settings.Default.ScanAutoResume.Value;
+            SectionView.FullRowSelect = Properties.Settings.Default.SectionViewFullRowSelect.Value;
         }
 
         public void ApplyUI()

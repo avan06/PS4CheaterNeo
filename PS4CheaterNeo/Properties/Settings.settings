@@ -77,6 +77,9 @@
     <Setting Name="MaxResultShow" Type="OptionTreeView.Option&lt;uint&gt;" Scope="User">
       <Value Profile="(Default)">0x2000|3_Query|4_Result|Enter the maximum number of displayed query results. will only affect the number of results displayed in the ResultView. Default value is 8192</Value>
     </Setting>
+    <Setting Name="SectionViewFullRowSelect" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
+      <Value Profile="(Default)">False|3_Query|5_SectionView|Determine whether to enable the FullRowSelect feature in the SectionView of the Query window. Default disabled</Value>
+    </Setting>
     <Setting Name="AutoRefresh" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
       <Value Profile="(Default)">False|4_HexEditor|Hex|Determines whether to enable Auto Refresh in HexEditor. Default disabled</Value>
     </Setting>

@@ -354,6 +354,19 @@ namespace PS4CheaterNeo.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False|3_Query|5_SectionView|Determine whether to enable the FullRowSelect feature" +
+            " in the SectionView of the Query window. Default disabled")]
+        public global::OptionTreeView.Option<bool> SectionViewFullRowSelect {
+            get {
+                return ((global::OptionTreeView.Option<bool>)(this["SectionViewFullRowSelect"]));
+            }
+            set {
+                this["SectionViewFullRowSelect"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False|4_HexEditor|Hex|Determines whether to enable Auto Refresh in HexEditor. Def" +
             "ault disabled")]
         public global::OptionTreeView.Option<bool> AutoRefresh {
