@@ -320,7 +320,7 @@ namespace PS4CheaterNeo
                         if (AutoResumeBox.Checked) ResumeBtn.PerformClick();
                     }
                 }
-                else if (Properties.Settings.Default.ShowSearchSizeFirstScan.Value && ResultView.Items.Count == 0 && MessageBox.Show("search size:" + (sectionTool.TotalMemorySize / (1024 * 1024)).ToString() + "MB", "First Scan",
+                else if (Properties.Settings.Default.ShowSearchSizeFirstScan.Value && ResultView.Items.Count == 0 && MessageBox.Show("Search size:" + (sectionTool.TotalMemorySize / (1024 * 1024)).ToString() + "MB", "First Scan",
                     MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) return;
                 else
                 {
@@ -414,6 +414,7 @@ namespace PS4CheaterNeo
             return addr;
         }
 
+        #region ScanTask
         //Invoke(new MethodInvoker(() => { }));
         private async Task<bool> ScanTask(bool alignment, bool isFilter, bool isFilterSize, ulong AddrMin, ulong AddrMax) => await Task.Run(() =>
         {
@@ -423,10 +424,10 @@ namespace PS4CheaterNeo
             {
                 if (enableUndoScan && bitsDictDict.Count > 0)
                 {
-                    Invoke(new MethodInvoker(() => { ToolStripMsg.Text = string.Format("Scan elapsed:{0}s. Start backup of current query results", tickerMajor.Elapsed.TotalSeconds); }));
+                    Invoke(new MethodInvoker(() => { ToolStripMsg.Text = string.Format("Scan elapsed:{0:0.00}s. Start backup of current query results", tickerMajor.Elapsed.TotalSeconds); }));
                     bitsDictDictUndo.Clear();
                     foreach (KeyValuePair<uint, BitsDictionary> bitsDict in bitsDictDict) bitsDictDictUndo.Add(bitsDict.Key, (BitsDictionary)bitsDict.Value.Clone());
-                    Invoke(new MethodInvoker(() => { UndoBtn.Enabled = true; ToolStripMsg.Text = string.Format("Scan elapsed:{0}s. Complete backup of current query results", tickerMajor.Elapsed.TotalSeconds); }));
+                    Invoke(new MethodInvoker(() => { UndoBtn.Enabled = true; ToolStripMsg.Text = string.Format("Scan elapsed:{0:0.00}s. Complete backup of current query results", tickerMajor.Elapsed.TotalSeconds); }));
                 }
 
                 ulong hitCnt = 0;
@@ -506,9 +507,12 @@ namespace PS4CheaterNeo
                         rangeIdx = (-1, -1); //initialize start and end index for non-isPerform scan
                     }
 
+                    int sectionSelectedCnt = 0;
+                    int sectionFoundCnt = 0;
                     for (int idx = 0; idx < rangeList.Count; idx++)
                     {
                         var range = rangeList[idx];
+                        sectionSelectedCnt += range.start == -1 ? 1 : (range.end - range.start + 1);
                         tasks.Add(Task.Run<bool>(() =>
                         {
                             try
@@ -553,6 +557,7 @@ namespace PS4CheaterNeo
                                             mutex.WaitOne();
                                             hitCnt += (ulong)bitsDict.Count;
                                             bitsDictDict[addrSection.SID] = bitsDict;
+                                            sectionFoundCnt++;
                                         }
                                         finally
                                         {
@@ -565,7 +570,7 @@ namespace PS4CheaterNeo
                                     Invoke(new MethodInvoker(() =>
                                     {
                                         ToolStripBar.Value = (int)(((float)processedMemoryLen / sectionTool.TotalMemorySize) * 100);
-                                        ToolStripMsg.Text = string.Format("Scan elapsed:{0}s. {1}MB, Count: {2}", tickerMajor.Elapsed.TotalSeconds, processedMemoryLen / (1024 * 1024), hitCnt);
+                                        ToolStripMsg.Text = string.Format("Scan elapsed:{0:0.00}s. {1}MB, Count: {2}, Section: {3}/{4}/{5}(found/selected/total)", tickerMajor.Elapsed.TotalSeconds, processedMemoryLen / (1024 * 1024), hitCnt, sectionFoundCnt, sectionSelectedCnt, SectionView.Items.Count);
                                     }));
                                 }
                             }
@@ -608,7 +613,7 @@ namespace PS4CheaterNeo
                 {
                     Invoke(new MethodInvoker(() => {
                         ToolStripBar.Value = 100;
-                        ToolStripMsg.Text = string.Format("Scan elapsed:{0}s. ScanTask canceled. {1}", tickerMajor.Elapsed.TotalSeconds, ex.InnerException.Message);
+                        ToolStripMsg.Text = string.Format("Scan elapsed:{0:0.00}s. ScanTask canceled. {1}", tickerMajor.Elapsed.TotalSeconds, ex.InnerException.Message);
                     }));
                 }
                 else errInfo += ex.ToString() + "\n\n";
@@ -622,6 +627,7 @@ namespace PS4CheaterNeo
             return true;
         });
 
+        #region ScanComparer
         private BitsDictionary Comparer(Byte[] buffer, Section section, int scanStep, ulong AddrMin, ulong AddrMax, BitsDictionary bitsDict)
         {
             if (ResultView.Items.Count == 0)
@@ -800,6 +806,7 @@ namespace PS4CheaterNeo
 
             return bitsDict;
         }
+        #endregion
 
         private void TaskCompleted()
         {
@@ -956,6 +963,7 @@ namespace PS4CheaterNeo
                 ScanBtn.Text = "Next Scan";
             }));
         }
+        #endregion
 
         Task<bool> refreshTask;
         CancellationTokenSource refreshSource;
@@ -1061,9 +1069,11 @@ namespace PS4CheaterNeo
                     rangeIdx = (-1, -1); //initialize start and end index for non-isPerform scan
                 }
 
+                int sectionSelectedCnt = 0;
                 for (int idx = 0; idx < rangeList.Count; idx++)
                 {
                     var range = rangeList[idx];
+                    sectionSelectedCnt += range.start == -1 ? 1 : (range.end - range.start + 1);
                     tasks.Add(Task.Run<bool>(() =>
                     {
                         try
@@ -1117,7 +1127,7 @@ namespace PS4CheaterNeo
                                 Invoke(new MethodInvoker(() =>
                                 {
                                     ToolStripBar.Value = (int)(((float)(++count) / sectionKeys.Length) * 100);
-                                    ToolStripMsg.Text = string.Format("Refresh elapsed:{0}s. {1}", tickerMajor.Elapsed.TotalSeconds, string.Format("Count: {0}", hitCnt));
+                                    ToolStripMsg.Text = string.Format("Refresh elapsed:{0:0.00}s. Count: {1}, Section: {2}/{3}(selected/total)", tickerMajor.Elapsed.TotalSeconds, hitCnt, sectionSelectedCnt, SectionView.Items.Count);
                                 }));
                             }
                         }
@@ -1135,7 +1145,7 @@ namespace PS4CheaterNeo
                 GC.Collect();
                 Invoke(new MethodInvoker(() => {
                     ToolStripBar.Value = 100;
-                    ToolStripMsg.Text = string.Format("Refresh elapsed:{0}s. {1}", tickerMajor.Elapsed.TotalSeconds, string.Format("Count: {0}", hitCnt));
+                    ToolStripMsg.Text = string.Format("Refresh elapsed:{0:0.00}s. Count: {1}, Section: {2}/{3}(selected/total)", tickerMajor.Elapsed.TotalSeconds, hitCnt, sectionSelectedCnt, SectionView.Items.Count);
                 }));
             }
             catch (Exception ex)
@@ -1144,7 +1154,7 @@ namespace PS4CheaterNeo
                 {
                     Invoke(new MethodInvoker(() => {
                         ToolStripBar.Value = 100;
-                        ToolStripMsg.Text = string.Format("Refresh elapsed:{0}s. RefreshTask canceled. {1}", tickerMajor.Elapsed.TotalSeconds, ex.InnerException.Message);
+                        ToolStripMsg.Text = string.Format("Refresh elapsed:{0:0.00}s. RefreshTask canceled. {1}", tickerMajor.Elapsed.TotalSeconds, ex.InnerException.Message);
                     }));
                 }
                 else MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source + ":RefreshTask", MessageBoxButtons.OK, MessageBoxIcon.Hand);
@@ -1276,6 +1286,7 @@ namespace PS4CheaterNeo
             section.Check = e.NewValue == CheckState.Checked;
             if (section.Check)
             {
+                sectionTool.TotalSelected += 1;
                 sectionTool.TotalMemorySize += (ulong)section.Length;
                 if (AddrMinBox.Text.Trim() == "") AddrMinBox.Text = section.Start.ToString("X");
                 else
@@ -1290,9 +1301,15 @@ namespace PS4CheaterNeo
                     if (section.Start + (ulong)section.Length > AddrMax) AddrMaxBox.Text = (section.Start + (ulong)section.Length).ToString("X");
                 }
             }
-            else sectionTool.TotalMemorySize -= (ulong)section.Length;
+            else
+            {
+                sectionTool.TotalSelected -= 1;
+                sectionTool.TotalMemorySize -= (ulong)section.Length;
+            }
 
             item.BackColor = item.Checked ? querySectionViewItemCheck1BackColor : querySectionViewItemCheck2BackColor; //Color.DarkSlateGray : Color.DarkGreen;
+
+            if (scanTask == null || scanTask.IsCompleted) ToolStripMsg.Text = string.Format("Total section: {0}, Selected section: {1}, Search size: {2}MB", SectionView.Items.Count, sectionTool.TotalSelected, sectionTool.TotalMemorySize / (1024 * 1024));
         }
 
         private void SelectAllBox_CheckedChanged(object sender, EventArgs e)

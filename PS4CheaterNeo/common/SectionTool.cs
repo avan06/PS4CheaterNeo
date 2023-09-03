@@ -10,6 +10,7 @@ namespace PS4CheaterNeo
 {
     public class SectionTool
     {
+        public uint TotalSelected;
         public ulong TotalMemorySize;
 
         /// <summary>
@@ -181,6 +182,7 @@ namespace PS4CheaterNeo
                 SectionFilterKeys = Regex.Replace(SectionFilterKeys, " *[,;] *", "|");
                 SectionDict = new Dictionary<uint, Section>();
                 SectionList = new List<(uint SID, ulong start, ulong end)>();
+                TotalSelected = 0;
                 TotalMemorySize = 0;
                 PID = pMap.pid;
                 (uint sIdx, uint ProtCnt) v1 = (0, 0);
