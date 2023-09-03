@@ -77,6 +77,7 @@ namespace PS4CheaterNeo
             this.label5 = new System.Windows.Forms.Label();
             this.AddrMaxBox = new System.Windows.Forms.TextBox();
             this.AddrMinBox = new System.Windows.Forms.TextBox();
+            this.ToolStripBar = new System.Windows.Forms.ProgressBar();
             this.SimpleValuesBox = new System.Windows.Forms.CheckBox();
             this.SlowMotionBox = new System.Windows.Forms.CheckBox();
             this.AutoResumeBox = new System.Windows.Forms.CheckBox();
@@ -98,7 +99,6 @@ namespace PS4CheaterNeo
             this.HexBox = new System.Windows.Forms.CheckBox();
             this.NotBox = new System.Windows.Forms.CheckBox();
             this.NewBtn = new System.Windows.Forms.Button();
-            this.ToolStripBar = new System.Windows.Forms.ProgressBar();
             this.RefreshBtn = new System.Windows.Forms.Button();
             this.ScanBtn = new System.Windows.Forms.Button();
             this.CompareTypeBox = new System.Windows.Forms.ComboBox();
@@ -245,8 +245,8 @@ namespace PS4CheaterNeo
             // 
             // SplitContainer1.Panel1
             // 
-            this.SplitContainer1.Panel1.Controls.Add(this.StatusStrip1);
             this.SplitContainer1.Panel1.Controls.Add(this.ResultView);
+            this.SplitContainer1.Panel1.Controls.Add(this.StatusStrip1);
             // 
             // SplitContainer1.Panel2
             // 
@@ -623,6 +623,15 @@ namespace PS4CheaterNeo
             this.AddrMinBox.Size = new System.Drawing.Size(102, 22);
             this.AddrMinBox.TabIndex = 18;
             // 
+            // ToolStripBar
+            // 
+            this.ToolStripBar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.ToolStripBar.Location = new System.Drawing.Point(3, 195);
+            this.ToolStripBar.Name = "ToolStripBar";
+            this.ToolStripBar.Size = new System.Drawing.Size(283, 10);
+            this.ToolStripBar.TabIndex = 16;
+            // 
             // SimpleValuesBox
             // 
             this.SimpleValuesBox.AutoSize = true;
@@ -899,15 +908,6 @@ namespace PS4CheaterNeo
             this.NewBtn.Text = "New";
             this.NewBtn.UseVisualStyleBackColor = false;
             this.NewBtn.Click += new System.EventHandler(this.NewBtn_Click);
-            // 
-            // ToolStripBar
-            // 
-            this.ToolStripBar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.ToolStripBar.Location = new System.Drawing.Point(3, 195);
-            this.ToolStripBar.Name = "ToolStripBar";
-            this.ToolStripBar.Size = new System.Drawing.Size(283, 10);
-            this.ToolStripBar.TabIndex = 16;
             // 
             // RefreshBtn
             // 
