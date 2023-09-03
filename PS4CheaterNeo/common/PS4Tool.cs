@@ -119,7 +119,8 @@ namespace PS4CheaterNeo
         /// <exception cref="Exception"></exception>
         public static void ConnectedCheck(int idx = 0)
         {
-            if (ps4s[idx] == null || (ps4s[idx] != null && !ps4s[idx].IsConnected)) throw new Exception("PS4DBG is not connected.");
+            if (ps4s[idx] == null && !Connect(Properties.Settings.Default.PS4IP.Value, out string msg, 2000, true)) throw new Exception("PS4DBG detected an anomaly. error: " + msg); ;
+            if (!ps4s[idx].IsConnected && !Connect(Properties.Settings.Default.PS4IP.Value, out msg, 2000, true)) throw new Exception("PS4DBG is not connected. error: " + msg);
         }
 
         /// <summary>
