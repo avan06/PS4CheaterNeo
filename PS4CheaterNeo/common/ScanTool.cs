@@ -293,7 +293,8 @@ namespace PS4CheaterNeo
                 case ScanType.Double_:
                     var newDouble = BitConverter.ToDouble(newValue, 0);
                     var input0Double = BitConverter.ToDouble(inputValue0, 0);
-                    result = Math.Abs(newDouble - input0Double) < 1;
+                    double valD = Math.Abs(newDouble - input0Double);
+                    result = comparerTool.EnableFloatingResultExact ? valD == 0 : valD < 1;
                     if (result && comparerTool.IsFloatingSimpleValues)
                     {
                         ulong newVar = BitConverter.ToUInt64(newValue, 0);
@@ -303,7 +304,8 @@ namespace PS4CheaterNeo
                 case ScanType.Float_:
                     var newFloat = BitConverter.ToSingle(newValue, 0);
                     var input0Float = BitConverter.ToSingle(inputValue0, 0);
-                    result = Math.Abs(newFloat - input0Float) < 1;
+                    float valF = Math.Abs(newFloat - input0Float);
+                    result = comparerTool.EnableFloatingResultExact ? valF == 0 : valF < 1;
                     if (result && comparerTool.IsFloatingSimpleValues)
                     {
                         uint newVar = BitConverter.ToUInt32(newValue, 0);

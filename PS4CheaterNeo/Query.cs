@@ -30,8 +30,7 @@ namespace PS4CheaterNeo
         //Confirm whether the compare type starts with UnknownInitial
         bool isUnknownInitial = false;
 
-        Dictionary<uint, BitsDictionary> bitsDictDict;
-        Dictionary<uint, BitsDictionary> bitsDictDictUndo;
+        Dictionary<string, Dictionary<uint, BitsDictionary>> bitsDictDicts;
 
         public Query(Main mainForm)
         {
@@ -46,8 +45,13 @@ namespace PS4CheaterNeo
             this.mainForm = mainForm;
 
             sectionTool = new SectionTool();
-            bitsDictDict = new Dictionary<uint, BitsDictionary>();
-            bitsDictDictUndo = new Dictionary<uint, BitsDictionary>();
+            bitsDictDicts = new Dictionary<string, Dictionary<uint, BitsDictionary>>
+            {
+                ["_s0"] = new Dictionary<uint, BitsDictionary>(),
+                ["_s1"] = new Dictionary<uint, BitsDictionary>(),
+                ["_s2"] = new Dictionary<uint, BitsDictionary>()
+            };
+
             IsFilterBox.Checked = Properties.Settings.Default.FilterQuery.Value;
             IsFilterSizeBox.Checked = Properties.Settings.Default.FilterSizeQuery.Value;
             enableUndoScan = Properties.Settings.Default.UndoScan.Value;
@@ -144,8 +148,9 @@ namespace PS4CheaterNeo
 
             ComboItem process = (ComboItem)ProcessesBox.SelectedItem;
             if (process != null) PS4Tool.DetachDebugger((int)process.Value);
-            bitsDictDict = null;
-            bitsDictDictUndo = null;
+            bitsDictDicts["_s0"] = null;
+            bitsDictDicts["_s1"] = null;
+            bitsDictDicts["_s2"] = null;
             GC.Collect();
             Properties.Settings.Default.Save();
         }
@@ -252,12 +257,14 @@ namespace PS4CheaterNeo
             }
 
             ResultView.Items.Clear();
-            if (bitsDictDict != null) bitsDictDict.Clear();
-            if (bitsDictDictUndo != null) bitsDictDictUndo.Clear();
+            if (bitsDictDicts["_s0"] != null) bitsDictDicts["_s0"].Clear();
+            if (bitsDictDicts["_s1"] != null) bitsDictDicts["_s1"].Clear();
+            if (bitsDictDicts["_s2"] != null) bitsDictDicts["_s2"].Clear();
 
             comparerTool = null;
-            bitsDictDict = new Dictionary<uint, BitsDictionary>();
-            bitsDictDictUndo = new Dictionary<uint, BitsDictionary>();
+            bitsDictDicts["_s0"] = new Dictionary<uint, BitsDictionary>();
+            bitsDictDicts["_s1"] = new Dictionary<uint, BitsDictionary>();
+            bitsDictDicts["_s2"] = new Dictionary<uint, BitsDictionary>();
             GC.Collect();
 
             ScanBtn.Text = "First Scan";
@@ -267,6 +274,8 @@ namespace PS4CheaterNeo
             UndoBtn.Enabled = false;
             RedoBtn.Enabled = false;
             isUnknownInitial = false;
+            CompareFirstBox.Enabled = false;
+            CompareFirstBox.Checked = false;
             ScanTypeBox_SelectedIndexChanged(null, null);
         }
 
@@ -294,9 +303,9 @@ namespace PS4CheaterNeo
         {
             if (!enableUndoScan) return;
 
-            Dictionary<uint, BitsDictionary> tmp = bitsDictDict;
-            bitsDictDict = bitsDictDictUndo;
-            bitsDictDictUndo = tmp;
+            Dictionary<uint, BitsDictionary> tmp = bitsDictDicts["_s1"];
+            bitsDictDicts["_s1"] = bitsDictDicts["_s2"];
+            bitsDictDicts["_s2"] = tmp;
             SectionView.BeginUpdate();
             SectionView.ItemCheck -= SectionView_ItemCheck;
             for (int sectionIdx = 0; sectionIdx < SectionView.Items.Count; ++sectionIdx)
@@ -304,11 +313,11 @@ namespace PS4CheaterNeo
                 ListViewItem sectionItem = SectionView.Items[sectionIdx];
                 uint sid = uint.Parse(sectionItem.SubItems[(int)SectionCol.SectionViewSID].Text);
 
-                if (bitsDictDict.ContainsKey(sid))
+                if (bitsDictDicts["_s1"].ContainsKey(sid))
                 {
-                    BitsDictionary bitsDict = bitsDictDict[sid];
+                    BitsDictionary bitsDict = bitsDictDicts["_s1"][sid];
                     sectionItem.Checked = bitsDict.Count > 0;
-                    if (!sectionItem.Checked) bitsDictDict.Remove(sid);
+                    if (!sectionItem.Checked) bitsDictDicts["_s1"].Remove(sid);
                 }
                 else sectionItem.Checked = false;
                 SectionCheckUpdate(sectionItem.Checked, sid);
@@ -381,7 +390,7 @@ namespace PS4CheaterNeo
                     ScanBtn.Text = "Stop";
                     if (scanSource != null) scanSource.Dispose();
                     scanSource = new CancellationTokenSource();
-                    scanTask = ScanTask(alignment, isFilter, isFilterSize, AddrMin, AddrMax);
+                    scanTask = ScanTask(alignment, isFilter, isFilterSize, AddrMin, AddrMax, CompareFirstBox.Checked);
 
                     scanTask.ContinueWith(t => {
                         if (t.Exception != null)
@@ -444,19 +453,20 @@ namespace PS4CheaterNeo
         /// <param name="isFilterSize">Enable size filtering for sections</param>
         /// <param name="AddrMin">Minimum section address</param>
         /// <param name="AddrMax">Maximum section address</param>
+        /// <param name="isCompareFirst">Compare to first scan will compare the current addresslist and it's value to the saved value of the first scan</param>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-        private async Task<bool> ScanTask(bool alignment, bool isFilter, bool isFilterSize, ulong AddrMin, ulong AddrMax) => await Task.Run(() =>
+        private async Task<bool> ScanTask(bool alignment, bool isFilter, bool isFilterSize, ulong AddrMin, ulong AddrMax, bool isCompareFirst) => await Task.Run(() =>
         {
             string errInfo = "";
             System.Diagnostics.Stopwatch tickerMajor = System.Diagnostics.Stopwatch.StartNew();
             try
             {
-                if (enableUndoScan && bitsDictDict.Count > 0)
+                if (enableUndoScan && bitsDictDicts["_s1"].Count > 0)
                 {
                     Invoke(new MethodInvoker(() => { ToolStripMsg.Text = string.Format("Scan elapsed:{0:0.00}s. Start backup of current query results", tickerMajor.Elapsed.TotalSeconds); }));
-                    bitsDictDictUndo.Clear();
-                    foreach (KeyValuePair<uint, BitsDictionary> bitsDict in bitsDictDict) bitsDictDictUndo.Add(bitsDict.Key, (BitsDictionary)bitsDict.Value.Clone());
+                    bitsDictDicts["_s2"].Clear();
+                    foreach (KeyValuePair<uint, BitsDictionary> bitsDict in bitsDictDicts["_s1"]) bitsDictDicts["_s2"].Add(bitsDict.Key, (BitsDictionary)bitsDict.Value.Clone());
                     Invoke(new MethodInvoker(() => { UndoBtn.Enabled = true; ToolStripMsg.Text = string.Format("Scan elapsed:{0:0.00}s. Complete backup of current query results", tickerMajor.Elapsed.TotalSeconds); }));
                 }
 
@@ -492,7 +502,7 @@ namespace PS4CheaterNeo
                         Section currentSection = sectionKeys[sectionIdx];
                         if (!currentSection.Check || isFilter && currentSection.IsFilter || isFilterSize && currentSection.IsFilterSize ||
                             currentSection.Start + (ulong)currentSection.Length < AddrMin || currentSection.Start > AddrMax) isContinue = true; //Check if section is not scanned
-                        else if (bitsDictDict.Count > 0 && bitsDictDict.ContainsKey(currentSection.SID) && bitsDictDict[currentSection.SID].Count is int chkCnt && chkCnt > 0 && chkCnt < MinResultAccessFactor)
+                        else if (bitsDictDicts["_s1"].Count > 0 && bitsDictDicts["_s1"].ContainsKey(currentSection.SID) && bitsDictDicts["_s1"][currentSection.SID].Count is int chkCnt && chkCnt > 0 && chkCnt < MinResultAccessFactor)
                         { //Access value directly by address when the number of query results for the same Section is less than this MinResultAccessFactor
                             rangeList.Add((-1, sectionIdx));
                             isContinue = true;
@@ -556,13 +566,13 @@ namespace PS4CheaterNeo
                                 if (sectionStart != null)
                                 {
                                     ulong bufferSize = sectionEnd.Start + (ulong)sectionEnd.Length - sectionStart.Start;
-                                    buffer = PS4Tool.ReadMemory(sectionStart.PID, sectionStart.Start, (int)bufferSize);
+                                    if (!isCompareFirst) buffer = PS4Tool.ReadMemory(sectionStart.PID, sectionStart.Start, (int)bufferSize);
                                 }
                                 if (range.start == -1)
                                 {
                                     range.start = range.end;
                                     sectionStart = sectionEnd;
-                                    buffer = PS4Tool.ReadMemory(sectionEnd.PID, sectionEnd.Start, (int)sectionEnd.Length);
+                                    if (!isCompareFirst) buffer = PS4Tool.ReadMemory(sectionEnd.PID, sectionEnd.Start, (int)sectionEnd.Length);
                                 }
 
                                 for (int rIdx = range.start; rIdx <= range.end; rIdx++)
@@ -572,14 +582,16 @@ namespace PS4CheaterNeo
 
                                     scanSource.Token.ThrowIfCancellationRequested();
                                     Byte[] subBuffer = null;
-                                    if (!bitsDictDict.TryGetValue(addrSection.SID, out BitsDictionary bitsDict)) bitsDict = new BitsDictionary(scanStep, comparerTool.ScanTypeLength);
+                                    BitsDictionary bitsDictFirst = null;
+                                    if (isCompareFirst && !bitsDictDicts["_s0"].TryGetValue(addrSection.SID, out bitsDictFirst)) bitsDictFirst = new BitsDictionary(scanStep, comparerTool.ScanTypeLength);
+                                    if (!bitsDictDicts["_s1"].TryGetValue(addrSection.SID, out BitsDictionary bitsDict)) bitsDict = new BitsDictionary(scanStep, comparerTool.ScanTypeLength);
                                     if (buffer != null)//bitsDict.Count == 0 || bitsDict.Count > MinResultAccessFactor)
                                     {
                                         subBuffer = new Byte[addrSection.Length];
                                         Buffer.BlockCopy(buffer, (int)scanOffset, subBuffer, 0, addrSection.Length);
                                     }
 
-                                    bitsDict = comparerTool.GroupTypes == null ? Comparer(subBuffer, addrSection, scanStep, AddrMin, AddrMax, bitsDict) : ComparerGroup(subBuffer, addrSection, scanStep, AddrMin, AddrMax, bitsDict);
+                                    bitsDict = comparerTool.GroupTypes == null ? Comparer(subBuffer, addrSection, scanStep, AddrMin, AddrMax, bitsDict, isCompareFirst, bitsDictFirst) : ComparerGroup(subBuffer, addrSection, scanStep, AddrMin, AddrMax, bitsDict, isCompareFirst, bitsDictFirst);
 
                                     if (bitsDict != null && bitsDict.Count > 0)
                                     {
@@ -587,7 +599,7 @@ namespace PS4CheaterNeo
                                         {
                                             mutex.WaitOne();
                                             hitCnt += (ulong)bitsDict.Count;
-                                            bitsDictDict[addrSection.SID] = bitsDict;
+                                            bitsDictDicts["_s1"][addrSection.SID] = bitsDict;
                                             sectionFoundCnt++;
                                         }
                                         finally
@@ -674,8 +686,10 @@ namespace PS4CheaterNeo
         /// <param name="AddrMin">Minimum section address</param>
         /// <param name="AddrMax">Maximum section address</param>
         /// <param name="bitsDict">Used to store the new or previous comparison results</param>
+        /// <param name="isCompareFirst">Compare to first scan will compare the current addresslist and it's value to the saved value of the first scan</param>
+        /// <param name="bitsDictFirst">Store the first scan results</param>
         /// <returns></returns>
-        private BitsDictionary Comparer(Byte[] buffer, Section section, int scanStep, ulong AddrMin, ulong AddrMax, BitsDictionary bitsDict)
+        private BitsDictionary Comparer(Byte[] buffer, Section section, int scanStep, ulong AddrMin, ulong AddrMax, BitsDictionary bitsDict, bool isCompareFirst, BitsDictionary bitsDictFirst)
         {
             if (ResultView.Items.Count == 0)
             {
@@ -712,7 +726,8 @@ namespace PS4CheaterNeo
                     if (address < AddrMin || address > AddrMax) continue;
 
                     byte[] newValue;
-                    if (buffer != null && buffer.Length > 0)
+                    if (isCompareFirst) newValue = bitsDictFirst != null ? bitsDictFirst[offsetAddr] : new byte[8];
+                    else if(buffer != null && buffer.Length > 0)
                     {
                         newValue = new byte[comparerTool.ScanTypeLength];
                         Buffer.BlockCopy(buffer, (int)offsetAddr, newValue, 0, comparerTool.ScanTypeLength);
@@ -748,8 +763,10 @@ namespace PS4CheaterNeo
         /// <param name="AddrMin">Minimum section address</param>
         /// <param name="AddrMax">Maximum section address</param>
         /// <param name="bitsDict">Used to store the new or previous comparison results</param>
+        /// <param name="isCompareFirst">Compare to first scan will compare the current addresslist and it's value to the saved value of the first scan</param>
+        /// <param name="bitsDictFirst">Store the first scan results</param>
         /// <returns></returns>
-        private BitsDictionary ComparerGroup(Byte[] buffer, Section section, int scanStep, ulong AddrMin, ulong AddrMax, BitsDictionary bitsDict)
+        private BitsDictionary ComparerGroup(Byte[] buffer, Section section, int scanStep, ulong AddrMin, ulong AddrMax, BitsDictionary bitsDict, bool isCompareFirst, BitsDictionary bitsDictFirst)
         {
             if (ResultView.Items.Count == 0)
             {
@@ -827,7 +844,8 @@ namespace PS4CheaterNeo
                     if (section.Start + offsetAddr < AddrMin || section.Start + offsetAddr > AddrMax) continue;
 
                     byte[] newBytes;
-                    if (buffer != null && buffer.Length > 0)
+                    if (isCompareFirst) newBytes = bitsDictFirst != null ? bitsDictFirst[offsetAddr] : new byte[comparerTool.ScanTypeLength];
+                    else if (buffer != null && buffer.Length > 0)
                     {
                         newBytes = new byte[comparerTool.ScanTypeLength];
                         Buffer.BlockCopy(buffer, (int)offsetAddr, newBytes, 0, comparerTool.ScanTypeLength);
@@ -869,7 +887,7 @@ namespace PS4CheaterNeo
 
         private void TaskCompleted()
         {
-            if (bitsDictDict.Count <= 0 && !enableUndoScan)
+            if (bitsDictDicts["_s1"].Count <= 0 && !enableUndoScan)
             {
                 Invoke(new MethodInvoker(() => { NewBtn.PerformClick(); }));
                 return;
@@ -884,9 +902,10 @@ namespace PS4CheaterNeo
                 ResultView.Items.Clear();
                 ResultView.BeginUpdate();
             }));
-            List<uint> sectionKeys = new List<uint>(bitsDictDict.Keys);
+            List<uint> sectionKeys = new List<uint>(bitsDictDicts["_s1"].Keys);
             sectionKeys.Sort();
             Color backColor = default;
+            bool isFirstScan = bitsDictDicts["_s0"].Count == 0;
             for (int sectionIdx = 0; sectionIdx < sectionKeys.Count; sectionIdx++)
             {
                 uint dictKey = sectionKeys[sectionIdx];
@@ -895,9 +914,11 @@ namespace PS4CheaterNeo
                 if (sectionTool.SectionDict.ContainsKey(dictKey))
                 {
                     section = sectionTool.SectionDict[sectionKeys[sectionIdx]];
-                    bitsDictDict.TryGetValue(section.SID, out bitsDict);
+                    bitsDictDicts["_s1"].TryGetValue(section.SID, out bitsDict);
                 }
                 if (bitsDict == null || bitsDict.Count == 0) continue;
+
+                if (isFirstScan) bitsDictDicts["_s0"].Add(dictKey, (BitsDictionary)bitsDict.Clone());
 
                 hitCnt += bitsDict.Count;
 
@@ -1020,6 +1041,7 @@ namespace PS4CheaterNeo
                 ResultView.EndUpdate();
                 ScanTypeBox_SelectedIndexChanged(null, null);
                 ScanBtn.Text = "Next Scan";
+                if (isFirstScan) CompareFirstBox.Enabled = true;
             }));
         }
         #endregion
@@ -1056,7 +1078,7 @@ namespace PS4CheaterNeo
             System.Diagnostics.Stopwatch tickerMajor = System.Diagnostics.Stopwatch.StartNew();
             try
             {
-                if (bitsDictDict.Count == 0) return false;
+                if (bitsDictDicts["_s1"].Count == 0) return false;
 
                 int hitCnt = 0;
                 int count = 0;
@@ -1076,7 +1098,7 @@ namespace PS4CheaterNeo
                 int readCnt = 0;
                 ulong minLength = QueryBufferSize * 1024 * 1024; //set the minimum read size in bytes
 
-                Section[] sectionKeys = sectionTool.GetSectionSortByAddr(bitsDictDict.Keys);
+                Section[] sectionKeys = sectionTool.GetSectionSortByAddr(bitsDictDicts["_s1"].Keys);
                 SemaphoreSlim semaphore = new SemaphoreSlim(MaxQueryThreads);
                 List<Task<bool>> tasks = new List<Task<bool>>();
                 List<(int start, int end)> rangeList = new List<(int start, int end)>();
@@ -1087,7 +1109,7 @@ namespace PS4CheaterNeo
                     bool isContinue = false;
                     Section currentSection = sectionKeys[sectionIdx];
                     if (!currentSection.Check || isFilter && currentSection.IsFilter || isFilterSize && currentSection.IsFilterSize) isContinue = true; //Check if section is not scanned
-                    else if (bitsDictDict.Count > 0 && bitsDictDict.ContainsKey(currentSection.SID) && bitsDictDict[currentSection.SID].Count is int chkCnt && chkCnt > 0 && chkCnt < MinResultAccessFactor)
+                    else if (bitsDictDicts["_s1"].Count > 0 && bitsDictDicts["_s1"].ContainsKey(currentSection.SID) && bitsDictDicts["_s1"][currentSection.SID].Count is int chkCnt && chkCnt > 0 && chkCnt < MinResultAccessFactor)
                     { //Access value directly by address when the number of query results for the same Section is less than this MinResultAccessFactor
                         rangeList.Add((-1, sectionIdx));
                         isContinue = true;
@@ -1166,7 +1188,7 @@ namespace PS4CheaterNeo
 
                                 refreshSource.Token.ThrowIfCancellationRequested();
                                 Byte[] subBuffer = null;
-                                bitsDictDict.TryGetValue(addrSection.SID, out BitsDictionary bitsDict);
+                                bitsDictDicts["_s1"].TryGetValue(addrSection.SID, out BitsDictionary bitsDict);
                                 if (buffer != null)//bitsDict.Count == 0 || bitsDict.Count > MinResultAccessFactor)
                                 {
                                     subBuffer = new Byte[addrSection.Length];

@@ -2,7 +2,7 @@
 
 PS4CheaterNeo is a program to find game cheat codes, and it is based on [`ps4debug`](https://github.com/jogolden/ps4debug) and [`.Net Framework 4.8`](https://support.microsoft.com/en-us/topic/microsoft-net-framework-4-8-offline-installer-for-windows-9d23f658-3b97-68ab-d013-aa3c3e7495e0).
 
-Currently in `version 0.9.9.2-beta`
+Currently in `version 0.9.9.3-beta`
 
 
 ## Table of Contents
@@ -18,6 +18,7 @@ Currently in `version 0.9.9.2-beta`
     + [Query window: Undo scan and auto pause](#query-window-undo-scan-and-auto-pause)
     + [Query window: format of scan range supports offset](#query-window-format-of-scan-range-supports-offset)
     + [Query window: Dump Import PS4 section memory block](#query-window-dump-import-ps4-section-memory-block)
+    + [Query window: Compare to first scan](#query-window-compare-to-first-scan)
   * [Scan Type](#scan-type)
     + [Scan Type: Byte](#scan-type-byte)
     + [Scan Type: 2 Bytes](#scan-type-2-bytes)
@@ -196,6 +197,14 @@ Cheat format used by PS4 Trainer and GoldHEN Cheat (0.9.6.0)
 
 - You can perform Dump or Import of PS4 section memory block from the right-click menu in the SectionView of the Query window. (0.9.8.7)
 - Note that this functionality is experimental; after importing dump files, the game is likely to be abnormal or encounter errors around 99% of the time.
+
+
+### Query window: Compare to first scan
+
+- Added support for comparing to the first scan result in the Query window. (0.9.9.3)
+- For scans performed after the initial scan, if the "Compare to first scan" checkbox is enabled, the current result values will be compared to the values from the first scan. (0.9.9.3)
+
+![query_compare_first](assets/query_compare_first.webp)
 
 
 
