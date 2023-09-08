@@ -10,7 +10,6 @@ using System.Security.Principal;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
-using static PS4CheaterNeo.SectionTool;
 
 namespace PS4CheaterNeo
 {

@@ -166,9 +166,9 @@
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
         YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAD3SURBVDhPY4CBb9++/UfG79+/F4BKEQdAmiy6TMCYJAOQ
         bUU2AIYJGoSsER1TxYAvX74s+/Tp08P79+//BvGB+ClI7OvXr2ZwA2AYWSMIP3j75X/l0df/c/a//N92
-        8hUYg9ggsQNnr/z9/v17MgPIiSCMzYD43c//P3vz8f+H96gYJAaSA6p5B3YFCMA0IWOXDU9xGgCSA6mB
+        8hUYg9ggsf0nL/z9/v17MgPIiSCMzYD43c//P3vz8f+H96gYJAaSA6p5B3YFCMA0IWOXDU9xGgCSA6mB
         ameAuwTZRdILH4Fx8LZn/5uOvwJjEBsmjmIAOkA2ABceAQa8s1z7FKtGEAbJgdRAlWMCUCIBJRZQorFY
-        8/S//OJHYAxioyQkfACUXEHJFmjT069A54IwiI1IygwMAOMiFI1yOjA1AAAAAElFTkSuQmCC
+        8/S//OJHYAxioyQkfACUXEHJFmjT069A54IwiI1IygwMAMYGFHKJNKbhAAAAAElFTkSuQmCC
 </value>
   </data>
   <data name="ToolStripHexView.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
@@ -218,6 +218,13 @@
         7J2z/+26rf5vO78NzCfJAJBmmy7L/34Tvf8/efkULIbXgJuPbuLVDMI4DZi1d8Z/W6AGkEZcmvEaAFII
         0gDSiEszXgNAGGYILs0gjNcAEAZpxKUZhAkaQAhjNYBUjGIAuRhsAPmAgQEA6c/eYOUC47kAAAAASUVO
         RK5CYII=
+</value>
+  </data>
+  <data name="ToolStripAutoRefresh.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
+        YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAvSURBVDhPY/j27dt/SjDYACcnJ7IwigEf3n8kCY8aMGoA
+        CA9HA8jBcAPIx9/+AwDLe2lecYYtYAAAAABJRU5ErkJggg==
 </value>
   </data>
   <data name="ToolStripSettings.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
@@ -329,6 +336,9 @@
   </metadata>
   <metadata name="SaveCheatDialog.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>524, 17</value>
+  </metadata>
+  <metadata name="AutoRefreshTimer.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>819, 17</value>
   </metadata>
   <metadata name="$this.TrayHeight" type="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>114</value>

@@ -1,5 +1,4 @@
 ﻿using GroupGridView;
-using libdebug;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -12,7 +11,6 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using static PS4CheaterNeo.SectionTool;
 
 namespace PS4CheaterNeo
 {
@@ -22,6 +20,9 @@ namespace PS4CheaterNeo
         private SendPayload sendPayload;
         private CheatJson cheatJson = null;
         private Brush cheatGridViewRowIndexForeBrush;
+        private bool VerifySectionWhenLock;
+        private bool VerifySectionWhenRefresh;
+        private bool CheatAutoRefreshShowStatus;
         public SectionTool sectionTool { get; private set; }
         public string ProcessName;
         public int ProcessPid;
@@ -32,6 +33,12 @@ namespace PS4CheaterNeo
             InitializeComponent();
             ApplyUI();
             ToolStripLockEnable.Checked = Properties.Settings.Default.CheatLock.Value;
+            ToolStripAutoRefresh.Checked = Properties.Settings.Default.CheatAutoRefresh.Value;
+            CheatAutoRefreshShowStatus = Properties.Settings.Default.CheatAutoRefreshShowStatus.Value;
+            AutoRefreshTimer.Interval = (int)Properties.Settings.Default.CheatAutoRefreshTimerInterval.Value;
+            VerifySectionWhenLock = Properties.Settings.Default.VerifySectionWhenLock.Value;
+            VerifySectionWhenRefresh = Properties.Settings.Default.VerifySectionWhenRefresh.Value;
+
             Text += " " + Application.ProductVersion; //Assembly.GetExecutingAssembly().GetName().Version.ToString(); // Assembly.GetEntryAssembly().GetName().Version.ToString();
             sectionTool = new SectionTool();
         }
@@ -112,6 +119,7 @@ namespace PS4CheaterNeo
             sendPayload.Show();
         }
 
+        #region ToolStripOpenAndSave
         private void ToolStripOpen_Click(object sender, EventArgs e)
         {
             try
@@ -132,7 +140,7 @@ namespace PS4CheaterNeo
                     string[] cheatHeaderItems = cheatStrArr[0].Split('|');
 
                     ProcessName = cheatHeaderItems[1];
-                    if (!InitSectionList(ProcessName)) return;
+                    if (!InitSections(ProcessName)) return;
 
                     #region ParsePS4CheatFiles
                     if (cheatStrArr[0].ToUpper().Contains("ID") && cheatStrArr[0].ToUpper().Contains("VER") && cheatStrArr[0].ToUpper().Contains("FM"))
@@ -192,7 +200,11 @@ namespace PS4CheaterNeo
                         int relativeOffset = isRelative ? int.Parse(cheatElements[5].Substring(1), NumberStyles.HexNumber) : -1;
 
                         Section section = isSIDv1 ? sectionTool.GetSectionBySIDv1(sid, name, prot) : sectionTool.GetSection(sid, name, prot);
-                        if (section == null && ToolStripLockEnable.Checked) ToolStripLockEnable.Checked = false;
+                        if (section == null && (ToolStripLockEnable.Checked || ToolStripAutoRefresh.Checked))
+                        {
+                            ToolStripLockEnable.Checked = false;
+                            ToolStripAutoRefresh.Checked = false;
+                        }
 
                         uint offsetAddr = 0;
                         List<long> pointerOffsets = null;
@@ -362,6 +374,10 @@ namespace PS4CheaterNeo
             }
         }
 
+        /// <summary>
+        /// Load and parse Cheat files in the @batchcode format.
+        /// </summary>
+        /// <param name="data"></param>
         private (string offset, ScanType vtype, string value) ParseBatchCode(string data)
         {
             int size = 0;
@@ -413,6 +429,11 @@ namespace PS4CheaterNeo
             return code;
         }
 
+        /// <summary>
+        /// Load a Cheat file in JSON format.
+        /// </summary>
+        /// <param name="cheatTexts"></param>
+        /// <returns></returns>
         private int ParseCheatJson(string cheatTexts)
         {
             int count = 0;
@@ -422,7 +443,7 @@ namespace PS4CheaterNeo
                 cheatJson = (CheatJson)deseralizer.ReadObject(ms);
 
                 ProcessName = cheatJson.Process;
-                if (!InitSectionList(ProcessName)) return 0;
+                if (!InitSections(ProcessName)) return 0;
 
                 #region cheatHeaderItems Check
                 string cheatGameID = cheatJson.Id;
@@ -482,7 +503,7 @@ namespace PS4CheaterNeo
             if (string.IsNullOrWhiteSpace(SaveCheatDialog.FileName)) SaveCheatDialog.FileName = gameID;
 
             if (SaveCheatDialog.ShowDialog() != DialogResult.OK) return;
-            if (!InitSectionList(ProcessName)) return;
+            if (!InitSections(ProcessName)) return;
             
             if (SaveCheatDialog.FileName.ToUpper().EndsWith("JSON"))
             {
@@ -588,6 +609,7 @@ namespace PS4CheaterNeo
             OpenCheatDialog.FileName = SaveCheatDialog.FileName;
             OpenCheatDialog.FilterIndex = SaveCheatDialog.FilterIndex;
         }
+        #endregion
 
         private void ToolStripNewQuery_Click(object sender, EventArgs e)
         {
@@ -639,7 +661,7 @@ namespace PS4CheaterNeo
                 if (InputBox.Show("Hex View", "Please enter the memory address(hex) you want to view", ref inputValue) != DialogResult.OK) return;
 
                 if ((ProcessName ?? "") == "") throw new Exception("No Process currently");
-                if (!InitSectionList(ProcessName)) throw new Exception(String.Format("Process({0}): InitSectionList failed", ProcessName));
+                if (!InitSections(ProcessName)) throw new Exception(String.Format("Process({0}): InitSections failed", ProcessName));
 
                 ulong address = ulong.Parse(inputValue, NumberStyles.HexNumber);
                 uint sid = sectionTool.GetSectionID(address);
@@ -661,26 +683,90 @@ namespace PS4CheaterNeo
         {
             if (CheatGridView.Rows.Count == 0 || (refreshCheatTask != null && !refreshCheatTask.IsCompleted)) return;
 
-            refreshCheatTask = RefreshCheatTask();
+            refreshCheatTask = RefreshCheatTask(true);
             ToolStripMsg.Text = string.Format("{0:000}%, Refresh Cheat finished.", 100);
+        }
+
+        private void ToolStripLockEnable_Click(object sender, EventArgs e) => ToolStripLockEnable.Checked = !ToolStripLockEnable.Checked;
+
+        private void ToolStripLockEnable_CheckedChanged(object sender, EventArgs e)
+        {
+            if (ToolStripLockEnable.Image != null) ToolStripLockEnable.Image.Dispose();
+            ToolStripLockEnable.Image = CheckBoxImage(ToolStripLockEnable.Checked);
+        }
+
+        private void ToolStripAutoRefresh_Click(object sender, EventArgs e) => ToolStripAutoRefresh.Checked = !ToolStripAutoRefresh.Checked;
+
+        private void ToolStripAutoRefresh_CheckedChanged(object sender, EventArgs e)
+        {
+            if (ToolStripAutoRefresh.Image != null) ToolStripAutoRefresh.Image.Dispose();
+            ToolStripAutoRefresh.Image = CheckBoxImage(ToolStripAutoRefresh.Checked);
+
+            if (!ToolStripAutoRefresh.Checked) AutoRefreshTimer.Stop();
+            AutoRefreshTimer.Enabled = ToolStripAutoRefresh.Checked;
+        }
+
+        /// <summary>
+        /// Get the Image of CheckBoxes with the status of Checked or Unchecked.
+        /// </summary>
+        /// <param name="isChecked">Checked or Unchecked</param>
+        /// <returns>Image of CheckBoxes</returns>
+        private Image CheckBoxImage(bool isChecked)
+        {
+            Image image = null;
+            byte[] imageBytes = isChecked ?
+                Convert.FromBase64String("iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAvElEQVR4Xr3ToQoCMRzH8Z8ytFy66DOIPocyBc/iExhE8FUMYhCLGBTBM7hX0KbJqGDUYLqwOPmHgzGO222Cn7zvj4WtpJSClFLBE0sDzjlcCSHAoIn3BxQV9XsgZfj788Djc0d32cL5eYKOFY0n8RhhNUSj1rTf4J28MuP5YIGgEuTfYHfdYH1ZYRrNQDLi/IF2vQNxO1IIYsT2ATpIwWg7BNFi+4A5QtLYZUAL7Zj5PF0x/WP4oO+MX3wBcd48+jpQHgAAAAAASUVORK5CYII=") :
+                Convert.FromBase64String("iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAARUlEQVR4Xu3SoRGAMBAF0Q1z5Z0J1AmYX9tZGGYQWL6KyCtg1baquvARAJmJQxLB69hP/li3zmPBN1BgBmYgPm/7AUm4bkJfDRuTAXI3AAAAAElFTkSuQmCC");
+            using (MemoryStream ms = new MemoryStream(imageBytes, 0, imageBytes.Length)) image = Image.FromStream(ms, true);
+            return image;
         }
         #endregion
 
         #region Task
         Task<bool> refreshCheatTask;
-        private async Task<bool> RefreshCheatTask() => await Task.Run(() => {
-            if (!InitSectionList(ProcessName, true)) return false;
+        private void AutoRefreshTimer_Tick(object sender, EventArgs e)
+        {
+            if (!(ToolStripProcessInfo.Tag is bool) && ProcessName != (string)ToolStripProcessInfo.Tag)
+            {
+                ToolStripProcessInfo.Tag = ProcessName;
+                ToolStripProcessInfo.Text = "Current Processes: " + (ProcessName == "" ? "Empty" : (ProcessName + (ProcessPid > 0 ? "(" + ProcessPid + ")" : "")));
+            }
+            if (!ToolStripAutoRefresh.Checked || CheatGridView.Rows.Count == 0 || (refreshCheatTask != null && !refreshCheatTask.IsCompleted)) return;
 
-            bool VerifySectionWhenRefresh = Properties.Settings.Default.VerifySectionWhenRefresh.Value;
+            if (refreshCheatTask != null) refreshCheatTask.Dispose();
+
+            if (ToolStripProcessInfo.Tag is bool && !(bool)ToolStripProcessInfo.Tag)
+            {
+                ToolStripAutoRefresh.Checked = false;
+                ToolStripLockEnable.Checked = false;
+                return;
+            }
+
+            refreshCheatTask = RefreshCheatTask();
+        }
+
+        private async Task<bool> RefreshCheatTask(bool isShowStatus = false) => await Task.Run(() => {
+            bool isForceInitSections = DateTime.Now.Second % 3 == 0;
             System.Diagnostics.Stopwatch tickerMajor = System.Diagnostics.Stopwatch.StartNew();
+            if (!InitSections(ProcessName, isForceInitSections)) return false;
+            if (isForceInitSections)
+            {
+                VerifySectionWhenRefresh = Properties.Settings.Default.VerifySectionWhenRefresh.Value;
+                CheatAutoRefreshShowStatus = Properties.Settings.Default.CheatAutoRefreshShowStatus.Value;
+                AutoRefreshTimer.Interval = (int)Properties.Settings.Default.CheatAutoRefreshTimerInterval.Value;
+            }
+
             (uint sid, string name, uint prot, uint offsetAddr) preData = (0, "", 0, 0);
             Dictionary<ulong, ulong> pointerCaches = new Dictionary<ulong, ulong>();
+            int processID = -1;
+            List<(ulong address, int length)> readData = new List<(ulong address, int length)>();
+            List<(int cIdx, ScanType scanType, bool isSign)> cheatList = new List<(int cIdx, ScanType scanType, bool isSign)>();
             for (int cIdx = 0; cIdx < CheatGridView.Rows.Count; cIdx++)
             {
                 try
                 {
                     string msg = string.Format("{0}/{1}", cIdx + 1, CheatGridView.Rows.Count);
-                    ToolStripMsg.Text = string.Format("{0:000}%, Refresh Cheat elapsed:{1}s. {2}", (int)(((float)(cIdx + 1) / CheatGridView.Rows.Count) * 100), tickerMajor.Elapsed.TotalSeconds, msg);
+                    if (CheatAutoRefreshShowStatus || isShowStatus) ToolStripMsg.Text = string.Format("{0:000}%, Refresh Cheat elapsed:{1:0.00}s. {2}", (int)(((float)(cIdx + 1) / CheatGridView.Rows.Count) * 100), tickerMajor.Elapsed.TotalSeconds, msg);
 
                     DataGridViewRow cheatRow = CheatGridView.Rows[cIdx];
                     (Section section, uint offsetAddr) = ((Section section, uint offsetAddr))cheatRow.Tag;
@@ -697,7 +783,10 @@ namespace PS4CheaterNeo
                         if (section == null)
                         {
                             ToolStripMsg.Text = string.Format("RefreshCheat Failed...CheatGrid({0}), section: {1}, offsetAddr: {2:X}", cIdx, string.Join("-", sectionArr), offsetAddr);
-                            if (ToolStripLockEnable.Checked) Invoke(new MethodInvoker(() => { ToolStripLockEnable.Checked = false; }));
+                            if (ToolStripLockEnable.Checked || ToolStripAutoRefresh.Checked) Invoke(new MethodInvoker(() => {
+                                ToolStripLockEnable.Checked = false;
+                                ToolStripAutoRefresh.Checked = false;
+                            }));
                             cheatRow.DefaultCellStyle.ForeColor = Color.Red;
                             preData = (0, "", 0, 0);
                             continue;
@@ -712,15 +801,34 @@ namespace PS4CheaterNeo
                     int scanTypeLength = 0;
                     if (scanType != ScanType.Hex && scanType != ScanType.String_) ScanTool.ScanTypeLengthDict.TryGetValue(scanType, out scanTypeLength);
                     else scanTypeLength = ScanTool.ValueStringToByte(scanType, cheatRow.Cells[(int)ChertCol.CheatListValue].Value.ToString()).Length;
-                    byte[] newData = PS4Tool.ReadMemory(section.PID, offsetAddr + section.Start, scanTypeLength);
+
+                    if (processID == -1) processID = section.PID;
+                    readData.Add((offsetAddr + section.Start, scanTypeLength));
+                    cheatList.Add((cIdx, scanType, isSign));
                     cheatRow.Tag = (section, offsetAddr);
-                    cheatRow.Cells[(int)ChertCol.CheatListValue].Value = ScanTool.BytesToString(scanType, newData, false, isSign);
                 }
                 catch (Exception) { preData = (0, "", 0, 0); }
             }
+
+            if (ProcessPid == 0) return false;
+
+            CheatBatchReadMemory(10, processID, readData, cheatList, isShowStatus, tickerMajor, true);
+
+            if (CheatAutoRefreshShowStatus || isShowStatus) ToolStripMsg.Text = string.Format("{0:000}%, Refresh Cheat elapsed:{1:0.00}s", (int)(((float)CheatGridView.Rows.Count / CheatGridView.Rows.Count) * 100), tickerMajor.Elapsed.TotalSeconds);
+
             return true;
         });
 
+        /// <summary>
+        /// Reload and update Section contents based on sid, name, and prot as conditions.
+        /// </summary>
+        /// <param name="sectionSid">section sid</param>
+        /// <param name="sectionArr">The CheatListSection field in CheatGridView records information about the Section.</param>
+        /// <param name="offsetAddr">The Tag of CheatGridView's Rows records the Section and Offset Address.</param>
+        /// <param name="isPointer">Verify if it's a pointer.</param>
+        /// <param name="preData">Save the previous data, which includes sid, name, prot, and offsetAddr.</param>
+        /// <param name="pointerCaches">memory caches for pointer</param>
+        /// <returns></returns>
         private (Section section, uint offsetAddr, string hexAddr) RefreshSection(uint sectionSid, string[] sectionArr, uint offsetAddr, bool isPointer, (uint sid, string name, uint prot, uint offsetAddr) preData, Dictionary<ulong, ulong> pointerCaches)
         {
             bool isRelative = sectionArr[0].StartsWith("+");
@@ -774,18 +882,30 @@ namespace PS4CheaterNeo
 
             if (refreshLockTask != null) refreshLockTask.Dispose();
 
+            if (ToolStripProcessInfo.Tag is bool && !(bool)ToolStripProcessInfo.Tag)
+            {
+                ToolStripAutoRefresh.Checked = false;
+                ToolStripLockEnable.Checked = false;
+                return;
+            }
+
             refreshLockTask = RefreshLockTask();
         }
 
         private async Task<bool> RefreshLockTask() => await Task.Run(() => {
+            bool isInitSections = false;
             if (DateTime.Now.Second % 5 == 0 && DateTime.Now.Millisecond < 500)
             {
-                if (!InitSectionList(ProcessName)) return false;
+                if (!InitSections(ProcessName)) return false;
+
+                isInitSections = true;
+                VerifySectionWhenLock = Properties.Settings.Default.VerifySectionWhenLock.Value;
             }
 
-            bool VerifySectionWhenLock = Properties.Settings.Default.VerifySectionWhenLock.Value;
             (uint sid, string name, uint prot, uint offsetAddr) preData = (0, "", 0, 0);
             Dictionary<ulong, ulong> pointerCaches = new Dictionary<ulong, ulong>();
+            int processID = -1;
+            List<(ulong address, byte[] data)> writeData = new List<(ulong address, byte[] data)>();
             for (int cIdx = 0; cIdx < CheatGridView.Rows.Count; cIdx++)
             {
                 try
@@ -798,7 +918,7 @@ namespace PS4CheaterNeo
                     }
                     (Section section, uint offsetAddr) = ((Section section, uint offsetAddr))cheatRow.Tag;
                     #region Refresh Section and offsetAddr
-                    if (VerifySectionWhenLock)
+                    if (isInitSections && VerifySectionWhenLock)
                     {
                         string hexAddr;
                         uint sid = cheatRow.Cells[(int)ChertCol.CheatListSID].Value == null ? 0 : (uint)cheatRow.Cells[(int)ChertCol.CheatListSID].Value;
@@ -844,12 +964,104 @@ namespace PS4CheaterNeo
                     #endregion
                     ScanType scanType = this.ParseFromDescription<ScanType>(cheatRow.Cells[(int)ChertCol.CheatListType].Value.ToString());
                     byte[] newData = ScanTool.ValueStringToByte(scanType, cheatRow.Cells[(int)ChertCol.CheatListValue].Value.ToString());
-                    PS4Tool.WriteMemory(section.PID, offsetAddr + section.Start, newData);
+
+                    if (processID == -1) processID = section.PID;
+                    writeData.Add((offsetAddr + section.Start, newData));
                 }
                 catch (Exception) { preData = (0, "", 0, 0); }
             }
+
+            if (ProcessPid == 0) return false;
+
+            CheatBatchWriteMemory(10, processID, writeData, true);
+
             return true;
         });
+
+        /// <summary>
+        /// After splitting the readData, which contains memory positions and lengths, 
+        /// into multiple chunks based on chunkSize, read PS4 memory content in batches. 
+        /// Then, using the corresponding cheatList (which includes index values and scan type information), 
+        /// update the newly read values in the CheatGridView.
+        /// </summary>
+        /// <param name="chunkSize">Size of each chunk</param>
+        /// <param name="processID">specified process PID</param>
+        /// <param name="readData">readData contains memory positions and lengths</param>
+        /// <param name="cheatList">cheatList includes index values and scan type information</param>
+        /// <param name="isShowStatus">Whether to display status messages.</param>
+        /// <param name="tickerMajor"></param>
+        private void CheatBatchReadMemory(int chunkSize, int processID, List<(ulong address, int length)> readData, List<(int cIdx, ScanType scanType, bool isSign)> cheatList, bool isShowStatus, System.Diagnostics.Stopwatch tickerMajor, bool isExceptionThrow = false)
+        {
+            List<List<(ulong address, int length)>> readDataList = SplitList(readData, chunkSize);
+
+            for (int idx = 0; idx < readDataList.Count; idx++)
+            {
+                List<(ulong address, int length)> subReadData = readDataList[idx];
+                try
+                {
+                    byte[][] newDatas = PS4Tool.ReadMemory(processID, subReadData.ToArray());
+
+                    int chunkStart = idx * chunkSize;
+                    int chunkEnd = chunkStart + newDatas.Length;
+                    for (int idx2 = chunkStart; idx2 < chunkEnd; idx2++)
+                    {
+                        byte[] newData = newDatas[idx2 - chunkStart];
+                        (int cIdx, ScanType scanType, bool isSign) = cheatList[idx2];
+                        DataGridViewRow cheatRow = CheatGridView.Rows[cIdx];
+                        cheatRow.Cells[(int)ChertCol.CheatListValue].Value = ScanTool.BytesToString(scanType, newData, false, isSign);
+                    }
+                    if (CheatAutoRefreshShowStatus || isShowStatus)
+                    {
+                        ToolStripMsg.Text = string.Format("{0:000}%, Refresh Cheat elapsed:{1:0.00}s. {2}/{3}",
+                        (int)(((float)(chunkEnd) / CheatGridView.Rows.Count) * 100), tickerMajor.Elapsed.TotalSeconds, chunkEnd, CheatGridView.Rows.Count);
+                    }
+                }
+                catch (Exception) { if (isExceptionThrow) throw; }
+            }
+        }
+
+        /// <summary>
+        /// Split the writeData containing memory locations and bytes into multiple chunks based on chunkSize and write them into PS4 memory in batches.
+        /// </summary>
+        /// <param name="chunkSize">Size of each chunk</param>
+        /// <param name="processID">specified process PID</param>
+        /// <param name="writeData">writeData containing memory locations and bytes</param>
+        private void CheatBatchWriteMemory(int chunkSize, int processID, List<(ulong address, byte[] data)> writeData, bool isExceptionThrow = false)
+        {
+            List<List<(ulong address, byte[] data)>> writeDataList = SplitList(writeData, chunkSize);
+
+            for (int idx = 0; idx < writeDataList.Count; idx++)
+            {
+                try
+                {
+                    List<(ulong address, byte[] data)> subWriteData = writeDataList[idx];
+                    PS4Tool.WriteMemory(processID, subWriteData.ToArray());
+                }
+                catch (Exception) { if (isExceptionThrow) throw; }
+            }
+        }
+
+        /// <summary>
+        /// Split the list into N sublists based on the chunkSize.
+        /// </summary>
+        /// <param name="source">Source list</param>
+        /// <param name="chunkSize">Size of each chunk</param>
+        /// <returns></returns>
+        private List<List<T>> SplitList<T>(List<T> source, int chunkSize)
+        {
+            var subLists = new List<List<T>>();
+
+            for (int idx = 0; idx < source.Count; idx += chunkSize)
+            {
+                int remainingCount = source.Count - idx;
+                int currentChunkSize = Math.Min(chunkSize, remainingCount);
+
+                List<T> chunk = source.GetRange(idx, currentChunkSize);
+                subLists.Add(chunk);
+            }
+
+            return subLists;
+        }
         #endregion
 
         #region CheatGridView
@@ -958,8 +1170,6 @@ namespace PS4CheaterNeo
             byte[] newData = ScanTool.ValueStringToByte(scanType, e.Text);
             PS4Tool.WriteMemory(section.PID, offsetAddr + section.Start, newData);
         }
-        #endregion
-
         #endregion
 
         #region CheatGridMenu
@@ -1139,10 +1349,7 @@ namespace PS4CheaterNeo
                 PointerFinder pointerFinder = new PointerFinder(this, offsetAddr + section.Start, scanType);
                 pointerFinder.Show();
             }
-            catch
-            {
-
-            }
+            catch { }
         }
 
         private void CheatGridMenuDelete_Click(object sender, EventArgs e)
@@ -1152,19 +1359,8 @@ namespace PS4CheaterNeo
             DataGridViewSelectedRowCollection rows = CheatGridView.SelectedRows;
             for (int i = 0; i < rows.Count; ++i) CheatGridView.Rows.Remove(rows[i]);
         }
+        #endregion
 
-        private void ToolStripLockEnable_Click(object sender, EventArgs e)
-        {
-            ToolStripLockEnable.Checked = !ToolStripLockEnable.Checked;
-        }
-
-        private void ToolStripLockEnable_CheckedChanged(object sender, EventArgs e)
-        {
-            byte[] checkBoxBase64;
-            if (ToolStripLockEnable.Checked) checkBoxBase64 = Convert.FromBase64String("iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAvElEQVR4Xr3ToQoCMRzH8Z8ytFy66DOIPocyBc/iExhE8FUMYhCLGBTBM7hX0KbJqGDUYLqwOPmHgzGO222Cn7zvj4WtpJSClFLBE0sDzjlcCSHAoIn3BxQV9XsgZfj788Djc0d32cL5eYKOFY0n8RhhNUSj1rTf4J28MuP5YIGgEuTfYHfdYH1ZYRrNQDLi/IF2vQNxO1IIYsT2ATpIwWg7BNFi+4A5QtLYZUAL7Zj5PF0x/WP4oO+MX3wBcd48+jpQHgAAAAAASUVORK5CYII=");
-            else checkBoxBase64 = Convert.FromBase64String("iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAARUlEQVR4Xu3SoRGAMBAF0Q1z5Z0J1AmYX9tZGGYQWL6KyCtg1baquvARAJmJQxLB69hP/li3zmPBN1BgBmYgPm/7AUm4bkJfDRuTAXI3AAAAAElFTkSuQmCC");
-            using (MemoryStream ms = new MemoryStream(checkBoxBase64, 0, checkBoxBase64.Length)) ToolStripLockEnable.Image = Image.FromStream(ms, true);
-        }
         #endregion
 
         #region Public Method
@@ -1276,30 +1472,34 @@ namespace PS4CheaterNeo
         /// <param name="processName">initialize Sections according to the passed process name</param>
         /// <param name="force">force initialization even if Section dictionary already has data</param>
         /// <returns>return whether the initialization was successful</returns>
-        public bool InitSectionList(string processName, bool force = false)
+        public bool InitSections(string processName, bool force = false)
         {
-            ProcessInfo processInfo = PS4Tool.GetProcessInfo(processName);
+            libdebug.ProcessMap pMap = null;
+            libdebug.ProcessInfo processInfo = PS4Tool.GetProcessInfo(processName);
 
             if (processInfo.pid == 0 || processInfo.name != processName)
             {
                 Invoke(new MethodInvoker(() =>
                 {
+                    ProcessPid = 0;
+                    ToolStripLockEnable.Checked = false;
+                    ToolStripAutoRefresh.Checked = false;
                     ToolStripProcessInfo.Text = string.Format("ProcessInfo: Cheat file Process({0}) could not find.", processName);
                     ToolStripProcessInfo.Tag = false;
                 }));
                 return false;
             }
-            else if (ToolStripProcessInfo.Tag is bool) ToolStripProcessInfo.Tag = null; //當已查詢到ProcessInfo時，清除失敗的Tag
+            else if (ToolStripProcessInfo.Tag is bool) ToolStripProcessInfo.Tag = null; //When ProcessInfo has been queried, clear unsuccessful Tags.
             else if (!force && processInfo.pid > 0 && processInfo.pid == sectionTool.PID && sectionTool.SectionDict != null)
             {
-                ProcessMap pMap = null;
                 if (sectionTool.SectionDict.Count < 20) pMap = PS4Tool.GetProcessMaps(processInfo.pid);
-                if (pMap == null || sectionTool.SectionDict.Count >= pMap.entries.Length) return true; //當Process ID相同時，不再執行初始化
+                if (pMap == null || sectionTool.SectionDict.Count >= pMap.entries.Length) return true; //When the Process ID is the same, initialization will no longer be executed.
             }
 
             ProcessPid = processInfo.pid;
             ProcessName = processInfo.name;
-            sectionTool.InitSectionList(processInfo.pid, ProcessName);
+            if (pMap == null) sectionTool.InitSections(processInfo.pid, ProcessName);
+            else sectionTool.InitSections(pMap, processInfo.pid, ProcessName);
 
             return true;
         }

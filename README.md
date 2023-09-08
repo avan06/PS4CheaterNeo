@@ -101,6 +101,7 @@ Currently in `version 0.9.9.2-beta`
 - The cheat list will show row number. (0.9.4.5)
 - Support using `keyboard up, down or mouse wheel` to adjust value when modifying cheat Value. (0.9.5.0)
 - Editing cheat values in UpDown can be automatically written to PS4 when CheatCellDirtyValueCommit is enabled. (0.9.5.3)
+- Added an "`Auto Refresh` Cheat" button in the main window. When enabled, it will automatically reload cheat values from the PS4 at intervals specified by the `CheatAutoRefreshTimerInterval` option. (0.9.9.2)
 
 ![cheat_1](assets/cheat_1.webp)
 ![cheat_2](assets/cheat_2.webp)
@@ -442,6 +443,8 @@ Enter PS4 FW Version (Confirm the fw version only when perform sendpayload).
 Determines whether to enable `collapsible split container` ui in `Query and HexEditor and PointerFinder` windows. Default enabled. (0.9.7.3)  
 - `UIOpacity`:
 Determines the opacity of the window, the maximum is 1 (opaque), `Default is 0.95`. (0.9.7.7)  
+- `PS4DBGMutexFactor`:
+It is not recommended to adjust this value, and changes take effect only after a restart. The Mutex factor determines the number of connections that PS4DBG can occupy during initialization. For ReadMemory, the number of connections is from 0 to (but not including) mutexFactor. For WriteMemory, the number of connections is from mutexFactor to (but not including) 2*mutexFactor. `Default value is 3` (0.9.9.2)  
 
 ### Cheat  
 - `CheatLock`:  
@@ -452,6 +455,12 @@ Determine whether to automatically write to PS4 when editing cheat values in UpD
 Determine whether to enable verifying Section values when locking cheat items, `Default enabled`. (0.9.4.1)  
 - `VerifySectionWhenRefresh`:  
 Determine whether to enable verifying Section values when refreshing the cheat list, `Default enabled`. (0.9.4.1)  
+- `CheatAutoRefresh`:  
+Determines whether to enable Auto Refresh in main window. `Default disabled`. (0.9.9.2)  
+- `CheatAutoRefreshShowStatus`:  
+Determines whether to display its execution status in the main window when CheatAutoRefresh is enabled. `Default disabled`. (0.9.9.2)  
+- `CheatAutoRefreshTimerInterval`:  
+Determines the Interval of AutoRefreshTimer when AutoRefresh is enabled, in milliseconds. `Default 2500`. (0.9.9.2)  
 
 ### Query  
 - `AutoPerformGetProcesses`:  
@@ -496,13 +505,13 @@ Determines whether to enable `Auto Refresh` in HexEditor. `Default disabled`. (0
 - `AutoRefreshTimerInterval`:  
 Determines the Interval of AutoRefreshTimer when AutoRefresh is enabled, in `milliseconds`, HexEditor needs to be restarted after this value is changed. `Default 2500`. (0.9.7.3)  
 - `HexInfoDash`:  
-Determines the delimited dash value that displays the current Hex value in the HexEditor. Default "-". (0.9.7.7)  
+Determines the delimited dash value that displays the current Hex value in the HexEditor. `Default "-"`. (0.9.7.7)  
 - `AutoFindClosestChangedPosition`:  
 Determines whether to enable automatic selection of the value change (`red` and `green` value) position closest to the current location when there is no input value for the find value. `Default enabled`. (0.9.8.5)  
 - `InputIsHexFormat`:  
-Determines whether to enable the input format for searching as Hex in the HexEditor window. Default enabled. (0.9.9.0)  
+Determines whether to enable the input format for searching as Hex in the HexEditor window. `Default enabled`. (0.9.9.0)  
 - `UsingLittleEndian`:  
-Determines whether to enable using LittleEndian endianness, when the input format for the search is Hex, in the HexEditor window, if this option is not checked, it will use BigEndian. Note: When LittleEndian is enabled, regardless of input length, the input Hex values will be completely reversed (using Array.Reverse). Default disabled. (0.9.9.0)  
+Determines whether to enable using LittleEndian endianness, when the input format for the search is Hex, in the HexEditor window, if this option is not checked, it will use BigEndian. Note: When LittleEndian is enabled, regardless of input length, the input Hex values will be completely reversed (using Array.Reverse). `Default disabled`. (0.9.9.0)  
 
 ### UI  
 - `ColorTheme`:  

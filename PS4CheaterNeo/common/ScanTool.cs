@@ -5,7 +5,6 @@ using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
-using static PS4CheaterNeo.SectionTool;
 
 namespace PS4CheaterNeo
 {
@@ -54,6 +53,7 @@ namespace PS4CheaterNeo
 
     public static class ScanTool
     {
+        private static SectionTool sectionTool = new SectionTool();
         public static Dictionary<ScanType, int> ScanTypeLengthDict = new Dictionary<ScanType, int>()
         {
             [ScanType.Byte_] = 1,
@@ -65,6 +65,13 @@ namespace PS4CheaterNeo
             [ScanType.AutoNumeric] = 8,
         };
 
+        /// <summary>
+        /// Convert the text's Value into the corresponding byte[] using BitConverter.GetBytes based on ScanType.
+        /// </summary>
+        /// <param name="scanType">Scanning types for text: byte, 2 bytes, 4 bytes, 8 bytes, float, double, Hex, String, Group, or AutoNumeric</param>
+        /// <param name="value">string value</param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         public static byte[] ValueStringToByte(ScanType scanType, string value)
         {
             byte[] bytes = null;
@@ -119,6 +126,11 @@ namespace PS4CheaterNeo
             return bytes;
         }
 
+        /// <summary>
+        /// Convert bytes to ulong type.
+        /// </summary>
+        /// <param name="bytes"></param>
+        /// <returns></returns>
         public static ulong BytesToULong(byte[] bytes)
         {
             if (bytes.Length < 8) Array.Resize(ref bytes, 8);
@@ -126,6 +138,12 @@ namespace PS4CheaterNeo
             return valueUlong;
         }
 
+        /// <summary>
+        /// First, use ValueStringToByte to obtain the corresponding byte[], and then use BytesToULong to convert it to ulong.
+        /// </summary>
+        /// <param name="scanType">Scanning types for text: byte, 2 bytes, 4 bytes, 8 bytes, float, double, Hex, String, Group, or AutoNumeric</param>
+        /// <param name="value">string value</param>
+        /// <returns></returns>
         public static ulong ValueStringToULong(ScanType scanType, string value)
         {
             byte[] bytes = ValueStringToByte(scanType, value);
@@ -134,6 +152,15 @@ namespace PS4CheaterNeo
             return valueUlong;
         }
 
+        /// <summary>
+        /// Depending on the ScanType, use BitConverter to convert the byte[] value into the corresponding string value.
+        /// </summary>
+        /// <param name="scanType">Scanning types for text: byte, 2 bytes, 4 bytes, 8 bytes, float, double, Hex, String, Group, or AutoNumeric</param>
+        /// <param name="value">string value</param>
+        /// <param name="isHex">if isHex is enabled, it will directly convert the bytes into hexadecimal text.</param>
+        /// <param name="isSign">During the conversion, it will consider whether it's a signed numeric type based on isSign</param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         public static string BytesToString(ScanType scanType, Byte[] value, bool isHex = false, bool isSign = false)
         {
             string result = "";
@@ -189,6 +216,14 @@ namespace PS4CheaterNeo
             return result;
         }
 
+        /// <summary>
+        /// Convert ulong to the corresponding text based on ScanType. First, convert ulong to bytes, and then use BytesToString to get the result.
+        /// </summary>
+        /// <param name="scanType"></param>
+        /// <param name="value"></param>
+        /// <param name="isHex"></param>
+        /// <param name="isSign"></param>
+        /// <returns></returns>
         public static string ULongToString(ScanType scanType, ulong value, bool isHex = false, bool isSign = false)
         {
             byte[] valueBytes = BitConverter.GetBytes(value);
@@ -196,6 +231,11 @@ namespace PS4CheaterNeo
             return result;
         }
 
+        /// <summary>
+        /// Reverse Hex text.
+        /// </summary>
+        /// <param name="hex"></param>
+        /// <returns></returns>
         public static string ReverseHexString(string hex)
         {
             if (hex == null || hex.Trim().Length <= 2) return hex;
@@ -950,6 +990,12 @@ namespace PS4CheaterNeo
             return result;
         }
 
+        /// <summary>
+        /// Read libSceCdlgUtilServer.sprx of PS4's SceCdlgApp to obtain the Game ID and version.
+        /// </summary>
+        /// <param name="FMVer">FM version</param>
+        /// <param name="gameID">Game ID</param>
+        /// <param name="gameVer">Game version</param>
         public static void GameInfo(string FMVer, out string gameID, out string gameVer)
         {
             gameID = null;
@@ -966,8 +1012,7 @@ namespace PS4CheaterNeo
 
             try
             {
-                SectionTool sectionTool = new SectionTool();
-                sectionTool.InitSectionList(processName);
+                sectionTool.InitSections(processName);
 
                 Section gameInfoSection = sectionTool.GetSection(sectionName, sectionProt);
 
@@ -984,6 +1029,12 @@ namespace PS4CheaterNeo
             }
         }
 
+        /// <summary>
+        /// When the query type is "Group," parse the input value0 query condition, 
+        /// convert it to the format (ScanType, groupTypeLength, isAny, isSign), and then store it in the GroupList.
+        /// </summary>
+        /// <param name="value0">input value0 query condition</param>
+        /// <returns></returns>
         public static (List<(ScanType scanType, int groupTypeLength, bool isAny, bool isSign)> groupTypes, 
             List<byte[]> groupValues, int groupFirstLength, int scanTypeLength) GenerateGroupList(string value0)
         {

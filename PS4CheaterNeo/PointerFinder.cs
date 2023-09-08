@@ -7,7 +7,6 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using static PS4CheaterNeo.SectionTool;
 
 namespace PS4CheaterNeo
 {
@@ -151,7 +150,7 @@ namespace PS4CheaterNeo
 
             try
             {
-                sectionTool.InitSectionList(processName);
+                sectionTool.InitSections(processName);
                 System.Diagnostics.Stopwatch ticker = System.Diagnostics.Stopwatch.StartNew();
                 if (addrPointerDict != null) addrPointerDict.Clear();
                 if (valuePointerDict != null) valuePointerDict.Clear();
@@ -240,7 +239,7 @@ namespace PS4CheaterNeo
                 GC.Collect();
 
                 IsInitScan.Checked = false;
-                ToolStripMsg.Text = String.Format("Loaded {0} address-value results, elapsed: {1}", resultCnt, ticker.Elapsed.TotalSeconds);
+                ToolStripMsg.Text = String.Format("Loaded {0} address-value results, elapsed: {1:0.00}", resultCnt, ticker.Elapsed.TotalSeconds);
                 ScanBtn.PerformClick();
             }
             catch (Exception ex)
@@ -322,7 +321,7 @@ namespace PS4CheaterNeo
                     for (int i = 0; i < maxOffsetLevel; ++i) PointerListView.Columns.Add("Offset " + (i + 1), "Offset " + (i + 1));
 
                     ScanBtn.Text = "Stop";
-                    sectionTool.InitSectionList(processName);
+                    sectionTool.InitSections(processName);
 
                     if (pointerSource != null) pointerSource.Dispose();
                     pointerSource = new CancellationTokenSource();
@@ -514,7 +513,7 @@ namespace PS4CheaterNeo
                                     Invoke(new MethodInvoker(() =>
                                     {
                                         ProgBar.Value = (int)(((float)(readCnt) / sections.Length) * 50);
-                                        ToolStripMsg.Text = string.Format("Scan elapsed:{0}s. Current: {1}/{2}, read memory...{3}MB", tickerMajor.Elapsed.TotalSeconds, readCnt, sections.Length, processedMemoryLen / (1024 * 1024));
+                                        ToolStripMsg.Text = string.Format("Scan elapsed:{0:0.00}s. Current: {1}/{2}, read memory...{3}MB", tickerMajor.Elapsed.TotalSeconds, readCnt, sections.Length, processedMemoryLen / (1024 * 1024));
                                     }));
 
                                     ulong bufferSize = sectionEnd.Start + (ulong)sectionEnd.Length - sectionStart.Start;
@@ -627,7 +626,7 @@ namespace PS4CheaterNeo
                     Invoke(new MethodInvoker(() => {
                         ProgBar.Value = 100;
                         IsInitScan.Checked = true;
-                        ToolStripMsg.Text = string.Format("Scan elapsed:{0}s. ScanTask canceled. {1}", tickerMajor.Elapsed.TotalSeconds, ex.InnerException.Message);
+                        ToolStripMsg.Text = string.Format("Scan elapsed:{0:0.00}s. ScanTask canceled. {1}", tickerMajor.Elapsed.TotalSeconds, ex.InnerException.Message);
                     }));
                 }
                 else MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
@@ -645,7 +644,7 @@ namespace PS4CheaterNeo
                 Invoke(new MethodInvoker(() =>
                 {
                     ProgBar.Value = 80;
-                    ToolStripMsg.Text = string.Format("Scan elapsed:{0}s. perform first query...", tickerMajor.Elapsed.TotalSeconds);
+                    ToolStripMsg.Text = string.Format("Scan elapsed:{0:0.00}s. perform first query...", tickerMajor.Elapsed.TotalSeconds);
                 }));
 
                 if (sectionTool.GetSectionID(queryAddress) is uint addrSID && addrSID == 0) return true; //-1(int) => 0(uint)
@@ -667,7 +666,7 @@ namespace PS4CheaterNeo
                         Invoke(new MethodInvoker(() =>
                         {
                             ProgBar.Value = 50 + (int)(((float)(pIdx + 1) / pointerResults.Count) * 50);
-                            ToolStripMsg.Text = string.Format("Scan elapsed:{0}s. Compare pointer results: {1}/{2}, mapped memory...", tickerMajor.Elapsed.TotalSeconds, pIdx + 1, pointerResults.Count);
+                            ToolStripMsg.Text = string.Format("Scan elapsed:{0:0.00}s. Compare pointer results: {1}/{2}, mapped memory...", tickerMajor.Elapsed.TotalSeconds, pIdx + 1, pointerResults.Count);
                         }));
                     }
 
@@ -797,7 +796,7 @@ namespace PS4CheaterNeo
             {
                 Invoke(new MethodInvoker(() =>
                 {
-                    ToolStripMsg.Text = string.Format("Scan elapsed:{0}s. first query: {1} results...level:{2}", tickerMajor.Elapsed.TotalSeconds, pointerResults.Count, level);
+                    ToolStripMsg.Text = string.Format("Scan elapsed:{0:0.00}s. first query: {1} results...level:{2}", tickerMajor.Elapsed.TotalSeconds, pointerResults.Count, level);
                 }));
             }
         }
@@ -820,7 +819,7 @@ namespace PS4CheaterNeo
                 
                 if (pointerResults.Count == 0) ScanBtn.Text = "First Scan";
                 else if (pointerResults.Count > 0) ScanBtn.Text = "Next Scan";
-                ToolStripMsg.Text = string.Format("Scan elapsed:{0}s. Query pointer end, find:{1}", tickerMajor.Elapsed.TotalSeconds, pointerResults.Count);
+                ToolStripMsg.Text = string.Format("Scan elapsed:{0:0.00}s. Query pointer end, find:{1}", tickerMajor.Elapsed.TotalSeconds, pointerResults.Count);
             }));
             if (pointerSource != null) pointerSource.Dispose();
             if (pointerTask != null) pointerTask.Dispose();

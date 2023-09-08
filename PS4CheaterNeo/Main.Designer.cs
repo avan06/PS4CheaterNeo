@@ -71,14 +71,13 @@ namespace PS4CheaterNeo
             this.ToolStripCollapseAll = new System.Windows.Forms.ToolStripButton();
             this.ToolStripLockEnable = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.ToolStripAutoRefresh = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.ToolStripSettings = new System.Windows.Forms.ToolStripButton();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.ToolStripMsg = new System.Windows.Forms.ToolStripStatusLabel();
             this.panel1 = new System.Windows.Forms.Panel();
             this.CheatGridView = new GroupGridView.GroupGridView();
-            this.RefreshLock = new System.Windows.Forms.Timer(this.components);
-            this.OpenCheatDialog = new System.Windows.Forms.OpenFileDialog();
-            this.SaveCheatDialog = new System.Windows.Forms.SaveFileDialog();
             this.CheatGridViewDel = new System.Windows.Forms.DataGridViewButtonColumn();
             this.CheatGridViewAddress = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.CheatGridViewType = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -88,6 +87,10 @@ namespace PS4CheaterNeo
             this.CheatGridViewSID = new GroupGridView.DataGridViewUpDownColumn();
             this.CheatGridViewLock = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.CheatGridViewDescription = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.RefreshLock = new System.Windows.Forms.Timer(this.components);
+            this.OpenCheatDialog = new System.Windows.Forms.OpenFileDialog();
+            this.SaveCheatDialog = new System.Windows.Forms.SaveFileDialog();
+            this.AutoRefreshTimer = new System.Windows.Forms.Timer(this.components);
             this.CheatGridMenu.SuspendLayout();
             this.ToolStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
@@ -211,6 +214,8 @@ namespace PS4CheaterNeo
             this.ToolStripCollapseAll,
             this.ToolStripLockEnable,
             this.toolStripSeparator3,
+            this.ToolStripAutoRefresh,
+            this.toolStripSeparator4,
             this.ToolStripSettings});
             this.ToolStrip1.Location = new System.Drawing.Point(0, 0);
             this.ToolStrip1.Name = "ToolStrip1";
@@ -366,6 +371,22 @@ namespace PS4CheaterNeo
             this.toolStripSeparator3.Name = "toolStripSeparator3";
             this.toolStripSeparator3.Size = new System.Drawing.Size(6, 25);
             // 
+            // ToolStripAutoRefresh
+            // 
+            this.ToolStripAutoRefresh.Image = ((System.Drawing.Image)(resources.GetObject("ToolStripAutoRefresh.Image")));
+            this.ToolStripAutoRefresh.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.ToolStripAutoRefresh.Name = "ToolStripAutoRefresh";
+            this.ToolStripAutoRefresh.Size = new System.Drawing.Size(96, 22);
+            this.ToolStripAutoRefresh.Text = "AutoRefresh";
+            this.ToolStripAutoRefresh.ToolTipText = "Whether to enable auto refresh";
+            this.ToolStripAutoRefresh.CheckedChanged += new System.EventHandler(this.ToolStripAutoRefresh_CheckedChanged);
+            this.ToolStripAutoRefresh.Click += new System.EventHandler(this.ToolStripAutoRefresh_Click);
+            // 
+            // toolStripSeparator4
+            // 
+            this.toolStripSeparator4.Name = "toolStripSeparator4";
+            this.toolStripSeparator4.Size = new System.Drawing.Size(6, 25);
+            // 
             // ToolStripSettings
             // 
             this.ToolStripSettings.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
@@ -460,12 +481,6 @@ namespace PS4CheaterNeo
             this.CheatGridView.EditingControlShowing += new System.Windows.Forms.DataGridViewEditingControlShowingEventHandler(this.CheatGridView_EditingControlShowing);
             this.CheatGridView.RowPostPaint += new System.Windows.Forms.DataGridViewRowPostPaintEventHandler(this.CheatGridView_RowPostPaint);
             this.CheatGridView.RowsRemoved += new System.Windows.Forms.DataGridViewRowsRemovedEventHandler(this.CheatGridView_RowsRemoved);
-            // 
-            // RefreshLock
-            // 
-            this.RefreshLock.Enabled = true;
-            this.RefreshLock.Interval = 500;
-            this.RefreshLock.Tick += new System.EventHandler(this.RefreshLock_Tick);
             // 
             // CheatGridViewDel
             // 
@@ -565,6 +580,17 @@ namespace PS4CheaterNeo
             this.CheatGridViewDescription.Name = "CheatGridViewDescription";
             this.CheatGridViewDescription.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             // 
+            // RefreshLock
+            // 
+            this.RefreshLock.Enabled = true;
+            this.RefreshLock.Interval = 500;
+            this.RefreshLock.Tick += new System.EventHandler(this.RefreshLock_Tick);
+            // 
+            // AutoRefreshTimer
+            // 
+            this.AutoRefreshTimer.Interval = 2500;
+            this.AutoRefreshTimer.Tick += new System.EventHandler(this.AutoRefreshTimer_Tick);
+            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -636,6 +662,9 @@ namespace PS4CheaterNeo
         private GroupGridView.DataGridViewUpDownColumn CheatGridViewSID;
         private System.Windows.Forms.DataGridViewCheckBoxColumn CheatGridViewLock;
         private System.Windows.Forms.DataGridViewTextBoxColumn CheatGridViewDescription;
+        private System.Windows.Forms.Timer AutoRefreshTimer;
+        private System.Windows.Forms.ToolStripButton ToolStripAutoRefresh;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
     }
 }
 

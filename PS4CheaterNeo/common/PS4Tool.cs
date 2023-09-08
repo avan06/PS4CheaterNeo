@@ -1,5 +1,4 @@
-﻿using libdebug;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Security.AccessControl;
@@ -11,10 +10,9 @@ namespace PS4CheaterNeo
 {
     public static class PS4Tool
     {
-        private static readonly int initIdx1 = 0;
-        private static readonly int initIdx2 = 2;
-        private static int currentIdx1 = initIdx1;
-        private static int currentIdx2 = initIdx2;
+        private static readonly int mutexFactor;
+        private static int currentIdx1 = 0;
+        private static int currentIdx2 = mutexFactor;
         private static int reTrySocket = 0;
 
         /// <summary>
@@ -27,40 +25,50 @@ namespace PS4CheaterNeo
 
         private static readonly Mutex mutex;
         private static readonly Mutex[] mutexs;
-        private static readonly PS4DBG[] ps4s;
+        private static readonly libdebug.PS4DBG[] ps4s;
         private static System.Diagnostics.Stopwatch tickerMajor = System.Diagnostics.Stopwatch.StartNew();
 
         static PS4Tool()
         {
+            mutexFactor = Properties.Settings.Default.PS4DBGMutexFactor.Value;
+            if (mutexFactor < 2) mutexFactor = 2;
+            else if (mutexFactor > 5) mutexFactor = 5;
+
             mutexId = "PS4ToolMutex";
             allowEveryoneRule = new MutexAccessRule(new SecurityIdentifier(WellKnownSidType.WorldSid, null), MutexRights.FullControl, AccessControlType.Allow);
             mSec = new MutexSecurity();
             mSec.AddAccessRule(allowEveryoneRule);
             mutex = new Mutex(false, mutexId, out _, mSec);
 
-            mutexs = new Mutex[4];
-            ps4s = new PS4DBG[mutexs.Length];
+            mutexs = new Mutex[mutexFactor*2];
+            ps4s = new libdebug.PS4DBG[mutexs.Length];
         }
 
+        /// <summary>
+        /// "CurrentIdx1" is for use with "ReadMemory" only.
+        /// </summary>
         private static int CurrentIdx1()
         {
             mutex.WaitOne();
             try
             {
                 int result = currentIdx1++;
-                if (currentIdx1 >= initIdx2) currentIdx1 = initIdx1;
+                if (currentIdx1 >= mutexFactor) currentIdx1 = 0;
                 return result;
             }
             finally { mutex.ReleaseMutex(); }
         }
 
+        /// <summary>
+        /// Use "CurrentIdx2" for everything except "ReadMemory."
+        /// </summary>
         private static int CurrentIdx2()
         {
             mutex.WaitOne();
             try
             {
                 int result = currentIdx2++;
-                if (currentIdx2 >= mutexs.Length) currentIdx2 = initIdx2;
+                if (currentIdx2 >= mutexs.Length) currentIdx2 = mutexFactor;
                 return result;
             }
             finally { mutex.ReleaseMutex(); }
@@ -92,7 +100,7 @@ namespace PS4CheaterNeo
                         try { ps4s[idx].Disconnect(); } catch (Exception ex) { Console.WriteLine(ex.Message + "\n" + ex.StackTrace); }
                         ps4s[idx] = null;
                     }
-                    if (ps4s[idx] == null) ps4s[idx] = new PS4DBG(ip);
+                    if (ps4s[idx] == null) ps4s[idx] = new libdebug.PS4DBG(ip);
 
                     if (idx == 0)
                     {
@@ -101,7 +109,7 @@ namespace PS4CheaterNeo
                         {
                             ps4s[idx].Disconnect();
                             ps4s[idx] = null;
-                            ps4s[idx] = new PS4DBG(ip);
+                            ps4s[idx] = new libdebug.PS4DBG(ip);
                             result = ps4s[idx].Connect(connectTimeout, sendTimeout, receiveTimeout);
                         }
                     }
@@ -129,10 +137,10 @@ namespace PS4CheaterNeo
         /// Socket errorCode 10060: connection timed out, will try to reconnect 5 times and throw error when all fails
         /// </summary>
         /// <returns>libdebug.ProcessList</returns>
-        public static ProcessList GetProcessList()
+        public static libdebug.ProcessList GetProcessList()
         {
             int current = CurrentIdx2();
-            ProcessList processList = null;
+            libdebug.ProcessList processList = null;
             try
             {
                 mutexs[current].WaitOne();
@@ -158,10 +166,10 @@ namespace PS4CheaterNeo
         /// </summary>
         /// <param name="processID">specified process PID</param>
         /// <returns>libdebug.ProcessInfo</returns>
-        public static ProcessInfo GetProcessInfo(int processID)
+        public static libdebug.ProcessInfo GetProcessInfo(int processID)
         {
             int current = CurrentIdx2();
-            ProcessInfo processInfo = new ProcessInfo();
+            libdebug.ProcessInfo processInfo = new libdebug.ProcessInfo();
             try
             {
                 mutexs[current].WaitOne();
@@ -178,16 +186,16 @@ namespace PS4CheaterNeo
         /// </summary>
         /// <param name="processName">specified process name</param>
         /// <returns>libdebug.ProcessInfo</returns>
-        public static ProcessInfo GetProcessInfo(string processName)
+        public static libdebug.ProcessInfo GetProcessInfo(string processName)
         {
-            ProcessInfo processInfo = new ProcessInfo();
-            ProcessList processList = GetProcessList();
+            libdebug.ProcessInfo processInfo = new libdebug.ProcessInfo();
+            libdebug.ProcessList processList = GetProcessList();
 
             if (processList == null) return processInfo;
 
             for (int idx = 0; idx < processList.processes.Length; idx++)
             {
-                Process process = processList.processes[idx];
+                libdebug.Process process = processList.processes[idx];
                 if (process.name != processName) continue;
                 processInfo = GetProcessInfo(process.pid);
                 break;
@@ -201,9 +209,9 @@ namespace PS4CheaterNeo
         /// </summary>
         /// <param name="processName">specified process name</param>
         /// <returns>libdebug.ProcessMap</returns>
-        public static ProcessMap GetProcessMaps(string processName)
+        public static libdebug.ProcessMap GetProcessMaps(string processName)
         {
-            ProcessInfo processInfo = GetProcessInfo(processName);
+            libdebug.ProcessInfo processInfo = GetProcessInfo(processName);
 
             if (processInfo.pid == 0) return null;
 
@@ -215,10 +223,10 @@ namespace PS4CheaterNeo
         /// </summary>
         /// <param name="processID">specified process PID</param>
         /// <returns>libdebug.ProcessMap</returns>
-        public static ProcessMap GetProcessMaps(int processID)
+        public static libdebug.ProcessMap GetProcessMaps(int processID)
         {
             int current = CurrentIdx2();
-            ProcessMap processMap = null;
+            libdebug.ProcessMap processMap = null;
             try
             {
                 mutexs[current].WaitOne();
@@ -315,6 +323,42 @@ namespace PS4CheaterNeo
         }
 
         /// <summary>
+        /// Read the value of the address to the specified process
+        /// </summary>
+        /// <param name="processID">specified process PID</param>
+        /// <param name="readData"></param>
+        /// <returns></returns>
+        public static byte[][] ReadMemory(int processID, (ulong address, int length)[] readData)
+        {
+            int current = CurrentIdx1();
+            try
+            {
+                mutexs[current].WaitOne();
+                byte[][] bufs = new byte[readData.Length][];
+                ConnectedCheck(current);
+                for (int i = 0; i < readData.Length; i++)
+                {
+                    (ulong address, int length) = readData[i];
+                    byte[] buf = ps4s[current].ReadMemory(processID, address, length);
+                    bufs[i] = buf;
+                }
+                return bufs;
+            }
+            catch (SocketException ex)
+            {
+                if (tickerMajor.Elapsed.TotalSeconds >= 1.5)
+                {
+                    reTrySocket = tickerMajor.Elapsed.TotalSeconds < 10 ? reTrySocket + 1 : 0;
+                    tickerMajor = System.Diagnostics.Stopwatch.StartNew();
+                    if ((ex.ErrorCode == 10054 || ex.ErrorCode == 10060) && reTrySocket > 5) throw;
+                    Connect(Properties.Settings.Default.PS4IP.Value, out string msg, 1000, true);
+                }
+            }
+            finally { try { mutexs[current].ReleaseMutex(); } catch (Exception) { } }
+            return null;
+        }
+
+        /// <summary>
         /// Writes the new value of the address to the specified process
         /// </summary>
         /// <param name="processID">specified process PID</param>
@@ -330,6 +374,29 @@ namespace PS4CheaterNeo
                 ps4s[current].WriteMemory(processID, address, data);
             }
             catch (Exception) {}
+            finally { try { mutexs[current].ReleaseMutex(); } catch (Exception) { } }
+        }
+
+        /// <summary>
+        /// Writes the new value of the address to the specified process
+        /// </summary>
+        /// <param name="processID">specified process PID</param>
+        /// <param name="writeData"></param>
+        public static void WriteMemory(int processID, (ulong address, byte[] data)[] writeData)
+        {
+            int current = CurrentIdx2();
+            try
+            {
+                mutexs[current].WaitOne();
+                ConnectedCheck(current);
+
+                for (int i = 0; i < writeData.Length; i++)
+                {
+                    (ulong address, byte[] data) = writeData[i];
+                    ps4s[current].WriteMemory(processID, address, data);
+                }
+            }
+            catch (Exception) { }
             finally { try { mutexs[current].ReleaseMutex(); } catch (Exception) { } }
         }
 

@@ -12,91 +12,103 @@
       <Value Profile="(Default)">|1_General|1_SendPayload|Enter PS4 FW Version (Confirm the fw version only when perform sendpayload)</Value>
     </Setting>
     <Setting Name="CollapsibleContainer" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
-      <Value Profile="(Default)">True|1_General|2_UI|Determines whether to enable collapsible split container ui in Query and HexEditor and PointerFinder windows. Default enabled</Value>
+      <Value Profile="(Default)">True|1_General|2_UI|Determines whether to enable collapsible split container ui in Query and HexEditor and PointerFinder windows. \nDefault enabled</Value>
     </Setting>
     <Setting Name="UIOpacity" Type="OptionTreeView.Option&lt;float&gt;" Scope="User">
-      <Value Profile="(Default)">0.95|1_General|2_UI|Determines the opacity of the window, the maximum is 1 (opaque), the default is 0.95|0.2|1</Value>
+      <Value Profile="(Default)">0.95|1_General|2_UI|Determines the opacity of the window, the maximum is 1 (opaque), \nDefault 0.95|0.2|1</Value>
     </Setting>
-    <Setting Name="CheatLock" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
-      <Value Profile="(Default)">True|2_Cheat|Cheat|Determines whether to enable cheat lock in the main window. Default enabled</Value>
-    </Setting>
-    <Setting Name="VerifySectionWhenLock" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
-      <Value Profile="(Default)">True|2_Cheat|Cheat|Determine whether to enable verifying Section values when locking cheat items. Default enabled</Value>
-    </Setting>
-    <Setting Name="VerifySectionWhenRefresh" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
-      <Value Profile="(Default)">True|2_Cheat|Cheat|Determine whether to enable verifying Section values when refreshing the cheat list. Default enabled</Value>
+    <Setting Name="PS4DBGMutexFactor" Type="OptionTreeView.Option&lt;byte&gt;" Scope="User">
+      <Value Profile="(Default)">3|1_General|3_PS4Tool|It is not recommended to adjust this value, and changes take effect only after a restart. \nThe Mutex factor determines the number of connections that PS4DBG can occupy during initialization. \nFor ReadMemory, the number of connections is from 0 to (but not including) mutexFactor. \nFor WriteMemory, the number of connections is from mutexFactor to (but not including) 2*mutexFactor. \nDefault value is 3.</Value>
     </Setting>
     <Setting Name="CheatCellDirtyValueCommit" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
       <Value Profile="(Default)">True|2_Cheat|Cheat|Determine whether to automatically write to PS4 when editing cheat values in UpDown</Value>
     </Setting>
+    <Setting Name="CheatLock" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
+      <Value Profile="(Default)">True|2_Cheat|CheatLock|Determines whether to enable cheat lock in the main window. \nDefault enabled</Value>
+    </Setting>
+    <Setting Name="VerifySectionWhenLock" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
+      <Value Profile="(Default)">True|2_Cheat|CheatLock|Determine whether to enable verifying Section values when locking cheat items. \nDefault enabled</Value>
+    </Setting>
+    <Setting Name="CheatAutoRefresh" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
+      <Value Profile="(Default)">False|2_Cheat|CheatRefresh|Determines whether to enable Auto Refresh in main window. \nDefault disabled</Value>
+    </Setting>
+    <Setting Name="CheatAutoRefreshShowStatus" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
+      <Value Profile="(Default)">False|2_Cheat|CheatRefresh|Determines whether to display its execution status in the main window when CheatAutoRefresh is enabled. \nDefault disabled</Value>
+    </Setting>
+    <Setting Name="CheatAutoRefreshTimerInterval" Type="OptionTreeView.Option&lt;uint&gt;" Scope="User">
+      <Value Profile="(Default)">2500|2_Cheat|CheatRefresh|Determines the Interval of AutoRefreshTimer when AutoRefresh is enabled, in milliseconds. \nDefault 2500</Value>
+    </Setting>
+    <Setting Name="VerifySectionWhenRefresh" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
+      <Value Profile="(Default)">True|2_Cheat|CheatRefresh|Determine whether to enable verifying Section values when refreshing the cheat list. \nDefault enabled</Value>
+    </Setting>
     <Setting Name="AutoPerformGetProcesses" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
-      <Value Profile="(Default)">True|3_Query|1_Query|Determine whether to enable automatic perform get processes when opening the Query window. Default enabled</Value>
+      <Value Profile="(Default)">True|3_Query|1_Query|Determine whether to enable automatic perform get processes when opening the Query window. \nDefault enabled</Value>
     </Setting>
     <Setting Name="DefaultProcess" Type="OptionTreeView.Option&lt;string&gt;" Scope="User">
-      <Value Profile="(Default)">eboot.bin|3_Query|1_Query|Set the default selected program when perform get processes. Default is eboot.bin</Value>
+      <Value Profile="(Default)">eboot.bin|3_Query|1_Query|Set the default selected program when perform get processes. \nDefault is eboot.bin</Value>
     </Setting>
     <Setting Name="MaxQueryThreads" Type="OptionTreeView.Option&lt;byte&gt;" Scope="User">
-      <Value Profile="(Default)">3|3_Query|1_Query|Enter the number of threads to use when querying. Default is 3 threads</Value>
+      <Value Profile="(Default)">3|3_Query|1_Query|Enter the number of threads to use when querying. \nDefault is 3 threads</Value>
     </Setting>
     <Setting Name="QueryBufferSize" Type="OptionTreeView.Option&lt;uint&gt;" Scope="User">
-      <Value Profile="(Default)">50|3_Query|1_Query|Set the minimum buffer size (in MB) in querying and pointerFinder, enter 0 to not use buffer, setting this value to 0 is better when the total number of Sections in the game is low. If the game has more than a thousand Sections, Buffer must be set</Value>
+      <Value Profile="(Default)">50|3_Query|1_Query|Set the minimum buffer size (in MB) in querying and pointerFinder, \nenter 0 to not use buffer, setting this value to 0 is better when the total number of Sections in the game is low. \nIf the game has more than a thousand Sections, Buffer must be set</Value>
     </Setting>
     <Setting Name="MinResultAccessFactor" Type="OptionTreeView.Option&lt;sbyte&gt;" Scope="User">
-      <Value Profile="(Default)">50|3_Query|1_Query|Access value directly by address when the number of query results for the same Section is less than this factor, used to control whether to read Section data completely, or directly access the value by address. Default value is 50</Value>
+      <Value Profile="(Default)">50|3_Query|1_Query|Access value directly by address when the number of query results for the same Section is less than this factor, \nused to control whether to read Section data completely, or directly access the value by address. \nDefault value is 50</Value>
     </Setting>
     <Setting Name="UndoScan" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
-      <Value Profile="(Default)">True|3_Query|1_Query|Determines whether to enable undo scan(revert to the previous scan result), if enabled, more memory needs to be used during scanning. Default enable</Value>
+      <Value Profile="(Default)">True|3_Query|1_Query|Determines whether to enable undo scan(revert to the previous scan result), \nif enabled, more memory needs to be used during scanning. \nDefault enable</Value>
     </Setting>
     <Setting Name="ScanAutoPause" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
-      <Value Profile="(Default)">False|3_Query|1_Query|Determines whether to automatically pause the game when starting the scan in query. Default disabled</Value>
+      <Value Profile="(Default)">False|3_Query|1_Query|Determines whether to automatically pause the game when starting the scan in query. \nDefault disabled</Value>
     </Setting>
     <Setting Name="ScanAutoResume" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
-      <Value Profile="(Default)">False|3_Query|1_Query|Determines whether to automatically resume the game when the scan is complete in query. Default disabled</Value>
+      <Value Profile="(Default)">False|3_Query|1_Query|Determines whether to automatically resume the game when the scan is complete in query. \nDefault disabled</Value>
     </Setting>
     <Setting Name="ShowSearchSizeFirstScan" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
-      <Value Profile="(Default)">True|3_Query|1_Query|Determines whether to show search size message when FirstScan. Default enabled</Value>
+      <Value Profile="(Default)">True|3_Query|1_Query|Determines whether to show search size message when FirstScan. \nDefault enabled</Value>
     </Setting>
     <Setting Name="FloatingResultExact" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
-      <Value Profile="(Default)">True|3_Query|2_Floating|Determines whether to make the calculation result of Floating(float, double) completely exact in query window, there can be 0.0001 difference in the old mechanism. Default enabled</Value>
+      <Value Profile="(Default)">True|3_Query|2_Floating|Determines whether to make the calculation result of Floating(float, double) completely exact in query window, \nthere can be 0.0001 difference in the old mechanism. \nDefault enabled</Value>
     </Setting>
     <Setting Name="FloatingSimpleValueExponents" Type="OptionTreeView.Option&lt;byte&gt;" Scope="User">
-      <Value Profile="(Default)">11|3_Query|2_Floating|Determine the exponents value of the simple value of floating. Cheat Engine is set to 11 (2 to the 11th power = 2^11 = plus or minus 2048). Default value is 11</Value>
+      <Value Profile="(Default)">11|3_Query|2_Floating|Determine the exponents value of the simple value of floating. \nCheat Engine is set to 11 (2 to the 11th power = 2^11 = plus or minus 2048). \nDefault value is 11</Value>
     </Setting>
     <Setting Name="FilterQuery" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
-      <Value Profile="(Default)">True|3_Query|3_Filter|Determine whether to enable filtering Sections when opening the query window. Default enabled</Value>
+      <Value Profile="(Default)">True|3_Query|3_Filter|Determine whether to enable filtering Sections when opening the query window. \nDefault enabled</Value>
     </Setting>
     <Setting Name="SectionFilterKeys" Type="OptionTreeView.Option&lt;string&gt;" Scope="User">
       <Value Profile="(Default)">libSce,libc.prx,SceShell,SceLib,SceNp,SceVoice,SceFios,libkernel,SceVdec|3_Query|3_Filter|Enter the filter value, the filter will be set here when listing Sections</Value>
     </Setting>
     <Setting Name="FilterSizeQuery" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
-      <Value Profile="(Default)">False|3_Query|3_Filter|Determine whether to enable filtering Sections by size when opening the query window. Default disabled</Value>
+      <Value Profile="(Default)">False|3_Query|3_Filter|Determine whether to enable filtering Sections by size when opening the query window. \nDefault disabled</Value>
     </Setting>
     <Setting Name="SectionFilterSize" Type="OptionTreeView.Option&lt;uint&gt;" Scope="User">
       <Value Profile="(Default)">204800|3_Query|3_Filter|Filter out when section size is less than this value(unit is bytes)</Value>
     </Setting>
     <Setting Name="MaxResultShow" Type="OptionTreeView.Option&lt;uint&gt;" Scope="User">
-      <Value Profile="(Default)">0x2000|3_Query|4_Result|Enter the maximum number of displayed query results. will only affect the number of results displayed in the ResultView. Default value is 8192</Value>
+      <Value Profile="(Default)">0x2000|3_Query|4_Result|Enter the maximum number of displayed query results. \nwill only affect the number of results displayed in the ResultView. \nDefault value is 8192</Value>
     </Setting>
     <Setting Name="SectionViewFullRowSelect" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
-      <Value Profile="(Default)">False|3_Query|5_SectionView|Determine whether to enable the FullRowSelect feature in the SectionView of the Query window. Default disabled</Value>
+      <Value Profile="(Default)">False|3_Query|5_SectionView|Determine whether to enable the FullRowSelect feature in the SectionView of the Query window. \nDefault disabled</Value>
     </Setting>
     <Setting Name="AutoRefresh" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
-      <Value Profile="(Default)">False|4_HexEditor|Hex|Determines whether to enable Auto Refresh in HexEditor. Default disabled</Value>
+      <Value Profile="(Default)">False|4_HexEditor|Hex|Determines whether to enable Auto Refresh in HexEditor. \nDefault disabled</Value>
     </Setting>
     <Setting Name="AutoRefreshTimerInterval" Type="OptionTreeView.Option&lt;uint&gt;" Scope="User">
-      <Value Profile="(Default)">2500|4_HexEditor|Hex|Determines the Interval of AutoRefreshTimer when AutoRefresh is enabled, in milliseconds, HexEditor needs to be restarted after this value is changed. Default 2500</Value>
+      <Value Profile="(Default)">2500|4_HexEditor|Hex|Determines the Interval of AutoRefreshTimer when AutoRefresh is enabled, in milliseconds, \nHexEditor needs to be restarted after this value is changed. \nDefault 2500</Value>
     </Setting>
     <Setting Name="HexInfoDash" Type="OptionTreeView.Option&lt;string&gt;" Scope="User">
-      <Value Profile="(Default)">-|4_HexEditor|Hex|Determines the delimited dash value that displays the current Hex value in the HexEditor. Default "-"</Value>
+      <Value Profile="(Default)">-|4_HexEditor|Hex|Determines the delimited dash value that displays the current Hex value in the HexEditor. \nDefault "-"</Value>
     </Setting>
     <Setting Name="AutoFindClosestChangedPosition" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
-      <Value Profile="(Default)">True|4_HexEditor|Find|Determines whether to enable automatic selection of the value change position closest to the current location when there is no input value for the find value. Default enabled</Value>
+      <Value Profile="(Default)">True|4_HexEditor|Find|Determines whether to enable automatic selection of the value change position \nclosest to the current location when there is no input value for the find value. \nDefault enabled</Value>
     </Setting>
     <Setting Name="InputIsHexFormat" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
-      <Value Profile="(Default)">True|4_HexEditor|Find|Determines whether to enable the input format for searching as Hex in the HexEditor window. Default enabled</Value>
+      <Value Profile="(Default)">True|4_HexEditor|Find|Determines whether to enable the input format for searching as Hex in the HexEditor window. \nDefault enabled</Value>
     </Setting>
     <Setting Name="UsingLittleEndian" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
-      <Value Profile="(Default)">False|4_HexEditor|Find|Determines whether to enable using LittleEndian endianness, when the input format for the search is Hex, in the HexEditor window, if this option is not checked, it will use BigEndian. Default disabled</Value>
+      <Value Profile="(Default)">False|4_HexEditor|Find|Determines whether to enable using LittleEndian endianness, when the input format for the search is Hex, \nin the HexEditor window, if this option is not checked, it will use BigEndian. \nDefault disabled</Value>
     </Setting>
     <Setting Name="ColorTheme" Type="OptionTreeView.Option&lt;PS4CheaterNeo.ColorTheme&gt;" Scope="User">
       <Value Profile="(Default)">0|5_UI|1_Color Theme|Determine color theme</Value>

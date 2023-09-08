@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
-using static PS4CheaterNeo.SectionTool;
 
 namespace PS4CheaterNeo
 {
@@ -56,7 +55,7 @@ namespace PS4CheaterNeo
             OffsetBoxList = new List<TextBox>();
             OffsetLabelList = new List<Label>();
 
-            mainForm.sectionTool.InitSectionList(mainForm.ProcessName);
+            mainForm.sectionTool.InitSections(mainForm.ProcessName);
 
             this.mainForm = mainForm;
             AddrSection = addrSection;
