@@ -48,6 +48,14 @@ namespace PS4CheaterNeo
             this.SectionViewUnCheckAll = new System.Windows.Forms.ToolStripMenuItem();
             this.SectionViewInvertChecked = new System.Windows.Forms.ToolStripMenuItem();
             this.ToolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
+            this.SectionViewCheckContains = new System.Windows.Forms.ToolStripMenuItem();
+            this.SectionViewUnCheckContains = new System.Windows.Forms.ToolStripMenuItem();
+            this.SectionViewTextContains = new System.Windows.Forms.ToolStripTextBox();
+            this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
+            this.SectionViewCheckProt = new System.Windows.Forms.ToolStripMenuItem();
+            this.SectionViewUnCheckProt = new System.Windows.Forms.ToolStripMenuItem();
+            this.SectionViewTextProt = new System.Windows.Forms.ToolStripTextBox();
+            this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
             this.SectionViewDump = new System.Windows.Forms.ToolStripMenuItem();
             this.SectionViewImport = new System.Windows.Forms.ToolStripMenuItem();
             this.Panel1 = new System.Windows.Forms.Panel();
@@ -82,6 +90,7 @@ namespace PS4CheaterNeo
             this.label5 = new System.Windows.Forms.Label();
             this.AddrMaxBox = new System.Windows.Forms.TextBox();
             this.AddrMinBox = new System.Windows.Forms.TextBox();
+            this.CompareFirstBox = new System.Windows.Forms.CheckBox();
             this.ToolStripBar = new System.Windows.Forms.ProgressBar();
             this.SimpleValuesBox = new System.Windows.Forms.CheckBox();
             this.SlowMotionBox = new System.Windows.Forms.CheckBox();
@@ -110,7 +119,6 @@ namespace PS4CheaterNeo
             this.SlowMotionTimer = new System.Windows.Forms.Timer(this.components);
             this.SaveDialog = new System.Windows.Forms.SaveFileDialog();
             this.OpenDialog = new System.Windows.Forms.OpenFileDialog();
-            this.CompareFirstBox = new System.Windows.Forms.CheckBox();
             this.ResultViewMenu.SuspendLayout();
             this.SectionViewMenu.SuspendLayout();
             this.Panel1.SuspendLayout();
@@ -199,72 +207,134 @@ namespace PS4CheaterNeo
             this.SectionViewUnCheckAll,
             this.SectionViewInvertChecked,
             this.ToolStripSeparator5,
+            this.SectionViewCheckContains,
+            this.SectionViewUnCheckContains,
+            this.SectionViewTextContains,
+            this.toolStripSeparator6,
+            this.SectionViewCheckProt,
+            this.SectionViewUnCheckProt,
+            this.SectionViewTextProt,
+            this.toolStripSeparator7,
             this.SectionViewDump,
             this.SectionViewImport});
             this.SectionViewMenu.Name = "SectionViewMenu";
-            this.SectionViewMenu.Size = new System.Drawing.Size(158, 176);
+            this.SectionViewMenu.Size = new System.Drawing.Size(208, 312);
             // 
             // SectionViewHexEditor
             // 
             this.SectionViewHexEditor.Name = "SectionViewHexEditor";
-            this.SectionViewHexEditor.Size = new System.Drawing.Size(157, 22);
+            this.SectionViewHexEditor.Size = new System.Drawing.Size(207, 22);
             this.SectionViewHexEditor.Text = "Hex Editor";
             this.SectionViewHexEditor.Click += new System.EventHandler(this.SectionViewHexEditor_Click);
             // 
             // ToolStripSeparator3
             // 
             this.ToolStripSeparator3.Name = "ToolStripSeparator3";
-            this.ToolStripSeparator3.Size = new System.Drawing.Size(154, 6);
+            this.ToolStripSeparator3.Size = new System.Drawing.Size(204, 6);
             // 
             // SectionViewCheck
             // 
             this.SectionViewCheck.Name = "SectionViewCheck";
-            this.SectionViewCheck.Size = new System.Drawing.Size(157, 22);
+            this.SectionViewCheck.Size = new System.Drawing.Size(207, 22);
             this.SectionViewCheck.Text = "Check";
             this.SectionViewCheck.Click += new System.EventHandler(this.SectionViewCheck_Click);
             // 
             // ToolStripSeparator4
             // 
             this.ToolStripSeparator4.Name = "ToolStripSeparator4";
-            this.ToolStripSeparator4.Size = new System.Drawing.Size(154, 6);
+            this.ToolStripSeparator4.Size = new System.Drawing.Size(204, 6);
             // 
             // SectionViewCheckAll
             // 
             this.SectionViewCheckAll.Name = "SectionViewCheckAll";
-            this.SectionViewCheckAll.Size = new System.Drawing.Size(157, 22);
+            this.SectionViewCheckAll.Size = new System.Drawing.Size(207, 22);
             this.SectionViewCheckAll.Text = "Check All";
             this.SectionViewCheckAll.Click += new System.EventHandler(this.SectionViewCheckAll_Click);
             // 
             // SectionViewUnCheckAll
             // 
             this.SectionViewUnCheckAll.Name = "SectionViewUnCheckAll";
-            this.SectionViewUnCheckAll.Size = new System.Drawing.Size(157, 22);
+            this.SectionViewUnCheckAll.Size = new System.Drawing.Size(207, 22);
             this.SectionViewUnCheckAll.Text = "Un-Check All";
             this.SectionViewUnCheckAll.Click += new System.EventHandler(this.SectionViewUnCheckAll_Click);
             // 
             // SectionViewInvertChecked
             // 
             this.SectionViewInvertChecked.Name = "SectionViewInvertChecked";
-            this.SectionViewInvertChecked.Size = new System.Drawing.Size(157, 22);
+            this.SectionViewInvertChecked.Size = new System.Drawing.Size(207, 22);
             this.SectionViewInvertChecked.Text = "Invert Checked";
             this.SectionViewInvertChecked.Click += new System.EventHandler(this.SectionViewInvertChecked_Click);
             // 
             // ToolStripSeparator5
             // 
             this.ToolStripSeparator5.Name = "ToolStripSeparator5";
-            this.ToolStripSeparator5.Size = new System.Drawing.Size(154, 6);
+            this.ToolStripSeparator5.Size = new System.Drawing.Size(204, 6);
+            // 
+            // SectionViewCheckContains
+            // 
+            this.SectionViewCheckContains.Name = "SectionViewCheckContains";
+            this.SectionViewCheckContains.Size = new System.Drawing.Size(207, 22);
+            this.SectionViewCheckContains.Text = "Check that contains:";
+            this.SectionViewCheckContains.Click += new System.EventHandler(this.SectionViewCheckContains_Click);
+            // 
+            // SectionViewUnCheckContains
+            // 
+            this.SectionViewUnCheckContains.Name = "SectionViewUnCheckContains";
+            this.SectionViewUnCheckContains.Size = new System.Drawing.Size(207, 22);
+            this.SectionViewUnCheckContains.Text = "Un-Check that contains:";
+            this.SectionViewUnCheckContains.Click += new System.EventHandler(this.SectionViewUnCheckContains_Click);
+            // 
+            // SectionViewTextContains
+            // 
+            this.SectionViewTextContains.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.SectionViewTextContains.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.SectionViewTextContains.Font = new System.Drawing.Font("Microsoft JhengHei UI", 9F);
+            this.SectionViewTextContains.Name = "SectionViewTextContains";
+            this.SectionViewTextContains.Size = new System.Drawing.Size(145, 16);
+            // 
+            // toolStripSeparator6
+            // 
+            this.toolStripSeparator6.Name = "toolStripSeparator6";
+            this.toolStripSeparator6.Size = new System.Drawing.Size(204, 6);
+            // 
+            // SectionViewCheckProt
+            // 
+            this.SectionViewCheckProt.Name = "SectionViewCheckProt";
+            this.SectionViewCheckProt.Size = new System.Drawing.Size(207, 22);
+            this.SectionViewCheckProt.Text = "Check that has prot:";
+            this.SectionViewCheckProt.Click += new System.EventHandler(this.SectionViewCheckProt_Click);
+            // 
+            // SectionViewUnCheckProt
+            // 
+            this.SectionViewUnCheckProt.Name = "SectionViewUnCheckProt";
+            this.SectionViewUnCheckProt.Size = new System.Drawing.Size(207, 22);
+            this.SectionViewUnCheckProt.Text = "Un-Check that has prot:";
+            this.SectionViewUnCheckProt.Click += new System.EventHandler(this.SectionViewUnCheckProt_Click);
+            // 
+            // SectionViewTextProt
+            // 
+            this.SectionViewTextProt.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.SectionViewTextProt.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.SectionViewTextProt.Font = new System.Drawing.Font("Microsoft JhengHei UI", 9F);
+            this.SectionViewTextProt.Name = "SectionViewTextProt";
+            this.SectionViewTextProt.Size = new System.Drawing.Size(145, 16);
+            // 
+            // toolStripSeparator7
+            // 
+            this.toolStripSeparator7.Name = "toolStripSeparator7";
+            this.toolStripSeparator7.Size = new System.Drawing.Size(204, 6);
             // 
             // SectionViewDump
             // 
             this.SectionViewDump.Name = "SectionViewDump";
-            this.SectionViewDump.Size = new System.Drawing.Size(157, 22);
+            this.SectionViewDump.Size = new System.Drawing.Size(207, 22);
             this.SectionViewDump.Text = "Dump";
             this.SectionViewDump.Click += new System.EventHandler(this.SectionViewDump_Click);
             // 
             // SectionViewImport
             // 
             this.SectionViewImport.Name = "SectionViewImport";
-            this.SectionViewImport.Size = new System.Drawing.Size(157, 22);
+            this.SectionViewImport.Size = new System.Drawing.Size(207, 22);
             this.SectionViewImport.Text = "Import";
             this.SectionViewImport.Click += new System.EventHandler(this.SectionViewImport_Click);
             // 
@@ -666,6 +736,18 @@ namespace PS4CheaterNeo
             this.AddrMinBox.Size = new System.Drawing.Size(102, 22);
             this.AddrMinBox.TabIndex = 18;
             // 
+            // CompareFirstBox
+            // 
+            this.CompareFirstBox.AutoSize = true;
+            this.CompareFirstBox.Enabled = false;
+            this.CompareFirstBox.Location = new System.Drawing.Point(3, 85);
+            this.CompareFirstBox.Margin = new System.Windows.Forms.Padding(0, 3, 0, 0);
+            this.CompareFirstBox.Name = "CompareFirstBox";
+            this.CompareFirstBox.Size = new System.Drawing.Size(123, 16);
+            this.CompareFirstBox.TabIndex = 34;
+            this.CompareFirstBox.Text = "Compare to first scan";
+            this.CompareFirstBox.UseVisualStyleBackColor = true;
+            // 
             // ToolStripBar
             // 
             this.ToolStripBar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
@@ -1004,18 +1086,6 @@ namespace PS4CheaterNeo
             this.OpenDialog.DefaultExt = "bin";
             this.OpenDialog.Multiselect = true;
             // 
-            // CompareFirstBox
-            // 
-            this.CompareFirstBox.AutoSize = true;
-            this.CompareFirstBox.Enabled = false;
-            this.CompareFirstBox.Location = new System.Drawing.Point(3, 85);
-            this.CompareFirstBox.Margin = new System.Windows.Forms.Padding(0, 3, 0, 0);
-            this.CompareFirstBox.Name = "CompareFirstBox";
-            this.CompareFirstBox.Size = new System.Drawing.Size(123, 16);
-            this.CompareFirstBox.TabIndex = 34;
-            this.CompareFirstBox.Text = "Compare to first scan";
-            this.CompareFirstBox.UseVisualStyleBackColor = true;
-            // 
             // Query
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -1030,6 +1100,7 @@ namespace PS4CheaterNeo
             this.Load += new System.EventHandler(this.Query_Load);
             this.ResultViewMenu.ResumeLayout(false);
             this.SectionViewMenu.ResumeLayout(false);
+            this.SectionViewMenu.PerformLayout();
             this.Panel1.ResumeLayout(false);
             this.SplitContainer1.Panel1.ResumeLayout(false);
             this.SplitContainer1.Panel1.PerformLayout();
@@ -1136,5 +1207,13 @@ namespace PS4CheaterNeo
         private System.Windows.Forms.ToolStripSeparator ToolStripSeparator5;
         private System.Windows.Forms.ToolStripMenuItem SectionViewCheckAll;
         private System.Windows.Forms.CheckBox CompareFirstBox;
+        private System.Windows.Forms.ToolStripMenuItem SectionViewCheckContains;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
+        private System.Windows.Forms.ToolStripMenuItem SectionViewUnCheckContains;
+        private System.Windows.Forms.ToolStripTextBox SectionViewTextContains;
+        private System.Windows.Forms.ToolStripMenuItem SectionViewCheckProt;
+        private System.Windows.Forms.ToolStripMenuItem SectionViewUnCheckProt;
+        private System.Windows.Forms.ToolStripTextBox SectionViewTextProt;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator7;
     }
 }

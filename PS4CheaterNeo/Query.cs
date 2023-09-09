@@ -1685,8 +1685,61 @@ namespace PS4CheaterNeo
             {
                 ListViewItem item = items[idx];
                 item.Checked = !item.Checked;
-
                 uint sid = uint.Parse(item.SubItems[(int)SectionCol.SectionViewSID].Text);
+                SectionCheckUpdate(item.Checked, sid);
+            }
+            ToolStripMsg.Text = string.Format("Total section: {0}, Selected section: {1}, Search size: {2}MB", SectionView.Items.Count, sectionTool.TotalSelected, sectionTool.TotalMemorySize / (1024 * 1024));
+            SectionView.ItemCheck += new ItemCheckEventHandler(SectionView_ItemCheck);
+            SectionView.EndUpdate();
+        }
+
+        private void SectionViewCheckContains_Click(object sender, EventArgs e) => SectionViewContains(true);
+
+        private void SectionViewUnCheckContains_Click(object sender, EventArgs e) => SectionViewContains(false);
+
+        /// <summary>
+        /// Select all sections that contain the specified text. If isContains is False, then do not select them.
+        /// </summary>
+        /// <param name="isContains"></param>
+        private void SectionViewContains(bool isContains)
+        {
+            if (SectionView.Items.Count == 0) return;
+
+            SectionView.BeginUpdate();
+            SectionView.ItemCheck -= SectionView_ItemCheck;
+            for (int idx = 0; idx < SectionView.Items.Count; ++idx)
+            {
+                ListViewItem item = SectionView.Items[idx];
+                uint sid = uint.Parse(item.SubItems[(int)SectionCol.SectionViewSID].Text);
+                string name = item.SubItems[(int)SectionCol.SectionViewName].Text;
+                item.Checked = isContains ? name.Contains(SectionViewTextContains.Text) : !name.Contains(SectionViewTextContains.Text);
+                SectionCheckUpdate(item.Checked, sid);
+            }
+            ToolStripMsg.Text = string.Format("Total section: {0}, Selected section: {1}, Search size: {2}MB", SectionView.Items.Count, sectionTool.TotalSelected, sectionTool.TotalMemorySize / (1024 * 1024));
+            SectionView.ItemCheck += new ItemCheckEventHandler(SectionView_ItemCheck);
+            SectionView.EndUpdate();
+        }
+
+        private void SectionViewCheckProt_Click(object sender, EventArgs e) => SectionViewProtection(true);
+
+        private void SectionViewUnCheckProt_Click(object sender, EventArgs e) => SectionViewProtection(false);
+
+        /// <summary>
+        /// Select all sections that match the Protection value. If isProt is False, then deselect them.
+        /// </summary>
+        /// <param name="isProt"></param>
+        private void SectionViewProtection(bool isProt)
+        {
+            if (SectionView.Items.Count == 0) return;
+
+            SectionView.BeginUpdate();
+            SectionView.ItemCheck -= SectionView_ItemCheck;
+            for (int idx = 0; idx < SectionView.Items.Count; ++idx)
+            {
+                ListViewItem item = SectionView.Items[idx];
+                uint sid = uint.Parse(item.SubItems[(int)SectionCol.SectionViewSID].Text);
+                string prot = item.SubItems[(int)SectionCol.SectionViewProt].Text;
+                item.Checked = isProt ? prot == SectionViewTextProt.Text : prot != SectionViewTextProt.Text;
                 SectionCheckUpdate(item.Checked, sid);
             }
             ToolStripMsg.Text = string.Format("Total section: {0}, Selected section: {1}, Search size: {2}MB", SectionView.Items.Count, sectionTool.TotalSelected, sectionTool.TotalMemorySize / (1024 * 1024));

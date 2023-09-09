@@ -149,7 +149,6 @@ Cheat format used by PS4 Trainer and GoldHEN Cheat (0.9.6.0)
 - Added AutoPause and DoneResume CheckBox in the query window, you can determine whether to enable or not. (0.9.7.3)
 - Added ScanType that supports Auto determine numeric (AutoNumeric) in Query. (0.9.8.3)
 - Added support for FullRowSelect in the SectionView of the Query window, this feature requires enabling `SectionViewFullRowSelect` in the Query of the Options window. (0.9.9.1)
-- Added support for "Check All", "Uncheck All", and "Invert Checked" in the right-click context menu of the SectionView in the Query window.  (0.9.9.1)
 
 ![query_1](assets/query_1.webp)
 ![query_2](assets/query_2.webp)
@@ -161,6 +160,11 @@ Cheat format used by PS4 Trainer and GoldHEN Cheat (0.9.6.0)
 
 ![query_section_count_1](assets/query_section_count_1.webp)
 ![query_section_count_2](assets/query_section_count_2.webp)
+
+- Added support for "Check All", "Uncheck All", and "Invert Checked" in the right-click context menu of the SectionView in the Query window.  (0.9.9.1)
+- Added support for "Check that contains," "Uncheck that contains," "Check that has prot," and "Uncheck that has prot" in the right-click menu of the SectionView in the Query window. (0.9.9.3)
+
+![query_SectionViewMenu](assets/query_SectionViewMenu.webp)
 
 
 ### Query window: SlowMotion and Pause
