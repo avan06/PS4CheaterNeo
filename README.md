@@ -2,7 +2,7 @@
 
 PS4CheaterNeo is a program to find game cheat codes, and it is based on [`ps4debug`](https://github.com/jogolden/ps4debug) and [`.Net Framework 4.8`](https://support.microsoft.com/en-us/topic/microsoft-net-framework-4-8-offline-installer-for-windows-9d23f658-3b97-68ab-d013-aa3c3e7495e0).
 
-Currently in `version 0.9.9.5-beta`
+Currently in `version 0.9.9.6-beta`
 
 
 ## Table of Contents
@@ -104,6 +104,7 @@ Currently in `version 0.9.9.5-beta`
 - Editing cheat values in UpDown can be automatically written to PS4 when CheatCellDirtyValueCommit is enabled. (0.9.5.3)
 - Added an "`Auto Refresh` Cheat" button in the main window. When enabled, it will automatically reload cheat values from the PS4 at intervals specified by the `CheatAutoRefreshTimerInterval` option. (0.9.9.2)
 - Added support for automatically removing non-Hex characters from input Hex text. When you select HexView from the ToolStrip in the main window, this prevents the program from encountering Hex conversion errors. (0.9.9.5)
+- Added the CheatGridViewGroupByEnabled option, which allows you to enable or disable the grouping feature in CheatGridView. (0.9.9.6)
 
 ![cheat_1](assets/cheat_1.webp)
 ![cheat_2](assets/cheat_2.webp)
@@ -460,6 +461,8 @@ Enter PS4 FW Version (Confirm the fw version only when perform sendpayload).
 Determines whether to enable `collapsible split container` ui in `Query and HexEditor and PointerFinder` windows. Default enabled. (0.9.7.3)  
 - `UIOpacity`:  
 Determines the opacity of the window, the maximum is 1 (opaque), `Default is 0.95`. (0.9.7.7)  
+- `CheatGridViewGroupByEnabled`:  
+Determines whether to enable the GroupByEnabled feature in CheatGridView. When enabled, Cheat items will be grouped. If you have a large number of Cheat items, you may consider disabling this feature to speed up Cheat loading. After setting this, you need to restart the program for it to take effect. `Default enabled` (0.9.9.6)  
 - `PS4DBGMutexFactor`:  
 It is not recommended to adjust this value, and changes take effect only after a restart. The Mutex factor determines the number of connections that PS4DBG can occupy during initialization. For ReadMemory, the number of connections is from 0 to (but not including) mutexFactor. For WriteMemory, the number of connections is from mutexFactor to (but not including) 2*mutexFactor. `Default value is 3` (0.9.9.2)  
 

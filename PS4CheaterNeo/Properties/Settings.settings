@@ -17,6 +17,9 @@
     <Setting Name="UIOpacity" Type="OptionTreeView.Option&lt;float&gt;" Scope="User">
       <Value Profile="(Default)">0.95|1_General|2_UI|Determines the opacity of the window, the maximum is 1 (opaque), \nDefault 0.95|0.2|1</Value>
     </Setting>
+    <Setting Name="CheatGridViewGroupByEnabled" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
+      <Value Profile="(Default)">True|1_General|2_UI|Determines whether to enable the GroupByEnabled feature in CheatGridView. \nWhen enabled, Cheat items will be grouped. \nIf you have a large number of Cheat items, \nyou may consider disabling this feature to speed up Cheat loading. \nAfter setting this, you need to restart the program for it to take effect. \nDefault enabled</Value>
+    </Setting>
     <Setting Name="PS4DBGMutexFactor" Type="OptionTreeView.Option&lt;byte&gt;" Scope="User">
       <Value Profile="(Default)">3|1_General|3_PS4Tool|It is not recommended to adjust this value, and changes take effect only after a restart. \nThe Mutex factor determines the number of connections that PS4DBG can occupy during initialization. \nFor ReadMemory, the number of connections is from 0 to (but not including) mutexFactor. \nFor WriteMemory, the number of connections is from mutexFactor to (but not including) 2*mutexFactor. \nDefault value is 3.</Value>
     </Setting>

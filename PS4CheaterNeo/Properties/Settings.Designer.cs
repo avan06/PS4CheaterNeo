@@ -88,6 +88,18 @@ namespace PS4CheaterNeo.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute(@"True|1_General|2_UI|Determines whether to enable the GroupByEnabled feature in CheatGridView. \nWhen enabled, Cheat items will be grouped. \nIf you have a large number of Cheat items, \nyou may consider disabling this feature to speed up Cheat loading. \nAfter setting this, you need to restart the program for it to take effect. \nDefault enabled")]
+        public global::OptionTreeView.Option<bool> CheatGridViewGroupByEnabled {
+            get {
+                return ((global::OptionTreeView.Option<bool>)(this["CheatGridViewGroupByEnabled"]));
+            }
+            set {
+                this["CheatGridViewGroupByEnabled"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute(@"3|1_General|3_PS4Tool|It is not recommended to adjust this value, and changes take effect only after a restart. \nThe Mutex factor determines the number of connections that PS4DBG can occupy during initialization. \nFor ReadMemory, the number of connections is from 0 to (but not including) mutexFactor. \nFor WriteMemory, the number of connections is from mutexFactor to (but not including) 2*mutexFactor. \nDefault value is 3.")]
         public global::OptionTreeView.Option<byte> PS4DBGMutexFactor {
             get {

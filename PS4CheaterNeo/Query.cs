@@ -239,8 +239,8 @@ namespace PS4CheaterNeo
                     else if (section.Name.Contains("NoName")) item.ForeColor = Properties.Settings.Default.QuerySectionViewNoNameForeColor.Value; //Color.Red;
                     else if (Regex.IsMatch(section.Name, @"^\[\d+\]$")) item.ForeColor = Properties.Settings.Default.QuerySectionViewNoName2ForeColor.Value; //Color.HotPink;
                     item.Checked = true;
-                    item.Checked = false; //When ListView is in VirtualMode, you need to handle it like this to make the CheckBoxes visible.
                     sectionItems.Add(item);
+                    item.Checked = false; //When ListView is in VirtualMode, you need to handle it like this to make the CheckBoxes visible.
                 }
 
                 SectionView.VirtualListSize = sectionItems.Count;
@@ -379,7 +379,7 @@ namespace PS4CheaterNeo
                         if (AutoResumeBox.Checked) ResumeBtn.PerformClick();
                     }
                 }
-                else if (Properties.Settings.Default.ShowSearchSizeFirstScan.Value && ResultView.Items.Count == 0 && MessageBox.Show("Search size:" + (sectionTool.TotalMemorySize / (1024 * 1024)).ToString() + "MB", "First Scan",
+                else if (Properties.Settings.Default.ShowSearchSizeFirstScan.Value && resultItems.Count == 0 && MessageBox.Show("Search size:" + (sectionTool.TotalMemorySize / (1024 * 1024)).ToString() + "MB", "First Scan",
                     MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) return;
                 else
                 {
@@ -437,7 +437,12 @@ namespace PS4CheaterNeo
                     }, TaskContinuationOptions.OnlyOnFaulted)
                     .ContinueWith(t => TaskCompleted(tickerMajor))
                     .ContinueWith(t => Invoke(new MethodInvoker(() => { if (AutoResumeBox.Checked) ResumeBtn.PerformClick(); })))
-                    .ContinueWith(t => scanSource = null);
+                    .ContinueWith(t => {
+                        scanSource?.Dispose();
+                        scanSource = null;
+                        scanTask?.Dispose();
+                        scanTask = null;
+                    });
 
                     ScanTypeBox.Enabled = false;
                     AlignmentBox.Enabled = false;
@@ -726,7 +731,7 @@ namespace PS4CheaterNeo
         /// <returns></returns>
         private BitsDictionary Comparer(Byte[] buffer, Section section, int scanStep, ulong AddrMin, ulong AddrMax, BitsDictionary bitsDict, bool isCompareFirst, BitsDictionary bitsDictFirst)
         {
-            if (ResultView.Items.Count == 0)
+            if (resultItems.Count == 0)
             {
                 for (int scanIdx = 0; scanIdx + comparerTool.ScanTypeLength < buffer.LongLength; scanIdx += scanStep)
                 {
@@ -803,7 +808,7 @@ namespace PS4CheaterNeo
         /// <returns></returns>
         private BitsDictionary ComparerGroup(Byte[] buffer, Section section, int scanStep, ulong AddrMin, ulong AddrMax, BitsDictionary bitsDict, bool isCompareFirst, BitsDictionary bitsDictFirst)
         {
-            if (ResultView.Items.Count == 0)
+            if (resultItems.Count == 0)
             {
                 for (int scanIdx = 0; scanIdx + comparerTool.GroupFirstLength < buffer.LongLength; scanIdx += scanStep)
                 {
@@ -1108,8 +1113,6 @@ namespace PS4CheaterNeo
             }
             finally
             {
-                if (scanSource != null) scanSource.Dispose();
-                if (refreshSource != null) refreshSource.Dispose();
                 if (tickerMajor != null) tickerMajor.Stop();
                 Invoke(new MethodInvoker(() => {
                     ResultView.VirtualMode = true;
@@ -1128,7 +1131,7 @@ namespace PS4CheaterNeo
         {
             try
             {
-                if (ResultView.Items.Count == 0) return; 
+                if (resultItems.Count == 0) return; 
                 else if (refreshTask != null && !refreshTask.IsCompleted) return;
                 else
                 {
@@ -1143,7 +1146,12 @@ namespace PS4CheaterNeo
                 refreshSource = new CancellationTokenSource();
                 refreshTask = RefreshTask(IsFilterBox.Checked, IsFilterSizeBox.Checked, tickerMajor);
                 refreshTask.ContinueWith(t => TaskCompleted(tickerMajor))
-                    .ContinueWith(t => refreshTask = null); ;
+                    .ContinueWith(t => {
+                        refreshSource?.Dispose();
+                        refreshSource = null;
+                        refreshTask?.Dispose();
+                        refreshTask = null;
+                    }); ;
             }
             catch (Exception ex)
             {
@@ -1342,13 +1350,13 @@ namespace PS4CheaterNeo
                 case ScanType.Bytes_4:
                 case ScanType.Bytes_2:
                 case ScanType.Byte_:
-                    if (ResultView.Items.Count == 0) CompareTypeBox.Items.AddRange(Constant.SearchByBytesFirst);
+                    if (resultItems.Count == 0) CompareTypeBox.Items.AddRange(Constant.SearchByBytesFirst);
                     else CompareTypeBox.Items.AddRange(Constant.SearchByBytesNext);
                     break;
                 case ScanType.Double_:
                 case ScanType.Float_:
                 case ScanType.AutoNumeric:
-                    if (ResultView.Items.Count == 0) CompareTypeBox.Items.AddRange(Constant.SearchByFloatFirst);
+                    if (resultItems.Count == 0) CompareTypeBox.Items.AddRange(Constant.SearchByFloatFirst);
                     else CompareTypeBox.Items.AddRange(Constant.SearchByFloatNext);
                     break;
                 case ScanType.Hex:
@@ -1460,7 +1468,10 @@ namespace PS4CheaterNeo
 
             ListViewItem item = ((ListView)sender).GetItemAt(e.X, e.Y);
             if (item == null) return;
-            
+
+            ListViewItem.ListViewSubItem subitem = item.GetSubItemAt(e.X, e.Y);
+            if (item.SubItems[(int)SectionCol.SectionViewID] != subitem) return;
+
             item.Checked = !item.Checked;
 
             uint sid = uint.Parse(item.SubItems[(int)SectionCol.SectionViewSID].Text);
@@ -1900,8 +1911,9 @@ namespace PS4CheaterNeo
                 uint offsetAddr = (uint)(ulong.Parse(resultItem.SubItems[(int)ResultCol.ResultListAddress].Text, NumberStyles.HexNumber) - section.Start);
                 string oldValue = resultItem.SubItems[(int)ResultCol.ResultListValue].Text;
 
-                if (offsetAddr > 0) mainForm.AddToCheatGrid(section, offsetAddr, scanType, oldValue);
+                if (offsetAddr > 0) mainForm.AddToCheatGrid(section, offsetAddr, scanType, oldValue, false, "", null, null, -1, false);
             }
+            mainForm.CheatGridViewRowCountUpdate();
         }
 
         private void ResultViewHexEditor_Click(object sender, EventArgs e)
@@ -1963,9 +1975,9 @@ namespace PS4CheaterNeo
         {
             if (ResultView.Items.Count == 0) return;
 
-            for (int i = 0; i < resultItems.Count; ++i)
+            for (int i = 0; i < ResultView.VirtualListSize; ++i)
             {
-                ListViewItem resultItem = resultItems[i];
+                ListViewItem resultItem = ResultView.Items[i];
                 resultItem.Selected = true;
             }
 

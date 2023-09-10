@@ -77,6 +77,10 @@ namespace PS4CheaterNeo
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.ToolStripMsg = new System.Windows.Forms.ToolStripStatusLabel();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.RefreshLock = new System.Windows.Forms.Timer(this.components);
+            this.OpenCheatDialog = new System.Windows.Forms.OpenFileDialog();
+            this.SaveCheatDialog = new System.Windows.Forms.SaveFileDialog();
+            this.AutoRefreshTimer = new System.Windows.Forms.Timer(this.components);
             this.CheatGridView = new GroupGridView.GroupGridView();
             this.CheatGridViewDel = new System.Windows.Forms.DataGridViewButtonColumn();
             this.CheatGridViewAddress = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -87,10 +91,6 @@ namespace PS4CheaterNeo
             this.CheatGridViewSID = new GroupGridView.DataGridViewUpDownColumn();
             this.CheatGridViewLock = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.CheatGridViewDescription = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.RefreshLock = new System.Windows.Forms.Timer(this.components);
-            this.OpenCheatDialog = new System.Windows.Forms.OpenFileDialog();
-            this.SaveCheatDialog = new System.Windows.Forms.SaveFileDialog();
-            this.AutoRefreshTimer = new System.Windows.Forms.Timer(this.components);
             this.CheatGridMenu.SuspendLayout();
             this.ToolStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
@@ -428,6 +428,17 @@ namespace PS4CheaterNeo
             this.panel1.Size = new System.Drawing.Size(800, 450);
             this.panel1.TabIndex = 0;
             // 
+            // RefreshLock
+            // 
+            this.RefreshLock.Enabled = true;
+            this.RefreshLock.Interval = 500;
+            this.RefreshLock.Tick += new System.EventHandler(this.RefreshLock_Tick);
+            // 
+            // AutoRefreshTimer
+            // 
+            this.AutoRefreshTimer.Interval = 2500;
+            this.AutoRefreshTimer.Tick += new System.EventHandler(this.AutoRefreshTimer_Tick);
+            // 
             // CheatGridView
             // 
             this.CheatGridView.AllowUserToAddRows = false;
@@ -475,9 +486,12 @@ namespace PS4CheaterNeo
             this.CheatGridView.TopLeftHeaderButtonEnabled = true;
             this.CheatGridView.TopLeftHeaderCollapseAll = ((System.Drawing.Bitmap)(resources.GetObject("CheatGridView.TopLeftHeaderCollapseAll")));
             this.CheatGridView.TopLeftHeaderExpandAll = ((System.Drawing.Bitmap)(resources.GetObject("CheatGridView.TopLeftHeaderExpandAll")));
+            this.CheatGridView.VirtualMode = true;
             this.CheatGridView.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.CheatGridView_CellContentClick);
             this.CheatGridView.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.CheatGridView_CellEndEdit);
             this.CheatGridView.CellValidating += new System.Windows.Forms.DataGridViewCellValidatingEventHandler(this.CheatGridView_CellValidating);
+            this.CheatGridView.CellValueNeeded += new System.Windows.Forms.DataGridViewCellValueEventHandler(this.CheatGridView_CellValueNeeded);
+            this.CheatGridView.CellValuePushed += new System.Windows.Forms.DataGridViewCellValueEventHandler(this.CheatGridView_CellValuePushed);
             this.CheatGridView.EditingControlShowing += new System.Windows.Forms.DataGridViewEditingControlShowingEventHandler(this.CheatGridView_EditingControlShowing);
             this.CheatGridView.RowPostPaint += new System.Windows.Forms.DataGridViewRowPostPaintEventHandler(this.CheatGridView_RowPostPaint);
             this.CheatGridView.RowsRemoved += new System.Windows.Forms.DataGridViewRowsRemovedEventHandler(this.CheatGridView_RowsRemoved);
@@ -579,17 +593,6 @@ namespace PS4CheaterNeo
             this.CheatGridViewDescription.HeaderText = "Description";
             this.CheatGridViewDescription.Name = "CheatGridViewDescription";
             this.CheatGridViewDescription.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // RefreshLock
-            // 
-            this.RefreshLock.Enabled = true;
-            this.RefreshLock.Interval = 500;
-            this.RefreshLock.Tick += new System.EventHandler(this.RefreshLock_Tick);
-            // 
-            // AutoRefreshTimer
-            // 
-            this.AutoRefreshTimer.Interval = 2500;
-            this.AutoRefreshTimer.Tick += new System.EventHandler(this.AutoRefreshTimer_Tick);
             // 
             // Main
             // 
