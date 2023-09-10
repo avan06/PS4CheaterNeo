@@ -30,6 +30,8 @@ namespace PS4CheaterNeo
         //Confirm whether the compare type starts with UnknownInitial
         bool isUnknownInitial = false;
 
+        List<ListViewItem> sectionItems = new List<ListViewItem>();
+        List<ListViewItem> resultItems = new List<ListViewItem>();
         Dictionary<string, Dictionary<uint, BitsDictionary>> bitsDictDicts;
 
         public Query(Main mainForm)
@@ -146,11 +148,15 @@ namespace PS4CheaterNeo
                 return;
             }
 
+            sectionItems.Clear();
+            sectionItems = null;
+            resultItems.Clear();
+            resultItems = null;
+            ResultView.Clear();
+            ResultView = null;
             ComboItem process = (ComboItem)ProcessesBox.SelectedItem;
             if (process != null) PS4Tool.DetachDebugger((int)process.Value);
-            bitsDictDicts["_s0"] = null;
-            bitsDictDicts["_s1"] = null;
-            bitsDictDicts["_s2"] = null;
+            bitsDictDicts.Clear();
             GC.Collect();
             Properties.Settings.Default.Save();
         }
@@ -184,7 +190,11 @@ namespace PS4CheaterNeo
             try
             {
                 SectionView.BeginUpdate();
-                SectionView.ItemCheck -= SectionView_ItemCheck;
+                SectionView.VirtualMode = false;
+                sectionItems.Clear();
+                resultItems.Clear();
+                SectionView.VirtualListSize = 0;
+                ResultView.VirtualListSize = 0;
                 SectionView.Items.Clear();
                 ResultView.Items.Clear();
 
@@ -194,8 +204,6 @@ namespace PS4CheaterNeo
                 mainForm.ProcessName = (string)process.Text;
 
                 Section[] sections = sectionTool.GetSectionSortByAddr();
-
-                List<ListViewItem> SectionViewItems = new List<ListViewItem>();
                 for (int sectionIdx = 0; sectionIdx < sections.Length; sectionIdx++)
                 {
                     Section section = sections[sectionIdx];
@@ -229,13 +237,15 @@ namespace PS4CheaterNeo
                     else if (section.Name.StartsWith("executable")) item.ForeColor = Properties.Settings.Default.QuerySectionViewExecutableForeColor.Value; //Color.GreenYellow;
                     else if (section.Name.Contains("NoName")) item.ForeColor = Properties.Settings.Default.QuerySectionViewNoNameForeColor.Value; //Color.Red;
                     else if (Regex.IsMatch(section.Name, @"^\[\d+\]$")) item.ForeColor = Properties.Settings.Default.QuerySectionViewNoName2ForeColor.Value; //Color.HotPink;
-                    SectionViewItems.Add(item);
+                    item.Checked = true;
+                    item.Checked = false; //When ListView is in VirtualMode, you need to handle it like this to make the CheckBoxes visible.
+                    sectionItems.Add(item);
                 }
 
-                SectionView.Items.AddRange(SectionViewItems.ToArray());
-                ToolStripMsg.Text = string.Format("Total section: {0}, Selected section: {1}, Search size: {2}MB", SectionView.Items.Count, sectionTool.TotalSelected, sectionTool.TotalMemorySize / (1024 * 1024));
-                SectionView.ItemCheck += new ItemCheckEventHandler(SectionView_ItemCheck);
+                SectionView.VirtualListSize = sectionItems.Count;
+                SectionView.VirtualMode = true;
                 SectionView.EndUpdate();
+                ToolStripMsg.Text = string.Format("Total section: {0}, Selected section: {1}, Search size: {2}MB", sectionItems.Count, sectionTool.TotalSelected, sectionTool.TotalMemorySize / (1024 * 1024));
             }
             catch (Exception ex)
             {
@@ -256,10 +266,10 @@ namespace PS4CheaterNeo
                 else return;
             }
 
+            ResultView.VirtualListSize = 0;
+            resultItems.Clear();
             ResultView.Items.Clear();
-            if (bitsDictDicts["_s0"] != null) bitsDictDicts["_s0"].Clear();
-            if (bitsDictDicts["_s1"] != null) bitsDictDicts["_s1"].Clear();
-            if (bitsDictDicts["_s2"] != null) bitsDictDicts["_s2"].Clear();
+            bitsDictDicts.Clear();
 
             comparerTool = null;
             bitsDictDicts["_s0"] = new Dictionary<uint, BitsDictionary>();
@@ -279,57 +289,82 @@ namespace PS4CheaterNeo
             ScanTypeBox_SelectedIndexChanged(null, null);
         }
 
+        Task<bool> undoTask = null;
         private void UndoBtn_Click(object sender, EventArgs e)
         {
             if (!enableUndoScan) return;
+            if (undoTask != null && !undoTask.IsCompleted) return;
 
-            UnReDO();
-            ToolStripMsg.Text = string.Format("Undo scan, count:{0}", hitCnt);
             UndoBtn.Enabled = false;
-            RedoBtn.Enabled = true;
+            RedoBtn.Enabled = false;
+
+            System.Diagnostics.Stopwatch tickerMajor = System.Diagnostics.Stopwatch.StartNew();
+            undoTask = UnReDO("Undo scan", tickerMajor);
+            undoTask
+                .ContinueWith(t => TaskCompleted(tickerMajor))
+                .ContinueWith(t => {
+                    Invoke(new MethodInvoker(() => {
+                        UndoBtn.Enabled = false;
+                        RedoBtn.Enabled = true;
+                    }));
+                });
         }
 
         private void RedoBtn_Click(object sender, EventArgs e)
         {
             if (!enableUndoScan) return;
+            if (undoTask != null && !undoTask.IsCompleted) return;
 
-            UnReDO();
-            ToolStripMsg.Text = string.Format("Redo scan, count:{0}", hitCnt);
-            UndoBtn.Enabled = true;
+            UndoBtn.Enabled = false;
             RedoBtn.Enabled = false;
+
+            System.Diagnostics.Stopwatch tickerMajor = System.Diagnostics.Stopwatch.StartNew();
+            undoTask = UnReDO("Redo scan", tickerMajor);
+            undoTask
+                .ContinueWith(t => TaskCompleted(tickerMajor))
+                .ContinueWith(t => {
+                    Invoke(new MethodInvoker(() => {
+                        UndoBtn.Enabled = true;
+                        RedoBtn.Enabled = false;
+                    }));
+                });
         }
 
-        private void UnReDO()
+        private async Task<bool> UnReDO(string msg, System.Diagnostics.Stopwatch tickerMajor) => await Task.Run(() =>
         {
-            if (!enableUndoScan) return;
+            if (!enableUndoScan) return true;
 
-            Dictionary<uint, BitsDictionary> tmp = bitsDictDicts["_s1"];
-            bitsDictDicts["_s1"] = bitsDictDicts["_s2"];
-            bitsDictDicts["_s2"] = tmp;
-            SectionView.BeginUpdate();
-            SectionView.ItemCheck -= SectionView_ItemCheck;
-            for (int sectionIdx = 0; sectionIdx < SectionView.Items.Count; ++sectionIdx)
+            (bitsDictDicts["_s2"], bitsDictDicts["_s1"]) = (bitsDictDicts["_s1"], bitsDictDicts["_s2"]);
+            Invoke(new MethodInvoker(() => { SectionView.BeginUpdate(); }));
+            for (int sectionIdx = 0; sectionIdx < sectionItems.Count; ++sectionIdx)
             {
-                ListViewItem sectionItem = SectionView.Items[sectionIdx];
+                ListViewItem sectionItem = sectionItems[sectionIdx];
                 uint sid = uint.Parse(sectionItem.SubItems[(int)SectionCol.SectionViewSID].Text);
 
-                if (bitsDictDicts["_s1"].ContainsKey(sid))
-                {
-                    BitsDictionary bitsDict = bitsDictDicts["_s1"][sid];
-                    sectionItem.Checked = bitsDict.Count > 0;
-                    if (!sectionItem.Checked) bitsDictDicts["_s1"].Remove(sid);
-                }
-                else sectionItem.Checked = false;
-                SectionCheckUpdate(sectionItem.Checked, sid);
+                Invoke(new MethodInvoker(() => {
+                    if (bitsDictDicts["_s1"].ContainsKey(sid))
+                    {
+                        BitsDictionary bitsDict = bitsDictDicts["_s1"][sid];
+                        sectionItem.Checked = bitsDict.Count > 0;
+                        if (!sectionItem.Checked) bitsDictDicts["_s1"].Remove(sid);
+                    }
+                    else sectionItem.Checked = false;
+                    SectionCheckUpdate(sectionItem.Checked, sid);
+                }));
             }
-            ToolStripMsg.Text = string.Format("Total section: {0}, Selected section: {1}, Search size: {2}MB", SectionView.Items.Count, sectionTool.TotalSelected, sectionTool.TotalMemorySize / (1024 * 1024));
-            SectionView.ItemCheck += new ItemCheckEventHandler(SectionView_ItemCheck);
-            SectionView.EndUpdate();
-            TaskCompleted();
-        }
+            Invoke(new MethodInvoker(() => {
+                if (AddrMinBox.Tag != null) AddrMinBox.Text = ((ulong)AddrMinBox.Tag).ToString("X");
+                if (AddrMaxBox.Tag != null) AddrMaxBox.Text = ((ulong)AddrMaxBox.Tag).ToString("X");
 
-        Task<bool> scanTask;
-        CancellationTokenSource scanSource;
+                ToolStripMsg.Text = string.Format("{0}, Section: {1}/{2}(selected/total)", msg, sectionTool.TotalSelected, sectionItems.Count);
+                SectionView.EndUpdate();
+            }));
+
+            return true;
+        });
+
+        Task<bool> scanTask = null;
+        CancellationTokenSource scanSource = null;
         private void ScanBtn_Click(object sender, EventArgs e)
         {
             try
@@ -390,8 +425,8 @@ namespace PS4CheaterNeo
                     ScanBtn.Text = "Stop";
                     if (scanSource != null) scanSource.Dispose();
                     scanSource = new CancellationTokenSource();
-                    scanTask = ScanTask(alignment, isFilter, isFilterSize, AddrMin, AddrMax, CompareFirstBox.Checked);
-
+                    System.Diagnostics.Stopwatch tickerMajor = System.Diagnostics.Stopwatch.StartNew();
+                    scanTask = ScanTask(alignment, isFilter, isFilterSize, AddrMin, AddrMax, CompareFirstBox.Checked, tickerMajor);
                     scanTask.ContinueWith(t => {
                         if (t.Exception != null)
                         {
@@ -399,8 +434,9 @@ namespace PS4CheaterNeo
                             InputBox.Show("ScanTask Exception", "", ref errMsg, 100);
                         }
                     }, TaskContinuationOptions.OnlyOnFaulted)
-                    .ContinueWith(t => TaskCompleted())
-                    .ContinueWith(t => Invoke(new MethodInvoker(() => { if (AutoResumeBox.Checked) ResumeBtn.PerformClick(); })));
+                    .ContinueWith(t => TaskCompleted(tickerMajor))
+                    .ContinueWith(t => Invoke(new MethodInvoker(() => { if (AutoResumeBox.Checked) ResumeBtn.PerformClick(); })))
+                    .ContinueWith(t => scanSource = null);
 
                     ScanTypeBox.Enabled = false;
                     AlignmentBox.Enabled = false;
@@ -456,10 +492,9 @@ namespace PS4CheaterNeo
         /// <param name="isCompareFirst">Compare to first scan will compare the current addresslist and it's value to the saved value of the first scan</param>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-        private async Task<bool> ScanTask(bool alignment, bool isFilter, bool isFilterSize, ulong AddrMin, ulong AddrMax, bool isCompareFirst) => await Task.Run(() =>
+        private async Task<bool> ScanTask(bool alignment, bool isFilter, bool isFilterSize, ulong AddrMin, ulong AddrMax, bool isCompareFirst, System.Diagnostics.Stopwatch tickerMajor) => await Task.Run(() =>
         {
             string errInfo = "";
-            System.Diagnostics.Stopwatch tickerMajor = System.Diagnostics.Stopwatch.StartNew();
             try
             {
                 if (enableUndoScan && bitsDictDicts["_s1"].Count > 0)
@@ -613,7 +648,7 @@ namespace PS4CheaterNeo
                                     Invoke(new MethodInvoker(() =>
                                     {
                                         ToolStripBar.Value = (int)(((float)processedMemoryLen / sectionTool.TotalMemorySize) * 100);
-                                        ToolStripMsg.Text = string.Format("Scan elapsed:{0:0.00}s. {1}MB, Count: {2}, Section: {3}/{4}/{5}(found/selected/total)", tickerMajor.Elapsed.TotalSeconds, processedMemoryLen / (1024 * 1024), hitCnt, sectionFoundCnt, sectionSelectedCnt, SectionView.Items.Count);
+                                        ToolStripMsg.Text = string.Format("Scan elapsed:{0:0.00}s. {1}MB, Count: {2}, Section: {3}/{4}/{5}(found/selected/total)", tickerMajor.Elapsed.TotalSeconds, processedMemoryLen / (1024 * 1024), hitCnt, sectionFoundCnt, sectionSelectedCnt, sectionItems.Count);
                                     }));
                                 }
                             }
@@ -639,14 +674,18 @@ namespace PS4CheaterNeo
                     GC.Collect();
                     Invoke(new MethodInvoker(() => {
                         SectionView.BeginUpdate();
-                        for (int sectionIdx = 0; sectionIdx < SectionView.Items.Count; ++sectionIdx)
+                        for (int sectionIdx = 0; sectionIdx < sectionItems.Count; ++sectionIdx)
                         {
-                            ListViewItem sectionItem = SectionView.Items[sectionIdx];
+                            ListViewItem sectionItem = sectionItems[sectionIdx];
                             if (!sectionItem.Checked) continue;
 
                             uint sid = uint.Parse(sectionItem.SubItems[(int)SectionCol.SectionViewSID].Text);
                             Section section = sectionTool.GetSection(sid);
-                            if (section.Check == false) sectionItem.Checked = false;
+                            if (section.Check == false)
+                            {
+                                sectionItem.Checked = false;
+                                SectionCheckUpdate(sectionItem.Checked, section, true);
+                            }
                         }
                         SectionView.EndUpdate();
                         ToolStripBar.Value = 100;
@@ -665,11 +704,6 @@ namespace PS4CheaterNeo
                     }));
                 }
                 else errInfo += ex.ToString() + "\n\n";
-            }
-            finally
-            {
-                if (scanSource != null) scanSource.Dispose();
-                tickerMajor.Stop();
             }
             if (errInfo != "") throw new Exception(errInfo);
             return true;
@@ -885,169 +919,210 @@ namespace PS4CheaterNeo
         }
         #endregion
 
-        private void TaskCompleted()
+        /// <summary>
+        /// After scanning or refreshing tasks are completed, display the found data in the ResultView.
+        /// </summary>
+        /// <param name="tickerMajor"></param>
+        private void TaskCompleted(System.Diagnostics.Stopwatch tickerMajor)
         {
-            if (bitsDictDicts["_s1"].Count <= 0 && !enableUndoScan)
-            {
-                Invoke(new MethodInvoker(() => { NewBtn.PerformClick(); }));
-                return;
-            }
-
-            hitCnt = 0;
-            int chkHitCnt = 0;
-            uint MaxResultShow = Properties.Settings.Default.MaxResultShow.Value;
-            MaxResultShow = MaxResultShow == 0 ? 0x2000 : MaxResultShow;
-            Invoke(new MethodInvoker(() =>
-            {
-                ResultView.Items.Clear();
-                ResultView.BeginUpdate();
-            }));
-            List<uint> sectionKeys = new List<uint>(bitsDictDicts["_s1"].Keys);
-            sectionKeys.Sort();
-            Color backColor = default;
             bool isFirstScan = bitsDictDicts["_s0"].Count == 0;
-            for (int sectionIdx = 0; sectionIdx < sectionKeys.Count; sectionIdx++)
+            try
             {
-                uint dictKey = sectionKeys[sectionIdx];
-                Section section = null;
-                BitsDictionary bitsDict = null;
-                if (sectionTool.SectionDict.ContainsKey(dictKey))
+                if (bitsDictDicts["_s1"].Count <= 0 && !enableUndoScan)
                 {
-                    section = sectionTool.SectionDict[sectionKeys[sectionIdx]];
-                    bitsDictDicts["_s1"].TryGetValue(section.SID, out bitsDict);
+                    Invoke(new MethodInvoker(() => { NewBtn.PerformClick(); }));
+                    return;
                 }
-                if (bitsDict == null || bitsDict.Count == 0) continue;
+                string msg = "";
+                Invoke(new MethodInvoker(() => { msg = ToolStripMsg.Text; }));
 
-                if (isFirstScan) bitsDictDicts["_s0"].Add(dictKey, (BitsDictionary)bitsDict.Clone());
-
-                hitCnt += bitsDict.Count;
-
-                bitsDict.Begin();
-                for (int idx = 0; idx < bitsDict.Count; idx++)
+                hitCnt = 0;
+                int chkHitCnt = 0;
+                uint MaxResultShow = Properties.Settings.Default.MaxResultShow.Value;
+                MaxResultShow = MaxResultShow == 0 ? 0x2000 : MaxResultShow;
+                Invoke(new MethodInvoker(() =>
                 {
-                    if (++chkHitCnt > MaxResultShow) break;
-
-                    (uint offsetAddr, byte[] oldBytes) = bitsDict.Get();
-
-                    if (comparerTool.ScanType_ != ScanType.Group)
+                    ResultView.BeginUpdate();
+                    ResultView.VirtualMode = false;
+                    resultItems.Clear();
+                    ResultView.VirtualListSize = 0;
+                    ResultView.Items.Clear();
+                }));
+                List<uint> sectionKeys = new List<uint>(bitsDictDicts["_s1"].Keys);
+                sectionKeys.Sort();
+                Color backColor = default;
+                for (int sectionIdx = 0; sectionIdx < sectionKeys.Count; sectionIdx++)
+                {
+                    if (scanSource != null && scanSource.Token.CanBeCanceled) scanSource.Token.ThrowIfCancellationRequested();
+                    if (refreshSource != null && refreshSource.Token.CanBeCanceled) refreshSource.Token.ThrowIfCancellationRequested();
+                    uint dictKey = sectionKeys[sectionIdx];
+                    Section section = null;
+                    BitsDictionary bitsDict = null;
+                    if (sectionTool.SectionDict.ContainsKey(dictKey))
                     {
-                        string typeStr = "";
-                        string valueStr = "";
-                        string valueHex = "";
+                        section = sectionTool.SectionDict[sectionKeys[sectionIdx]];
+                        bitsDictDicts["_s1"].TryGetValue(section.SID, out bitsDict);
+                    }
+                    if (bitsDict == null || bitsDict.Count == 0) continue;
 
-                        if (comparerTool.ScanType_ == ScanType.AutoNumeric)
+                    if (isFirstScan) bitsDictDicts["_s0"].Add(dictKey, (BitsDictionary)bitsDict.Clone());
+
+                    hitCnt += bitsDict.Count;
+
+                    bitsDict.Begin();
+                    for (int idx = 0; idx < bitsDict.Count; idx++)
+                    {
+                        if (scanSource != null && scanSource.Token.CanBeCanceled) scanSource.Token.ThrowIfCancellationRequested();
+                        if (refreshSource != null && refreshSource.Token.CanBeCanceled) refreshSource.Token.ThrowIfCancellationRequested();
+                        if (++chkHitCnt >= MaxResultShow) break;
+
+                        (uint offsetAddr, byte[] oldBytes) = bitsDict.Get();
+
+                        if (comparerTool.ScanType_ != ScanType.Group)
                         {
-                            bool isHit = false;
-                            string signString = "";
-                            ScanType valueType = comparerTool.ScanType_;
-                            if (comparerTool.AutoNumericValid.UInt)
-                            {
-                                ulong valueUlong = ScanTool.BytesToULong(oldBytes);
-                                if (isUnknownInitial)
-                                {
-                                    if (valueUlong <= 0xFF) valueType = ScanType.Byte_;
-                                    else if (valueUlong <= 0xFFFF) valueType = ScanType.Bytes_2;
-                                    else if (valueUlong <= 0xFFFFFFFF) valueType = ScanType.Bytes_4;
-                                    else valueType = ScanType.Bytes_8;
-                                }
-                                else if (comparerTool.Input0UInt64 <= 0xFF) //255
-                                {
-                                    valueType = ScanType.Byte_;
-                                    valueUlong = BitConverter.GetBytes(valueUlong)[0];
-                                    if (comparerTool.IsValue0Signed) signString = ((sbyte)valueUlong).ToString();
-                                }
-                                else if (comparerTool.Input0UInt64 <= 0xFFFF) //65535
-                                {
-                                    valueType = ScanType.Bytes_2;
-                                    valueUlong = (UInt16)valueUlong;
-                                    if (comparerTool.IsValue0Signed) signString = ((Int16)valueUlong).ToString();
-                                }
-                                else if (comparerTool.Input0UInt64 <= 0xFFFFFFFF) //4294967295
-                                {
-                                    valueType = ScanType.Bytes_4;
-                                    valueUlong = (UInt32)valueUlong;
-                                    if (comparerTool.IsValue0Signed) signString = ((Int32)valueUlong).ToString();
-                                }
-                                else
-                                {
-                                    valueType = ScanType.Bytes_8;
-                                    if (comparerTool.IsValue0Signed) signString = ((Int64)valueUlong).ToString();
-                                }
+                            string typeStr = "";
+                            string valueStr = "";
+                            string valueHex = "";
 
-                                if (valueUlong - comparerTool.Input0UInt64 == 0 || isUnknownInitial)
+                            if (comparerTool.ScanType_ == ScanType.AutoNumeric)
+                            {
+                                bool isHit = false;
+                                string signString = "";
+                                ScanType valueType = comparerTool.ScanType_;
+                                if (comparerTool.AutoNumericValid.UInt)
                                 {
-                                    isHit = true;
-                                    valueStr = comparerTool.IsValue0Signed ? signString : valueUlong.ToString();
+                                    ulong valueUlong = ScanTool.BytesToULong(oldBytes);
+                                    if (isUnknownInitial)
+                                    {
+                                        if (valueUlong <= 0xFF) valueType = ScanType.Byte_;
+                                        else if (valueUlong <= 0xFFFF) valueType = ScanType.Bytes_2;
+                                        else if (valueUlong <= 0xFFFFFFFF) valueType = ScanType.Bytes_4;
+                                        else valueType = ScanType.Bytes_8;
+                                    }
+                                    else if (comparerTool.Input0UInt64 <= 0xFF) //255
+                                    {
+                                        valueType = ScanType.Byte_;
+                                        valueUlong = BitConverter.GetBytes(valueUlong)[0];
+                                        if (comparerTool.IsValue0Signed) signString = ((sbyte)valueUlong).ToString();
+                                    }
+                                    else if (comparerTool.Input0UInt64 <= 0xFFFF) //65535
+                                    {
+                                        valueType = ScanType.Bytes_2;
+                                        valueUlong = (UInt16)valueUlong;
+                                        if (comparerTool.IsValue0Signed) signString = ((Int16)valueUlong).ToString();
+                                    }
+                                    else if (comparerTool.Input0UInt64 <= 0xFFFFFFFF) //4294967295
+                                    {
+                                        valueType = ScanType.Bytes_4;
+                                        valueUlong = (UInt32)valueUlong;
+                                        if (comparerTool.IsValue0Signed) signString = ((Int32)valueUlong).ToString();
+                                    }
+                                    else
+                                    {
+                                        valueType = ScanType.Bytes_8;
+                                        if (comparerTool.IsValue0Signed) signString = ((Int64)valueUlong).ToString();
+                                    }
+
+                                    if (valueUlong - comparerTool.Input0UInt64 == 0 || isUnknownInitial)
+                                    {
+                                        isHit = true;
+                                        valueStr = comparerTool.IsValue0Signed ? signString : valueUlong.ToString();
+                                    }
                                 }
+                                if (!isHit && comparerTool.AutoNumericValid.Double && BitConverter.ToDouble(oldBytes, 0) is double valueDouble && Math.Abs(valueDouble - comparerTool.Input0Double) < 1)
+                                {
+                                    valueType = ScanType.Double_;
+                                    valueStr = valueDouble.ToString();
+                                }
+                                else if (!isHit && comparerTool.AutoNumericValid.Float && BitConverter.ToSingle(oldBytes, 0) is float valueFloat && Math.Abs(valueFloat - comparerTool.Input0Float) < 1)
+                                {
+                                    valueType = ScanType.Float_;
+                                    valueStr = ((double)valueFloat).ToString();
+                                }
+                                typeStr = valueType.GetDescription();
+                                valueHex = ScanTool.BytesToString(valueType, oldBytes, true, false);
                             }
-                            if(!isHit && comparerTool.AutoNumericValid.Double && BitConverter.ToDouble(oldBytes, 0) is double valueDouble && Math.Abs(valueDouble - comparerTool.Input0Double) < 1)
+                            else
                             {
-                                valueType = ScanType.Double_;
-                                valueStr = valueDouble.ToString();
+                                typeStr = comparerTool.ScanType_.GetDescription();
+                                valueStr = ScanTool.BytesToString(comparerTool.ScanType_, oldBytes, false, comparerTool.IsValue0Signed);
+                                valueHex = ScanTool.BytesToString(comparerTool.ScanType_, oldBytes, true, false);
                             }
-                            else if (!isHit && comparerTool.AutoNumericValid.Float && BitConverter.ToSingle(oldBytes, 0) is float valueFloat && Math.Abs(valueFloat - comparerTool.Input0Float) < 1)
+                            ListViewItem resultItem = new ListViewItem((offsetAddr + section.Start).ToString("X8"), 0)
                             {
-                                valueType = ScanType.Float_;
-                                valueStr = ((double)valueFloat).ToString();
-                            }
-                            typeStr = valueType.GetDescription();
-                            valueHex = ScanTool.BytesToString(valueType, oldBytes, true, false);
+                                Name = offsetAddr.ToString("X8"),
+                                Tag = (section.SID, bitsDict.Index)
+                            };
+                            resultItem.SubItems.Add(typeStr);
+                            resultItem.SubItems.Add(valueStr);
+                            resultItem.SubItems.Add(valueHex);
+                            resultItem.SubItems.Add(string.Format("{0}_{1}_{2}_{3}", section.Start.ToString("X"), section.Name, section.Prot.ToString("X"), section.Offset.ToString("X")));
+                            resultItems.Add(resultItem);
                         }
                         else
                         {
-                            typeStr = comparerTool.ScanType_.GetDescription();
-                            valueStr = ScanTool.BytesToString(comparerTool.ScanType_, oldBytes, false, comparerTool.IsValue0Signed);
-                            valueHex = ScanTool.BytesToString(comparerTool.ScanType_, oldBytes, true, false);
+                            int scanOffset = 0;
+                            backColor = backColor == default ? Color.DarkSlateGray : default;
+                            for (int gIdx = 0; gIdx < comparerTool.GroupTypes.Count; gIdx++)
+                            {
+                                (ScanType scanType, int groupTypeLength, bool isAny, bool isSign) group = comparerTool.GroupTypes[gIdx];
+                                byte[] oldGroupBytes = new byte[group.groupTypeLength];
+                                Buffer.BlockCopy(oldBytes, scanOffset, oldGroupBytes, 0, group.groupTypeLength);
+                                string typeStr = group.scanType.GetDescription();
+                                string valueStr = ScanTool.BytesToString(group.scanType, oldGroupBytes, false, group.isSign);
+                                string valueHex = ScanTool.BytesToString(group.scanType, oldGroupBytes, true, false);
+
+                                ListViewItem resultItem = new ListViewItem((offsetAddr + section.Start + (uint)scanOffset).ToString("X8"), 0)
+                                {
+                                    Name = offsetAddr.ToString("X8"),
+                                    Tag = (section.SID, bitsDict.Index)
+                                };
+                                resultItem.SubItems.Add(typeStr);
+                                resultItem.SubItems.Add(valueStr);
+                                resultItem.SubItems.Add(valueHex);
+                                resultItem.SubItems.Add(string.Format("{0}_{1}_{2}_{3}", section.Start.ToString("X"), section.Name, section.Prot.ToString("X"), section.Offset.ToString("X")));
+                                resultItem.BackColor = backColor;
+                                resultItems.Add(resultItem);
+                                scanOffset += group.groupTypeLength;
+                            }
                         }
-
-                        Invoke(new MethodInvoker(() => {
-                            int itemIdx = ResultView.Items.Count;
-                            ResultView.Items.Add(offsetAddr.ToString("X8"), (offsetAddr + section.Start).ToString("X8"), 0);
-                            ResultView.Items[itemIdx].Tag = (section.SID, bitsDict.Index);
-                            ResultView.Items[itemIdx].SubItems.Add(typeStr);
-                            ResultView.Items[itemIdx].SubItems.Add(valueStr);
-                            ResultView.Items[itemIdx].SubItems.Add(valueHex);
-                            ResultView.Items[itemIdx].SubItems.Add(string.Format("{0}_{1}_{2}_{3}", section.Start.ToString("X"), section.Name, section.Prot.ToString("X"), section.Offset.ToString("X")));
-                        }));
-                        continue;
+                        if (chkHitCnt % 0x2000 == 0)
+                        {
+                            Invoke(new MethodInvoker(() =>
+                            {
+                                ResultView.VirtualListSize = resultItems.Count;
+                                ToolStripMsg.Text = string.Format("{0}; Processed elapsed:{1:0.00}s, ListView:{2}/{3}", msg, tickerMajor.Elapsed.TotalSeconds, chkHitCnt, sectionIdx + 1);
+                            }));
+                        }
                     }
-
-                    int scanOffset = 0;
-                    backColor = backColor == default ? Color.DarkSlateGray : default;
-                    for (int gIdx = 0; gIdx < comparerTool.GroupTypes.Count; gIdx++)
+                    if (resultItems.Count > 0)
                     {
-                        (ScanType scanType, int groupTypeLength, bool isAny, bool isSign) group = comparerTool.GroupTypes[gIdx];
-                        byte[] oldGroupBytes = new byte[group.groupTypeLength];
-                        Buffer.BlockCopy(oldBytes, scanOffset, oldGroupBytes, 0, group.groupTypeLength);
-                        string typeStr = group.scanType.GetDescription();
-                        string valueStr = ScanTool.BytesToString(group.scanType, oldGroupBytes, false, group.isSign);
-                        string valueHex = ScanTool.BytesToString(group.scanType, oldGroupBytes, true, false);
-
-                        Invoke(new MethodInvoker(() => {
-                            int groupIdx = ResultView.Items.Count;
-                            ResultView.Items.Add(offsetAddr.ToString("X8"), (offsetAddr + section.Start + (uint)scanOffset).ToString("X8"), 0);
-                            ResultView.Items[groupIdx].Tag = (section.SID, bitsDict.Index);
-                            ResultView.Items[groupIdx].SubItems.Add(typeStr);
-                            ResultView.Items[groupIdx].SubItems.Add(valueStr);
-                            ResultView.Items[groupIdx].SubItems.Add(valueHex);
-                            ResultView.Items[groupIdx].SubItems.Add(string.Format("{0}_{1}_{2}_{3}", section.Start.ToString("X"), section.Name, section.Prot.ToString("X"), section.Offset.ToString("X")));
-                            ResultView.Items[groupIdx].BackColor = backColor;
+                        Invoke(new MethodInvoker(() =>
+                        {
+                            ResultView.VirtualListSize = resultItems.Count;
+                            ToolStripMsg.Text = string.Format("{0}; Processed elapsed:{1:0.00}s, ListView:{2}/{3}", msg, tickerMajor.Elapsed.TotalSeconds, chkHitCnt, sectionIdx + 1);
                         }));
-                        scanOffset += group.groupTypeLength;
                     }
                 }
             }
-            Invoke(new MethodInvoker(() => {
-                ResultView.EndUpdate();
-                ScanTypeBox_SelectedIndexChanged(null, null);
-                ScanBtn.Text = "Next Scan";
-                if (isFirstScan) CompareFirstBox.Enabled = true;
-            }));
+            finally
+            {
+                if (scanSource != null) scanSource.Dispose();
+                if (refreshSource != null) refreshSource.Dispose();
+                if (tickerMajor != null) tickerMajor.Stop();
+                Invoke(new MethodInvoker(() => {
+                    ResultView.VirtualMode = true;
+                    ResultView.EndUpdate();
+                    ScanTypeBox_SelectedIndexChanged(null, null);
+                    ScanBtn.Text = "Next Scan";
+                    if (isFirstScan) CompareFirstBox.Enabled = true;
+                }));
+            }
         }
         #endregion
 
-        Task<bool> refreshTask;
-        CancellationTokenSource refreshSource;
+        Task<bool> refreshTask = null;
+        CancellationTokenSource refreshSource = null;
         private void RefreshBtn_Click(object sender, EventArgs e)
         {
             try
@@ -1063,9 +1138,11 @@ namespace PS4CheaterNeo
                 }
 
                 if (refreshSource != null) refreshSource.Dispose();
+                System.Diagnostics.Stopwatch tickerMajor = System.Diagnostics.Stopwatch.StartNew();
                 refreshSource = new CancellationTokenSource();
-                refreshTask = RefreshTask(IsFilterBox.Checked, IsFilterSizeBox.Checked);
-                refreshTask.ContinueWith(t => TaskCompleted());
+                refreshTask = RefreshTask(IsFilterBox.Checked, IsFilterSizeBox.Checked, tickerMajor);
+                refreshTask.ContinueWith(t => TaskCompleted(tickerMajor))
+                    .ContinueWith(t => refreshTask = null); ;
             }
             catch (Exception ex)
             {
@@ -1074,8 +1151,7 @@ namespace PS4CheaterNeo
         }
 
         //Invoke(new MethodInvoker(() => { }));
-        private async Task<bool> RefreshTask(bool isFilter, bool isFilterSize) => await Task.Run(() => {
-            System.Diagnostics.Stopwatch tickerMajor = System.Diagnostics.Stopwatch.StartNew();
+        private async Task<bool> RefreshTask(bool isFilter, bool isFilterSize, System.Diagnostics.Stopwatch tickerMajor) => await Task.Run(() => {
             try
             {
                 if (bitsDictDicts["_s1"].Count == 0) return false;
@@ -1213,7 +1289,7 @@ namespace PS4CheaterNeo
                                 Invoke(new MethodInvoker(() =>
                                 {
                                     ToolStripBar.Value = (int)(((float)(++count) / sectionKeys.Length) * 100);
-                                    ToolStripMsg.Text = string.Format("Refresh elapsed:{0:0.00}s. Count: {1}, Section: {2}/{3}(selected/total)", tickerMajor.Elapsed.TotalSeconds, hitCnt, sectionSelectedCnt, SectionView.Items.Count);
+                                    ToolStripMsg.Text = string.Format("Refresh elapsed:{0:0.00}s. Count: {1}, Section: {2}/{3}(selected/total)", tickerMajor.Elapsed.TotalSeconds, hitCnt, sectionSelectedCnt, sectionItems.Count);
                                 }));
                             }
                         }
@@ -1231,7 +1307,7 @@ namespace PS4CheaterNeo
                 GC.Collect();
                 Invoke(new MethodInvoker(() => {
                     ToolStripBar.Value = 100;
-                    ToolStripMsg.Text = string.Format("Refresh elapsed:{0:0.00}s. Count: {1}, Section: {2}/{3}(selected/total)", tickerMajor.Elapsed.TotalSeconds, hitCnt, sectionSelectedCnt, SectionView.Items.Count);
+                    ToolStripMsg.Text = string.Format("Refresh elapsed:{0:0.00}s. Count: {1}, Section: {2}/{3}(selected/total)", tickerMajor.Elapsed.TotalSeconds, hitCnt, sectionSelectedCnt, sectionItems.Count);
                 }));
             }
             catch (Exception ex)
@@ -1244,11 +1320,6 @@ namespace PS4CheaterNeo
                     }));
                 }
                 else MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source + ":RefreshTask", MessageBoxButtons.OK, MessageBoxIcon.Hand);
-            }
-            finally
-            {
-                if (refreshSource != null) refreshSource.Dispose();
-                tickerMajor.Stop();
             }
             return true;
         });
@@ -1361,13 +1432,42 @@ namespace PS4CheaterNeo
             }
         }
 
-        private void SectionView_ItemCheck(object sender, ItemCheckEventArgs e)
+        private void ResumeBtn_Click(object sender, EventArgs e)
         {
-            ListViewItem item = SectionView.Items[e.Index];
-            uint sid = uint.Parse(item.SubItems[(int)SectionCol.SectionViewSID].Text);
-            SectionCheckUpdate(e.NewValue == CheckState.Checked, sid);
+            processStatus = ProcessStatus.Resume;
+            ComboItem process = (ComboItem)ProcessesBox.SelectedItem;
+            PS4Tool.AttachDebugger((int)process.Value, (string)process.Text, processStatus);
+        }
+
+        private void PauseBtn_Click(object sender, EventArgs e)
+        {
+            processStatus = ProcessStatus.Pause;
+            ComboItem process = (ComboItem)ProcessesBox.SelectedItem;
+            PS4Tool.AttachDebugger((int)process.Value, (string)process.Text, processStatus);
+        }
+        #endregion
+
+        #region SectionView
+        private void SectionView_RetrieveVirtualItem(object sender, RetrieveVirtualItemEventArgs e) => e.Item = sectionItems.Count > e.ItemIndex ? sectionItems[e.ItemIndex] : null;
+
+        /// <summary>
+        /// When ListView is enabled with VirtualMode, the ItemCheck and ItemChecked events are not triggered.
+        /// </summary>
+        private void SectionView_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button != MouseButtons.Left) return;
+
+            ListViewItem item = ((ListView)sender).GetItemAt(e.X, e.Y);
+            if (item == null) return;
             
-            if (scanTask == null || scanTask.IsCompleted) 
+            item.Checked = !item.Checked;
+
+            uint sid = uint.Parse(item.SubItems[(int)SectionCol.SectionViewSID].Text);
+            SectionCheckUpdate(item.Checked, sid);
+
+            if (AddrMinBox.Tag != null) AddrMinBox.Text = ((ulong)AddrMinBox.Tag).ToString("X");
+            if (AddrMaxBox.Tag != null) AddrMaxBox.Text = ((ulong)AddrMaxBox.Tag).ToString("X");
+            if (scanTask == null || scanTask.IsCompleted)
                 ToolStripMsg.Text = string.Format("Total section: {0}, Selected section: {1}, Search size: {2}MB", SectionView.Items.Count, sectionTool.TotalSelected, sectionTool.TotalMemorySize / (1024 * 1024));
 
             item.BackColor = item.Checked ? querySectionViewItemCheck1BackColor : querySectionViewItemCheck2BackColor; //Color.DarkSlateGray : Color.DarkGreen;
@@ -1380,28 +1480,42 @@ namespace PS4CheaterNeo
         /// </summary>
         /// <param name="isChecked"></param>
         /// <param name="sid"></param>
-        private void SectionCheckUpdate(bool isChecked, uint sid)
+        /// <param name="force"></param>
+        private void SectionCheckUpdate(bool isChecked, uint sid, bool force = false)
         {
             Section section = sectionTool.SectionDict[sid];
-            if (section.Check == isChecked) return;
+            SectionCheckUpdate(isChecked, section, force);
+        }
+
+        /// <summary>
+        /// When the Checked status of SectionView is modified, 
+        /// verify and synchronize the Checked status of SectionDict and 
+        /// update the values of TotalSelected, TotalMemorySize, AddrMinBox, and AddrMaxBox.
+        /// </summary>
+        /// <param name="isChecked"></param>
+        /// <param name="section"></param>
+        /// <param name="force"></param>
+        private void SectionCheckUpdate(bool isChecked, Section section, bool force = false)
+        {
+            if (section.Check == isChecked && !force) return;
 
             section.Check = isChecked;
             if (section.Check)
             {
                 sectionTool.TotalSelected += 1;
                 sectionTool.TotalMemorySize += (ulong)section.Length;
-                if (AddrMinBox.Text.Trim() == "") AddrMinBox.Text = section.Start.ToString("X");
+                if (AddrMinBox.Tag == null) AddrMinBox.Tag = section.Start;
                 else
                 {
-                    var AddrMin = ParseHexAddrText(AddrMinBox.Text);
-                    if (section.Start < AddrMin) AddrMinBox.Text = section.Start.ToString("X");
+                    var AddrMin = (ulong)AddrMinBox.Tag;//ParseHexAddrText(AddrMinBox.Text);
+                    if (section.Start < AddrMin) AddrMinBox.Tag = section.Start;
                 }
                 ulong sectionEnd = section.Start + (ulong)section.Length;
-                if (AddrMaxBox.Text.Trim() == "") AddrMaxBox.Text = sectionEnd.ToString("X");
+                if (AddrMaxBox.Tag == null) AddrMaxBox.Tag = sectionEnd;
                 else
                 {
-                    var AddrMax = ParseHexAddrText(AddrMaxBox.Text);
-                    if (sectionEnd > AddrMax) AddrMaxBox.Text = sectionEnd.ToString("X");
+                    var AddrMax = (ulong)AddrMinBox.Tag;//ParseHexAddrText(AddrMaxBox.Text);
+                    if (sectionEnd > AddrMax) AddrMaxBox.Tag = sectionEnd;
                 }
             }
             else
@@ -1415,21 +1529,23 @@ namespace PS4CheaterNeo
         {
             bool check = SelectAllBox.Checked;
             SectionView.BeginUpdate();
-            SectionView.ItemCheck -= SectionView_ItemCheck;
-            for (int idx = 0; idx < SectionView.Items.Count; ++idx)
+            for (int idx = 0; idx < sectionItems.Count; ++idx)
             {
-                if (SectionView.Items[idx].Checked == check) continue;
+                if (sectionItems[idx].Checked == check) continue;
 
-                ListViewItem item = SectionView.Items[idx];
+                ListViewItem item = sectionItems[idx];
                 item.Checked = check;
                 uint sid = uint.Parse(item.SubItems[(int)SectionCol.SectionViewSID].Text);
                 SectionCheckUpdate(check, sid);
             }
-            ToolStripMsg.Text = string.Format("Total section: {0}, Selected section: {1}, Search size: {2}MB", SectionView.Items.Count, sectionTool.TotalSelected, sectionTool.TotalMemorySize / (1024 * 1024));
-            SectionView.ItemCheck += new ItemCheckEventHandler(SectionView_ItemCheck);
+            if (AddrMinBox.Tag != null) AddrMinBox.Text = ((ulong)AddrMinBox.Tag).ToString("X");
+            if (AddrMaxBox.Tag != null) AddrMaxBox.Text = ((ulong)AddrMaxBox.Tag).ToString("X");
+            ToolStripMsg.Text = string.Format("Total section: {0}, Selected section: {1}, Search size: {2}MB", sectionItems.Count, sectionTool.TotalSelected, sectionTool.TotalMemorySize / (1024 * 1024));
             SectionView.EndUpdate();
             if (!check)
             {
+                AddrMinBox.Tag = null;
+                AddrMaxBox.Tag = null;
                 AddrMinBox.Text = "";
                 AddrMaxBox.Text = "";
             }
@@ -1452,39 +1568,25 @@ namespace PS4CheaterNeo
             else
             {
                 SectionView.BeginUpdate();
-                SectionView.ItemCheck -= SectionView_ItemCheck;
-                for (int sIdx = 0; sIdx < SectionView.Items.Count; sIdx++)
+                SectionView.VirtualMode = false;
+                for (int sIdx = 0; sIdx < sectionItems.Count; sIdx++)
                 {
-                    ListViewItem item = SectionView.Items[sIdx];
+                    ListViewItem item = sectionItems[sIdx];
 
                     if (!filter.Equals(item.Tag)) continue;
 
                     uint sid = uint.Parse(item.SubItems[(int)SectionCol.SectionViewSID].Text);
                     SectionCheckUpdate(false, sid);
-
-                    item.Checked = false; //Ensure that MappedSectionList is not selected
-                    item.Remove();
+                    sectionItems.Remove(item);
                     --sIdx;
                 }
-                ToolStripMsg.Text = string.Format("Total section: {0}, Selected section: {1}, Search size: {2}MB", SectionView.Items.Count, sectionTool.TotalSelected, sectionTool.TotalMemorySize / (1024 * 1024));
-                SectionView.ItemCheck += new ItemCheckEventHandler(SectionView_ItemCheck);
+                if (AddrMinBox.Tag != null) AddrMinBox.Text = ((ulong)AddrMinBox.Tag).ToString("X");
+                if (AddrMaxBox.Tag != null) AddrMaxBox.Text = ((ulong)AddrMaxBox.Tag).ToString("X");
+                ToolStripMsg.Text = string.Format("Total section: {0}, Selected section: {1}, Search size: {2}MB", sectionItems.Count, sectionTool.TotalSelected, sectionTool.TotalMemorySize / (1024 * 1024));
+                SectionView.VirtualListSize = sectionItems.Count;
+                SectionView.VirtualMode = true;
                 SectionView.EndUpdate();
             }
-        }
-
-        private void ResultView_DoubleClick(object sender, EventArgs e)
-        {
-            if (ResultView.SelectedItems.Count != 1) return;
-
-            ListViewItem resultItem = ResultView.SelectedItems[0];
-
-            (uint sid, _) = ((uint sid, int resultIdx))resultItem.Tag;
-            Section section = sectionTool.GetSection(sid);
-            ScanType scanType = this.ParseFromDescription<ScanType>(resultItem.SubItems[(int)ResultCol.ResultListType].Text);
-            uint offsetAddr = (uint)(ulong.Parse(resultItem.SubItems[(int)ResultCol.ResultListAddress].Text, NumberStyles.HexNumber) - section.Start);
-            string oldValue = resultItem.SubItems[(int)ResultCol.ResultListValue].Text;
-
-            if (offsetAddr > 0) mainForm.AddToCheatGrid(section, offsetAddr, scanType, oldValue);
         }
 
         private string searchSectionName = "";
@@ -1494,12 +1596,12 @@ namespace PS4CheaterNeo
 
             int startIndex = 0;
             ListView.SelectedListViewItemCollection items = SectionView.SelectedItems;
-            if (items.Count > 0 && items[items.Count - 1].Index + 1 < SectionView.Items.Count) startIndex = items[items.Count - 1].Index + 1;
+            if (items.Count > 0 && items[items.Count - 1].Index + 1 < sectionItems.Count) startIndex = items[items.Count - 1].Index + 1;
             ListViewItem item = SectionView.FindItemWithText(searchSectionName, true, startIndex);
             if (item == null) return;
 
-            SectionView.Items[item.Index].Selected = true;
-            SectionView.Items[item.Index].EnsureVisible();
+            sectionItems[item.Index].Selected = true;
+            sectionItems[item.Index].EnsureVisible();
         }
 
         private void FilterRuleBtn_Click(object sender, EventArgs e)
@@ -1510,28 +1612,29 @@ namespace PS4CheaterNeo
 
             Properties.Settings.Default.SectionFilterKeys.Value = SectionFilterKeys;
         }
-        private void ResumeBtn_Click(object sender, EventArgs e)
+
+        /// <summary>
+        /// Get all the SelectedItems of a List's ListViewItem.
+        /// </summary>
+        /// <param name="items">List's ListViewItem</param>
+        /// <returns>SelectedItems</returns>
+        private List<ListViewItem> GetSelectedItems(List<ListViewItem> items)
         {
-            processStatus = ProcessStatus.Resume;
-            ComboItem process = (ComboItem)ProcessesBox.SelectedItem;
-            PS4Tool.AttachDebugger((int)process.Value, (string)process.Text, processStatus);
+            List<ListViewItem> selectedItems = new List<ListViewItem>();
+            for (int i = 0; i < items.Count; i++)
+            {
+                if (!items[i].Selected) continue;
+                selectedItems.Add(items[i]);
+            }
+            return selectedItems;
         }
 
-        private void PauseBtn_Click(object sender, EventArgs e)
-        {
-            processStatus = ProcessStatus.Pause;
-            ComboItem process = (ComboItem)ProcessesBox.SelectedItem;
-            PS4Tool.AttachDebugger((int)process.Value, (string)process.Text, processStatus);
-        }
-        #endregion
-
-        #region SectionViewMenu
         private void SectionViewHexEditor_Click(object sender, EventArgs e)
         {
-            ListView.SelectedListViewItemCollection items = SectionView.SelectedItems;
-            if (items.Count == 0) return;
+            List<ListViewItem> selectedItems = GetSelectedItems(sectionItems);
+            if (selectedItems.Count == 0) return;
 
-            var sectionItem = items[0];
+            var sectionItem = selectedItems[0];
             uint sid = uint.Parse(sectionItem.SubItems[(int)SectionCol.SectionViewSID].Text);
             Section section = sectionTool.GetSection(sid);
 
@@ -1541,8 +1644,8 @@ namespace PS4CheaterNeo
 
         private void SectionViewDump_Click(object sender, EventArgs e)
         {
-            ListView.SelectedListViewItemCollection items = SectionView.SelectedItems;
-            if (items.Count > 0)
+            List<ListViewItem> selectedItems = GetSelectedItems(sectionItems);
+            if (selectedItems.Count > 0)
             {
                 SaveDialog.Filter = "Directory | directory"; //"Section binary (*.bin)|*.bin";
                 SaveDialog.FilterIndex = 1;
@@ -1554,13 +1657,13 @@ namespace PS4CheaterNeo
                 double dumpSize = 0;
                 string savePath = Path.GetDirectoryName(SaveDialog.FileName);
                 string processName = MakeValidFileName(mainForm.ProcessName);
-                ComboItem process = (ComboItem)ProcessesBox.SelectedItem;
-                for (int idx = 0; idx < items.Count; ++idx)
+                //ComboItem process = (ComboItem)ProcessesBox.SelectedItem;
+                for (int idx = 0; idx < selectedItems.Count; ++idx)
                 {
-                    string sectionAddr = MakeValidFileName(items[idx].SubItems[(int)SectionCol.SectionViewAddress].Text);
-                    string sectionName = MakeValidFileName(items[idx].SubItems[(int)SectionCol.SectionViewName].Text);
+                    string sectionAddr = MakeValidFileName(selectedItems[idx].SubItems[(int)SectionCol.SectionViewAddress].Text);
+                    string sectionName = MakeValidFileName(selectedItems[idx].SubItems[(int)SectionCol.SectionViewName].Text);
 
-                    uint sid = uint.Parse(items[idx].SubItems[(int)SectionCol.SectionViewSID].Text);
+                    uint sid = uint.Parse(selectedItems[idx].SubItems[(int)SectionCol.SectionViewSID].Text);
                     Section section = sectionTool.GetSection(sid);
                     byte[] subBuffer = PS4Tool.ReadMemory(section.PID, section.Start, section.Length);
 
@@ -1628,27 +1731,29 @@ namespace PS4CheaterNeo
 
         private void SectionViewSelectAll(bool isSelectAll)
         {
-            if (SectionView.Items.Count == 0) return;
+            if (sectionItems.Count == 0) return;
 
             if (SelectAllBox.Checked != isSelectAll) SelectAllBox.Checked = isSelectAll;
             else
             {
                 SectionView.BeginUpdate();
-                SectionView.ItemCheck -= SectionView_ItemCheck;
-                for (int idx = 0; idx < SectionView.Items.Count; ++idx)
+                for (int idx = 0; idx < sectionItems.Count; ++idx)
                 {
-                    ListViewItem item = SectionView.Items[idx];
+                    ListViewItem item = sectionItems[idx];
                     if (item.Checked == isSelectAll) continue;
 
                     item.Checked = isSelectAll;
                     uint sid = uint.Parse(item.SubItems[(int)SectionCol.SectionViewSID].Text);
                     SectionCheckUpdate(isSelectAll, sid);
                 }
-                ToolStripMsg.Text = string.Format("Total section: {0}, Selected section: {1}, Search size: {2}MB", SectionView.Items.Count, sectionTool.TotalSelected, sectionTool.TotalMemorySize / (1024 * 1024));
-                SectionView.ItemCheck += new ItemCheckEventHandler(SectionView_ItemCheck);
+                if (AddrMinBox.Tag != null) AddrMinBox.Text = ((ulong)AddrMinBox.Tag).ToString("X");
+                if (AddrMaxBox.Tag != null) AddrMaxBox.Text = ((ulong)AddrMaxBox.Tag).ToString("X");
+                ToolStripMsg.Text = string.Format("Total section: {0}, Selected section: {1}, Search size: {2}MB", sectionItems.Count, sectionTool.TotalSelected, sectionTool.TotalMemorySize / (1024 * 1024));
                 SectionView.EndUpdate();
                 if (!isSelectAll)
                 {
+                    AddrMinBox.Tag = null;
+                    AddrMaxBox.Tag = null;
                     AddrMinBox.Text = "";
                     AddrMaxBox.Text = "";
                 }
@@ -1657,39 +1762,38 @@ namespace PS4CheaterNeo
 
         private void SectionViewInvertChecked_Click(object sender, EventArgs e)
         {
-            if (SectionView.Items.Count == 0) return;
+            if (sectionItems.Count == 0) return;
 
             SectionView.BeginUpdate();
-            SectionView.ItemCheck -= SectionView_ItemCheck;
-            for (int idx = 0; idx < SectionView.Items.Count; ++idx)
+            for (int idx = 0; idx < sectionItems.Count; ++idx)
             {
-                ListViewItem item = SectionView.Items[idx];
+                ListViewItem item = sectionItems[idx];
                 item.Checked = !item.Checked;
                 uint sid = uint.Parse(item.SubItems[(int)SectionCol.SectionViewSID].Text);
                 SectionCheckUpdate(item.Checked, sid);
             }
-            ToolStripMsg.Text = string.Format("Total section: {0}, Selected section: {1}, Search size: {2}MB", SectionView.Items.Count, sectionTool.TotalSelected, sectionTool.TotalMemorySize / (1024 * 1024));
-            SectionView.ItemCheck += new ItemCheckEventHandler(SectionView_ItemCheck);
+            if (AddrMinBox.Tag != null) AddrMinBox.Text = ((ulong)AddrMinBox.Tag).ToString("X");
+            if (AddrMaxBox.Tag != null) AddrMaxBox.Text = ((ulong)AddrMaxBox.Tag).ToString("X");
+            ToolStripMsg.Text = string.Format("Total section: {0}, Selected section: {1}, Search size: {2}MB", sectionItems.Count, sectionTool.TotalSelected, sectionTool.TotalMemorySize / (1024 * 1024));
             SectionView.EndUpdate();
         }
 
         private void SectionViewCheck_Click(object sender, EventArgs e)
         {
-            if (SectionView.SelectedItems.Count == 0) return;
+            List<ListViewItem> selectedItems = GetSelectedItems(sectionItems);
+            if (selectedItems.Count == 0) return;
 
             SectionView.BeginUpdate();
-            ListViewItem[] items = new ListViewItem[SectionView.SelectedItems.Count];
-            SectionView.SelectedItems.CopyTo(items, 0);
-            SectionView.ItemCheck -= SectionView_ItemCheck;
-            for (int idx = 0; idx < items.Length; ++idx)
+            for (int idx = 0; idx < selectedItems.Count; ++idx)
             {
-                ListViewItem item = items[idx];
+                ListViewItem item = selectedItems[idx];
                 item.Checked = !item.Checked;
                 uint sid = uint.Parse(item.SubItems[(int)SectionCol.SectionViewSID].Text);
                 SectionCheckUpdate(item.Checked, sid);
             }
-            ToolStripMsg.Text = string.Format("Total section: {0}, Selected section: {1}, Search size: {2}MB", SectionView.Items.Count, sectionTool.TotalSelected, sectionTool.TotalMemorySize / (1024 * 1024));
-            SectionView.ItemCheck += new ItemCheckEventHandler(SectionView_ItemCheck);
+            if (AddrMinBox.Tag != null) AddrMinBox.Text = ((ulong)AddrMinBox.Tag).ToString("X");
+            if (AddrMaxBox.Tag != null) AddrMaxBox.Text = ((ulong)AddrMaxBox.Tag).ToString("X");
+            ToolStripMsg.Text = string.Format("Total section: {0}, Selected section: {1}, Search size: {2}MB", sectionItems.Count, sectionTool.TotalSelected, sectionTool.TotalMemorySize / (1024 * 1024));
             SectionView.EndUpdate();
         }
 
@@ -1703,20 +1807,20 @@ namespace PS4CheaterNeo
         /// <param name="isContains"></param>
         private void SectionViewContains(bool isContains)
         {
-            if (SectionView.Items.Count == 0) return;
+            if (sectionItems.Count == 0) return;
 
             SectionView.BeginUpdate();
-            SectionView.ItemCheck -= SectionView_ItemCheck;
-            for (int idx = 0; idx < SectionView.Items.Count; ++idx)
+            for (int idx = 0; idx < sectionItems.Count; ++idx)
             {
-                ListViewItem item = SectionView.Items[idx];
+                ListViewItem item = sectionItems[idx];
                 uint sid = uint.Parse(item.SubItems[(int)SectionCol.SectionViewSID].Text);
                 string name = item.SubItems[(int)SectionCol.SectionViewName].Text;
                 item.Checked = isContains ? name.Contains(SectionViewTextContains.Text) : !name.Contains(SectionViewTextContains.Text);
                 SectionCheckUpdate(item.Checked, sid);
             }
-            ToolStripMsg.Text = string.Format("Total section: {0}, Selected section: {1}, Search size: {2}MB", SectionView.Items.Count, sectionTool.TotalSelected, sectionTool.TotalMemorySize / (1024 * 1024));
-            SectionView.ItemCheck += new ItemCheckEventHandler(SectionView_ItemCheck);
+            if (AddrMinBox.Tag != null) AddrMinBox.Text = ((ulong)AddrMinBox.Tag).ToString("X");
+            if (AddrMaxBox.Tag != null) AddrMaxBox.Text = ((ulong)AddrMaxBox.Tag).ToString("X");
+            ToolStripMsg.Text = string.Format("Total section: {0}, Selected section: {1}, Search size: {2}MB", sectionItems.Count, sectionTool.TotalSelected, sectionTool.TotalMemorySize / (1024 * 1024));
             SectionView.EndUpdate();
         }
 
@@ -1730,33 +1834,51 @@ namespace PS4CheaterNeo
         /// <param name="isProt"></param>
         private void SectionViewProtection(bool isProt)
         {
-            if (SectionView.Items.Count == 0) return;
+            if (sectionItems.Count == 0) return;
 
             SectionView.BeginUpdate();
-            SectionView.ItemCheck -= SectionView_ItemCheck;
-            for (int idx = 0; idx < SectionView.Items.Count; ++idx)
+            for (int idx = 0; idx < sectionItems.Count; ++idx)
             {
-                ListViewItem item = SectionView.Items[idx];
+                ListViewItem item = sectionItems[idx];
                 uint sid = uint.Parse(item.SubItems[(int)SectionCol.SectionViewSID].Text);
                 string prot = item.SubItems[(int)SectionCol.SectionViewProt].Text;
                 item.Checked = isProt ? prot == SectionViewTextProt.Text : prot != SectionViewTextProt.Text;
                 SectionCheckUpdate(item.Checked, sid);
             }
-            ToolStripMsg.Text = string.Format("Total section: {0}, Selected section: {1}, Search size: {2}MB", SectionView.Items.Count, sectionTool.TotalSelected, sectionTool.TotalMemorySize / (1024 * 1024));
-            SectionView.ItemCheck += new ItemCheckEventHandler(SectionView_ItemCheck);
+            if (AddrMinBox.Tag != null) AddrMinBox.Text = ((ulong)AddrMinBox.Tag).ToString("X");
+            if (AddrMaxBox.Tag != null) AddrMaxBox.Text = ((ulong)AddrMaxBox.Tag).ToString("X");
+            ToolStripMsg.Text = string.Format("Total section: {0}, Selected section: {1}, Search size: {2}MB", sectionItems.Count, sectionTool.TotalSelected, sectionTool.TotalMemorySize / (1024 * 1024));
             SectionView.EndUpdate();
         }
         #endregion
 
         #region ResultViewMenu
+        private void ResultView_RetrieveVirtualItem(object sender, RetrieveVirtualItemEventArgs e) => e.Item = resultItems.Count > e.ItemIndex ? resultItems[e.ItemIndex] : null;
+
+        private void ResultView_DoubleClick(object sender, EventArgs e)
+        {
+            List<ListViewItem> selectedItems = GetSelectedItems(resultItems);
+            if (selectedItems.Count != 1) return;
+
+            ListViewItem resultItem = selectedItems[0];
+
+            (uint sid, _) = ((uint sid, int resultIdx))resultItem.Tag;
+            Section section = sectionTool.GetSection(sid);
+            ScanType scanType = this.ParseFromDescription<ScanType>(resultItem.SubItems[(int)ResultCol.ResultListType].Text);
+            uint offsetAddr = (uint)(ulong.Parse(resultItem.SubItems[(int)ResultCol.ResultListAddress].Text, NumberStyles.HexNumber) - section.Start);
+            string oldValue = resultItem.SubItems[(int)ResultCol.ResultListValue].Text;
+
+            if (offsetAddr > 0) mainForm.AddToCheatGrid(section, offsetAddr, scanType, oldValue);
+        }
+
         private void ResultViewAddToCheatGrid_Click(object sender, EventArgs e)
         {
-            if (ResultView.SelectedItems == null) return;
+            List<ListViewItem> selectedItems = GetSelectedItems(resultItems);
+            if (selectedItems.Count == 0) return;
 
-            ListView.SelectedListViewItemCollection items = ResultView.SelectedItems;
-            for (int i = 0; i < items.Count; ++i)
+            for (int i = 0; i < selectedItems.Count; ++i)
             {
-                ListViewItem resultItem = items[i];
+                ListViewItem resultItem = selectedItems[i];
                 (uint sid, _) = ((uint sid, int resultIdx))resultItem.Tag;
                 Section section = sectionTool.GetSection(sid);
                 ScanType scanType = this.ParseFromDescription<ScanType>(resultItem.SubItems[(int)ResultCol.ResultListType].Text);
@@ -1769,10 +1891,10 @@ namespace PS4CheaterNeo
 
         private void ResultViewHexEditor_Click(object sender, EventArgs e)
         {
-            if (ResultView.SelectedItems == null || ResultView.SelectedItems.Count != 1) return;
+            List<ListViewItem> selectedItems = GetSelectedItems(resultItems);
+            if (selectedItems.Count != 1) return;
 
-            ListView.SelectedListViewItemCollection items = ResultView.SelectedItems;
-            var resultItem = items[0];
+            var resultItem = selectedItems[0];
             (uint sid, _) = ((uint sid, int resultIdx))resultItem.Tag;
             Section section = sectionTool.GetSection(sid);
             uint offsetAddr = (uint)(ulong.Parse(resultItem.SubItems[(int)ResultCol.ResultListAddress].Text, NumberStyles.HexNumber) - section.Start);
@@ -1784,26 +1906,22 @@ namespace PS4CheaterNeo
 
         private void ResultViewCopyAddress_Click(object sender, EventArgs e)
         {
-            if (ResultView.SelectedItems == null || ResultView.SelectedItems.Count == 0) return;
+            List<string> clipList = new List<string>();
 
-            string clipStr = "";
-            ListView.SelectedListViewItemCollection items = ResultView.SelectedItems;
-            for (int i = 0; i < items.Count; ++i)
+            for (int i = 0; i < resultItems.Count; ++i)
             {
-                ListViewItem resultItem = items[i];
-                (uint sid, _) = ((uint sid, int resultIdx))resultItem.Tag;
-                Section section = sectionTool.GetSection(sid);
-                uint offsetAddr = (uint)(ulong.Parse(resultItem.SubItems[(int)ResultCol.ResultListAddress].Text, NumberStyles.HexNumber) - section.Start);
-                if (offsetAddr == 0) continue;
-                if (clipStr.Length > 0) clipStr += " \n";
-                clipStr += (offsetAddr + section.Start).ToString("X");
+                ListViewItem resultItem = resultItems[i];
+                if (!resultItem.Selected) continue;
+
+                clipList.Add(resultItem.SubItems[(int)ResultCol.ResultListAddress].Text);
             }
-            if (clipStr.Length > 0) Clipboard.SetText(clipStr);
+            if (clipList.Count > 0) Clipboard.SetText(string.Join(",", clipList));
         }
 
         private void ResultViewDump_Click(object sender, EventArgs e)
         {
-            //if (ResultView.SelectedItems.Count == 1)
+            //List<ListViewItem> selectedItems = GetSelectedItems(resultItems);
+            //if (selectedItems.Count == 1)
             //{
             //    ulong address = ulong.Parse(ResultView.SelectedItems[0].SubItems[(int)ResultCol.ResultListAddress].Text, NumberStyles.HexNumber);
             //    int sectionID = processManager.MappedSectionList.GetMappedSectionID(address);
@@ -1813,16 +1931,29 @@ namespace PS4CheaterNeo
 
         private void ResultViewFindPointer_Click(object sender, EventArgs e)
         {
-            if (ResultView.SelectedItems == null || ResultView.SelectedItems.Count != 1) return;
+            List<ListViewItem> selectedItems = GetSelectedItems(resultItems);
+            if (selectedItems.Count != 1) return;
 
             try
             {
-                ulong address = ulong.Parse(ResultView.SelectedItems[0].SubItems[(int)ResultCol.ResultListAddress].Text, NumberStyles.HexNumber);
-                ScanType scanType = this.ParseFromDescription<ScanType>(ResultView.SelectedItems[0].SubItems[(int)ResultCol.ResultListType].Text);
+                ulong address = ulong.Parse(selectedItems[0].SubItems[(int)ResultCol.ResultListAddress].Text, NumberStyles.HexNumber);
+                ScanType scanType = this.ParseFromDescription<ScanType>(selectedItems[0].SubItems[(int)ResultCol.ResultListType].Text);
                 PointerFinder pointerFinder = new PointerFinder(mainForm, address, scanType);
                 pointerFinder.Show();
             }
             catch (Exception) { }
+        }
+
+        private void ResultViewSelectAll_Click(object sender, EventArgs e)
+        {
+            if (ResultView.Items.Count == 0) return;
+
+            for (int i = 0; i < resultItems.Count; ++i)
+            {
+                ListViewItem resultItem = resultItems[i];
+                resultItem.Selected = true;
+            }
+
         }
         #endregion
 

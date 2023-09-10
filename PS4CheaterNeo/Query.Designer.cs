@@ -33,6 +33,7 @@ namespace PS4CheaterNeo
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Query));
             this.ResultViewMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.ResultViewAddToCheatGrid = new System.Windows.Forms.ToolStripMenuItem();
+            this.ResultViewSelectAll = new System.Windows.Forms.ToolStripMenuItem();
             this.ToolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.ResultViewHexEditor = new System.Windows.Forms.ToolStripMenuItem();
             this.ResultViewCopyAddress = new System.Windows.Forms.ToolStripMenuItem();
@@ -141,6 +142,7 @@ namespace PS4CheaterNeo
             // 
             this.ResultViewMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.ResultViewAddToCheatGrid,
+            this.ResultViewSelectAll,
             this.ToolStripSeparator1,
             this.ResultViewHexEditor,
             this.ResultViewCopyAddress,
@@ -148,7 +150,7 @@ namespace PS4CheaterNeo
             this.ToolStripSeparator2,
             this.ResultViewFindPointer});
             this.ResultViewMenu.Name = "ResultViewMenu";
-            this.ResultViewMenu.Size = new System.Drawing.Size(177, 126);
+            this.ResultViewMenu.Size = new System.Drawing.Size(177, 148);
             // 
             // ResultViewAddToCheatGrid
             // 
@@ -156,6 +158,13 @@ namespace PS4CheaterNeo
             this.ResultViewAddToCheatGrid.Size = new System.Drawing.Size(176, 22);
             this.ResultViewAddToCheatGrid.Text = "Add to Cheat Grid";
             this.ResultViewAddToCheatGrid.Click += new System.EventHandler(this.ResultViewAddToCheatGrid_Click);
+            // 
+            // ResultViewSelectAll
+            // 
+            this.ResultViewSelectAll.Name = "ResultViewSelectAll";
+            this.ResultViewSelectAll.Size = new System.Drawing.Size(176, 22);
+            this.ResultViewSelectAll.Text = "Select All";
+            this.ResultViewSelectAll.Click += new System.EventHandler(this.ResultViewSelectAll_Click);
             // 
             // ToolStripSeparator1
             // 
@@ -391,6 +400,8 @@ namespace PS4CheaterNeo
             this.ResultView.TabIndex = 0;
             this.ResultView.UseCompatibleStateImageBehavior = false;
             this.ResultView.View = System.Windows.Forms.View.Details;
+            this.ResultView.VirtualMode = true;
+            this.ResultView.RetrieveVirtualItem += new System.Windows.Forms.RetrieveVirtualItemEventHandler(this.ResultView_RetrieveVirtualItem);
             this.ResultView.DoubleClick += new System.EventHandler(this.ResultView_DoubleClick);
             // 
             // ResultViewAddress
@@ -626,7 +637,9 @@ namespace PS4CheaterNeo
             this.SectionView.TabIndex = 2;
             this.SectionView.UseCompatibleStateImageBehavior = false;
             this.SectionView.View = System.Windows.Forms.View.Details;
-            this.SectionView.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.SectionView_ItemCheck);
+            this.SectionView.VirtualMode = true;
+            this.SectionView.RetrieveVirtualItem += new System.Windows.Forms.RetrieveVirtualItemEventHandler(this.SectionView_RetrieveVirtualItem);
+            this.SectionView.MouseDown += new System.Windows.Forms.MouseEventHandler(this.SectionView_MouseDown);
             // 
             // SectionViewID
             // 
@@ -1215,5 +1228,6 @@ namespace PS4CheaterNeo
         private System.Windows.Forms.ToolStripMenuItem SectionViewUnCheckProt;
         private System.Windows.Forms.ToolStripTextBox SectionViewTextProt;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator7;
+        private System.Windows.Forms.ToolStripMenuItem ResultViewSelectAll;
     }
 }
