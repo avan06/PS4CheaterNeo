@@ -2,7 +2,7 @@
 
 PS4CheaterNeo is a program to find game cheat codes, and it is based on [`ps4debug`](https://github.com/jogolden/ps4debug) and [`.Net Framework 4.8`](https://support.microsoft.com/en-us/topic/microsoft-net-framework-4-8-offline-installer-for-windows-9d23f658-3b97-68ab-d013-aa3c3e7495e0).
 
-Currently in `version 0.9.9.4-beta`
+Currently in `version 0.9.9.5-beta`
 
 
 ## Table of Contents
@@ -103,6 +103,7 @@ Currently in `version 0.9.9.4-beta`
 - Support using `keyboard up, down or mouse wheel` to adjust value when modifying cheat Value. (0.9.5.0)
 - Editing cheat values in UpDown can be automatically written to PS4 when CheatCellDirtyValueCommit is enabled. (0.9.5.3)
 - Added an "`Auto Refresh` Cheat" button in the main window. When enabled, it will automatically reload cheat values from the PS4 at intervals specified by the `CheatAutoRefreshTimerInterval` option. (0.9.9.2)
+- Added support for automatically removing non-Hex characters from input Hex text. When you select HexView from the ToolStrip in the main window, this prevents the program from encountering Hex conversion errors. (0.9.9.5)
 
 ![cheat_1](assets/cheat_1.webp)
 ![cheat_2](assets/cheat_2.webp)
@@ -149,6 +150,8 @@ Cheat format used by PS4 Trainer and GoldHEN Cheat (0.9.6.0)
 - Added AutoPause and DoneResume CheckBox in the query window, you can determine whether to enable or not. (0.9.7.3)
 - Added ScanType that supports Auto determine numeric (AutoNumeric) in Query. (0.9.8.3)
 - Added support for FullRowSelect in the SectionView of the Query window, this feature requires enabling `SectionViewFullRowSelect` in the Query of the Options window. (0.9.9.1)
+- Added support for `not skipping byte 0 values` when the Compare Type is `UnknownInitial` in the Query window. This feature needs to be enabled in the Option window under the Query's `UnknownInitialScanDoNotSkip0` option. (0.9.9.5)  
+Note: Enabling this option will significantly increase the number of results and restart the Query window for the setting to take effect. (0.9.9.5)  
 
 ![query_1](assets/query_1.webp)
 ![query_2](assets/query_2.webp)
@@ -163,6 +166,7 @@ Cheat format used by PS4 Trainer and GoldHEN Cheat (0.9.6.0)
 
 - Added support for "Check All", "Uncheck All", and "Invert Checked" in the right-click context menu of the SectionView in the Query window.  (0.9.9.1)
 - Added support for "Check that contains," "Uncheck that contains," "Check that has prot," and "Uncheck that has prot" in the right-click menu of the SectionView in the Query window. (0.9.9.3)
+- Added support for inputting multiple prot values in the 'Check/Uncheck that has prot' function in SectionView. The program will now automatically detect delimiter symbols, including ',', '-', ';', '|', and spaces. (0.9.9.5)
 
 ![query_SectionViewMenu](assets/query_SectionViewMenu.webp)
 
@@ -454,9 +458,9 @@ Enter PS4 Port.
 Enter PS4 FW Version (Confirm the fw version only when perform sendpayload).  
 - `CollapsibleContainer`:  
 Determines whether to enable `collapsible split container` ui in `Query and HexEditor and PointerFinder` windows. Default enabled. (0.9.7.3)  
-- `UIOpacity`:
+- `UIOpacity`:  
 Determines the opacity of the window, the maximum is 1 (opaque), `Default is 0.95`. (0.9.7.7)  
-- `PS4DBGMutexFactor`:
+- `PS4DBGMutexFactor`:  
 It is not recommended to adjust this value, and changes take effect only after a restart. The Mutex factor determines the number of connections that PS4DBG can occupy during initialization. For ReadMemory, the number of connections is from 0 to (but not including) mutexFactor. For WriteMemory, the number of connections is from mutexFactor to (but not including) 2*mutexFactor. `Default value is 3` (0.9.9.2)  
 
 ### Cheat  
@@ -504,11 +508,13 @@ Determines whether to automatically pause the game when starting the scan in que
 Determines whether to automatically resume the game when the scan is complete in query. `Default disabled`. (0.9.7.0)  
 - `ShowSearchSizeFirstScan`:  
 Determines whether to show search size message when FirstScan. `Default enabled`. (0.9.7.6)  
+- `UnknownInitialScanDoNotSkip0`:  
+Determines whether to enable not skipping values with a byte of 0 when the Compare Type is UnknownInitial in the Query window. Note: Enabling this option will significantly increase the number of results. Restart the Query window for the setting to take effect. `Default disabled`. (0.9.9.5)  
 - `FloatingResultExact`:  
 Determines whether to make the calculation result of `Floating(float, double) completely exact` in query window, there can be `0.0001 difference` in the old mechanism. `Default enabled`. (0.9.7.5)  
 - `FloatingSimpleValueExponents`:  
 Determine the `exponents value of the simple value of floating`. this option value is used in the query window when SimpleValues for floating point numbers is enabled. Cheat Engine is set to 11 (2 to the 11th power = 2^11 = plus or minus 2048). `Default value is 11`. (0.9.7.3)  
-- `SectionViewFullRowSelect`:
+- `SectionViewFullRowSelect`:  
 Determine whether to enable the `FullRowSelect` feature in the `SectionView` of the Query window. `Default disabled`. (0.9.9.1)  
 
 

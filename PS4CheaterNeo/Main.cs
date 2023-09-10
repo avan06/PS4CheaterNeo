@@ -658,11 +658,12 @@ namespace PS4CheaterNeo
                     inputValue = (section.Start + offsetAddr).ToString("X");
                 }
 
-                if (InputBox.Show("Hex View", "Please enter the memory address(hex) you want to view", ref inputValue) != DialogResult.OK) return;
-
                 if ((ProcessName ?? "") == "") throw new Exception("No Process currently");
                 if (!InitSections(ProcessName)) throw new Exception(String.Format("Process({0}): InitSections failed", ProcessName));
 
+                if (InputBox.Show("Hex View", "Please enter the memory address(hex) you want to view", ref inputValue) != DialogResult.OK) return;
+
+                inputValue = Regex.Replace(inputValue, "[^0-9a-fA-F]", "");
                 ulong address = ulong.Parse(inputValue, NumberStyles.HexNumber);
                 uint sid = sectionTool.GetSectionID(address);
                 if (sid == 0) return; //-1(int) => 0(uint)

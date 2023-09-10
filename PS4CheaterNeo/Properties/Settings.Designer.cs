@@ -310,6 +310,18 @@ namespace PS4CheaterNeo.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute(@"False|3_Query|1_Query|Determines whether to enable not skipping values\n with a byte of 0 when the Compare Type is UnknownInitial in the Query window. \nNote: Enabling this option will significantly increase the number of results. \nRestart the Query window for the setting to take effect. \nDefault disabled")]
+        public global::OptionTreeView.Option<bool> UnknownInitialScanDoNotSkip0 {
+            get {
+                return ((global::OptionTreeView.Option<bool>)(this["UnknownInitialScanDoNotSkip0"]));
+            }
+            set {
+                this["UnknownInitialScanDoNotSkip0"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True|3_Query|2_Floating|Determines whether to make the calculation result of Floa" +
             "ting(float, double) completely exact in query window, \\nthere can be 0.0001 diff" +
             "erence in the old mechanism. \\nDefault enabled")]

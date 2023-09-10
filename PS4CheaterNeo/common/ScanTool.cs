@@ -333,7 +333,8 @@ namespace PS4CheaterNeo
         /// <param name="comparerTool">comparison tool</param>
         /// <param name="newData">new value in memory</param>
         /// <param name="oldData">previous result value</param>
-        public static bool Comparer(ComparerTool comparerTool, ref ulong newData, ulong oldData)
+        /// <param name="UnknownInitialScanDoNotSkip0">not skipping values with a byte of 0</param>
+        public static bool Comparer(ComparerTool comparerTool, ref ulong newData, ulong oldData, bool UnknownInitialScanDoNotSkip0)
         {
             bool result = false;
 
@@ -942,33 +943,37 @@ namespace PS4CheaterNeo
             }
             else if (comparerTool.CompareType_ == CompareType.UnknownInitial)
             {
-                switch (comparerTool.ScanType_)
+                if (UnknownInitialScanDoNotSkip0) result = true;
+                else
                 {
-                    case ScanType.Bytes_8:
-                        result = newUInt64 != 0;
-                        break;
-                    case ScanType.Bytes_4:
-                        result = newUInt32 != 0;
-                        break;
-                    case ScanType.Bytes_2:
-                        result = newUInt16 != 0;
-                        break;
-                    case ScanType.Byte_:
-                        result = newByte != 0;
-                        break;
-                    case ScanType.Double_:
-                        result = newDouble != 0;
-                        break;
-                    case ScanType.Float_:
-                        result = newFloat != 0;
-                        break;
-                    case ScanType.AutoNumeric:
-                        if (comparerTool.AutoNumericValid.UInt) result = newDataTmp != 0;
-                        if (!result && comparerTool.AutoNumericValid.Float && newFloatValid) result = newFloat != 0;
-                        if (!result && comparerTool.AutoNumericValid.Double && newDoubleValid) result = newDouble != 0;
-                        break;
-                    default:
-                        throw new Exception("Unknown scanType type.");
+                    switch (comparerTool.ScanType_)
+                    {
+                        case ScanType.Bytes_8:
+                            result = newUInt64 != 0;
+                            break;
+                        case ScanType.Bytes_4:
+                            result = newUInt32 != 0;
+                            break;
+                        case ScanType.Bytes_2:
+                            result = newUInt16 != 0;
+                            break;
+                        case ScanType.Byte_:
+                            result = newByte != 0;
+                            break;
+                        case ScanType.Double_:
+                            result = newDouble != 0;
+                            break;
+                        case ScanType.Float_:
+                            result = newFloat != 0;
+                            break;
+                        case ScanType.AutoNumeric:
+                            if (comparerTool.AutoNumericValid.UInt) result = newDataTmp != 0;
+                            if (!result && comparerTool.AutoNumericValid.Float && newFloatValid) result = newFloat != 0;
+                            if (!result && comparerTool.AutoNumericValid.Double && newDoubleValid) result = newDouble != 0;
+                            break;
+                        default:
+                            throw new Exception("Unknown scanType type.");
+                    }
                 }
             }
 
