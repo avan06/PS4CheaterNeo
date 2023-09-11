@@ -639,6 +639,7 @@ namespace PS4CheaterNeo
             this.SectionView.View = System.Windows.Forms.View.Details;
             this.SectionView.VirtualMode = true;
             this.SectionView.RetrieveVirtualItem += new System.Windows.Forms.RetrieveVirtualItemEventHandler(this.SectionView_RetrieveVirtualItem);
+            this.SectionView.SearchForVirtualItem += new System.Windows.Forms.SearchForVirtualItemEventHandler(this.SectionView_SearchForVirtualItem);
             this.SectionView.MouseDown += new System.Windows.Forms.MouseEventHandler(this.SectionView_MouseDown);
             // 
             // SectionViewID

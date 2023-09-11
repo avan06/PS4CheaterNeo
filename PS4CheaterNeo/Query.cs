@@ -235,6 +235,7 @@ namespace PS4CheaterNeo
                         item.ForeColor = querySectionViewFilterSizeForeColor; //Color.DarkCyan;
                         item.BackColor = querySectionViewFilterSizeBackColor; //Color.DarkSlateGray;
                     }
+                    else if (section.Name.Contains("Hidden")) item.ForeColor = Properties.Settings.Default.QuerySectionViewHiddenForeColor.Value; //Color.Firebrick;
                     else if (section.Name.StartsWith("executable")) item.ForeColor = Properties.Settings.Default.QuerySectionViewExecutableForeColor.Value; //Color.GreenYellow;
                     else if (section.Name.Contains("NoName")) item.ForeColor = Properties.Settings.Default.QuerySectionViewNoNameForeColor.Value; //Color.Red;
                     else if (Regex.IsMatch(section.Name, @"^\[\d+\]$")) item.ForeColor = Properties.Settings.Default.QuerySectionViewNoName2ForeColor.Value; //Color.HotPink;
@@ -1459,6 +1460,20 @@ namespace PS4CheaterNeo
         #region SectionView
         private void SectionView_RetrieveVirtualItem(object sender, RetrieveVirtualItemEventArgs e) => e.Item = sectionItems.Count > e.ItemIndex ? sectionItems[e.ItemIndex] : null;
 
+        private void SectionView_SearchForVirtualItem(object sender, SearchForVirtualItemEventArgs e)
+        {
+            string searchTerm = e.Text;
+            for (int i = e.StartIndex; i < sectionItems.Count; i++)
+            {
+                ListViewItem item = sectionItems[i];
+                if (!item.SubItems[(int)SectionCol.SectionViewName].Text.Contains(searchTerm)) continue;
+                e.Index = i;
+                return;
+            }
+
+            e.Index = -1;
+        }
+
         /// <summary>
         /// When ListView is enabled with VirtualMode, the ItemCheck and ItemChecked events are not triggered.
         /// </summary>
@@ -1607,13 +1622,13 @@ namespace PS4CheaterNeo
             if (InputBox.Show("Search", "Enter the value of the search section name", ref searchSectionName) != DialogResult.OK) return;
 
             int startIndex = 0;
-            ListView.SelectedListViewItemCollection items = SectionView.SelectedItems;
-            if (items.Count > 0 && items[items.Count - 1].Index + 1 < sectionItems.Count) startIndex = items[items.Count - 1].Index + 1;
+            List<ListViewItem> selectedItems = GetSelectedItems(SectionView);
+            if (selectedItems.Count > 0 && selectedItems[selectedItems.Count - 1].Index + 1 < sectionItems.Count) startIndex = selectedItems[selectedItems.Count - 1].Index + 1;
             ListViewItem item = SectionView.FindItemWithText(searchSectionName, true, startIndex);
             if (item == null) return;
 
-            sectionItems[item.Index].Selected = true;
-            sectionItems[item.Index].EnsureVisible();
+            SectionView.Items[item.Index].Selected = true;
+            SectionView.Items[item.Index].EnsureVisible();
         }
 
         private void FilterRuleBtn_Click(object sender, EventArgs e)

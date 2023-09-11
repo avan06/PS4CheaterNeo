@@ -98,6 +98,12 @@
     <Setting Name="SectionViewFullRowSelect" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
       <Value Profile="(Default)">False|3_Query|5_SectionView|Determine whether to enable the FullRowSelect feature in the SectionView of the Query window. \nDefault disabled</Value>
     </Setting>
+    <Setting Name="SectionViewDetectHiddenSection" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
+      <Value Profile="(Default)">False|3_Query|5_SectionView|Determine whether to enable automatic detection of hidden sections. \nThis is currently an experimental feature. \nDefault disabled</Value>
+    </Setting>
+    <Setting Name="LastHiddenSectionLengthHex" Type="OptionTreeView.Option&lt;int&gt;" Scope="User">
+      <Value Profile="(Default)">0x40000000|3_Query|5_SectionView|Specify the Hex length of the last hidden section. \nThis only takes effect when SectionViewDetectHiddenSection is enabled. \nDefault value is 0x40000000.</Value>
+    </Setting>
     <Setting Name="AutoRefresh" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
       <Value Profile="(Default)">False|4_HexEditor|Hex|Determines whether to enable Auto Refresh in HexEditor. \nDefault disabled</Value>
     </Setting>
@@ -181,6 +187,9 @@
     </Setting>
     <Setting Name="QuerySectionViewNoName2ForeColor" Type="OptionTreeView.Option&lt;System.Drawing.Color&gt;" Scope="User">
       <Value Profile="(Default)">HotPink|5_UI|3_Color Query|Determine the Query SectionView NoName2 foreground color</Value>
+    </Setting>
+    <Setting Name="QuerySectionViewHiddenForeColor" Type="OptionTreeView.Option&lt;System.Drawing.Color&gt;" Scope="User">
+      <Value Profile="(Default)">Firebrick|5_UI|3_Color Query|Determine the Query SectionView Hidden foreground color</Value>
     </Setting>
     <Setting Name="QuerySectionViewItemCheck1BackColor" Type="OptionTreeView.Option&lt;System.Drawing.Color&gt;" Scope="User">
       <Value Profile="(Default)">DarkSlateGray|5_UI|3_Color Query|Determine the Query SectionView ItemCheck1 background color</Value>

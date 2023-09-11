@@ -2,7 +2,7 @@
 
 PS4CheaterNeo is a program to find game cheat codes, and it is based on [`ps4debug`](https://github.com/jogolden/ps4debug) and [`.Net Framework 4.8`](https://support.microsoft.com/en-us/topic/microsoft-net-framework-4-8-offline-installer-for-windows-9d23f658-3b97-68ab-d013-aa3c3e7495e0).
 
-Currently in `version 0.9.9.6-beta`
+Currently in `version 0.9.9.7-beta`
 
 
 ## Table of Contents
@@ -19,6 +19,7 @@ Currently in `version 0.9.9.6-beta`
     + [Query window: format of scan range supports offset](#query-window-format-of-scan-range-supports-offset)
     + [Query window: Dump Import PS4 section memory block](#query-window-dump-import-ps4-section-memory-block)
     + [Query window: Compare to first scan](#query-window-compare-to-first-scan)
+    + [Query window: Detect Hidden Section](#query-window-detect-hidden-section)
   * [Scan Type](#scan-type)
     + [Scan Type: Byte](#scan-type-byte)
     + [Scan Type: 2 Bytes](#scan-type-2-bytes)
@@ -214,6 +215,15 @@ Note: Enabling this option will significantly increase the number of results and
 - For scans performed after the initial scan, if the "Compare to first scan" checkbox is enabled, the current result values will be compared to the values from the first scan. (0.9.9.3)
 
 ![query_compare_first](assets/query_compare_first.webp)
+
+
+### Query window: Detect Hidden Section
+
+- Added support for automatically detecting hidden sections. (0.9.9.7)  
+When the "`SectionViewDetectHiddenSection`" option is enabled, SectionView will automatically force the display of sections that are hidden due to undefined addresses by the system. This feature is currently experimental. (0.9.9.7)  
+Automatically detecting hidden sections is done by arranging the existing sections from the smallest Start address to the largest. If the memory addresses of two sections are not contiguous, a new section is automatically added to fill the addresses that are undefined by the system. This detection process is executed when the SectionViewDetectHiddenSection option is enabled in the settings. (0.9.9.7)  
+
+![query_DetectHiddenSection](assets/query_DetectHiddenSection.webp)
 
 
 
@@ -519,7 +529,10 @@ Determines whether to make the calculation result of `Floating(float, double) co
 Determine the `exponents value of the simple value of floating`. this option value is used in the query window when SimpleValues for floating point numbers is enabled. Cheat Engine is set to 11 (2 to the 11th power = 2^11 = plus or minus 2048). `Default value is 11`. (0.9.7.3)  
 - `SectionViewFullRowSelect`:  
 Determine whether to enable the `FullRowSelect` feature in the `SectionView` of the Query window. `Default disabled`. (0.9.9.1)  
-
+- `SectionViewDetectHiddenSection`:  
+Determine whether to enable automatic detection of hidden sections. This is currently an experimental feature. Default disabled. (0.9.9.7)  
+- `LastHiddenSectionLengthHex`:  
+Specify the Hex length of the last hidden section. This only takes effect when `SectionViewDetectHiddenSection` is enabled. Default value is 0x40000000. (0.9.9.7)  
 
 ### HexEditor  
 - `AutoRefresh`:  
@@ -580,6 +593,8 @@ Determine the Query SectionView executable foreground color.
 Determine the Query SectionView NoName foreground color.  
 - `QuerySectionViewNoName2ForeColor`:  
 Determine the Query SectionView NoName2 foreground color.  
+- `QuerySectionViewHiddenForeColor`:  
+Determine the Query SectionView Hidden foreground color.  
 - `QuerySectionViewItemCheck1BackColor`:  
 Determine the Query SectionView ItemCheck1 background color.  
 - `QuerySectionViewItemCheck2BackColor`:  

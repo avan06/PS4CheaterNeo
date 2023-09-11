@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Security.AccessControl;
 using System.Security.Principal;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 
@@ -109,6 +110,25 @@ namespace PS4CheaterNeo
         /// Whether the length of the section is a filtering target.
         /// </summary>
         public bool IsFilterSize;
+
+        public Section Clone()
+        {
+            Section section = new Section
+            {
+                PID = PID,
+                SID = SID,
+                SIDv1 = SIDv1,
+                Start = Start,
+                Length = Length,
+                Name = Name,
+                Check = Check,
+                Prot = Prot,
+                Offset = Offset,
+                IsFilter = IsFilter,
+                IsFilterSize = IsFilterSize
+            };
+            return section;
+        }
 
         public override string ToString() => $"{Start:X},{(float)Length / 1024} KB,{Name},{Prot:X},{Offset:X},{IsFilter},{IsFilterSize},{Check},{PID},{SID}";
     }
@@ -321,6 +341,66 @@ namespace PS4CheaterNeo
             }
             catch (Exception) { throw; }
             finally { mutex.ReleaseMutex(); }
+            bool SectionViewDetectHiddenSection = Properties.Settings.Default.SectionViewDetectHiddenSection.Value;
+            if (SectionViewDetectHiddenSection) DetectHiddenSection(Properties.Settings.Default.LastHiddenSectionLengthHex.Value);
+        }
+
+        /// <summary>
+        /// Automatically detecting hidden sections is done by arranging the existing sections from the smallest Start address to the largest. 
+        /// If the memory addresses of two sections are not contiguous, 
+        /// a new section is automatically added to fill the addresses that are undefined by the system. 
+        /// This detection process is executed when the SectionViewDetectHiddenSection option is enabled in the Option windows.
+        /// </summary>
+        /// <param name="LastHiddenSectionLengthHex">Specify the Hex length of the last hidden section.</param>
+        public void DetectHiddenSection(int LastHiddenSectionLengthHex)
+        {
+            StringBuilder errors = new StringBuilder();
+            Section[] sections = GetSectionSortByAddr();
+            for (int idx  = 0; idx < sections.Length; idx++)
+            {
+                try
+                {
+                    Section section1 = sections[idx].Clone();
+                    if (idx < sections.Length - 1)
+                    {
+                        Section section2 = sections[idx + 1];
+                        ulong section1End = section1.Start + (uint)section1.Length;
+                        int chkLen = (int)(section2.Start - 1 - (section1End + 1));
+                        if (chkLen > 1)
+                        {
+                            section1.Start = section1End + 1;
+                            section1.Length = chkLen;
+                            section1.SID += 1;
+                            section1.SIDv1 += 1;
+                            section1.Name = "Hidden_" + section1.Name;
+                            section1.IsFilter = false;
+                            section1.IsFilterSize = false;
+                            SectionDict.Add(section1.SID, section1);
+                        }
+                    }
+                    else
+                    {
+                        int chkLen = LastHiddenSectionLengthHex;
+                        section1.Start += (uint)section1.Length + 1;
+                        section1.Length = chkLen;
+                        section1.SID += 1;
+                        section1.SIDv1 += 1;
+                        section1.Name = "Hidden_" + section1.Name;
+                        section1.IsFilter = false;
+                        section1.IsFilterSize = false;
+                        SectionDict.Add(section1.SID, section1);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    errors.AppendLine(ex.ToString());
+                }
+            }
+            if (errors.Length > 0)
+            {
+                string msg = errors.ToString();
+                InputBox.Show("Detect Hidden Section Exception", "", ref msg, 100);
+            }
         }
 
         /// <summary>

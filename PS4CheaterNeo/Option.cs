@@ -50,6 +50,7 @@ namespace PS4CheaterNeo
                 Properties.Settings.Default.QuerySectionViewExecutableForeColor.Value = Color.GreenYellow;
                 Properties.Settings.Default.QuerySectionViewNoNameForeColor.Value     = Color.Red;
                 Properties.Settings.Default.QuerySectionViewNoName2ForeColor.Value    = Color.HotPink;
+                Properties.Settings.Default.QuerySectionViewHiddenForeColor.Value     = Color.Firebrick;
                 Properties.Settings.Default.QuerySectionViewItemCheck1BackColor.Value = Color.DarkSlateGray;
                 Properties.Settings.Default.QuerySectionViewItemCheck2BackColor.Value = Color.DarkGreen;
 
@@ -89,6 +90,7 @@ namespace PS4CheaterNeo
                 Properties.Settings.Default.QuerySectionViewExecutableForeColor.Value = Color.FromArgb(0, 210, 0);
                 Properties.Settings.Default.QuerySectionViewNoNameForeColor.Value     = Color.Red;
                 Properties.Settings.Default.QuerySectionViewNoName2ForeColor.Value    = Color.FromArgb(255, 51, 153);
+                Properties.Settings.Default.QuerySectionViewHiddenForeColor.Value     = Color.Firebrick;
                 Properties.Settings.Default.QuerySectionViewItemCheck1BackColor.Value = Color.FromArgb(204, 255, 255);
                 Properties.Settings.Default.QuerySectionViewItemCheck2BackColor.Value = Color.FromArgb(204, 255, 229);
 

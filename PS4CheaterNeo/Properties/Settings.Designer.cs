@@ -442,6 +442,33 @@ namespace PS4CheaterNeo.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False|3_Query|5_SectionView|Determine whether to enable automatic detection of hi" +
+            "dden sections. \\nThis is currently an experimental feature. \\nDefault disabled")]
+        public global::OptionTreeView.Option<bool> SectionViewDetectHiddenSection {
+            get {
+                return ((global::OptionTreeView.Option<bool>)(this["SectionViewDetectHiddenSection"]));
+            }
+            set {
+                this["SectionViewDetectHiddenSection"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0x40000000|3_Query|5_SectionView|Specify the Hex length of the last hidden sectio" +
+            "n. \\nThis only takes effect when SectionViewDetectHiddenSection is enabled. \\nDe" +
+            "fault value is 0x40000000.")]
+        public global::OptionTreeView.Option<int> LastHiddenSectionLengthHex {
+            get {
+                return ((global::OptionTreeView.Option<int>)(this["LastHiddenSectionLengthHex"]));
+            }
+            set {
+                this["LastHiddenSectionLengthHex"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False|4_HexEditor|Hex|Determines whether to enable Auto Refresh in HexEditor. \\nD" +
             "efault disabled")]
         public global::OptionTreeView.Option<bool> AutoRefresh {
@@ -791,6 +818,19 @@ namespace PS4CheaterNeo.Properties {
             }
             set {
                 this["QuerySectionViewNoName2ForeColor"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Firebrick|5_UI|3_Color Query|Determine the Query SectionView Hidden foreground co" +
+            "lor")]
+        public global::OptionTreeView.Option<System.Drawing.Color> QuerySectionViewHiddenForeColor {
+            get {
+                return ((global::OptionTreeView.Option<System.Drawing.Color>)(this["QuerySectionViewHiddenForeColor"]));
+            }
+            set {
+                this["QuerySectionViewHiddenForeColor"] = value;
             }
         }
         
