@@ -15,18 +15,18 @@ namespace PS4CheaterNeo
         readonly Main mainForm;
         readonly string processName;
         readonly SectionTool sectionTool;
-        ListViewColumnSorter columnSorter;
+        ListViewItemComparer listViewItemComparer;
         Dictionary<uint, List<Pointer>> addrPointerDict;
         Dictionary<uint, List<Pointer>> valuePointerDict;
         List<((uint BaseSID, uint BasePos, List<long> Offsets) pointer, List<Pointer> pathPointers)> pointerResults;
-        List<ListViewItem> pointerItemsBuffer;
+        List<ListViewItem> pointerItems;
 
         public PointerFinder(Main mainForm, ulong address, ScanType scanType)
         {
             InitializeComponent();
             ApplyUI();
-            columnSorter = new ListViewColumnSorter(0, SortOrder.Ascending);
-            PointerListView.ListViewItemSorter = columnSorter; // Create an instance of a ListView column sorter and assign it to the ListView control.
+            listViewItemComparer = new ListViewItemComparer();
+            pointerItems = new List<ListViewItem>();
             if (!Properties.Settings.Default.CollapsibleContainer.Value) SplitContainer1.SplitterButtonStyle = ButtonStyle.None;
             this.mainForm = mainForm;
             sectionTool = new SectionTool();
@@ -94,9 +94,20 @@ namespace PS4CheaterNeo
                 }
                 else e.Cancel = true;
             }
-            else if (PointerListView.Items.Count > 0 && 
+            else if (pointerItems.Count > 0 && 
                 MessageBox.Show("Still in the find pointer, Do you want to close PointerFinder?", "PointerFinder", 
                 MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) e.Cancel = true;
+
+            if (!e.Cancel)
+            {
+                PointerListView.VirtualListSize = 0;
+                PointerListView.VirtualMode = false;
+                pointerItems.Clear();
+                pointerItems = null;
+                PointerListView.Clear();
+                PointerListView = null;
+            }
+
             GC.Collect();
         }
 
@@ -248,48 +259,6 @@ namespace PS4CheaterNeo
             }
         }
 
-        private void PointerListView_DoubleClick(object sender, EventArgs e)
-        {
-            if (PointerListView.SelectedItems.Count != 1) return;
-
-            ListViewItem resultItem = PointerListView.SelectedItems[0];
-            int idx = (int)resultItem.Tag;
-
-            var pointerResult = pointerResults[idx];
-
-            ScanType scanType = (ScanType)((ComboItem)(ScanTypeBox.SelectedItem)).Value;
-            Section baseSection = sectionTool.GetSection(pointerResult.pointer.BaseSID);
-            ulong baseAddress = baseSection.Start + pointerResult.pointer.BasePos;
-
-            try
-            {
-                List<long> offsetList = new List<long> { (long)baseAddress };
-                offsetList.AddRange(pointerResult.pointer.Offsets);
-                NewAddress newAddress = new NewAddress(mainForm, null, baseSection, 0, scanType, null, false, "", offsetList, false);
-                if (newAddress.ShowDialog() != DialogResult.OK) return;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
-            }
-        }
-
-        /// <summary>
-        /// https://learn.microsoft.com/en-us/troubleshoot/developer/visualstudio/csharp/language-compilers/sort-listview-by-column
-        /// </summary>
-        private void PointerListView_ColumnClick(object sender, ColumnClickEventArgs e)
-        {
-            // Determine if clicked column is already the column that is being sorted.
-            if (columnSorter.SortColumn == e.Column)
-                columnSorter.Order = columnSorter.Order == SortOrder.Ascending ? SortOrder.Descending : SortOrder.Ascending; // Reverse the current sort direction for this column.
-            else
-            {
-                columnSorter.SortColumn = e.Column; // Set the column number that is to be sorted; default to ascending.
-                columnSorter.Order = SortOrder.Ascending;
-            }
-            PointerListView.Sort(); // Perform the sort with these new sort options.
-        }
-
         Task<bool> pointerTask;
         CancellationTokenSource pointerSource;
         private void ScanBtn_Click(object sender, EventArgs e)
@@ -312,8 +281,8 @@ namespace PS4CheaterNeo
                     int maxOffsetRange = (int)MaxRangeUpDown.Value;
                     ulong queryAddress = ulong.Parse(AddressBox.Text, NumberStyles.HexNumber);
 
-                    pointerItemsBuffer = new List<ListViewItem>();
-
+                    PointerListView.VirtualListSize = 0;
+                    pointerItems.Clear();
                     PointerListView.Clear();
                     PointerListView.GridLines = true;
                     PointerListView.Columns.Add("Base Address", "Base Address");
@@ -347,44 +316,16 @@ namespace PS4CheaterNeo
                 }
                 else return;
             }
+
+            PointerListView.VirtualListSize = 0;
+            pointerItems.Clear();
+            PointerListView.Clear();
+
             ProgBar.Value = 0;
             pointerResults.Clear();
             IsInitScan.Checked = true;
             ScanBtn.Text = "First Scan";
             GC.Collect();
-        }
-
-        private void PointerListViewAddToCheatGrid_Click(object sender, EventArgs e)
-        {
-            if (PointerListView.SelectedItems.Count == 0) return;
-
-            Dictionary<ulong, ulong> pointerCaches = new Dictionary<ulong, ulong>();
-            ScanType scanType = (ScanType)((ComboItem)(ScanTypeBox.SelectedItem)).Value;
-            ListView.SelectedListViewItemCollection items = PointerListView.SelectedItems;
-            for (int itemIdx = 0; itemIdx < items.Count; ++itemIdx)
-            {
-                try
-                {
-                    ListViewItem resultItem = items[itemIdx];
-                    int idx = (int)resultItem.Tag;
-
-                    var pointerResult = pointerResults[idx];
-
-                    Section baseSection = sectionTool.GetSection(pointerResult.pointer.BaseSID);
-                    ulong baseAddress = baseSection.Start + (ulong)pointerResult.pointer.BasePos;
-                    string msg = pointerResult.pointer.BasePos.ToString("X");
-                    List<long> pointerOffsets = new List<long> { (long)baseAddress };
-                    pointerResult.pointer.Offsets.ForEach(offset => {
-                        msg += "_" + offset.ToString("X");
-                        pointerOffsets.Add(offset);
-                    });
-                    mainForm.AddToCheatGrid(baseSection, 0, scanType, "0", false, msg, pointerOffsets, pointerCaches); //FIXME oldValue is 0
-                }
-                catch (Exception ex)
-                {
-                    ToolStripMsg.Text = string.Format("Add Pointer To CheatGrid failed...{0}, {1}", ex.Message, ex.StackTrace);
-                }
-            }
         }
 
         private void FilterRuleBtn_Click(object sender, EventArgs e)
@@ -405,8 +346,108 @@ namespace PS4CheaterNeo
 
             Properties.Settings.Default.SectionFilterSize.Value = uint.Parse(sectionFilterSizeStr);
         }
+
         #endregion
 
+        #region PointerListView
+        private void PointerListView_RetrieveVirtualItem(object sender, RetrieveVirtualItemEventArgs e) => e.Item = pointerItems.Count > e.ItemIndex ? pointerItems[e.ItemIndex] : null;
+
+        private void PointerListView_DoubleClick(object sender, EventArgs e)
+        {
+            List<ListViewItem> selectedItems = ListViewLVITEM.GetSelectedItems(PointerListView);
+            if (selectedItems.Count != 1) return;
+
+            ListViewItem resultItem = selectedItems[0];
+            int idx = (int)resultItem.Tag;
+
+            var pointerResult = pointerResults[idx];
+
+            ScanType scanType = (ScanType)((ComboItem)(ScanTypeBox.SelectedItem)).Value;
+            Section baseSection = sectionTool.GetSection(pointerResult.pointer.BaseSID);
+            ulong baseAddress = baseSection.Start + pointerResult.pointer.BasePos;
+
+            try
+            {
+                List<long> offsetList = new List<long> { (long)baseAddress };
+                offsetList.AddRange(pointerResult.pointer.Offsets);
+                NewAddress newAddress = new NewAddress(mainForm, null, baseSection, 0, scanType, null, false, "", offsetList, false);
+                if (newAddress.ShowDialog() != DialogResult.OK) return;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+            }
+        }
+
+        /// <summary>
+        /// Sort VirtualMode ListView items
+        /// https://stackoverflow.com/a/39505452
+        /// Sort a ListView control by using a column
+        /// https://learn.microsoft.com/en-us/troubleshoot/developer/visualstudio/csharp/language-compilers/sort-listview-by-column
+        /// </summary>
+        private void PointerListView_ColumnClick(object sender, ColumnClickEventArgs e)
+        {// Determine if clicked column is already the column that is being sorted.
+            if (listViewItemComparer.SortColumns.Contains(e.Column))
+            {
+                if (listViewItemComparer.SortColumns.First.Value == e.Column)
+                    listViewItemComparer.Order = listViewItemComparer.Order == SortOrder.Ascending ? SortOrder.Descending : SortOrder.Ascending; // Reverse the current sort direction for this column.
+                else
+                {
+                    listViewItemComparer.SortColumns.Remove(e.Column);
+                    listViewItemComparer.SortColumns.AddFirst(e.Column);
+                }
+            }
+            else
+            {
+                listViewItemComparer.SortColumns.AddFirst(e.Column); // Set the column number that is to be sorted; default to ascending.
+                listViewItemComparer.Order = SortOrder.Ascending;
+            }
+            pointerItems.Sort(listViewItemComparer);
+            PointerListView.Refresh();
+        }
+
+        private void PointerListViewAddToCheatGrid_Click(object sender, EventArgs e)
+        {
+            List<ListViewItem> selectedItems = ListViewLVITEM.GetSelectedItems(PointerListView);
+            if (selectedItems.Count == 0) return;
+
+            Dictionary<ulong, ulong> pointerCaches = new Dictionary<ulong, ulong>();
+            ScanType scanType = (ScanType)((ComboItem)(ScanTypeBox.SelectedItem)).Value;
+            for (int itemIdx = 0; itemIdx < selectedItems.Count; ++itemIdx)
+            {
+                try
+                {
+                    ListViewItem resultItem = selectedItems[itemIdx];
+                    int idx = (int)resultItem.Tag;
+
+                    var pointerResult = pointerResults[idx];
+
+                    Section baseSection = sectionTool.GetSection(pointerResult.pointer.BaseSID);
+                    ulong baseAddress = baseSection.Start + pointerResult.pointer.BasePos;
+                    string msg = pointerResult.pointer.BasePos.ToString("X");
+                    List<long> pointerOffsets = new List<long> { (long)baseAddress };
+                    pointerResult.pointer.Offsets.ForEach(offset => {
+                        msg += "_" + offset.ToString("X");
+                        pointerOffsets.Add(offset);
+                    });
+                    mainForm.AddToCheatGrid(baseSection, 0, scanType, "0", false, msg, pointerOffsets, pointerCaches); //FIXME oldValue is 0
+                }
+                catch (Exception ex)
+                {
+                    ToolStripMsg.Text = string.Format("Add Pointer To CheatGrid failed...{0}, {1}", ex.Message, ex.StackTrace);
+                }
+            }
+        }
+
+        private void PointerListViewSelectAll_Click(object sender, EventArgs e)
+        {
+            if (PointerListView.Items.Count == 0) return;
+
+            PointerListView.BeginUpdate();
+            ListViewLVITEM.SelectAllItems(PointerListView);
+            PointerListView.EndUpdate();
+        }
+        #endregion
 
         #region Task
         /// <summary>
@@ -675,7 +716,7 @@ namespace PS4CheaterNeo
                     if (tailAddress != queryAddress) continue;
 
                     newPointerResults.Add(pointerResult);
-                    if (newPointerResults.Count < 20000 && pointerResult.pointer.Offsets.Count > 0) AddPointerListViewItem(newPointerResults.Count - 1, pointerResult.pathPointers, pointerResult.pointer.Offsets);
+                    if (newPointerResults.Count < 20000 && pointerResult.pointer.Offsets.Count > 0) AddPointerListViewItem(newPointerResults.Count - 1, pointerResult.pathPointers, pointerResult.pointer.Offsets, maxOffsetLevel);
                 }
 
                 if (newPointerResults.Count > 0 ||
@@ -704,7 +745,7 @@ namespace PS4CheaterNeo
         private void QueryPointerFirst(Pointer queryPointer, int maxOffsetLevel, int maxOffsetRange, System.Diagnostics.Stopwatch tickerMajor, int level = 0, List<long> pathOffsets = null, List<Pointer> pathPointers = null)
         {
             pointerSource.Token.ThrowIfCancellationRequested();
-            if (level >= maxOffsetLevel) return;
+            if (level > maxOffsetLevel) return;
             if (!addrPointerDict.TryGetValue(queryPointer.AddrSID, out List<Pointer> addrPointerList) || addrPointerList.Count == 0) return;
             
             Section[] sections = sectionTool.GetSectionSortByAddr(queryPointer.AddrSID, out int sIdx, new List<uint>(addrPointerDict.Keys));
@@ -791,7 +832,7 @@ namespace PS4CheaterNeo
 
             pointerResults.Add((pointer, new List<Pointer>(pathPointers)));
 
-            if (pointerResults.Count < 20000 && pathOffsets.Count > 0) AddPointerListViewItem(pointerResults.Count - 1, pathPointers, pathOffsets);
+            if (pointerResults.Count < 20000 && pathOffsets.Count > 0) AddPointerListViewItem(pointerResults.Count - 1, pathPointers, pathOffsets, maxOffsetLevel);
             if (pointerResults.Count % 1000 == 0)
             {
                 Invoke(new MethodInvoker(() =>
@@ -811,12 +852,7 @@ namespace PS4CheaterNeo
             tickerMajor.Stop();
             Invoke(new MethodInvoker(() => {
                 ProgBar.Value = 100;
-                if (pointerItemsBuffer.Count > 0)
-                {
-                    PointerListView.Items.AddRange(pointerItemsBuffer.ToArray());
-                    pointerItemsBuffer.Clear();
-                }
-                
+                PointerListView.VirtualListSize = pointerItems.Count;
                 if (pointerResults.Count == 0) ScanBtn.Text = "First Scan";
                 else if (pointerResults.Count > 0) ScanBtn.Text = "Next Scan";
                 ToolStripMsg.Text = string.Format("Scan elapsed:{0:0.00}s. Query pointer end, find:{1}", tickerMajor.Elapsed.TotalSeconds, pointerResults.Count);
@@ -828,14 +864,13 @@ namespace PS4CheaterNeo
         }
 
         /// <summary>
-        /// add current pointers to pointerItemsBuffer first and add it to PointerListView when it reaches 100 items when perform AddPointerListViewItem
+        /// add current pointers to pointerItems first and add it to PointerListView when it reaches 100 items when perform AddPointerListViewItem
         /// </summary>
         /// <param name="idx">index position of pointerResult</param>
         /// <param name="pathPointers">all paths of pointer result</param>
         /// <param name="pathOffsets">all paths of offset result</param>
-        private void AddPointerListViewItem(int idx, List<Pointer> pathPointers, List<long> pathOffsets)
+        private void AddPointerListViewItem(int idx, List<Pointer> pathPointers, List<long> pathOffsets, int maxOffsetLevel)
         {
-            int itemIdx = PointerListView.Items.Count;
             Pointer pointer = pathPointers[pathPointers.Count - 1];
             Section section = sectionTool.GetSection(pointer.AddrSID);
             string sectionStr = $"{section.Start.ToString("X9")}-{section.Name}-{section.Prot.ToString("X")}-{section.Length / 1024}KB";
@@ -844,14 +879,14 @@ namespace PS4CheaterNeo
             item.Tag = idx;
             item.SubItems.Add(sectionStr); //Base Section
             for (int i = 0; i < pathOffsets.Count; ++i) item.SubItems.Add(pathOffsets[i].ToString("X"));
-            pointerItemsBuffer.Add(item);
+            if (pathOffsets.Count < maxOffsetLevel)
+            { //To prevent the error "When in VirtualMode, the ListView RetrieveVirtualListItem event needs a list view SubItem for each ListView column."
+                for (int i = 0; i < maxOffsetLevel - pathOffsets.Count; ++i) item.SubItems.Add("");
+            }
+            pointerItems.Add(item);
             Invoke(new MethodInvoker(() =>
             {
-                if (pointerItemsBuffer.Count % 100 == 0)
-                {
-                    PointerListView.Items.AddRange(pointerItemsBuffer.ToArray());
-                    pointerItemsBuffer.Clear();
-                }
+                PointerListView.VirtualListSize = pointerItems.Count;
             }));
         }
 
@@ -952,7 +987,7 @@ namespace PS4CheaterNeo
             if (!addrPointerDict.TryGetValue(addrSection.SID, out List<Pointer> addrPointerList)) return tailAddr;
 
             List<long> offsetList = new List<long>();
-            offsetList.Add((long)pointerResult.pointer.BasePos); //offsetList.Add((long)(addrSection.Start + pointerResult.pointer.position));
+            offsetList.Add(pointerResult.pointer.BasePos); //offsetList.Add((long)(addrSection.Start + pointerResult.pointer.position));
             offsetList.AddRange(pointerResult.pointer.Offsets);
 
             ulong headAddrPos = 0;

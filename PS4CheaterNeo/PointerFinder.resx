@@ -126,10 +126,10 @@
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="SplitContainer1.SplitterButtonBitmap" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
-        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
-        YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAABnSURBVDhPYyAGvH//XuDr168BUC5pAKT527dvF16/fv3/
-        +/fvCVBh4gBMc2tr6//k5OT/JBmCrNnJyem/r6/v/ytXrhBnwEjUDAIUGwACo4ZgAmRDSE7KMAAzhCzN
-        MAAyBHt2ZmAAAP3tDzSQoElYAAAAAElFTkSuQmCC
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
+        vwAADr8BOAVTJAAAAGdJREFUOE9jIAa8f/9e4OvXrwFQLmkApPnbt28XXr9+/f/79+8JUGHiAExza2vr
+        /+Tk5P8kGYKs2cnJ6b+vr+//K1euEGfASNQMAhQbAAKjhmACZENITsowADOELM0wADIEe3ZmYAAA/e0P
+        NJCgSVgAAAAASUVORK5CYII=
 </value>
   </data>
   <metadata name="SaveDialog.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">

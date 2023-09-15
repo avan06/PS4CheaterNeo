@@ -270,9 +270,9 @@ namespace PS4CheaterNeo
                 (uint sIdx, uint ProtCnt) v2 = (0, 0);
                 (uint HighBits, uint TypeCode, uint Prot) tmp = (0, 0, 0);
                 Array.Sort(pMap.entries, CompareMemoryEntry); //Sort MemoryEntry in order to calculate SID
-                for (int i = 0; i < pMap.entries.Length; i++)
+                for (int eIdx = 0; eIdx < pMap.entries.Length; eIdx++)
                 {
-                    libdebug.MemoryEntry entry = pMap.entries[i];
+                    libdebug.MemoryEntry entry = pMap.entries[eIdx];
                     if ((entry.prot & 0x1) != 0x1) continue;
 
                     ulong start = entry.start;
@@ -298,23 +298,23 @@ namespace PS4CheaterNeo
                     {
                         ulong curLength = bufferLength;
 
-                        if (curLength > length)
+                        if (curLength <= length) length -= curLength;
+                        else
                         {
                             curLength = length;
                             length = 0;
                         }
-                        else length -= curLength;
 
                         Section section = new Section
                         {
-                            PID = pMap.pid,
-                            SIDv1 = idx + v1.sIdx * 100 + v1.ProtCnt * 1000000 + typeCode * 100000000,
-                            SID = idx + v2.sIdx * 100 + v2.ProtCnt * 100000 + typeCode * 1000000 + highBits * 10000000,
-                            Start = start,
+                            PID    = pMap.pid,
+                            SIDv1  = idx + v1.sIdx * 100 + v1.ProtCnt * 1000000 + typeCode * 100000000,
+                            SID    = idx + v2.sIdx * 100 + v2.ProtCnt * 100000  + typeCode * 1000000 + highBits * 10000000,
+                            Start  = start,
                             Length = (int)curLength,
-                            Name = entry.name + "[" + idx + "]",
-                            Check = false,
-                            Prot = entry.prot,
+                            Name   = entry.name + (length == 0 && idx == 0 ? "" : "[" + idx + "]"),
+                            Check  = false,
+                            Prot   = entry.prot,
                             Offset = entry.offset
                         };
                         if (isFilter) section.IsFilter = true;
@@ -352,43 +352,75 @@ namespace PS4CheaterNeo
         /// This detection process is executed when the SectionViewDetectHiddenSection option is enabled in the Option windows.
         /// </summary>
         /// <param name="LastHiddenSectionLengthHex">Specify the Hex length of the last hidden section.</param>
-        public void DetectHiddenSection(int LastHiddenSectionLengthHex)
+        public void DetectHiddenSection(ulong LastHiddenSectionLengthHex)
         {
             StringBuilder errors = new StringBuilder();
             Section[] sections = GetSectionSortByAddr();
-            for (int idx  = 0; idx < sections.Length; idx++)
+            for (int sIdx  = 0; sIdx < sections.Length; sIdx++)
             {
                 try
                 {
-                    Section section1 = sections[idx].Clone();
-                    if (idx < sections.Length - 1)
+                    Section section1 = sections[sIdx];
+                    ulong section1End = section1.Start + (uint)section1.Length;
+                    ulong sectionNewStart = section1End + 1;
+                    ulong bufferLength = 1024 * 1024 * 128; //128M
+                    int idx = 0;
+                    string name = section1.Name;
+                    if (sIdx < sections.Length - 1)
                     {
-                        Section section2 = sections[idx + 1];
-                        ulong section1End = section1.Start + (uint)section1.Length;
-                        int chkLen = (int)(section2.Start - 1 - (section1End + 1));
-                        if (chkLen > 1)
+                        Section section2 = sections[sIdx + 1];
+                        if (section2.Start - section1End > 100)
                         {
-                            section1.Start = section1End + 1;
-                            section1.Length = chkLen;
-                            section1.SID += 1;
-                            section1.SIDv1 += 1;
-                            section1.Name = "Hidden_" + section1.Name;
-                            section1.IsFilter = false;
-                            section1.IsFilterSize = false;
-                            SectionDict.Add(section1.SID, section1);
+                            ulong length = section2.Start - 1 - sectionNewStart;
+                            while (length != 0)
+                            {
+                                ulong curLength = bufferLength;
+
+                                if (curLength <= length) length -= curLength;
+                                else
+                                {
+                                    curLength = length;
+                                    length = 0;
+                                }
+                                section1 = section1.Clone();
+                                section1.Start = sectionNewStart;
+                                section1.Length = (int)curLength;
+                                section1.SID++;
+                                section1.SIDv1++;
+                                section1.Name = "Hidden_" + name + (length == 0 && idx == 0 ? "" : "[" + idx++ + "]");
+                                section1.IsFilter = false;
+                                section1.IsFilterSize = false;
+                                SectionDict.Add(section1.SID, section1);
+                                sectionNewStart += curLength;
+                            }
                         }
                     }
                     else
                     {
-                        int chkLen = LastHiddenSectionLengthHex;
-                        section1.Start += (uint)section1.Length + 1;
-                        section1.Length = chkLen;
-                        section1.SID += 1;
-                        section1.SIDv1 += 1;
-                        section1.Name = "Hidden_" + section1.Name;
-                        section1.IsFilter = false;
-                        section1.IsFilterSize = false;
-                        SectionDict.Add(section1.SID, section1);
+                        ulong length = LastHiddenSectionLengthHex;
+                        MemoryEnd = sectionNewStart + length;
+                        while (length != 0)
+                        {
+                            ulong curLength = bufferLength;
+
+                            if (curLength <= length) length -= curLength;
+                            else
+                            {
+                                curLength = length;
+                                length = 0;
+                            }
+
+                            section1 = section1.Clone();
+                            section1.Start = sectionNewStart;
+                            section1.Length = (int)curLength;
+                            section1.SID++;
+                            section1.SIDv1++;
+                            section1.Name = "Hidden_" + name + (length == 0 && idx == 0 ? "" : "[" + idx++ + "]");
+                            section1.IsFilter = false;
+                            section1.IsFilterSize = false;
+                            SectionDict.Add(section1.SID, section1);
+                            sectionNewStart += curLength;
+                        }
                     }
                 }
                 catch (Exception ex)

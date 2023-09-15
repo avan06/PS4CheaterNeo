@@ -683,7 +683,7 @@ namespace PS4CheaterNeo
                 section = sectionTool.GetSection(sid);
                 offsetAddr = (uint)(address - section.Start);
 
-                HexEditor hexEdit = new HexEditor(this, section, (int)offsetAddr);
+                HexEditor hexEdit = new HexEditor(this, sectionTool, section, (int)offsetAddr);
                 hexEdit.Show(this);
             }
             catch (Exception ex)
@@ -1228,7 +1228,7 @@ namespace PS4CheaterNeo
                 var cheatRow = rows[0];
                 (Section section, uint offsetAddr) = ((Section section, uint offsetAddr))cheatRow.Tag;
 
-                HexEditor hexEdit = new HexEditor(this, section, (int)offsetAddr);
+                HexEditor hexEdit = new HexEditor(this, sectionTool, section, (int)offsetAddr);
                 hexEdit.Show(this);
             }
             catch (Exception ex)

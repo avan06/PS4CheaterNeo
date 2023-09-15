@@ -2,7 +2,7 @@
 
 PS4CheaterNeo is a program to find game cheat codes, and it is based on [`ps4debug`](https://github.com/jogolden/ps4debug) and [`.Net Framework 4.8`](https://support.microsoft.com/en-us/topic/microsoft-net-framework-4-8-offline-installer-for-windows-9d23f658-3b97-68ab-d013-aa3c3e7495e0).
 
-Currently in `version 0.9.9.7-beta`
+Currently in `version 0.9.9.8-beta`
 
 
 ## Table of Contents
@@ -34,6 +34,7 @@ Currently in `version 0.9.9.7-beta`
     + [ScanType: Auto determine numeric (AutoNumeric)](#scantype-auto-determine-numeric-autonumeric)
   * [Hex Editor](#hex-editor)
     + [Hex editor: displaying decimal, float, and double](#hex-editor-displaying-decimal-float-and-double)
+    + [Hex editor: Section switching ComboBox](#hex-editor-section-switching-combobox)
   * [Pointer finder](#pointer-finder)
   * [Section](#section)
     + [Section ID](#section-id)
@@ -167,8 +168,9 @@ Note: Enabling this option will significantly increase the number of results and
 ![query_section_count_2](assets/query_section_count_2.webp)
 
 - Added support for "Check All", "Uncheck All", and "Invert Checked" in the right-click context menu of the SectionView in the Query window.  (0.9.9.1)
-- Added support for "Check that contains," "Uncheck that contains," "Check that has prot," and "Uncheck that has prot" in the right-click menu of the SectionView in the Query window. (0.9.9.3)
+- Added support for "Check that contains", "Uncheck that contains", "Check that has prot" and "Uncheck that has prot" in the right-click menu of the SectionView in the Query window. (0.9.9.3)
 - Added support for inputting multiple prot values in the 'Check/Uncheck that has prot' function in SectionView. The program will now automatically detect delimiter symbols, including ',', '-', ';', '|', and spaces. (0.9.9.5)
+- Added support for "Check that contains Hidden", "Uncheck that contains Hidden" in the right-click menu of the SectionView in the Query window. (0.9.9.8)
 
 ![query_SectionViewMenu](assets/query_SectionViewMenu.webp)
 
@@ -219,9 +221,14 @@ Note: Enabling this option will significantly increase the number of results and
 
 ### Query window: Detect Hidden Section
 
-- Added support for automatically detecting hidden sections. (0.9.9.7)  
+- Added support for automatically detecting hidden sections.  
 When the "`SectionViewDetectHiddenSection`" option is enabled, SectionView will automatically force the display of sections that are hidden due to undefined addresses by the system. This feature is currently experimental. (0.9.9.7)  
-Automatically detecting hidden sections is done by arranging the existing sections from the smallest Start address to the largest. If the memory addresses of two sections are not contiguous, a new section is automatically added to fill the addresses that are undefined by the system. This detection process is executed when the SectionViewDetectHiddenSection option is enabled in the settings. (0.9.9.7)  
+- Automatically detecting hidden sections is done by arranging the existing sections  
+from the smallest Start address to the largest. If the memory addresses of two sections are not contiguous, a new section is automatically added to fill the addresses that are undefined by the system. This detection process is executed when the SectionViewDetectHiddenSection option is enabled in the settings. (0.9.9.7)  
+- Changed the format of the LastHiddenSectionLengthHex option from int to ulong,  
+so now this option is not limited by the int32 upper limit, and when initializing the last hidden section, it will be automatically processed in segments according to the buffer length (128MB). (0.9.9.8)  
+- Previously, when detecting hidden sections, there was no segmentation processing for each section.  
+Now, each detected hidden section is segmented according to the buffer length (128M), following the standard section processing method. This helps reduce memory usage during Query scanning. (0.9.9.8)  
 
 ![query_DetectHiddenSection](assets/query_DetectHiddenSection.webp)
 
@@ -379,6 +386,15 @@ Range: -0x8000000000000000 to 0x7FFFFFFFFFFFFFFF (-9,223,372,036,854,775,808 to 
 ![hexeditor4](assets/hexeditor4.webp)
 
 
+### Hex editor: Section switching ComboBox
+
+ - Added a Section switching ComboBox at the top right of the Hex Editor, allowing for quick Section switching. (0.9.9.8)
+
+![hexeditor_sectionSwitching1](assets/hexeditor_sectionSwitching1.webp)
+![hexeditor_sectionSwitching2](assets/hexeditor_sectionSwitching2.webp)
+
+
+
 ## Pointer finder	[🔼](#table-of-contents)
 
 - Make the `base address` of the pointer be in the `executable section` when `FastScan` is clicked.
@@ -387,6 +403,7 @@ Range: -0x8000000000000000 to 0x7FFFFFFFFFFFFFFF (-9,223,372,036,854,775,808 to 
 - The preset section filter rules is `libSce, libc.prx, SceShell, SceLib, SceNp, SceVoice, SceFios, libkernel, SceVdec`, these rules can also be customized.
 - Default maximum offset range (MaxRange) changed from 8192 to 0 (unlimited range) in PointerFinder. (0.9.7.1)
 - Added support for PointerFinder auto sorting by `Base Address` field default, and also supports manual sorting. (0.9.8.2)
+- PointerFinder now supports stable sorting, maintaining the relative order of the previous sorting during sorting. (0.9.9.8)
 
 ![pointerfinder_1](assets/pointerfinder_1.webp)
 ![pointerfinder_2](assets/pointerfinder_2.webp)

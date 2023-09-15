@@ -36,8 +36,10 @@
             this.HexViewMenuByteGroup = new System.Windows.Forms.ToolStripComboBox();
             this.HexViewMenuGroupSize = new System.Windows.Forms.ToolStripComboBox();
             this.HexViewMenuSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.HexViewMenuCopyAddress = new System.Windows.Forms.ToolStripMenuItem();
             this.SplitContainer2 = new PS4CheaterNeo.CollapsibleSplitContainer();
             this.TableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+            this.SectionBox = new System.Windows.Forms.ComboBox();
             this.InfoBox0Panel = new System.Windows.Forms.Panel();
             this.SwapBytesBox = new System.Windows.Forms.CheckBox();
             this.InfoBox0 = new System.Windows.Forms.TextBox();
@@ -169,9 +171,10 @@
             this.HexViewMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.HexViewMenuByteGroup,
             this.HexViewMenuGroupSize,
-            this.HexViewMenuSeparator1});
+            this.HexViewMenuSeparator1,
+            this.HexViewMenuCopyAddress});
             this.HexViewMenu.Name = "HexViewMenu";
-            this.HexViewMenu.Size = new System.Drawing.Size(211, 64);
+            this.HexViewMenu.Size = new System.Drawing.Size(211, 108);
             // 
             // HexViewMenuByteGroup
             // 
@@ -191,6 +194,13 @@
             // 
             this.HexViewMenuSeparator1.Name = "HexViewMenuSeparator1";
             this.HexViewMenuSeparator1.Size = new System.Drawing.Size(207, 6);
+            // 
+            // HexViewMenuCopyAddress
+            // 
+            this.HexViewMenuCopyAddress.Name = "HexViewMenuCopyAddress";
+            this.HexViewMenuCopyAddress.Size = new System.Drawing.Size(210, 22);
+            this.HexViewMenuCopyAddress.Text = "Copy Address";
+            this.HexViewMenuCopyAddress.Click += new System.EventHandler(this.HexViewMenuCopyAddress_Click);
             // 
             // SplitContainer2
             // 
@@ -225,19 +235,21 @@
             this.TableLayoutPanel1.AutoSize = true;
             this.TableLayoutPanel1.ColumnCount = 1;
             this.TableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.TableLayoutPanel1.Controls.Add(this.InfoBox0Panel, 0, 7);
-            this.TableLayoutPanel1.Controls.Add(this.TableLayoutPanel4, 0, 5);
-            this.TableLayoutPanel1.Controls.Add(this.CommitBtn, 0, 3);
-            this.TableLayoutPanel1.Controls.Add(this.AddToCheatGridBtn, 0, 4);
-            this.TableLayoutPanel1.Controls.Add(this.TableLayoutPanel2, 0, 0);
-            this.TableLayoutPanel1.Controls.Add(this.PageBox, 0, 1);
-            this.TableLayoutPanel1.Controls.Add(this.TableLayoutPanel3, 0, 2);
-            this.TableLayoutPanel1.Controls.Add(this.InfoBoxPanel, 0, 8);
-            this.TableLayoutPanel1.Controls.Add(this.TableLayoutPanel7, 0, 6);
+            this.TableLayoutPanel1.Controls.Add(this.SectionBox, 0, 0);
+            this.TableLayoutPanel1.Controls.Add(this.InfoBox0Panel, 0, 8);
+            this.TableLayoutPanel1.Controls.Add(this.TableLayoutPanel4, 0, 6);
+            this.TableLayoutPanel1.Controls.Add(this.CommitBtn, 0, 4);
+            this.TableLayoutPanel1.Controls.Add(this.AddToCheatGridBtn, 0, 5);
+            this.TableLayoutPanel1.Controls.Add(this.TableLayoutPanel2, 0, 1);
+            this.TableLayoutPanel1.Controls.Add(this.PageBox, 0, 2);
+            this.TableLayoutPanel1.Controls.Add(this.TableLayoutPanel3, 0, 3);
+            this.TableLayoutPanel1.Controls.Add(this.InfoBoxPanel, 0, 9);
+            this.TableLayoutPanel1.Controls.Add(this.TableLayoutPanel7, 0, 7);
             this.TableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.TableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
             this.TableLayoutPanel1.Name = "TableLayoutPanel1";
-            this.TableLayoutPanel1.RowCount = 9;
+            this.TableLayoutPanel1.RowCount = 10;
+            this.TableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.TableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.TableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.TableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
@@ -250,12 +262,27 @@
             this.TableLayoutPanel1.Size = new System.Drawing.Size(225, 372);
             this.TableLayoutPanel1.TabIndex = 14;
             // 
+            // SectionBox
+            // 
+            this.SectionBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(36)))), ((int)(((byte)(36)))));
+            this.SectionBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.SectionBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.SectionBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.SectionBox.ForeColor = System.Drawing.Color.White;
+            this.SectionBox.FormattingEnabled = true;
+            this.SectionBox.Location = new System.Drawing.Point(0, 3);
+            this.SectionBox.Margin = new System.Windows.Forms.Padding(0, 3, 0, 3);
+            this.SectionBox.Name = "SectionBox";
+            this.SectionBox.Size = new System.Drawing.Size(225, 20);
+            this.SectionBox.TabIndex = 5;
+            this.SectionBox.SelectedIndexChanged += new System.EventHandler(this.SectionBox_SelectedIndexChanged);
+            // 
             // InfoBox0Panel
             // 
             this.InfoBox0Panel.Controls.Add(this.SwapBytesBox);
             this.InfoBox0Panel.Controls.Add(this.InfoBox0);
             this.InfoBox0Panel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.InfoBox0Panel.Location = new System.Drawing.Point(0, 227);
+            this.InfoBox0Panel.Location = new System.Drawing.Point(0, 255);
             this.InfoBox0Panel.Margin = new System.Windows.Forms.Padding(0);
             this.InfoBox0Panel.Name = "InfoBox0Panel";
             this.InfoBox0Panel.Size = new System.Drawing.Size(225, 20);
@@ -298,13 +325,13 @@
             this.TableLayoutPanel4.Controls.Add(this.HexBox, 0, 0);
             this.TableLayoutPanel4.Controls.Add(this.LittleEndianBox, 0, 1);
             this.TableLayoutPanel4.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.TableLayoutPanel4.Location = new System.Drawing.Point(0, 152);
+            this.TableLayoutPanel4.Location = new System.Drawing.Point(0, 178);
             this.TableLayoutPanel4.Margin = new System.Windows.Forms.Padding(0, 3, 0, 3);
             this.TableLayoutPanel4.Name = "TableLayoutPanel4";
             this.TableLayoutPanel4.RowCount = 2;
             this.TableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.TableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.TableLayoutPanel4.Size = new System.Drawing.Size(225, 42);
+            this.TableLayoutPanel4.Size = new System.Drawing.Size(225, 44);
             this.TableLayoutPanel4.TabIndex = 11;
             // 
             // InputBox
@@ -337,7 +364,7 @@
             this.TableLayoutPanel4.SetColumnSpan(this.LittleEndianBox, 2);
             this.LittleEndianBox.Location = new System.Drawing.Point(3, 25);
             this.LittleEndianBox.Name = "LittleEndianBox";
-            this.LittleEndianBox.Size = new System.Drawing.Size(81, 14);
+            this.LittleEndianBox.Size = new System.Drawing.Size(81, 16);
             this.LittleEndianBox.TabIndex = 11;
             this.LittleEndianBox.Text = "LittleEndian";
             this.LittleEndianBox.UseVisualStyleBackColor = true;
@@ -347,7 +374,7 @@
             this.CommitBtn.Dock = System.Windows.Forms.DockStyle.Fill;
             this.CommitBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.CommitBtn.ForeColor = System.Drawing.Color.White;
-            this.CommitBtn.Location = new System.Drawing.Point(0, 90);
+            this.CommitBtn.Location = new System.Drawing.Point(0, 116);
             this.CommitBtn.Margin = new System.Windows.Forms.Padding(0, 3, 0, 3);
             this.CommitBtn.Name = "CommitBtn";
             this.CommitBtn.Size = new System.Drawing.Size(225, 25);
@@ -361,7 +388,7 @@
             this.AddToCheatGridBtn.Dock = System.Windows.Forms.DockStyle.Fill;
             this.AddToCheatGridBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.AddToCheatGridBtn.ForeColor = System.Drawing.Color.White;
-            this.AddToCheatGridBtn.Location = new System.Drawing.Point(0, 121);
+            this.AddToCheatGridBtn.Location = new System.Drawing.Point(0, 147);
             this.AddToCheatGridBtn.Margin = new System.Windows.Forms.Padding(0, 3, 0, 3);
             this.AddToCheatGridBtn.Name = "AddToCheatGridBtn";
             this.AddToCheatGridBtn.Size = new System.Drawing.Size(225, 25);
@@ -379,7 +406,7 @@
             this.TableLayoutPanel2.Controls.Add(this.NextBtn, 1, 0);
             this.TableLayoutPanel2.Controls.Add(this.PreviousBtn, 0, 0);
             this.TableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.TableLayoutPanel2.Location = new System.Drawing.Point(0, 0);
+            this.TableLayoutPanel2.Location = new System.Drawing.Point(0, 26);
             this.TableLayoutPanel2.Margin = new System.Windows.Forms.Padding(0);
             this.TableLayoutPanel2.Name = "TableLayoutPanel2";
             this.TableLayoutPanel2.RowCount = 1;
@@ -423,7 +450,7 @@
             this.PageBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.PageBox.ForeColor = System.Drawing.Color.White;
             this.PageBox.FormattingEnabled = true;
-            this.PageBox.Location = new System.Drawing.Point(0, 33);
+            this.PageBox.Location = new System.Drawing.Point(0, 59);
             this.PageBox.Margin = new System.Windows.Forms.Padding(0, 3, 0, 3);
             this.PageBox.Name = "PageBox";
             this.PageBox.Size = new System.Drawing.Size(225, 20);
@@ -439,7 +466,7 @@
             this.TableLayoutPanel3.Controls.Add(this.RefreshBtn, 1, 0);
             this.TableLayoutPanel3.Controls.Add(this.AutoRefreshBox, 0, 0);
             this.TableLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.TableLayoutPanel3.Location = new System.Drawing.Point(0, 59);
+            this.TableLayoutPanel3.Location = new System.Drawing.Point(0, 85);
             this.TableLayoutPanel3.Margin = new System.Windows.Forms.Padding(0, 3, 0, 3);
             this.TableLayoutPanel3.Name = "TableLayoutPanel3";
             this.TableLayoutPanel3.RowCount = 1;
@@ -478,9 +505,9 @@
             this.InfoBoxPanel.AutoScroll = true;
             this.InfoBoxPanel.Controls.Add(this.TableLayoutPanel5);
             this.InfoBoxPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.InfoBoxPanel.Location = new System.Drawing.Point(3, 250);
+            this.InfoBoxPanel.Location = new System.Drawing.Point(3, 278);
             this.InfoBoxPanel.Name = "InfoBoxPanel";
-            this.InfoBoxPanel.Size = new System.Drawing.Size(219, 119);
+            this.InfoBoxPanel.Size = new System.Drawing.Size(219, 91);
             this.InfoBoxPanel.TabIndex = 17;
             // 
             // TableLayoutPanel5
@@ -850,7 +877,7 @@
             this.TableLayoutPanel7.Controls.Add(this.FindBtn, 1, 0);
             this.TableLayoutPanel7.Controls.Add(this.ForwardBox, 0, 0);
             this.TableLayoutPanel7.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.TableLayoutPanel7.Location = new System.Drawing.Point(0, 197);
+            this.TableLayoutPanel7.Location = new System.Drawing.Point(0, 225);
             this.TableLayoutPanel7.Margin = new System.Windows.Forms.Padding(0);
             this.TableLayoutPanel7.Name = "TableLayoutPanel7";
             this.TableLayoutPanel7.RowCount = 1;
@@ -960,7 +987,6 @@
             this.Name = "HexEditor";
             this.Text = "HexEditor";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.HexEditor_FormClosing);
-            this.Load += new System.EventHandler(this.HexEditor_Load);
             this.SplitContainer1.Panel1.ResumeLayout(false);
             this.SplitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.SplitContainer1)).EndInit();
@@ -1054,5 +1080,7 @@
         private System.Windows.Forms.Button FindBtn;
         private System.Windows.Forms.CheckBox ForwardBox;
         private System.Windows.Forms.CheckBox LittleEndianBox;
+        private System.Windows.Forms.ComboBox SectionBox;
+        private System.Windows.Forms.ToolStripMenuItem HexViewMenuCopyAddress;
     }
 }

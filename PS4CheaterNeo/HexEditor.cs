@@ -23,7 +23,10 @@ namespace PS4CheaterNeo
         Dictionary<long, long> changedPosDic;
         const int PageSize = 8 * 1024 * 1024;
         readonly Main mainForm;
-        readonly Section section;
+        readonly SectionTool sectionTool;
+        Section section;
+        Section[] sections;
+
         /// <summary>
         /// good pattern for using a Global Mutex in C#
         /// https://stackoverflow.com/a/229567
@@ -80,11 +83,31 @@ namespace PS4CheaterNeo
             LittleEndianBox.Checked = Properties.Settings.Default.UsingLittleEndian.Value;
         }
 
-        public HexEditor(Main mainForm, Section section, int baseAddr) : this(mainForm)
+        public HexEditor(Main mainForm, SectionTool sectionTool, Section section, int baseAddr) : this(mainForm)
         {
             if (section == null || section.SID == 0) throw new ArgumentNullException("Init HexEditor failed, section is null.");
             if (baseAddr < 0) throw new ArgumentNullException("Init HexEditor failed, baseAddr is invalid.");
 
+            this.sectionTool = sectionTool;
+            sections = sectionTool.GetSectionSortByAddr();
+            for (int sectionIdx = 0; sectionIdx < sections.Length; sectionIdx++)
+            {
+                Section tmpS = sections[sectionIdx];
+                SectionBox.Items.Add(string.Format(" {0:0000}:{1:X9} 	 	 {2} Prot:{3:X2} Len:{4:X}", sectionIdx, tmpS.Start, tmpS.Name, tmpS.Prot, tmpS.Length));
+                if (tmpS.SID == section.SID) SectionBox.SelectedIndex = sectionIdx;
+            }
+
+            InitPageData(section, baseAddr);
+        }
+
+        /// <summary>
+        /// Initialize the contents of the PageBox menu based on the specified Section and 
+        /// select the corresponding PageBox menu based on the relative address (baseAddr).
+        /// </summary>
+        /// <param name="section"></param>
+        /// <param name="baseAddr"></param>
+        private void InitPageData(Section section, int baseAddr)
+        {
             this.section = section;
             Page = baseAddr / PageSize;
             Line = (baseAddr - Page * PageSize) / HexView.BytesPerLine;
@@ -92,12 +115,14 @@ namespace PS4CheaterNeo
 
             PageCount = DivUP(section.Length, PageSize);
 
+            PageBox.Items.Clear();
             for (int i = 0; i < PageCount; ++i)
             {
                 ulong start = section.Start + (ulong)i * PageSize;
                 ulong end = section.Start + (ulong)(i + 1) * PageSize;
                 PageBox.Items.Add((i + 1).ToString("00") + String.Format(" {0:X8}-{1:X8}", start, end));
             }
+            PageBox.SelectedIndex = PageBox.Items.Count > Page ? Page : PageBox.Items.Count - 1;
         }
 
         public void ApplyUI()
@@ -173,6 +198,27 @@ namespace PS4CheaterNeo
             if (dynaBP != null && dynaBP.HasChanges() && MessageBox.Show("Byte data has changes, Do you want to close HexEditor?", "HexEditor", 
                 MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) e.Cancel = true;
         }
+
+        #region HexView
+        private void HexViewByteGroup_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            var byteGroupComboBox = (ToolStripComboBox)sender;
+            ComboItem comboItem = (ComboItem)byteGroupComboBox.SelectedItem;
+            HexBox.ByteGroupingType byteGroupingType = (HexBox.ByteGroupingType)comboItem.Value;
+            HexView.ByteGrouping = byteGroupingType;
+            if (HexViewMenuGroupSize.Items.Count > 0) HexViewMenuGroupSize.SelectedIndex = HexView.ByteGroupingSize;
+        }
+
+        private void HexViewGroupSize_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            var groupSizeComboBox = (ToolStripComboBox)sender;
+            int groupSize = groupSizeComboBox.SelectedIndex;
+
+            HexView.GroupSeparatorVisible = groupSize > 0;
+            HexView.GroupSize = groupSize;
+        }
+
+        private void HexViewMenuCopyAddress_Click(object sender, EventArgs e) => Clipboard.SetText(string.Format("{0:X9}", HexView.SelectionStart + HexView.LineInfoOffset));
 
         /// <summary>
         /// BaseAddr = HexView.SelectionStart + HexView.LineInfoOffset - (long)section.Start
@@ -291,7 +337,6 @@ namespace PS4CheaterNeo
                 }
             }
         }
-
         private IEnumerable<Instruction> Disassembly(byte[] data, ulong address)
         {
             ArchitectureMode architecture = ArchitectureMode.x86_64;
@@ -300,8 +345,9 @@ namespace PS4CheaterNeo
             IEnumerable<Instruction> instructions = new Disassembler(data, architecture, address, true, Vendor.Any, 0UL).Disassemble();
             foreach (Instruction instruction in instructions) yield return instruction;
         }
+        #endregion
 
-        private void HexEditor_Load(object sender, EventArgs e) => PageBox.SelectedIndex = PageBox.Items.Count > Page ? Page : PageBox.Items.Count - 1;
+        private void SectionBox_SelectedIndexChanged(object sender, EventArgs e) => InitPageData(sections[SectionBox.SelectedIndex], 0);
 
         private void PageBox_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -312,7 +358,11 @@ namespace PS4CheaterNeo
 
         private void PreviousBtn_Click(object sender, EventArgs e)
         {
-            if (Page <= 0) return;
+            if (Page <= 0)
+            {
+                if (SectionBox.SelectedIndex > 0) SectionBox.SelectedIndex--;
+                return;
+            }
 
             Page--;
             Line = 0;
@@ -322,7 +372,11 @@ namespace PS4CheaterNeo
 
         private void NextBtn_Click(object sender, EventArgs e)
         {
-            if (Page + 1 >= PageCount) return;
+            if (Page + 1 >= PageCount)
+            {
+                if (SectionBox.SelectedIndex < SectionBox.Items.Count - 1) SectionBox.SelectedIndex++;
+                return;
+            };
 
             Page++;
             Line = 0;
@@ -517,24 +571,6 @@ namespace PS4CheaterNeo
             finally { mutex.ReleaseMutex(); }
         }
 
-        private void HexViewByteGroup_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            var byteGroupComboBox = (ToolStripComboBox)sender;
-            ComboItem comboItem = (ComboItem)byteGroupComboBox.SelectedItem;
-            HexBox.ByteGroupingType byteGroupingType = (HexBox.ByteGroupingType)comboItem.Value;
-            HexView.ByteGrouping = byteGroupingType;
-            if (HexViewMenuGroupSize.Items.Count > 0) HexViewMenuGroupSize.SelectedIndex = HexView.ByteGroupingSize;
-        }
-
-        private void HexViewGroupSize_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            var groupSizeComboBox = (ToolStripComboBox)sender;
-            int groupSize = groupSizeComboBox.SelectedIndex;
-
-            HexView.GroupSeparatorVisible = groupSize > 0;
-            HexView.GroupSize = groupSize;
-        }
-
         private void AutoRefreshBox_CheckedChanged(object sender, EventArgs e)
         {
             if (!AutoRefreshBox.Checked) AutoRefreshTimer.Stop();
@@ -543,14 +579,24 @@ namespace PS4CheaterNeo
 
         private void SwapBytesBox_CheckedChanged(object sender, EventArgs e) => HexView_SelectionStartChanged(HexView, e);
 
-        private void HexBox_CheckedChanged(object sender, EventArgs e)
-        {
-            LittleEndianBox.Visible = HexBox.Checked;
-        }
+        private void HexBox_CheckedChanged(object sender, EventArgs e) => LittleEndianBox.Visible = HexBox.Checked;
         #endregion
 
+        /// <summary>
+        /// Round up the result when dividing sum by div.
+        /// </summary>
+        /// <param name="sum"></param>
+        /// <param name="div"></param>
+        /// <returns></returns>
         private int DivUP(int sum, int div) => sum / div + ((sum % div != 0) ? 1 : 0);
 
+        /// <summary>
+        /// Read the PS4 memory bytes data from a specified section and corresponding page's starting address, 
+        /// display it in the HexEditor, and navigate to the specified line and column address.
+        /// </summary>
+        /// <param name="page"></param>
+        /// <param name="line"></param>
+        /// <param name="chkChangedPosSet">Confirm if you want to highlight the addresses where bytes have been changed.</param>
         private void UpdateUi(int page, long line, bool chkChangedPosSet = false)
         {
             int memSize = PageSize;
@@ -583,6 +629,7 @@ namespace PS4CheaterNeo
                 if (ScrollVpos > 0) HexView.PerformScrollToLine(ScrollVpos);
             }
         }
+
         private void ByteProvider_Changed(object sender, EventArgs e)
         {
             if (HexView.SelectionStart < 0) return;

@@ -458,9 +458,9 @@ namespace PS4CheaterNeo.Properties {
         [global::System.Configuration.DefaultSettingValueAttribute("0x40000000|3_Query|5_SectionView|Specify the Hex length of the last hidden sectio" +
             "n. \\nThis only takes effect when SectionViewDetectHiddenSection is enabled. \\nDe" +
             "fault value is 0x40000000.")]
-        public global::OptionTreeView.Option<int> LastHiddenSectionLengthHex {
+        public global::OptionTreeView.Option<ulong> LastHiddenSectionLengthHex {
             get {
-                return ((global::OptionTreeView.Option<int>)(this["LastHiddenSectionLengthHex"]));
+                return ((global::OptionTreeView.Option<ulong>)(this["LastHiddenSectionLengthHex"]));
             }
             set {
                 this["LastHiddenSectionLengthHex"] = value;

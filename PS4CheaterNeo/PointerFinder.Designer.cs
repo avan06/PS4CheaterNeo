@@ -58,6 +58,7 @@ namespace PS4CheaterNeo
             this.label1 = new System.Windows.Forms.Label();
             this.SaveDialog = new System.Windows.Forms.SaveFileDialog();
             this.OpenDialog = new System.Windows.Forms.OpenFileDialog();
+            this.PointerListViewSelectAll = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.SplitContainer1)).BeginInit();
             this.SplitContainer1.Panel1.SuspendLayout();
             this.SplitContainer1.Panel2.SuspendLayout();
@@ -125,20 +126,23 @@ namespace PS4CheaterNeo
             this.PointerListView.TabIndex = 3;
             this.PointerListView.UseCompatibleStateImageBehavior = false;
             this.PointerListView.View = System.Windows.Forms.View.Details;
+            this.PointerListView.VirtualMode = true;
             this.PointerListView.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.PointerListView_ColumnClick);
+            this.PointerListView.RetrieveVirtualItem += new System.Windows.Forms.RetrieveVirtualItemEventHandler(this.PointerListView_RetrieveVirtualItem);
             this.PointerListView.DoubleClick += new System.EventHandler(this.PointerListView_DoubleClick);
             // 
             // PointerListViewMenu
             // 
             this.PointerListViewMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.PointerListViewAddToCheatGrid});
+            this.PointerListViewAddToCheatGrid,
+            this.PointerListViewSelectAll});
             this.PointerListViewMenu.Name = "contextMenuStrip1";
-            this.PointerListViewMenu.Size = new System.Drawing.Size(177, 26);
+            this.PointerListViewMenu.Size = new System.Drawing.Size(181, 70);
             // 
             // PointerListViewAddToCheatGrid
             // 
             this.PointerListViewAddToCheatGrid.Name = "PointerListViewAddToCheatGrid";
-            this.PointerListViewAddToCheatGrid.Size = new System.Drawing.Size(176, 22);
+            this.PointerListViewAddToCheatGrid.Size = new System.Drawing.Size(180, 22);
             this.PointerListViewAddToCheatGrid.Text = "Add to Cheat Grid";
             this.PointerListViewAddToCheatGrid.Click += new System.EventHandler(this.PointerListViewAddToCheatGrid_Click);
             // 
@@ -406,6 +410,13 @@ namespace PS4CheaterNeo
             this.label1.TabIndex = 1;
             this.label1.Text = "Address:";
             // 
+            // PointerListViewSelectAll
+            // 
+            this.PointerListViewSelectAll.Name = "PointerListViewSelectAll";
+            this.PointerListViewSelectAll.Size = new System.Drawing.Size(180, 22);
+            this.PointerListViewSelectAll.Text = "Select All";
+            this.PointerListViewSelectAll.Click += new System.EventHandler(this.PointerListViewSelectAll_Click);
+            // 
             // PointerFinder
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -461,5 +472,6 @@ namespace PS4CheaterNeo
         private System.Windows.Forms.CheckBox NegativeOffsetBox;
         private System.Windows.Forms.Button FilterSizeRuleBtn;
         private System.Windows.Forms.CheckBox IsFilterSizeBox;
+        private System.Windows.Forms.ToolStripMenuItem PointerListViewSelectAll;
     }
 }

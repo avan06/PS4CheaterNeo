@@ -149,6 +149,10 @@ namespace PS4CheaterNeo
                 return;
             }
 
+            SectionView.VirtualListSize = 0;
+            SectionView.VirtualMode = false;
+            ResultView.VirtualListSize = 0;
+            ResultView.VirtualMode = false;
             sectionItems.Clear();
             sectionItems = null;
             resultItems.Clear();
@@ -190,14 +194,18 @@ namespace PS4CheaterNeo
         {
             try
             {
+                bool SectionViewDetectHiddenSection = Properties.Settings.Default.SectionViewDetectHiddenSection.Value;
+                SectionViewCheckAllHidden.Visible = SectionViewDetectHiddenSection;
+                SectionViewUnCheckAllHidden.Visible = SectionViewDetectHiddenSection;
+
                 SectionView.BeginUpdate();
-                SectionView.VirtualMode = false;
-                sectionItems.Clear();
-                resultItems.Clear();
                 SectionView.VirtualListSize = 0;
                 ResultView.VirtualListSize = 0;
+                sectionItems.Clear();
+                resultItems.Clear();
                 SectionView.Items.Clear();
                 ResultView.Items.Clear();
+                SectionView.VirtualMode = false;
 
                 ComboItem process = (ComboItem)ProcessesBox.SelectedItem;
                 sectionTool.InitSections((int)process.Value, (string)process.Text);
@@ -1622,7 +1630,7 @@ namespace PS4CheaterNeo
             if (InputBox.Show("Search", "Enter the value of the search section name", ref searchSectionName) != DialogResult.OK) return;
 
             int startIndex = 0;
-            List<ListViewItem> selectedItems = GetSelectedItems(SectionView);
+            List<ListViewItem> selectedItems = ListViewLVITEM.GetSelectedItems(SectionView);
             if (selectedItems.Count > 0 && selectedItems[selectedItems.Count - 1].Index + 1 < sectionItems.Count) startIndex = selectedItems[selectedItems.Count - 1].Index + 1;
             ListViewItem item = SectionView.FindItemWithText(searchSectionName, true, startIndex);
             if (item == null) return;
@@ -1640,44 +1648,22 @@ namespace PS4CheaterNeo
             Properties.Settings.Default.SectionFilterKeys.Value = SectionFilterKeys;
         }
 
-        /// <summary>
-        /// Get all the SelectedItems of a ListView.
-        /// </summary>
-        /// <param name="listView">listView</param>
-        /// <returns>SelectedItems</returns>
-        private List<ListViewItem> GetSelectedItems(ListView listView)
-        {
-            List<ListViewItem> selectedItems = new List<ListViewItem>();
-
-            // Use ListView.SelectedIndices to get the indices of selected items.
-            foreach (int selectedIndex in listView.SelectedIndices)
-            {
-                // Use VirtualListSize to check if the index is within the visible range.
-                if (selectedIndex < 0 || selectedIndex >= listView.VirtualListSize) continue;
-                // If it's within the visible range, then get the corresponding ListViewItem.
-                ListViewItem item = listView.Items[selectedIndex];
-                selectedItems.Add(item);
-            }
-
-            return selectedItems;
-        }
-
         private void SectionViewHexEditor_Click(object sender, EventArgs e)
         {
-            List<ListViewItem> selectedItems = GetSelectedItems(SectionView);
+            List<ListViewItem> selectedItems = ListViewLVITEM.GetSelectedItems(SectionView);
             if (selectedItems.Count == 0) return;
 
             var sectionItem = selectedItems[0];
             uint sid = uint.Parse(sectionItem.SubItems[(int)SectionCol.SectionViewSID].Text);
             Section section = sectionTool.GetSection(sid);
 
-            HexEditor hexEdit = new HexEditor(mainForm, section, 0);
+            HexEditor hexEdit = new HexEditor(mainForm, sectionTool, section, 0);
             hexEdit.Show(this);
         }
 
         private void SectionViewDump_Click(object sender, EventArgs e)
         {
-            List<ListViewItem> selectedItems = GetSelectedItems(SectionView);
+            List<ListViewItem> selectedItems = ListViewLVITEM.GetSelectedItems(SectionView);
             if (selectedItems.Count > 0)
             {
                 SaveDialog.Filter = "Directory | directory"; //"Section binary (*.bin)|*.bin";
@@ -1813,7 +1799,7 @@ namespace PS4CheaterNeo
 
         private void SectionViewCheck_Click(object sender, EventArgs e)
         {
-            List<ListViewItem> selectedItems = GetSelectedItems(SectionView);
+            List<ListViewItem> selectedItems = ListViewLVITEM.GetSelectedItems(SectionView);
             if (selectedItems.Count == 0) return;
 
             SectionView.BeginUpdate();
@@ -1830,15 +1816,19 @@ namespace PS4CheaterNeo
             SectionView.EndUpdate();
         }
 
-        private void SectionViewCheckContains_Click(object sender, EventArgs e) => SectionViewContains(true);
+        private void SectionViewCheckContains_Click(object sender, EventArgs e) => SectionViewContains(true, SectionViewTextContains.Text);
 
-        private void SectionViewUnCheckContains_Click(object sender, EventArgs e) => SectionViewContains(false);
+        private void SectionViewUnCheckContains_Click(object sender, EventArgs e) => SectionViewContains(false, SectionViewTextContains.Text);
+
+        private void SectionViewCheckAllHidden_Click(object sender, EventArgs e) => SectionViewContains(true, "Hidden");
+
+        private void SectionViewUnCheckAllHidden_Click(object sender, EventArgs e) => SectionViewContains(false, "Hidden");
 
         /// <summary>
         /// Select all sections that contain the specified text. If isContains is False, then do not select them.
         /// </summary>
         /// <param name="isContains"></param>
-        private void SectionViewContains(bool isContains)
+        private void SectionViewContains(bool isContains, string contains)
         {
             if (sectionItems.Count == 0) return;
 
@@ -1848,7 +1838,7 @@ namespace PS4CheaterNeo
                 ListViewItem item = sectionItems[idx];
                 uint sid = uint.Parse(item.SubItems[(int)SectionCol.SectionViewSID].Text);
                 string name = item.SubItems[(int)SectionCol.SectionViewName].Text;
-                item.Checked = isContains ? name.Contains(SectionViewTextContains.Text) : !name.Contains(SectionViewTextContains.Text);
+                item.Checked = isContains ? name.Contains(contains) : !name.Contains(contains);
                 SectionCheckUpdate(item.Checked, sid);
             }
             if (AddrMinBox.Tag != null) AddrMinBox.Text = ((ulong)AddrMinBox.Tag).ToString("X");
@@ -1898,7 +1888,7 @@ namespace PS4CheaterNeo
 
         private void ResultView_DoubleClick(object sender, EventArgs e)
         {
-            List<ListViewItem> selectedItems = GetSelectedItems(ResultView);
+            List<ListViewItem> selectedItems = ListViewLVITEM.GetSelectedItems(ResultView);
             if (selectedItems.Count != 1) return;
 
             ListViewItem resultItem = selectedItems[0];
@@ -1914,7 +1904,7 @@ namespace PS4CheaterNeo
 
         private void ResultViewAddToCheatGrid_Click(object sender, EventArgs e)
         {
-            List<ListViewItem> selectedItems = GetSelectedItems(ResultView);
+            List<ListViewItem> selectedItems = ListViewLVITEM.GetSelectedItems(ResultView);
             if (selectedItems.Count == 0) return;
 
             for (int i = 0; i < selectedItems.Count; ++i)
@@ -1933,7 +1923,7 @@ namespace PS4CheaterNeo
 
         private void ResultViewHexEditor_Click(object sender, EventArgs e)
         {
-            List<ListViewItem> selectedItems = GetSelectedItems(ResultView);
+            List<ListViewItem> selectedItems = ListViewLVITEM.GetSelectedItems(ResultView);
             if (selectedItems.Count != 1) return;
 
             var resultItem = selectedItems[0];
@@ -1942,7 +1932,7 @@ namespace PS4CheaterNeo
             uint offsetAddr = (uint)(ulong.Parse(resultItem.SubItems[(int)ResultCol.ResultListAddress].Text, NumberStyles.HexNumber) - section.Start);
             if (offsetAddr == 0) return;
 
-            HexEditor hexEdit = new HexEditor(mainForm, section, (int)offsetAddr);
+            HexEditor hexEdit = new HexEditor(mainForm, sectionTool, section, (int)offsetAddr);
             hexEdit.Show(this);
         }
 
@@ -1962,7 +1952,7 @@ namespace PS4CheaterNeo
 
         private void ResultViewDump_Click(object sender, EventArgs e)
         {
-            //List<ListViewItem> selectedItems = GetSelectedItems(ResultView);
+            //List<ListViewItem> selectedItems = ListViewLVITEM.GetSelectedItems(ResultView);
             //if (selectedItems.Count == 1)
             //{
             //    ulong address = ulong.Parse(ResultView.SelectedItems[0].SubItems[(int)ResultCol.ResultListAddress].Text, NumberStyles.HexNumber);
@@ -1973,7 +1963,7 @@ namespace PS4CheaterNeo
 
         private void ResultViewFindPointer_Click(object sender, EventArgs e)
         {
-            List<ListViewItem> selectedItems = GetSelectedItems(ResultView);
+            List<ListViewItem> selectedItems = ListViewLVITEM.GetSelectedItems(ResultView);
             if (selectedItems.Count != 1) return;
 
             try
@@ -1990,12 +1980,9 @@ namespace PS4CheaterNeo
         {
             if (ResultView.Items.Count == 0) return;
 
-            for (int i = 0; i < ResultView.VirtualListSize; ++i)
-            {
-                ListViewItem resultItem = ResultView.Items[i];
-                resultItem.Selected = true;
-            }
-
+            ResultView.BeginUpdate();
+            ListViewLVITEM.SelectAllItems(ResultView);
+            ResultView.EndUpdate();
         }
         #endregion
 
