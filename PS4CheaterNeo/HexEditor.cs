@@ -220,6 +220,51 @@ namespace PS4CheaterNeo
 
         private void HexViewMenuCopyAddress_Click(object sender, EventArgs e) => Clipboard.SetText(string.Format("{0:X9}", HexView.SelectionStart + HexView.LineInfoOffset));
 
+        private void HexViewMenuJumpToAddress_Click(object sender, EventArgs e)
+        {
+            string inputValue = "";
+            if (PS4CheaterNeo.InputBox.Show("Hex View", "Please enter the memory address(hex) you'd like to jump to:", ref inputValue) != DialogResult.OK) return;
+
+            inputValue = Regex.Replace(inputValue, "[^0-9a-fA-F]", "");
+            ulong address = ulong.Parse(inputValue, NumberStyles.HexNumber);
+
+            HexViewJumpToAddress(address);
+        }
+
+        private void HexViewMenuJumpToOffset_Click(object sender, EventArgs e)
+        {
+            string inputValue = "";
+            if (PS4CheaterNeo.InputBox.Show("Hex View", "Please enter the relative offset(hex) you'd like to jump to from the current memory address:", ref inputValue) != DialogResult.OK) return;
+
+            bool isNegative = false;
+            inputValue = Regex.Replace(inputValue, "[^-0-9a-fA-F]", "");
+            if (inputValue.StartsWith("-")) isNegative = true;
+            inputValue = Regex.Replace(inputValue, "[^0-9a-fA-F]", "");
+            ulong offset = ulong.Parse(inputValue, NumberStyles.HexNumber);
+            ulong address = section.Start + (ulong)HexView.SelectionStart;
+            address = isNegative ? address - offset : address + offset;
+
+            HexViewJumpToAddress(address);
+        }
+
+        private void HexViewJumpToAddress(ulong address)
+        {
+            if (address < section.Start || address > section.Start + (uint)section.Length)
+            {
+                (int index, Section sectionNew) = sectionTool.GetIndexInSectionSortByAddr(address, sections);
+                if (index == -1) return;
+
+                HexView.SelectionStart = 0;
+                SectionBox.SelectedIndexChanged -= new EventHandler(SectionBox_SelectedIndexChanged);
+                SectionBox.SelectedIndex = index;
+                InitPageData(sectionNew, (int)(address - sectionNew.Start));
+                SectionBox.SelectedIndexChanged += new EventHandler(SectionBox_SelectedIndexChanged);
+            }
+            HexView.SelectionLength = 4;
+            HexView.SelectionStart = (long)(address - section.Start);
+            HexView.SelectionLength = 4;
+        }
+
         /// <summary>
         /// BaseAddr = HexView.SelectionStart + HexView.LineInfoOffset - (long)section.Start
         /// </summary>
@@ -312,17 +357,17 @@ namespace PS4CheaterNeo
             if (InfoBoxB.Text.Length % 8 != 0) InfoBoxB.Text = InfoBoxB.Text.PadLeft(InfoBoxB.Text.Length + 8 - InfoBoxB.Text.Length % 8, '0');
             for (int i = InfoBoxB.Text.Length - 8; i >= 8; i -= 8) InfoBoxB.Text = InfoBoxB.Text.Insert(i, ",");
 
-            InfoBox0.Text  = string.Format(@"{0:X} | {1:X}+{2:X}", HexView.SelectionStart + HexView.LineInfoOffset, HexView.SelectionStart + HexView.LineInfoOffset - (long)section.Start, section.Start);
+            InfoBox0.Text   = string.Format(@"{0:X} | {1:X}+{2:X}", HexView.SelectionStart + HexView.LineInfoOffset, HexView.SelectionStart + HexView.LineInfoOffset - (long)section.Start, section.Start);
             InfoBox1U.Text  = string.Format("{0:N0} | ", info1) + InfoBox1U.Text;
             InfoBox2U.Text  = string.Format("{0:N0} | ", info2) + InfoBox2U.Text;
             InfoBox3U.Text  = string.Format("{0:N0} | ", info4) + InfoBox3U.Text;
             InfoBox4U.Text  = string.Format("{0:N0} | ", info8) + InfoBox4U.Text;
-            InfoBoxF.Text  = string.Format("{0}", (double)infoF); //float which maps to System.Single simply does not have enough precision／https://stackoverflow.com/a/69849989
-            InfoBoxD.Text  = string.Format("{0}", infoD);
-            InfoBox1S.Text = string.Format("{0:N0} | ", info1S) + InfoBox1S.Text;
-            InfoBox2S.Text = string.Format("{0:N0} | ", info2S) + InfoBox2S.Text;
-            InfoBox3S.Text = string.Format("{0:N0} | ", info4S) + InfoBox3S.Text;
-            InfoBox4S.Text = string.Format("{0:N0} | ", info8S) + InfoBox4S.Text;
+            InfoBoxF.Text   = string.Format("{0}", (double)infoF); //float which maps to System.Single simply does not have enough precision／https://stackoverflow.com/a/69849989
+            InfoBoxD.Text   = string.Format("{0}", infoD);
+            InfoBox1S.Text  = string.Format("{0:N0} | ", info1S) + InfoBox1S.Text;
+            InfoBox2S.Text  = string.Format("{0:N0} | ", info2S) + InfoBox2S.Text;
+            InfoBox3S.Text  = string.Format("{0:N0} | ", info4S) + InfoBox3S.Text;
+            InfoBox4S.Text  = string.Format("{0:N0} | ", info8S) + InfoBox4S.Text;
 
             if (SplitContainer2.Panel1Minimized)
             {

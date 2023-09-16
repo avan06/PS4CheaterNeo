@@ -104,6 +104,9 @@
     <Setting Name="LastHiddenSectionLengthHex" Type="OptionTreeView.Option&lt;ulong&gt;" Scope="User">
       <Value Profile="(Default)">0x40000000|3_Query|5_SectionView|Specify the Hex length of the last hidden section. \nThis only takes effect when SectionViewDetectHiddenSection is enabled. \nDefault value is 0x40000000.</Value>
     </Setting>
+    <Setting Name="HiddenSectionStartAtPreviousEnd" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
+      <Value Profile="(Default)">True|3_Query|5_SectionView|Determine whether to enable the starting address of the Hidden Section to be the end address of the previous section. \nIf not enabled, the starting address will be the end address of the previous section plus 1. \nDefault enable</Value>
+    </Setting>
     <Setting Name="AutoRefresh" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
       <Value Profile="(Default)">False|4_HexEditor|Hex|Determines whether to enable Auto Refresh in HexEditor. \nDefault disabled</Value>
     </Setting>

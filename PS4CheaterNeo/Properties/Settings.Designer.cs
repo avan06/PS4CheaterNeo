@@ -469,6 +469,18 @@ namespace PS4CheaterNeo.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute(@"True|3_Query|5_SectionView|Determine whether to enable the starting address of the Hidden Section to be the end address of the previous section. \nIf not enabled, the starting address will be the end address of the previous section plus 1. \nDefault enable")]
+        public global::OptionTreeView.Option<bool> HiddenSectionStartAtPreviousEnd {
+            get {
+                return ((global::OptionTreeView.Option<bool>)(this["HiddenSectionStartAtPreviousEnd"]));
+            }
+            set {
+                this["HiddenSectionStartAtPreviousEnd"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False|4_HexEditor|Hex|Determines whether to enable Auto Refresh in HexEditor. \\nD" +
             "efault disabled")]
         public global::OptionTreeView.Option<bool> AutoRefresh {

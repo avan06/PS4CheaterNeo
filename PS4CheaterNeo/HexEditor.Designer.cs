@@ -37,6 +37,8 @@
             this.HexViewMenuGroupSize = new System.Windows.Forms.ToolStripComboBox();
             this.HexViewMenuSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.HexViewMenuCopyAddress = new System.Windows.Forms.ToolStripMenuItem();
+            this.HexViewMenuJumpToAddress = new System.Windows.Forms.ToolStripMenuItem();
+            this.HexViewMenuJumpToOffset = new System.Windows.Forms.ToolStripMenuItem();
             this.SplitContainer2 = new PS4CheaterNeo.CollapsibleSplitContainer();
             this.TableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.SectionBox = new System.Windows.Forms.ComboBox();
@@ -172,9 +174,11 @@
             this.HexViewMenuByteGroup,
             this.HexViewMenuGroupSize,
             this.HexViewMenuSeparator1,
-            this.HexViewMenuCopyAddress});
+            this.HexViewMenuCopyAddress,
+            this.HexViewMenuJumpToAddress,
+            this.HexViewMenuJumpToOffset});
             this.HexViewMenu.Name = "HexViewMenu";
-            this.HexViewMenu.Size = new System.Drawing.Size(211, 108);
+            this.HexViewMenu.Size = new System.Drawing.Size(211, 130);
             // 
             // HexViewMenuByteGroup
             // 
@@ -201,6 +205,20 @@
             this.HexViewMenuCopyAddress.Size = new System.Drawing.Size(210, 22);
             this.HexViewMenuCopyAddress.Text = "Copy Address";
             this.HexViewMenuCopyAddress.Click += new System.EventHandler(this.HexViewMenuCopyAddress_Click);
+            // 
+            // HexViewMenuJumpToAddress
+            // 
+            this.HexViewMenuJumpToAddress.Name = "HexViewMenuJumpToAddress";
+            this.HexViewMenuJumpToAddress.Size = new System.Drawing.Size(210, 22);
+            this.HexViewMenuJumpToAddress.Text = "Jump to Address";
+            this.HexViewMenuJumpToAddress.Click += new System.EventHandler(this.HexViewMenuJumpToAddress_Click);
+            // 
+            // HexViewMenuJumpToOffset
+            // 
+            this.HexViewMenuJumpToOffset.Name = "HexViewMenuJumpToOffset";
+            this.HexViewMenuJumpToOffset.Size = new System.Drawing.Size(210, 22);
+            this.HexViewMenuJumpToOffset.Text = "Jump to Offset";
+            this.HexViewMenuJumpToOffset.Click += new System.EventHandler(this.HexViewMenuJumpToOffset_Click);
             // 
             // SplitContainer2
             // 
@@ -1082,5 +1100,7 @@
         private System.Windows.Forms.CheckBox LittleEndianBox;
         private System.Windows.Forms.ComboBox SectionBox;
         private System.Windows.Forms.ToolStripMenuItem HexViewMenuCopyAddress;
+        private System.Windows.Forms.ToolStripMenuItem HexViewMenuJumpToAddress;
+        private System.Windows.Forms.ToolStripMenuItem HexViewMenuJumpToOffset;
     }
 }

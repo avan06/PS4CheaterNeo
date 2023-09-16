@@ -2,7 +2,7 @@
 
 PS4CheaterNeo is a program to find game cheat codes, and it is based on [`ps4debug`](https://github.com/jogolden/ps4debug) and [`.Net Framework 4.8`](https://support.microsoft.com/en-us/topic/microsoft-net-framework-4-8-offline-installer-for-windows-9d23f658-3b97-68ab-d013-aa3c3e7495e0).
 
-Currently in `version 0.9.9.8-beta`
+Currently in `version 0.9.9.9-beta`
 
 
 ## Table of Contents
@@ -35,6 +35,7 @@ Currently in `version 0.9.9.8-beta`
   * [Hex Editor](#hex-editor)
     + [Hex editor: displaying decimal, float, and double](#hex-editor-displaying-decimal-float-and-double)
     + [Hex editor: Section switching ComboBox](#hex-editor-section-switching-combobox)
+    + [Hex editor: Jump to Address／Offset](#hex-editor-jump-to-addressoffset)
   * [Pointer finder](#pointer-finder)
   * [Section](#section)
     + [Section ID](#section-id)
@@ -229,6 +230,8 @@ from the smallest Start address to the largest. If the memory addresses of two s
 so now this option is not limited by the int32 upper limit, and when initializing the last hidden section, it will be automatically processed in segments according to the buffer length (128MB). (0.9.9.8)  
 - Previously, when detecting hidden sections, there was no segmentation processing for each section.  
 Now, each detected hidden section is segmented according to the buffer length (128M), following the standard section processing method. This helps reduce memory usage during Query scanning. (0.9.9.8)  
+- Added support for setting the starting address of HiddenSection as the end address of the previous section.  
+avoiding starting addresses that do not end with an integer 0. You can enable/disable this by setting the `HiddenSectionStartAtPreviousEnd` option, which is enabled by default. (0.9.9.9)
 
 ![query_DetectHiddenSection](assets/query_DetectHiddenSection.webp)
 
@@ -393,6 +396,14 @@ Range: -0x8000000000000000 to 0x7FFFFFFFFFFFFFFF (-9,223,372,036,854,775,808 to 
 ![hexeditor_sectionSwitching1](assets/hexeditor_sectionSwitching1.webp)
 ![hexeditor_sectionSwitching2](assets/hexeditor_sectionSwitching2.webp)
 
+### Hex editor: Jump to Address／Offset
+
+- Added support for "Jump to Address" in the HexEditor's context menu. Enter an address, and it will automatically navigate to that location. (0.9.9.9)
+- Added support for "Jump to Offset" in the HexEditor's context menu. Enter an offset value from the current address, and it will navigate to the address relative to the current position. Negative offsets are also accepted. (0.9.9.9)
+
+![hexeditor_contextMenu](assets/hexeditor_contextMenu.webp)
+![hexeditor_jumpAddress](assets/hexeditor_jumpAddress.webp)
+![hexeditor_jumpOffset](assets/hexeditor_jumpOffset.webp)
 
 
 ## Pointer finder	[🔼](#table-of-contents)
@@ -550,6 +561,8 @@ Determine whether to enable the `FullRowSelect` feature in the `SectionView` of 
 Determine whether to enable automatic detection of hidden sections. This is currently an experimental feature. Default disabled. (0.9.9.7)  
 - `LastHiddenSectionLengthHex`:  
 Specify the Hex length of the last hidden section. This only takes effect when `SectionViewDetectHiddenSection` is enabled. Default value is 0x40000000. (0.9.9.7)  
+- `HiddenSectionStartAtPreviousEnd`:  
+Determine whether to enable the starting address of the Hidden Section to be the end address of the previous section. If not enabled, the starting address will be the end address of the previous section plus 1. Default enable. (9.9.9)  
 
 ### HexEditor  
 - `AutoRefresh`:  

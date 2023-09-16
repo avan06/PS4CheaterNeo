@@ -356,13 +356,15 @@ namespace PS4CheaterNeo
         {
             StringBuilder errors = new StringBuilder();
             Section[] sections = GetSectionSortByAddr();
+            bool HiddenSectionStartAtPreviousEnd = Properties.Settings.Default.HiddenSectionStartAtPreviousEnd.Value;
+            uint chkPlus1 = HiddenSectionStartAtPreviousEnd ? 0u : 1u;
             for (int sIdx  = 0; sIdx < sections.Length; sIdx++)
             {
                 try
                 {
                     Section section1 = sections[sIdx];
                     ulong section1End = section1.Start + (uint)section1.Length;
-                    ulong sectionNewStart = section1End + 1;
+                    ulong sectionNewStart = section1End + chkPlus1;
                     ulong bufferLength = 1024 * 1024 * 128; //128M
                     int idx = 0;
                     string name = section1.Name;
@@ -571,6 +573,33 @@ namespace PS4CheaterNeo
             return 0;
         }
 
+        /// <summary>
+        /// Query the Section index position corresponding to the Section array obtained from GetSectionSortByAddr using memory addresses as keys.
+        /// </summary>
+        /// <param name="address">query address</param>
+        /// <param name="sectionsSortByAddr"></param>
+        /// <returns>section array index</returns>
+        public (int, Section) GetIndexInSectionSortByAddr(ulong address, Section[] sectionsSortByAddr)
+        {
+            if (MemoryStart > address || MemoryEnd < address) return (-1, null);
+
+            if (sectionsSortByAddr == null || sectionsSortByAddr.Length == 0) return (-1, null);
+
+            int low = 0;
+            int high = sectionsSortByAddr.Length - 1;
+            int middle;
+
+            while (low <= high)
+            {
+                middle = (low + high) / 2;
+                Section section = sectionsSortByAddr[middle];
+                if (address >= section.Start + (uint)section.Length) low = middle + 1;   //find the second half of the array
+                else if (address < section.Start) high = middle - 1;  //find the first half of the array
+                else return (middle, section);  //return index of the specified address
+            }
+
+            return (-1, null);
+        }
 
         /// <summary>
         /// get Sections sorted by address
