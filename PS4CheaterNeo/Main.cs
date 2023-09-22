@@ -28,6 +28,9 @@ namespace PS4CheaterNeo
         List<DataGridViewRow> cheatGridRowList = new List<DataGridViewRow>();
 
         public SectionTool sectionTool { get; private set; }
+        public string GameID { get; private set; }
+        public string GameVer { get; private set; }
+        public Dictionary<uint, (ulong Start, ulong End, bool Valid, byte Prot, string Name)> LocalHiddenSections { get; private set; }
         public string ProcessName;
         public int ProcessPid;
         public Main()
@@ -45,7 +48,7 @@ namespace PS4CheaterNeo
             CheatGridView.GroupByEnabled = Properties.Settings.Default.CheatGridViewGroupByEnabled.Value;
 
             Text += " " + Application.ProductVersion; //Assembly.GetExecutingAssembly().GetName().Version.ToString(); // Assembly.GetEntryAssembly().GetName().Version.ToString();
-            sectionTool = new SectionTool();
+            sectionTool = new SectionTool(this);
 
             int cheatIdx = CheatGridView.Rows.Add();
             cheatRowTemplate = (DataGridViewRow)CheatGridView.Rows[cheatIdx].Clone();
@@ -174,16 +177,16 @@ namespace PS4CheaterNeo
                     string cheatGameVer = cheatHeaderItems[3];
                     string cheatFWVer = cheatHeaderItems[4];
                     string PS4FWVersion = Properties.Settings.Default.PS4FWVersion.Value ?? "";
-                    string FMVer = PS4FWVersion != "" ? PS4FWVersion : Constant.Versions[0];
+                    string FWVer = PS4FWVersion != "" ? PS4FWVersion : Constant.Versions[0];
 
-                    ScanTool.GameInfo(FMVer, out string gameID, out string gameVer);
+                    InitGameInfo();
 
-                    if (gameID != cheatGameID && MessageBox.Show(string.Format("Your Game ID({0}) is different with cheat file({1}), still load?", gameID, cheatGameID),
+                    if (GameID != cheatGameID && MessageBox.Show(string.Format("Your Game ID({0}) is different with cheat file({1}), still load?", GameID, cheatGameID),
                         "GameID", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes) return;
-                    if (gameVer != cheatGameVer && MessageBox.Show(string.Format("Your Game version({0}) is different with cheat file({1}), still load?", gameVer, cheatGameVer),
+                    if (GameVer != cheatGameVer && MessageBox.Show(string.Format("Your Game version({0}) is different with cheat file({1}), still load?", GameVer, cheatGameVer),
                         "GameVer", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes) return;
-                    if (FMVer != cheatFWVer && MessageBox.Show(string.Format("Your Firmware version({0}) is different with cheat file({1}), still load?", FMVer, cheatFWVer),
-                        "FMVer", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes) return;
+                    if (FWVer != cheatFWVer && MessageBox.Show(string.Format("Your Firmware version({0}) is different with cheat file({1}), still load?", FWVer, cheatFWVer),
+                        "FWVer", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes) return;
                     #endregion
                     Dictionary<ulong, ulong> pointerCaches = new Dictionary<ulong, ulong>();
                     (uint sid, string name, uint prot, uint offsetFirst, uint offsetAddr) preData = (0, "", 0, 0, 0);
@@ -460,14 +463,12 @@ namespace PS4CheaterNeo
                 #region cheatHeaderItems Check
                 string cheatGameID = cheatJson.Id;
                 string cheatGameVer = cheatJson.Version;
-                string PS4FWVersion = Properties.Settings.Default.PS4FWVersion.Value ?? "";
-                string FMVer = PS4FWVersion != "" ? PS4FWVersion : Constant.Versions[0];
 
-                ScanTool.GameInfo(FMVer, out string gameID, out string gameVer);
+                InitGameInfo();
 
-                if (gameID != cheatGameID && MessageBox.Show(string.Format("Your Game ID({0}) is different with cheat file({1}), still load?", gameID, cheatGameID),
+                if (GameID != cheatGameID && MessageBox.Show(string.Format("Your Game ID({0}) is different with cheat file({1}), still load?", GameID, cheatGameID),
                     "GameID", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes) return 0;
-                if (gameVer != cheatGameVer && MessageBox.Show(string.Format("Your Game version({0}) is different with cheat file({1}), still load?", gameVer, cheatGameVer),
+                if (GameVer != cheatGameVer && MessageBox.Show(string.Format("Your Game version({0}) is different with cheat file({1}), still load?", GameVer, cheatGameVer),
                     "GameVer", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes) return 0;
                 #endregion
 
@@ -507,19 +508,19 @@ namespace PS4CheaterNeo
         {
             if (cheatGridRowList.Count == 0) return;
 
-            string FMVer = Properties.Settings.Default.PS4FWVersion.Value;
-            ScanTool.GameInfo(FMVer, out string gameID, out string gameVer);
+            string FWVer = Properties.Settings.Default.PS4FWVersion.Value;
+            InitGameInfo();
             SaveCheatDialog.Filter = "Cheat (*.cht)|*.cht|Cheat Relative (*.chtr)|*.chtr|Cheat Json (*.json)|*.json";
             SaveCheatDialog.AddExtension = true;
             SaveCheatDialog.RestoreDirectory = true;
-            if (string.IsNullOrWhiteSpace(SaveCheatDialog.FileName)) SaveCheatDialog.FileName = gameID;
+            if (string.IsNullOrWhiteSpace(SaveCheatDialog.FileName)) SaveCheatDialog.FileName = GameID;
 
             if (SaveCheatDialog.ShowDialog() != DialogResult.OK) return;
             if (!InitSections(ProcessName)) return;
             
             if (SaveCheatDialog.FileName.ToUpper().EndsWith("JSON"))
             {
-                if (cheatJson == null || cheatJson.Id != gameID) cheatJson = new CheatJson(gameID, gameID, gameVer, ProcessName);
+                if (cheatJson == null || cheatJson.Id != GameID) cheatJson = new CheatJson(GameID, GameID, GameVer, ProcessName);
                 else cheatJson.Mods = new List<CheatJson.Mod>();
 
                 CheatJson.Mod modBak = null;
@@ -571,7 +572,7 @@ namespace PS4CheaterNeo
             else
             {
                 string processName = ProcessName;
-                string saveBuf = $"{Application.ProductVersion}|{processName}|{gameID}|{gameVer}|{FMVer}\n";
+                string saveBuf = $"{Application.ProductVersion}|{processName}|{GameID}|{GameVer}|{FWVer}\n";
                 uint maxRelative = 0x100;
                 ulong preAddr = 0;
                 for (int cIdx = 0; cIdx < cheatGridRowList.Count; cIdx++)
@@ -1553,6 +1554,7 @@ namespace PS4CheaterNeo
                     ToolStripAutoRefresh.Checked = false;
                     ToolStripProcessInfo.Text = string.Format("ProcessInfo: Cheat file Process({0}) could not find.", processName);
                     ToolStripProcessInfo.Tag = false;
+                    (GameID, GameVer) = (null, null);
                 }));
                 return false;
             }
@@ -1569,6 +1571,110 @@ namespace PS4CheaterNeo
             else sectionTool.InitSections(pMap, processInfo.pid, ProcessName);
 
             return true;
+        }
+
+        /// <summary>
+        /// Read libSceCdlgUtilServer.sprx of PS4's SceCdlgApp to obtain the Game ID and version.
+        /// </summary>
+        public void InitGameInfo()
+        {
+            if ((GameID, GameVer) != default) return;
+
+            string PS4FWVersion = Properties.Settings.Default.PS4FWVersion.Value ?? "";
+            string FWVer = PS4FWVersion != "" ? PS4FWVersion : Constant.Versions[0];
+
+            (GameID, GameVer) = ScanTool.GameInfo(FWVer);
+        }
+
+        /// <summary>
+        /// Read the conf file corresponding to the game ID in the "sections" directory.
+        /// The file contains the addresses, start and end, and whether they are valid for various Hidden Sections.
+        /// Convert this information into a LocalHiddenSections Dictionary.
+        /// </summary>
+        public void InitLocalHiddenSections()
+        {
+            if (LocalHiddenSections != null) LocalHiddenSections.Clear();
+            LocalHiddenSections = new Dictionary<uint, (ulong Start, ulong End, bool Valid, byte Prot, string Name)>();
+            try
+            {
+                string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("sections{0}{1}.conf", Path.DirectorySeparatorChar, GameID));
+                if (!File.Exists(filePath)) return;
+
+                foreach (string line in File.ReadLines(filePath))
+                {
+                    string[] sectionInfo = line.Split(new char[] { '\t', ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                    if (sectionInfo.Length < 3) continue;
+                    if (!uint.TryParse(sectionInfo[0], out uint sid)) continue;
+                    ulong start = ulong.Parse(sectionInfo[1], NumberStyles.HexNumber);
+                    ulong end   = ulong.Parse(sectionInfo[2], NumberStyles.HexNumber);
+                    bool valid  = bool.Parse(sectionInfo[3]);
+                    byte Prot   = byte.Parse(sectionInfo[4], NumberStyles.HexNumber);
+                    string name = sectionInfo[5];
+                    LocalHiddenSections.Add(sid, (start, end, valid, Prot, name));
+                }
+            }
+            catch (Exception ex)
+            {
+                string msg = ex.ToString();
+                InputBox.Show("Read Local HiddenSections Exception", "", ref msg, 100);
+            }
+        }
+
+        /// <summary>
+        /// Read the contents of the LocalHiddenSections Dictionary and update them in the conf file corresponding to the game ID in the "sections" directory.
+        /// </summary>
+        public void UpdateLocalHiddenSections()
+        {
+            try
+            {
+                if (LocalHiddenSections == null || LocalHiddenSections.Count == 0) return;
+
+                string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("sections{0}{1}.conf", Path.DirectorySeparatorChar, GameID));
+                if (!File.Exists(filePath)) return;
+
+                StringBuilder localSectionSB = new StringBuilder();
+                foreach (string line in File.ReadLines(filePath))
+                {
+                    string[] sectionInfo = line.Split(new char[] { '\t', ' ' }, 6, StringSplitOptions.RemoveEmptyEntries);
+                    if (sectionInfo.Length < 3 || !uint.TryParse(sectionInfo[0], out uint sid))
+                    {
+                        localSectionSB.AppendLine(line);
+                        continue;
+                    }
+                    ulong start = ulong.Parse(sectionInfo[1], NumberStyles.HexNumber);
+                    ulong end   = ulong.Parse(sectionInfo[2], NumberStyles.HexNumber);
+                    bool valid  = bool.Parse(sectionInfo[3]);
+                    uint prot   = uint.Parse(sectionInfo[4], NumberStyles.HexNumber);
+                    string name = sectionInfo[5];
+                    if (LocalHiddenSections.TryGetValue(sid, out (ulong Start, ulong End, bool Valid, byte Prot, string Name) localSection))
+                    {
+                        start = localSection.Start;
+                        end   = localSection.End;
+                        valid = localSection.Valid;
+                        LocalHiddenSections.Remove(sid);
+                    }
+                    string newLine = string.Format("{0:000000000}\t{1:X9}\t{2:X9}\t{3}\t{4:X2}\t{5}", sid, start, end, valid, prot, name);
+                    localSectionSB.AppendLine(newLine);
+                }
+                if (LocalHiddenSections.Count > 0)
+                {
+                    foreach (KeyValuePair<uint, (ulong Start, ulong End, bool Valid, byte Prot, string Name)> kvp in LocalHiddenSections)
+                    {
+                        (ulong Start, ulong End, bool Valid, byte Prot, string Name) local = kvp.Value;
+                        string newLine = string.Format("{0:000000000}\t{1:X9}\t{2:X9}\t{3}\t{4:X2}\t{5}", kvp.Key, local.Start, local.End, local.Valid, local.Prot, local.Name);
+                        localSectionSB.AppendLine(newLine);
+                    }
+                    LocalHiddenSections.Clear();
+                }
+                string contentToWrite = localSectionSB.ToString();
+
+                File.WriteAllText(filePath, contentToWrite);
+            }
+            catch (Exception ex)
+            {
+                string msg = ex.ToString();
+                InputBox.Show("Write Local HiddenSection Exception", "", ref msg, 100);
+            }
         }
         #endregion
     }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Text;
@@ -155,9 +156,11 @@ namespace PS4CheaterNeo
         private readonly MutexAccessRule allowEveryoneRule;
         private readonly MutexSecurity mSec;
         private readonly Mutex mutex;
+        readonly Main mainForm;
 
-        public SectionTool()
+        public SectionTool(Main mainForm)
         {
+            this.mainForm = mainForm;
             allowEveryoneRule = new MutexAccessRule(new SecurityIdentifier(WellKnownSidType.WorldSid, null), MutexRights.FullControl, AccessControlType.Allow);
             mSec = new MutexSecurity();
             mSec.AddAccessRule(allowEveryoneRule);
@@ -261,6 +264,7 @@ namespace PS4CheaterNeo
                 string SectionFilterKeys = Properties.Settings.Default.SectionFilterKeys.Value;
                 uint SectionFilterSize = Properties.Settings.Default.SectionFilterSize.Value;
                 SectionFilterKeys = Regex.Replace(SectionFilterKeys, " *[,;] *", "|");
+                if (SectionDict != null) SectionDict.Clear();
                 SectionDict = new Dictionary<uint, Section>();
                 SectionList = new List<(uint SID, ulong start, ulong end)>();
                 TotalSelected = 0;
@@ -269,12 +273,13 @@ namespace PS4CheaterNeo
                 (uint sIdx, uint ProtCnt) v1 = (0, 0);
                 (uint sIdx, uint ProtCnt) v2 = (0, 0);
                 (uint HighBits, uint TypeCode, uint Prot) tmp = (0, 0, 0);
+                libdebug.MemoryEntry tmpEntry = null;
                 Array.Sort(pMap.entries, CompareMemoryEntry); //Sort MemoryEntry in order to calculate SID
                 for (int eIdx = 0; eIdx < pMap.entries.Length; eIdx++)
                 {
                     libdebug.MemoryEntry entry = pMap.entries[eIdx];
                     if ((entry.prot & 0x1) != 0x1) continue;
-
+                    if (tmpEntry != null && tmpEntry.start == entry.start && tmpEntry.end == entry.end) continue;
                     ulong start = entry.start;
                     ulong end = entry.end;
                     ulong length = end - start;
@@ -337,12 +342,13 @@ namespace PS4CheaterNeo
                         v2.sIdx = 0;
                     }
                     tmp = (highBits, typeCode, entry.prot);
+                    tmpEntry = entry;
                 }
+                bool SectionViewDetectHiddenSection = Properties.Settings.Default.SectionViewDetectHiddenSection.Value;
+                if (SectionViewDetectHiddenSection) DetectHiddenSection(Properties.Settings.Default.LastHiddenSectionLengthHex.Value);
             }
             catch (Exception) { throw; }
             finally { mutex.ReleaseMutex(); }
-            bool SectionViewDetectHiddenSection = Properties.Settings.Default.SectionViewDetectHiddenSection.Value;
-            if (SectionViewDetectHiddenSection) DetectHiddenSection(Properties.Settings.Default.LastHiddenSectionLengthHex.Value);
         }
 
         /// <summary>
@@ -354,8 +360,16 @@ namespace PS4CheaterNeo
         /// <param name="LastHiddenSectionLengthHex">Specify the Hex length of the last hidden section.</param>
         public void DetectHiddenSection(ulong LastHiddenSectionLengthHex)
         {
-            StringBuilder errors = new StringBuilder();
+            bool WriteHiddenSectionConf = Properties.Settings.Default.WriteHiddenSectionConf.Value;
+            if (WriteHiddenSectionConf)
+            {
+                mainForm.InitGameInfo();
+                mainForm.InitLocalHiddenSections();
+            }
             Section[] sections = GetSectionSortByAddr();
+            StringBuilder errors = new StringBuilder();
+            StringBuilder localSectionSB = new StringBuilder();
+            if (WriteHiddenSectionConf && mainForm.LocalHiddenSections.Count == 0) localSectionSB.AppendLine("__SID____\t__Start__\t__End____\tValid\tProt\t__Name______________________");
             bool HiddenSectionStartAtPreviousEnd = Properties.Settings.Default.HiddenSectionStartAtPreviousEnd.Value;
             uint chkPlus1 = HiddenSectionStartAtPreviousEnd ? 0u : 1u;
             for (int sIdx  = 0; sIdx < sections.Length; sIdx++)
@@ -371,7 +385,7 @@ namespace PS4CheaterNeo
                     if (sIdx < sections.Length - 1)
                     {
                         Section section2 = sections[sIdx + 1];
-                        if (section2.Start - section1End > 100)
+                        if (section2.Start > section1End + 100)
                         {
                             ulong length = section2.Start - 1 - sectionNewStart;
                             while (length != 0)
@@ -392,7 +406,23 @@ namespace PS4CheaterNeo
                                 section1.Name = "Hidden_" + name + (length == 0 && idx == 0 ? "" : "[" + idx++ + "]");
                                 section1.IsFilter = false;
                                 section1.IsFilterSize = false;
-                                SectionDict.Add(section1.SID, section1);
+                                bool valid = true;
+                                if (WriteHiddenSectionConf)
+                                {
+                                    if (mainForm.LocalHiddenSections.Count == 0) localSectionSB.AppendLine(string.Format("{0:000000000}\t{1:X9}\t{2:X9}\tTrue\t{3:X2}\t{4}", section1.SID, section1.Start, section1.Start + (uint)section1.Length, section1.Prot, section1.Name));
+                                    else if (mainForm.LocalHiddenSections.TryGetValue(section1.SID, out (ulong Start, ulong End, bool Valid, byte Prot, string Name) localSection))
+                                    {
+                                        section1.Start = localSection.Start;
+                                        section1.Length = (int)(localSection.End - localSection.Start);
+                                        valid = localSection.Valid;
+                                    }
+                                }
+                                if (valid)
+                                {
+                                    if (SectionDict.ContainsKey(section1.SID))
+                                        Console.WriteLine(section1);
+                                    else SectionDict.Add(section1.SID, section1);
+                                }
                                 sectionNewStart += curLength;
                             }
                         }
@@ -420,7 +450,18 @@ namespace PS4CheaterNeo
                             section1.Name = "Hidden_" + name + (length == 0 && idx == 0 ? "" : "[" + idx++ + "]");
                             section1.IsFilter = false;
                             section1.IsFilterSize = false;
-                            SectionDict.Add(section1.SID, section1);
+                            bool valid = true;
+                            if (WriteHiddenSectionConf)
+                            {
+                                if (mainForm.LocalHiddenSections.Count == 0) localSectionSB.AppendLine(string.Format("{0:000000000}\t{1:X9}\t{2:X9}\tTrue\t{3:X2}\t{4}", section1.SID, section1.Start, section1.Start + (uint)section1.Length, section1.Prot, section1.Name));
+                                else if (mainForm.LocalHiddenSections.TryGetValue(section1.SID, out (ulong Start, ulong End, bool Valid, byte Prot, string Name) localSection))
+                                {
+                                    section1.Start = localSection.Start;
+                                    section1.Length = (int)(localSection.End - localSection.Start);
+                                    valid = localSection.Valid;
+                                }
+                            }
+                            if (valid) SectionDict.Add(section1.SID, section1);
                             sectionNewStart += curLength;
                         }
                     }
@@ -430,10 +471,32 @@ namespace PS4CheaterNeo
                     errors.AppendLine(ex.ToString());
                 }
             }
+            if (WriteHiddenSectionConf && localSectionSB.Length > 0) WriteLocalHiddenSection(localSectionSB);
             if (errors.Length > 0)
             {
                 string msg = errors.ToString();
                 InputBox.Show("Detect Hidden Section Exception", "", ref msg, 100);
+            }
+        }
+
+        private void WriteLocalHiddenSection(StringBuilder sectionSB)
+        {
+            try
+            {
+                if (sectionSB == null || sectionSB.Length == 0) return;
+
+                string confPath = string.Format("sections{0}", Path.DirectorySeparatorChar);
+                Directory.CreateDirectory(confPath);
+                string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("{0}{1}.conf", confPath, mainForm.GameID));
+
+                string contentToWrite = sectionSB.ToString();
+
+                File.WriteAllText(filePath, contentToWrite);
+            }
+            catch (Exception ex)
+            {
+                string msg = ex.ToString();
+                InputBox.Show("Write Local HiddenSection Exception", "", ref msg, 100);
             }
         }
 

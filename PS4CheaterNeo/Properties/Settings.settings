@@ -107,6 +107,9 @@
     <Setting Name="HiddenSectionStartAtPreviousEnd" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
       <Value Profile="(Default)">True|3_Query|5_SectionView|Determine whether to enable the starting address of the Hidden Section to be the end address of the previous section. \nIf not enabled, the starting address will be the end address of the previous section plus 1. \nDefault enable</Value>
     </Setting>
+    <Setting Name="WriteHiddenSectionConf" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
+      <Value Profile="(Default)">False|3_Query|5_SectionView|Determine whether to enable writing detected hidden section configurations to the "path to PS4CheaterNeo\sections\[GAME_ID].conf" path. \nThis option must be enabled when using the "SCAN for Hidden Sections" query window scan type. \nNote: Enabling this option will result in longer startup times for the Query window as it queries [GAME_ID] information every time the program starts. \nDefault disabled</Value>
+    </Setting>
     <Setting Name="AutoRefresh" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
       <Value Profile="(Default)">False|4_HexEditor|Hex|Determines whether to enable Auto Refresh in HexEditor. \nDefault disabled</Value>
     </Setting>

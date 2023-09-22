@@ -28,6 +28,8 @@ namespace PS4CheaterNeo
         String_,
         Hex,
         Group,
+        [Description("SCAN for Hidden Sections")]
+        HiddenSections,
     }
 
     public enum CompareType
@@ -53,16 +55,16 @@ namespace PS4CheaterNeo
 
     public static class ScanTool
     {
-        private static SectionTool sectionTool = new SectionTool();
         public static Dictionary<ScanType, int> ScanTypeLengthDict = new Dictionary<ScanType, int>()
         {
-            [ScanType.Byte_] = 1,
-            [ScanType.Bytes_2] = 2,
-            [ScanType.Bytes_4] = 4,
-            [ScanType.Bytes_8] = 8,
-            [ScanType.Float_] = 4,
-            [ScanType.Double_] = 8,
-            [ScanType.AutoNumeric] = 8,
+            [ScanType.Byte_]          = 1,
+            [ScanType.Bytes_2]        = 2,
+            [ScanType.Bytes_4]        = 4,
+            [ScanType.Bytes_8]        = 8,
+            [ScanType.Float_]         = 4,
+            [ScanType.Double_]        = 8,
+            [ScanType.AutoNumeric]    = 8,
+            [ScanType.HiddenSections] = 8,
         };
 
         /// <summary>
@@ -81,6 +83,7 @@ namespace PS4CheaterNeo
             switch (scanType)
             {
                 case ScanType.Bytes_8:
+                case ScanType.HiddenSections:
                     bytes = BitConverter.GetBytes(value.StartsWith("-") ? (ulong)long.Parse(value) : ulong.Parse(value));
                     break;
                 case ScanType.Bytes_4:
@@ -168,6 +171,7 @@ namespace PS4CheaterNeo
             switch (scanType)
             {
                 case ScanType.Bytes_8:
+                case ScanType.HiddenSections:
                     if (isHex) hexFormat = "X16";
                     if (isSign) result = BitConverter.ToInt64(value, 0).ToString(hexFormat);
                     else result = BitConverter.ToUInt64(value, 0).ToString(hexFormat);
@@ -363,6 +367,7 @@ namespace PS4CheaterNeo
             switch (comparerTool.ScanType_)
             {
                 case ScanType.Bytes_8:
+                case ScanType.HiddenSections:
                     newUInt64 = newData;
                     oldUInt64 = oldData;
                     break;
@@ -422,6 +427,7 @@ namespace PS4CheaterNeo
                 switch (comparerTool.ScanType_)
                 {
                     case ScanType.Bytes_8:
+                    case ScanType.HiddenSections:
                         result = newUInt64 == comparerTool.Input0UInt64;
                         break;
                     case ScanType.Bytes_4:
@@ -997,43 +1003,46 @@ namespace PS4CheaterNeo
             return result;
         }
 
+        public static (string processName, string sectionName, uint sectionProt, ulong idOffset, ulong versionOffset) SectionGameInfo(string FWVer)
+        {
+            Dictionary<string, object> gameInfo = Constant.GameInfos[""];
+            if (Constant.GameInfos.ContainsKey(FWVer)) gameInfo = Constant.GameInfos[FWVer];
+
+            string processName  = (string)gameInfo["ProcessName"];
+            string sectionName  = (string)gameInfo["SectionName"];
+            uint sectionProt    = Convert.ToUInt32(gameInfo["SectionProt"]);
+            ulong idOffset      = Convert.ToUInt64(gameInfo["IdOffset"]);
+            ulong versionOffset = Convert.ToUInt64(gameInfo["VersionOffset"]);
+            return (processName, sectionName, sectionProt, idOffset, versionOffset);
+        }
+
         /// <summary>
         /// Read libSceCdlgUtilServer.sprx of PS4's SceCdlgApp to obtain the Game ID and version.
         /// </summary>
-        /// <param name="FMVer">FM version</param>
+        /// <param name="FWVer">FM version</param>
         /// <param name="gameID">Game ID</param>
         /// <param name="gameVer">Game version</param>
-        public static void GameInfo(string FMVer, out string gameID, out string gameVer)
+        public static (string gameID, string gameVer) GameInfo(string FWVer)
         {
-            gameID = null;
-            gameVer = null;
+            string gameID = null;
+            string gameVer = null;
+            (string processName, string sectionName, uint sectionProt, ulong idOffset, ulong versionOffset) = SectionGameInfo(FWVer);
 
-            Dictionary<string, object> gameInfo = Constant.GameInfos[""];
-            if (Constant.GameInfos.ContainsKey(FMVer)) gameInfo = Constant.GameInfos[FMVer];
+            libdebug.ProcessMap pMap = PS4Tool.GetProcessMaps(processName);
+            if (pMap == null || pMap.entries == null || pMap.entries.Length == 0) throw new Exception(string.Format("{0}: Process({1}) Map is null.", processName, pMap.pid));
 
-            string processName = (string)gameInfo["ProcessName"];
-            string sectionName = (string)gameInfo["SectionName"];
-            uint sectionProt = Convert.ToUInt32(gameInfo["SectionProt"]);
-            ulong idOffset = Convert.ToUInt64(gameInfo["IdOffset"]);
-            ulong versionOffset = Convert.ToUInt64(gameInfo["VersionOffset"]);
-
-            try
+            for (int eIdx = 0; eIdx < pMap.entries.Length; eIdx++)
             {
-                sectionTool.InitSections(processName);
-
-                Section gameInfoSection = sectionTool.GetSection(sectionName, sectionProt);
-
-                if (gameInfoSection == null) return;
-
-                gameID = Encoding.Default.GetString(PS4Tool.ReadMemory(sectionTool.PID, gameInfoSection.Start + idOffset, 16));
+                libdebug.MemoryEntry entry = pMap.entries[eIdx];
+                if ((entry.prot & 0x1) != 0x1) continue;
+                if (entry.name != sectionName && entry.name != sectionName + "[0]" || entry.prot != sectionProt) continue;
+                gameID = Encoding.Default.GetString(PS4Tool.ReadMemory(pMap.pid, entry.start + idOffset, 16));
                 gameID = gameID.Trim(new char[] { '\0' });
-                gameVer = Encoding.Default.GetString(PS4Tool.ReadMemory(sectionTool.PID, gameInfoSection.Start + versionOffset, 16));
+                gameVer = Encoding.Default.GetString(PS4Tool.ReadMemory(pMap.pid, entry.start + versionOffset, 16));
                 gameVer = gameVer.Trim(new char[] { '\0' });
             }
-            catch
-            {
 
-            }
+            return (gameID, gameVer);
         }
 
         /// <summary>
@@ -1308,6 +1317,7 @@ namespace PS4CheaterNeo
             switch (scanType)
             {
                 case ScanType.Bytes_8:
+                case ScanType.HiddenSections:
                     Input0UInt64 = input0Data != default ? BitConverter.ToUInt64(input0Data, 0) : (IsValue0Signed ? (ulong)long.Parse(value0.Replace(",", "")) : ulong.Parse(value0.Replace(",", "")));
                     Input1UInt64 = input1Data != default ? BitConverter.ToUInt64(input1Data, 0) : (IsValue1Signed ? (ulong)long.Parse(value1.Replace(",", "")) : ulong.Parse(value1.Replace(",", "")));
                     //input0UInt64 = isHex ? ulong.Parse(value0, NumberStyles.HexNumber) : ulong.Parse(value0); //Big-Endian
@@ -1422,6 +1432,7 @@ namespace PS4CheaterNeo
                 Value0Long = scanType == ScanType.AutoNumeric ? Input0UInt64 : ScanTool.ValueStringToULong(scanType, value0.Replace(",", ""));
                 if (!string.IsNullOrWhiteSpace(value1)) Value1Long = scanType == ScanType.AutoNumeric ? Input1UInt64 : ScanTool.ValueStringToULong(scanType, value1.Replace(",", ""));
             }
+            else if (scanType == ScanType.HiddenSections) return;
             else
             { //for ScanType:Hex、String
                 if (scanType == ScanType.Hex && !isHex)

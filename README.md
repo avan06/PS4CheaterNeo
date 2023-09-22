@@ -2,7 +2,7 @@
 
 PS4CheaterNeo is a program to find game cheat codes, and it is based on [`ps4debug`](https://github.com/jogolden/ps4debug) and [`.Net Framework 4.8`](https://support.microsoft.com/en-us/topic/microsoft-net-framework-4-8-offline-installer-for-windows-9d23f658-3b97-68ab-d013-aa3c3e7495e0).
 
-Currently in `version 0.9.9.9-beta`
+Currently in `version 0.9.9.10-beta`
 
 
 ## Table of Contents
@@ -235,6 +235,15 @@ avoiding starting addresses that do not end with an integer 0. You can enable/di
 
 ![query_DetectHiddenSection](assets/query_DetectHiddenSection.webp)
 
+- Added support for "`SCAN for Hidden Sections`" in the Query window.  
+When executed, it will scan all Hidden Sections and verify the actual start and end addresses of sections in the PS4's memory that contain data. This scan will take a significant amount of time, at least one hour or more. (0.9.9.10)  
+The relevant execution steps are as follows:
+1. Enable the "`SectionViewDetectHiddenSection`" and "`WriteHiddenSectionConf`" options in the Options window.
+2. Open the Query window and wait for the Hidden Sections conf file to be generated. Verify if the "`path to PS4CheaterNeo\sections\[GAME_ID].conf`" file exists.
+3. Once the conf file is confirmed to exist, select the "`SCAN for Hidden Sections`" scan type and begin the scan, which will take at least one hour.
+4. After completing the scan, you can check if there have been any changes in the conf file's contents.
+5. When opening a new Query window, it will automatically load the corresponding game ID's conf file and display Hidden Section addresses and whether they should be shown, based on the configuration.
+6. The conf file format is "`SID, Start, End, Valid, Prot, Name`" with each line recording a local Hidden Section. When `"Valid" is false`, it means that this `section has no data`.
 
 
 ## Scan Type	[🔼](#table-of-contents)
@@ -562,7 +571,9 @@ Determine whether to enable automatic detection of hidden sections. This is curr
 - `LastHiddenSectionLengthHex`:  
 Specify the Hex length of the last hidden section. This only takes effect when `SectionViewDetectHiddenSection` is enabled. Default value is 0x40000000. (0.9.9.7)  
 - `HiddenSectionStartAtPreviousEnd`:  
-Determine whether to enable the starting address of the Hidden Section to be the end address of the previous section. If not enabled, the starting address will be the end address of the previous section plus 1. Default enable. (9.9.9)  
+Determine whether to enable the starting address of the Hidden Section to be the end address of the previous section. If not enabled, the starting address will be the end address of the previous section plus 1. Default enable. (0.9.9.9)  
+- `WriteHiddenSectionConf`:  
+Determine whether to enable writing detected hidden section configurations to the "`path to PS4CheaterNeo\sections\[GAME_ID].conf`" path. This option must be enabled when using the "`SCAN for Hidden Sections`" query window scan type. Note: Enabling this option will result in longer startup times for the Query window as it queries [GAME_ID] information every time the program starts. `Default disabled`. (0.9.9.10)  
 
 ### HexEditor  
 - `AutoRefresh`:  

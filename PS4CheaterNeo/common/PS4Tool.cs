@@ -151,10 +151,14 @@ namespace PS4CheaterNeo
             {
                 if (tickerMajor.Elapsed.TotalSeconds >= 1.5)
                 {
-                    reTrySocket = tickerMajor.Elapsed.TotalSeconds < 10 ? reTrySocket + 1 : 0;
-                    tickerMajor = System.Diagnostics.Stopwatch.StartNew();
-                    if ((ex.ErrorCode == 10054 || ex.ErrorCode == 10060) && reTrySocket > 5) throw;
-                    Connect(Properties.Settings.Default.PS4IP.Value, out string msg, 1000, true);
+                    if (ex.ErrorCode == 10054 || ex.ErrorCode == 10060)
+                    {
+                        reTrySocket = tickerMajor.Elapsed.TotalSeconds < 10 ? reTrySocket + 1 : 0;
+                        tickerMajor = System.Diagnostics.Stopwatch.StartNew();
+                        if (reTrySocket > 5) throw;
+                        Connect(Properties.Settings.Default.PS4IP.Value, out string msg, 1000, true);
+                    }
+                    else throw;
                 }
             }
             finally { try { mutexs[current].ReleaseMutex(); } catch (Exception) { } }
@@ -237,10 +241,14 @@ namespace PS4CheaterNeo
             {
                 if (tickerMajor.Elapsed.TotalSeconds >= 1.5)
                 {
-                    reTrySocket = tickerMajor.Elapsed.TotalSeconds < 10 ? reTrySocket + 1 : 0;
-                    tickerMajor = System.Diagnostics.Stopwatch.StartNew();
-                    if ((ex.ErrorCode == 10054 || ex.ErrorCode == 10060) && reTrySocket > 5) throw;
-                    Connect(Properties.Settings.Default.PS4IP.Value, out string msg, 1000, true);
+                    if (ex.ErrorCode == 10054 || ex.ErrorCode == 10060)
+                    {
+                        reTrySocket = tickerMajor.Elapsed.TotalSeconds < 10 ? reTrySocket + 1 : 0;
+                        tickerMajor = System.Diagnostics.Stopwatch.StartNew();
+                        if (reTrySocket > 5) throw;
+                        Connect(Properties.Settings.Default.PS4IP.Value, out string msg, 1000, true);
+                    }
+                    else throw;
                 }
             }
             finally { try { mutexs[current].ReleaseMutex(); } catch (Exception) { } }
@@ -312,10 +320,14 @@ namespace PS4CheaterNeo
             {
                 if (tickerMajor.Elapsed.TotalSeconds >= 1.5)
                 {
-                    reTrySocket = tickerMajor.Elapsed.TotalSeconds < 10 ? reTrySocket + 1 : 0;
-                    tickerMajor = System.Diagnostics.Stopwatch.StartNew();
-                    if ((ex.ErrorCode == 10054 || ex.ErrorCode == 10060) && reTrySocket > 5) throw;
-                    Connect(Properties.Settings.Default.PS4IP.Value, out string msg, 1000, true);
+                    if (ex.ErrorCode == 10054 || ex.ErrorCode == 10060)
+                    {
+                        reTrySocket = tickerMajor.Elapsed.TotalSeconds < 10 ? reTrySocket + 1 : 0;
+                        tickerMajor = System.Diagnostics.Stopwatch.StartNew();
+                        if (reTrySocket > 5) throw;
+                        Connect(Properties.Settings.Default.PS4IP.Value, out string msg, 1000, true);
+                    }
+                    else throw;
                 }
             }
             finally { try { mutexs[current].ReleaseMutex(); } catch (Exception) { } }
@@ -348,10 +360,14 @@ namespace PS4CheaterNeo
             {
                 if (tickerMajor.Elapsed.TotalSeconds >= 1.5)
                 {
-                    reTrySocket = tickerMajor.Elapsed.TotalSeconds < 10 ? reTrySocket + 1 : 0;
-                    tickerMajor = System.Diagnostics.Stopwatch.StartNew();
-                    if ((ex.ErrorCode == 10054 || ex.ErrorCode == 10060) && reTrySocket > 5) throw;
-                    Connect(Properties.Settings.Default.PS4IP.Value, out string msg, 1000, true);
+                    if (ex.ErrorCode == 10054 || ex.ErrorCode == 10060)
+                    {
+                        reTrySocket = tickerMajor.Elapsed.TotalSeconds < 10 ? reTrySocket + 1 : 0;
+                        tickerMajor = System.Diagnostics.Stopwatch.StartNew();
+                        if (reTrySocket > 5) throw;
+                        Connect(Properties.Settings.Default.PS4IP.Value, out string msg, 1000, true);
+                    }
+                    else throw;
                 }
             }
             finally { try { mutexs[current].ReleaseMutex(); } catch (Exception) { } }

@@ -23,13 +23,15 @@ namespace PS4CheaterNeo
         Color querySectionViewItemCheck1BackColor;
         Color querySectionViewItemCheck2BackColor;
 
-        int hitCnt = 0;
+        int hitCnt;
         bool enableFloatingResultExact = true;
         byte floatingSimpleValueExponents = 10;
 
         //Confirm whether the compare type starts with UnknownInitial
         bool isUnknownInitial = false;
-        bool UnknownInitialScanDoNotSkip0 = Properties.Settings.Default.UnknownInitialScanDoNotSkip0.Value;
+        bool UnknownInitialScanDoNotSkip0   = Properties.Settings.Default.UnknownInitialScanDoNotSkip0.Value;
+        bool SectionViewDetectHiddenSection = Properties.Settings.Default.SectionViewDetectHiddenSection.Value;
+        bool WriteHiddenSectionConf         = Properties.Settings.Default.WriteHiddenSectionConf.Value;
 
         List<ListViewItem> sectionItems = new List<ListViewItem>();
         List<ListViewItem> resultItems = new List<ListViewItem>();
@@ -47,7 +49,7 @@ namespace PS4CheaterNeo
             }
             this.mainForm = mainForm;
 
-            sectionTool = new SectionTool();
+            sectionTool = new SectionTool(mainForm);
             bitsDictDicts = new Dictionary<string, Dictionary<uint, BitsDictionary>>
             {
                 ["_s0"] = new Dictionary<uint, BitsDictionary>(),
@@ -55,11 +57,11 @@ namespace PS4CheaterNeo
                 ["_s2"] = new Dictionary<uint, BitsDictionary>()
             };
 
-            IsFilterBox.Checked = Properties.Settings.Default.FilterQuery.Value;
-            IsFilterSizeBox.Checked = Properties.Settings.Default.FilterSizeQuery.Value;
-            enableUndoScan = Properties.Settings.Default.UndoScan.Value;
-            AutoPauseBox.Checked = Properties.Settings.Default.ScanAutoPause.Value;
-            AutoResumeBox.Checked = Properties.Settings.Default.ScanAutoResume.Value;
+            IsFilterBox.Checked       = Properties.Settings.Default.FilterQuery.Value;
+            IsFilterSizeBox.Checked   = Properties.Settings.Default.FilterSizeQuery.Value;
+            enableUndoScan            = Properties.Settings.Default.UndoScan.Value;
+            AutoPauseBox.Checked      = Properties.Settings.Default.ScanAutoPause.Value;
+            AutoResumeBox.Checked     = Properties.Settings.Default.ScanAutoResume.Value;
             SectionView.FullRowSelect = Properties.Settings.Default.SectionViewFullRowSelect.Value;
         }
 
@@ -69,11 +71,11 @@ namespace PS4CheaterNeo
             {
                 Opacity = Properties.Settings.Default.UIOpacity.Value;
 
-                ForeColor = Properties.Settings.Default.UiForeColor.Value; //Color.White;
-                BackColor = Properties.Settings.Default.UiBackColor.Value; //Color.FromArgb(36, 36, 36);
+                ForeColor              = Properties.Settings.Default.UiForeColor.Value; //Color.White;
+                BackColor              = Properties.Settings.Default.UiBackColor.Value; //Color.FromArgb(36, 36, 36);
                 StatusStrip1.BackColor = Properties.Settings.Default.QueryStatusStrip1BackColor.Value; //Color.DimGray;
                 AlignmentBox.ForeColor = Properties.Settings.Default.QueryAlignmentBoxForeColor.Value; //Color.Silver;
-                ScanBtn.BackColor = Properties.Settings.Default.QueryScanBtnBackColor.Value; //Color.SteelBlue;
+                ScanBtn.BackColor      = Properties.Settings.Default.QueryScanBtnBackColor.Value; //Color.SteelBlue;
 
                 querySectionViewFilterForeColor     = Properties.Settings.Default.QuerySectionViewFilterForeColor.Value;
                 querySectionViewFilterBackColor     = Properties.Settings.Default.QuerySectionViewFilterBackColor.Value;
@@ -136,7 +138,10 @@ namespace PS4CheaterNeo
         private void Query_Load(object sender, EventArgs e)
         {
             foreach (ScanType filterEnum in (ScanType[])Enum.GetValues(typeof(ScanType)))
+            {
+                if ((!SectionViewDetectHiddenSection || !WriteHiddenSectionConf) && filterEnum == ScanType.HiddenSections) continue;
                 ScanTypeBox.Items.Add(new ComboItem(filterEnum.GetDescription(), filterEnum));
+            }
             ScanTypeBox.SelectedIndex = 2;
             if (Properties.Settings.Default.AutoPerformGetProcesses.Value) GetProcessesBtn.PerformClick();
         }
@@ -194,8 +199,7 @@ namespace PS4CheaterNeo
         {
             try
             {
-                bool SectionViewDetectHiddenSection = Properties.Settings.Default.SectionViewDetectHiddenSection.Value;
-                SectionViewCheckAllHidden.Visible = SectionViewDetectHiddenSection;
+                SectionViewCheckAllHidden.Visible   = SectionViewDetectHiddenSection;
                 SectionViewUnCheckAllHidden.Visible = SectionViewDetectHiddenSection;
 
                 SectionView.BeginUpdate();
@@ -410,7 +414,17 @@ namespace PS4CheaterNeo
                     bool isFilterSize = IsFilterSizeBox.Checked;
                     Enum.TryParse(((ComboItem)(ScanTypeBox.SelectedItem)).Value.ToString(), out ScanType scanType);
                     Enum.TryParse(CompareTypeBox.SelectedItem.ToString(), out CompareType compareType);
-
+                    if (scanType == ScanType.HiddenSections)
+                    {
+                        mainForm.InitGameInfo();
+                        mainForm.InitLocalHiddenSections();
+                        if (mainForm.LocalHiddenSections.Count == 0)
+                        {
+                            MessageBox.Show(string.Format("Hidden Sections data (sections{0}{1}.conf) was not found locally. \nYou need to enable the \"WriteHiddenSectionConf\" option and \nrestart the Query window to initialize the configuration file.", Path.DirectorySeparatorChar, mainForm.GameID), "Scan", MessageBoxButtons.OK);
+                            return;
+                        }
+                    }
+                    
                     ulong AddrMin = ParseHexAddrText(AddrMinBox.Text);
                     ulong AddrMax = ParseHexAddrText(AddrMaxBox.Text);
                     if (AddrMin > AddrMax && MessageBox.Show(String.Format("AddrMin({1:X}) > AddrMax({0:X})", AddrMin, AddrMax), "Scan", MessageBoxButtons.OK, MessageBoxIcon.Error) == DialogResult.OK) return;
@@ -521,81 +535,30 @@ namespace PS4CheaterNeo
                 }
 
                 ulong hitCnt = 0;
-                int scanStep = (comparerTool.ScanType_ == ScanType.Hex || comparerTool.ScanType_ == ScanType.String_) ? 1 :
-                    alignment ? (comparerTool.ScanTypeLength > 4 ? 4 : comparerTool.ScanTypeLength) : 1;
+                int scanStep;
+                if (comparerTool.ScanType_ == ScanType.Hex || comparerTool.ScanType_ == ScanType.String_ || !alignment) scanStep = 1;
+                else if (comparerTool.ScanTypeLength > 4) scanStep = 4;
+                else scanStep = comparerTool.ScanTypeLength;
 
                 Invoke(new MethodInvoker(() => { ToolStripBar.Value = 1; }));
 
                 using (Mutex mutex = new Mutex())
                 {
-                    byte MaxQueryThreads = Properties.Settings.Default.MaxQueryThreads.Value;
-                    uint QueryBufferSize = Properties.Settings.Default.QueryBufferSize.Value;
-                    uint SectionFilterSize = Properties.Settings.Default.SectionFilterSize.Value;
-                    string SectionFilterKeys = Properties.Settings.Default.SectionFilterKeys.Value;
+                    byte MaxQueryThreads        = Properties.Settings.Default.MaxQueryThreads.Value;
+                    uint QueryBufferSize        = Properties.Settings.Default.QueryBufferSize.Value;
+                    uint SectionFilterSize      = Properties.Settings.Default.SectionFilterSize.Value;
+                    string SectionFilterKeys    = Properties.Settings.Default.SectionFilterKeys.Value;
                     sbyte MinResultAccessFactor = Properties.Settings.Default.MinResultAccessFactor.Value;
                     MaxQueryThreads = MaxQueryThreads == (byte)0 ? (byte)1 : MaxQueryThreads;
                     SectionFilterKeys = Regex.Replace(SectionFilterKeys, " *[,;] *", "|");
 
-                    int readCnt = 0;
                     long processedMemoryLen = 0;
                     ulong minLength = QueryBufferSize * 1024 * 1024; //set the minimum read size in bytes
 
-                    Section[] sectionKeys = sectionTool.GetSectionSortByAddr();
+                    Section[] sectionKeys   = sectionTool.GetSectionSortByAddr();
                     SemaphoreSlim semaphore = new SemaphoreSlim(MaxQueryThreads);
-                    List<Task<bool>> tasks = new List<Task<bool>>();
-                    List<(int start, int end)> rangeList = new List<(int start, int end)>();
-                    (int start, int end) rangeIdx = (-1, -1);
-                    for (int sectionIdx = 0; sectionIdx < sectionKeys.Length; sectionIdx++)
-                    {
-                        readCnt++;
-                        bool isContinue = false;
-                        Section currentSection = sectionKeys[sectionIdx];
-                        if (!currentSection.Check || isFilter && currentSection.IsFilter || isFilterSize && currentSection.IsFilterSize ||
-                            currentSection.Start + (ulong)currentSection.Length < AddrMin || currentSection.Start > AddrMax) isContinue = true; //Check if section is not scanned
-                        else if (bitsDictDicts["_s1"].Count > 0 && bitsDictDicts["_s1"].ContainsKey(currentSection.SID) && bitsDictDicts["_s1"][currentSection.SID].Count is int chkCnt && chkCnt > 0 && chkCnt < MinResultAccessFactor)
-                        { //Access value directly by address when the number of query results for the same Section is less than this MinResultAccessFactor
-                            rangeList.Add((-1, sectionIdx));
-                            isContinue = true;
-                        }
-                        else if ((ulong)currentSection.Length > minLength)
-                        {
-                            rangeList.Add((sectionIdx, sectionIdx));
-                            isContinue = true;
-                        }
-
-                        if (isContinue)
-                        {
-                            if (rangeIdx.start != -1) //add rangeIdx when the start index is set
-                            {
-                                rangeList.Add(rangeIdx);
-                                rangeIdx = (-1, -1);
-                            }
-                            continue;
-                        }
-                        else if (rangeIdx.start == -1) rangeIdx = (sectionIdx, sectionIdx);//set start and end index when not set
-
-                        Section startSection = sectionKeys[rangeIdx.start];
-                        ulong bufferSize = currentSection.Start + (ulong)currentSection.Length - startSection.Start;
-                        if (bufferSize >= int.MaxValue) //check the size of the scan to be executed, whether the scan size has been reached the upper limit
-                        {
-                            if (rangeIdx.start != -1) //add rangeIdx when the start index is set
-                            {
-                                rangeList.Add(rangeIdx);
-                                rangeIdx = (-1, -1);
-                            }
-                            rangeIdx = (sectionIdx, sectionIdx);
-                            continue;
-                        }
-                        else if (bufferSize < minLength && (sectionIdx != sectionKeys.Length - 1))
-                        {
-                            rangeIdx.end = sectionIdx;//update end index
-                            continue;
-                        }
-
-                        rangeIdx.end = sectionIdx;//update end index
-                        rangeList.Add(rangeIdx);
-                        rangeIdx = (-1, -1); //initialize start and end index for non-isPerform scan
-                    }
+                    List<Task<bool>> tasks  = new List<Task<bool>>();
+                    List<(int start, int end)> rangeList = GetSectionRangeList(sectionKeys, isFilter, isFilterSize, minLength, AddrMin, AddrMax, MinResultAccessFactor);
 
                     int sectionSelectedCnt = 0;
                     int sectionFoundCnt = 0;
@@ -635,7 +598,7 @@ namespace PS4CheaterNeo
                                     BitsDictionary bitsDictFirst = null;
                                     if (isCompareFirst && !bitsDictDicts["_s0"].TryGetValue(addrSection.SID, out bitsDictFirst)) bitsDictFirst = new BitsDictionary(scanStep, comparerTool.ScanTypeLength);
                                     if (!bitsDictDicts["_s1"].TryGetValue(addrSection.SID, out BitsDictionary bitsDict)) bitsDict = new BitsDictionary(scanStep, comparerTool.ScanTypeLength);
-                                    if (buffer != null)//bitsDict.Count == 0 || bitsDict.Count > MinResultAccessFactor)
+                                    if (buffer != null) //bitsDict.Count == 0 || bitsDict.Count > MinResultAccessFactor)
                                     {
                                         subBuffer = new Byte[addrSection.Length];
                                         Buffer.BlockCopy(buffer, (int)scanOffset, subBuffer, 0, addrSection.Length);
@@ -702,6 +665,7 @@ namespace PS4CheaterNeo
                                 SectionCheckUpdate(sectionItem.Checked, section, true);
                             }
                         }
+                        if (comparerTool.ScanType_ == ScanType.HiddenSections) mainForm.UpdateLocalHiddenSections();
                         SectionView.EndUpdate();
                         ToolStripBar.Value = 100;
                     }));
@@ -724,6 +688,79 @@ namespace PS4CheaterNeo
             return true;
         });
 
+        /// <summary>
+        /// Filter sections based on whether they need to be processed, 
+        /// and when their memory size is smaller than the queried buffer, 
+        /// set consecutive sections as a group, and finally return a list that is grouped accordingly.
+        /// </summary>
+        /// <param name="sectionKeys"></param>
+        /// <param name="isFilter"></param>
+        /// <param name="isFilterSize"></param>
+        /// <param name="minLength">minimum buffer size (in bytes) in querying and pointerFinder, enter 0 to not use buffer, setting this value to 0 is better when the total number of Sections in the game is low. If the game has more than a thousand Sections, Buffer must be set</param>
+        /// <param name="AddrMin"></param>
+        /// <param name="AddrMax"></param>
+        /// <param name="MinResultAccessFactor">Access value directly by address when the number of query results for the same Section is less than this factor, used to control whether to read Section data completely, or directly access the value by address. Default value is 50</param>
+        /// <returns></returns>
+        private List<(int start, int end)> GetSectionRangeList(Section[] sectionKeys, bool isFilter, bool isFilterSize, ulong minLength, ulong AddrMin, ulong AddrMax, sbyte MinResultAccessFactor)
+        {
+            int readCnt = 0;
+            List<(int start, int end)> rangeList = new List<(int start, int end)>();
+            (int start, int end) rangeIdx = (-1, -1);
+            for (int sectionIdx = 0; sectionIdx < sectionKeys.Length; sectionIdx++)
+            {
+                readCnt++;
+                bool isContinue = false;
+                Section currentSection = sectionKeys[sectionIdx];
+                if (!currentSection.Check || isFilter && currentSection.IsFilter || isFilterSize && currentSection.IsFilterSize) isContinue = true; //Check if section is not scanned
+                else if (AddrMin > 0 && AddrMax > 0 && currentSection.Start + (ulong)currentSection.Length < AddrMin || currentSection.Start > AddrMax) isContinue = true;
+                else if (bitsDictDicts["_s1"].Count > 0 && bitsDictDicts["_s1"].ContainsKey(currentSection.SID) && bitsDictDicts["_s1"][currentSection.SID].Count is int chkCnt && chkCnt > 0 && chkCnt < MinResultAccessFactor)
+                { //Access value directly by address when the number of query results for the same Section is less than this MinResultAccessFactor
+                    rangeList.Add((-1, sectionIdx));
+                    isContinue = true;
+                }
+                else if ((ulong)currentSection.Length > minLength)
+                {
+                    rangeList.Add((sectionIdx, sectionIdx));
+                    isContinue = true;
+                }
+
+                if (isContinue)
+                {
+                    if (rangeIdx.start != -1) //add rangeIdx when the start index is set
+                    {
+                        rangeList.Add(rangeIdx);
+                        rangeIdx = (-1, -1);
+                    }
+                    continue;
+                }
+                else if (rangeIdx.start == -1) rangeIdx = (sectionIdx, sectionIdx);//set start and end index when not set
+
+                Section startSection = sectionKeys[rangeIdx.start];
+                ulong bufferSize = currentSection.Start + (ulong)currentSection.Length - startSection.Start;
+                if (bufferSize >= int.MaxValue) //check the size of the scan to be executed, whether the scan size has been reached the upper limit
+                {
+                    if (rangeIdx.start != -1) //add rangeIdx when the start index is set
+                    {
+                        rangeList.Add(rangeIdx);
+                        rangeIdx = (-1, -1);
+                    }
+                    rangeIdx = (sectionIdx, sectionIdx);
+                    continue;
+                }
+                else if (bufferSize < minLength && (sectionIdx != sectionKeys.Length - 1))
+                {
+                    rangeIdx.end = sectionIdx;//update end index
+                    continue;
+                }
+
+                rangeIdx.end = sectionIdx;//update end index
+                rangeList.Add(rangeIdx);
+                rangeIdx = (-1, -1); //initialize start and end index for non-isPerform scan
+            }
+
+            return rangeList;
+        }
+
         #region ScanComparer
         /// <summary>
         /// During the initial scan, data matching the input conditions will be read from the PS4.
@@ -740,6 +777,12 @@ namespace PS4CheaterNeo
         /// <returns></returns>
         private BitsDictionary Comparer(Byte[] buffer, Section section, int scanStep, ulong AddrMin, ulong AddrMax, BitsDictionary bitsDict, bool isCompareFirst, BitsDictionary bitsDictFirst)
         {
+            (ulong Start, ulong End, bool Valid, byte Prot, string Name) localHiddenSection = default;
+            if (comparerTool.ScanType_ == ScanType.HiddenSections)
+            { 
+                if (!mainForm.LocalHiddenSections.TryGetValue(section.SID, out localHiddenSection))
+                    localHiddenSection = (section.Start, section.Start + (uint)section.Length, true, (byte)section.Prot, section.Name);
+            }
             if (resultItems.Count == 0)
             {
                 for (int scanIdx = 0; scanIdx + comparerTool.ScanTypeLength < buffer.LongLength; scanIdx += scanStep)
@@ -755,10 +798,20 @@ namespace PS4CheaterNeo
                         if (ScanTool.Comparer(comparerTool, ref longValue, 0, UnknownInitialScanDoNotSkip0))
                         {
                             if (comparerTool.ScanType_ == ScanType.AutoNumeric && longValue < 0xFFFFFFFF) newValue = BitConverter.GetBytes(longValue);
+                            else if (comparerTool.ScanType_ == ScanType.HiddenSections && bitsDict.Count == 0) localHiddenSection.Start = section.Start + (uint)scanIdx;
                             bitsDict.Add((uint)scanIdx, newValue);
                         }
                     }
                     else if (ScanTool.ComparerExact(comparerTool, newValue, comparerTool.Value0Byte)) bitsDict.Add((uint)scanIdx, newValue);
+                }
+                if (comparerTool.ScanType_ == ScanType.HiddenSections)
+                {
+                    if (bitsDict.Count == 0) localHiddenSection.Valid = false;
+                    else
+                    {
+                        (uint key, byte[] _) = bitsDict.Get(bitsDict.Count - 1);
+                        localHiddenSection.End = section.Start + key;
+                    }
                 }
             }
             else
@@ -790,14 +843,25 @@ namespace PS4CheaterNeo
                         if (ScanTool.Comparer(comparerTool, ref newData, oldData, UnknownInitialScanDoNotSkip0))
                         {
                             if (comparerTool.ScanType_ == ScanType.AutoNumeric && newData < 0xFFFFFFFF) newValue = BitConverter.GetBytes(newData);
+                            else if (comparerTool.ScanType_ == ScanType.HiddenSections && newBitsDict.Count == 0) localHiddenSection.Start = address;
                             newBitsDict.Add(offsetAddr, newValue);
                         }
                     }
                     else if (ScanTool.ComparerExact(comparerTool, newValue, comparerTool.Value0Byte)) newBitsDict.Add(offsetAddr, newValue);
                 }
+                if (comparerTool.ScanType_ == ScanType.HiddenSections)
+                {
+                    if (newBitsDict.Count == 0) localHiddenSection.Valid = false;
+                    else
+                    {
+                        (uint key, byte[] _) = newBitsDict.Get(newBitsDict.Count - 1);
+                        localHiddenSection.End = section.Start + key;
+                    }
+                }
                 bitsDict.Clear();
                 bitsDict = newBitsDict;
             }
+            if (comparerTool.ScanType_ == ScanType.HiddenSections) mainForm.LocalHiddenSections[section.SID] = localHiddenSection;
             return bitsDict;
         }
 
@@ -958,9 +1022,9 @@ namespace PS4CheaterNeo
                 Invoke(new MethodInvoker(() =>
                 {
                     ResultView.BeginUpdate();
-                    ResultView.VirtualMode = false;
-                    resultItems.Clear();
                     ResultView.VirtualListSize = 0;
+                    resultItems.Clear();
+                    ResultView.VirtualMode = false;
                     ResultView.Items.Clear();
                 }));
                 List<uint> sectionKeys = new List<uint>(bitsDictDicts["_s1"].Keys);
@@ -1179,79 +1243,27 @@ namespace PS4CheaterNeo
 
                 Invoke(new MethodInvoker(() => { ToolStripBar.Value = 1; }));
 
-                byte MaxQueryThreads = Properties.Settings.Default.MaxQueryThreads.Value;
-                uint QueryBufferSize = Properties.Settings.Default.QueryBufferSize.Value;
-                uint MaxResultShow = Properties.Settings.Default.MaxResultShow.Value;
-                uint SectionFilterSize = Properties.Settings.Default.SectionFilterSize.Value;
-                string SectionFilterKeys = Properties.Settings.Default.SectionFilterKeys.Value;
+                byte MaxQueryThreads        = Properties.Settings.Default.MaxQueryThreads.Value;
+                uint QueryBufferSize        = Properties.Settings.Default.QueryBufferSize.Value;
+                uint MaxResultShow          = Properties.Settings.Default.MaxResultShow.Value;
+                uint SectionFilterSize      = Properties.Settings.Default.SectionFilterSize.Value;
+                string SectionFilterKeys    = Properties.Settings.Default.SectionFilterKeys.Value;
                 sbyte MinResultAccessFactor = Properties.Settings.Default.MinResultAccessFactor.Value;
                 MaxQueryThreads = MaxQueryThreads == (byte)0 ? (byte)1 : MaxQueryThreads;
                 MaxResultShow = MaxResultShow == 0 ? 0x2000 : MaxResultShow;
                 SectionFilterKeys = Regex.Replace(SectionFilterKeys, " *[,;] *", "|");
 
-                int readCnt = 0;
                 ulong minLength = QueryBufferSize * 1024 * 1024; //set the minimum read size in bytes
 
-                Section[] sectionKeys = sectionTool.GetSectionSortByAddr(bitsDictDicts["_s1"].Keys);
+                Section[] sectionKeys   = sectionTool.GetSectionSortByAddr(bitsDictDicts["_s1"].Keys);
                 SemaphoreSlim semaphore = new SemaphoreSlim(MaxQueryThreads);
-                List<Task<bool>> tasks = new List<Task<bool>>();
-                List<(int start, int end)> rangeList = new List<(int start, int end)>();
-                (int start, int end) rangeIdx = (-1, -1);
-                for (int sectionIdx = 0; sectionIdx < sectionKeys.Length; sectionIdx++)
-                {
-                    readCnt++;
-                    bool isContinue = false;
-                    Section currentSection = sectionKeys[sectionIdx];
-                    if (!currentSection.Check || isFilter && currentSection.IsFilter || isFilterSize && currentSection.IsFilterSize) isContinue = true; //Check if section is not scanned
-                    else if (bitsDictDicts["_s1"].Count > 0 && bitsDictDicts["_s1"].ContainsKey(currentSection.SID) && bitsDictDicts["_s1"][currentSection.SID].Count is int chkCnt && chkCnt > 0 && chkCnt < MinResultAccessFactor)
-                    { //Access value directly by address when the number of query results for the same Section is less than this MinResultAccessFactor
-                        rangeList.Add((-1, sectionIdx));
-                        isContinue = true;
-                    }
-                    else if ((ulong)currentSection.Length > minLength)
-                    {
-                        rangeList.Add((sectionIdx, sectionIdx));
-                        isContinue = true;
-                    }
-
-                    if (isContinue)
-                    {
-                        if (rangeIdx.start != -1) //add rangeIdx when the start index is set
-                        {
-                            rangeList.Add(rangeIdx);
-                            rangeIdx = (-1, -1);
-                        }
-                        continue;
-                    }
-                    else if (rangeIdx.start == -1) rangeIdx = (sectionIdx, sectionIdx);//set start and end index when not set
-
-                    Section startSection = sectionKeys[rangeIdx.start];
-                    ulong bufferSize = currentSection.Start + (ulong)currentSection.Length - startSection.Start;
-                    if (bufferSize >= int.MaxValue) //check the size of the scan to be executed, whether the scan size has been reached the upper limit
-                    {
-                        if (rangeIdx.start != -1) //add rangeIdx when the start index is set
-                        {
-                            rangeList.Add(rangeIdx);
-                            rangeIdx = (-1, -1);
-                        }
-                        rangeIdx = (sectionIdx, sectionIdx);
-                        continue;
-                    }
-                    else if (bufferSize < minLength && (sectionIdx != sectionKeys.Length - 1))
-                    {
-                        rangeIdx.end = sectionIdx;//update end index
-                        continue;
-                    }
-
-                    rangeIdx.end = sectionIdx;//update end index
-                    rangeList.Add(rangeIdx);
-                    rangeIdx = (-1, -1); //initialize start and end index for non-isPerform scan
-                }
+                List<Task<bool>> tasks  = new List<Task<bool>>();
+                List<(int start, int end)> rangeList = GetSectionRangeList(sectionKeys, isFilter, isFilterSize, minLength, 0, 0, MinResultAccessFactor);
 
                 int sectionSelectedCnt = 0;
                 for (int idx = 0; idx < rangeList.Count; idx++)
                 {
-                    var range = rangeList[idx];
+                    (int start, int end) range = rangeList[idx];
                     sectionSelectedCnt += range.start == -1 ? 1 : (range.end - range.start + 1);
                     tasks.Add(Task.Run<bool>(() =>
                     {
@@ -1351,6 +1363,7 @@ namespace PS4CheaterNeo
                 AlignmentBox.Enabled = true;
                 AlignmentBox.Checked = true;
             }
+            ValueBox.Enabled = true;
             CompareTypeBox.Items.Clear();
             ScanType scanType = this.ParseFromDescription<ScanType>(ScanTypeBox.SelectedItem.ToString());
             switch (scanType)
@@ -1385,6 +1398,18 @@ namespace PS4CheaterNeo
                     }
                     AlignmentBox.Enabled = scanType != ScanType.Group ? false : true;
                     AlignmentBox.Checked = false;
+                    CompareTypeBox.Items.AddRange(Constant.SearchByHex);
+                    break;
+                case ScanType.HiddenSections:
+                    NotBox.Checked = true;
+                    NotBox.Enabled = false;
+                    HexBox.Enabled = false;
+                    HexBox.Checked = false;
+                    AlignmentBox.Enabled = true;
+                    AlignmentBox.Checked = false;
+                    ValueBox.Text = "0";
+                    ValueBox.Enabled = false;
+                    SectionViewContains(true, "Hidden");
                     CompareTypeBox.Items.AddRange(Constant.SearchByHex);
                     break;
                 default:
@@ -1432,7 +1457,7 @@ namespace PS4CheaterNeo
                     break;
                 default:
                     ScanType scanType = this.ParseFromDescription<ScanType>(ScanTypeBox.SelectedItem.ToString());
-                    if (scanType != ScanType.String_ && scanType != ScanType.Hex && scanType != ScanType.Group) NotBox.Enabled = true;
+                    if (scanType != ScanType.String_ && scanType != ScanType.Hex && scanType != ScanType.Group && scanType != ScanType.HiddenSections) NotBox.Enabled = true;
                     break;
             }
             switch (compareType)
@@ -1595,15 +1620,10 @@ namespace PS4CheaterNeo
             int idx = ProcessesBox.SelectedIndex;
             if (idx == -1) return;
 
-            if (!isFilterChecked)
-            {
-                ProcessesBox.SelectedIndex = 0;
-                ProcessesBox.SelectedIndex = idx;
-            }
+            if (!isFilterChecked) ProcessesBox_SelectedIndexChanged(ProcessesBox, null);
             else
             {
                 SectionView.BeginUpdate();
-                SectionView.VirtualMode = false;
                 for (int sIdx = 0; sIdx < sectionItems.Count; sIdx++)
                 {
                     ListViewItem item = sectionItems[sIdx];
@@ -1619,7 +1639,6 @@ namespace PS4CheaterNeo
                 if (AddrMaxBox.Tag != null) AddrMaxBox.Text = ((ulong)AddrMaxBox.Tag).ToString("X");
                 ToolStripMsg.Text = string.Format("Total section: {0}, Selected section: {1}, Search size: {2}MB", sectionItems.Count, sectionTool.TotalSelected, sectionTool.TotalMemorySize / (1024 * 1024));
                 SectionView.VirtualListSize = sectionItems.Count;
-                SectionView.VirtualMode = true;
                 SectionView.EndUpdate();
             }
         }

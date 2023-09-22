@@ -29,7 +29,7 @@ namespace PS4CheaterNeo
             pointerItems = new List<ListViewItem>();
             if (!Properties.Settings.Default.CollapsibleContainer.Value) SplitContainer1.SplitterButtonStyle = ButtonStyle.None;
             this.mainForm = mainForm;
-            sectionTool = new SectionTool();
+            sectionTool = new SectionTool(mainForm);
             processName = mainForm.ProcessName;
             pointerResults = new List<((uint BaseSID, uint BasePos, List<long> Offsets) pointer, List<Pointer> pathPointers)>();
             AddressBox.Text = address.ToString("X");
@@ -467,94 +467,40 @@ namespace PS4CheaterNeo
 
                     using(Mutex mutex = new Mutex())
                     {
-                        byte MaxQueryThreads = Properties.Settings.Default.MaxQueryThreads.Value;
-                        MaxQueryThreads = MaxQueryThreads == (byte)0 ? (byte)1 : MaxQueryThreads;
+                        bool isFilter            = IsFilterBox.Checked;
+                        bool isFilterSize        = IsFilterSizeBox.Checked;
+                        byte MaxQueryThreads     = Properties.Settings.Default.MaxQueryThreads.Value;
+                        MaxQueryThreads          = MaxQueryThreads == (byte)0 ? (byte)1 : MaxQueryThreads;
                         string SectionFilterKeys = Properties.Settings.Default.SectionFilterKeys.Value;
-                        uint SectionFilterSize = Properties.Settings.Default.SectionFilterSize.Value;
-                        uint QueryBufferSize = Properties.Settings.Default.QueryBufferSize.Value;
-                        SectionFilterKeys = Regex.Replace(SectionFilterKeys, " *[,;] *", "|");
+                        SectionFilterKeys        = Regex.Replace(SectionFilterKeys, " *[,;] *", "|");
+                        uint SectionFilterSize   = Properties.Settings.Default.SectionFilterSize.Value;
+                        uint QueryBufferSize     = Properties.Settings.Default.QueryBufferSize.Value;
 
-                        int readCnt = 0;
                         long processedMemoryLen = 0;
                         ulong minLength = QueryBufferSize * 1024 * 1024; //set the minimum read size in bytes
 
                         List<Pointer> addrValueList = new List<Pointer>();
-                        Section[] sections = sectionTool.GetSectionSortByAddr();
+                        Section[] sectionKeys   = sectionTool.GetSectionSortByAddr();
                         SemaphoreSlim semaphore = new SemaphoreSlim(MaxQueryThreads);
-                        List<Task<bool>> tasks = new List<Task<bool>>();
-                        List<(int start, int end)> rangeList = new List<(int start, int end)>();
-
-                        bool isFilter = IsFilterBox.Checked;
-                        bool isFilterSize = IsFilterSizeBox.Checked;
-                        (int start, int end) rangeIdx = (-1, -1);
-                        for (int sectionIdx = 0; sectionIdx < sections.Length; sectionIdx++)
-                        {
-                            bool isContinue = false;
-                            Section currentSection = sections[sectionIdx];
-
-                            if (!isFilter && currentSection.Name.StartsWith("libSce") ||
-                            isFilter && sectionTool.SectionIsFilter(currentSection.Name, SectionFilterKeys) ||
-                            isFilterSize && currentSection.Length < SectionFilterSize)
-                            {
-                                readCnt++;
-                                isContinue = true; //Check if section is not scanned
-                            }
-                            else if ((ulong)currentSection.Length > minLength)
-                            {
-                                rangeList.Add((sectionIdx, sectionIdx));
-                                isContinue = true;
-                            }
-
-                            if (isContinue)
-                            {
-                                if (rangeIdx.start != -1) //add rangeIdx when the start index is set
-                                {
-                                    rangeList.Add(rangeIdx);
-                                    rangeIdx = (-1, -1);
-                                }
-                                continue;
-                            }
-                            else if (rangeIdx.start == -1) rangeIdx = (sectionIdx, sectionIdx);//set start and end index when not set
-
-                            Section startSection = sections[rangeIdx.start];
-                            ulong bufferSize = currentSection.Start + (ulong)currentSection.Length - startSection.Start;
-                            if (bufferSize >= int.MaxValue) //check the size of the scan to be executed, whether the scan size has been reached the upper limit
-                            {
-                                if (rangeIdx.start != -1) //add rangeIdx when the start index is set
-                                {
-                                    rangeList.Add(rangeIdx);
-                                    rangeIdx = (-1, -1);
-                                }
-                                rangeIdx = (sectionIdx, sectionIdx);
-                                continue;
-                            }
-                            else if (bufferSize < minLength && (sectionIdx != sections.Length - 1))
-                            {
-                                rangeIdx.end = sectionIdx;//update end index
-                                continue;
-                            }
-
-                            rangeIdx.end = sectionIdx;//update end index
-                            rangeList.Add(rangeIdx);
-                            rangeIdx = (-1, -1); //initialize start and end index for non-isPerform scan
-                        }
+                        List<Task<bool>> tasks  = new List<Task<bool>>();
+                        (List<(int start, int end)> rangeList, int readCnt) = GetSectionRangeList(sectionKeys, isFilter, isFilterSize, minLength, SectionFilterKeys, SectionFilterSize);
 
                         for (int idx = 0; idx < rangeList.Count; idx++)
                         {
-                            var range = rangeList[idx];
+                            (int start, int end) range = rangeList[idx];
                             tasks.Add(Task.Run<bool>(() =>
                             {
                                 try
                                 {
                                     semaphore.Wait();
                                     pointerSource.Token.ThrowIfCancellationRequested();
-                                    Section sectionStart = sections[range.start];
-                                    Section sectionEnd = sections[range.end];
+                                    Section sectionStart = sectionKeys[range.start];
+                                    Section sectionEnd = sectionKeys[range.end];
                                     readCnt += range.end - range.start + 1;
                                     Invoke(new MethodInvoker(() =>
                                     {
-                                        ProgBar.Value = (int)(((float)(readCnt) / sections.Length) * 50);
-                                        ToolStripMsg.Text = string.Format("Scan elapsed:{0:0.00}s. Current: {1}/{2}, read memory...{3}MB", tickerMajor.Elapsed.TotalSeconds, readCnt, sections.Length, processedMemoryLen / (1024 * 1024));
+                                        ProgBar.Value = (int)(((float)(readCnt) / sectionKeys.Length) * 50);
+                                        ToolStripMsg.Text = string.Format("Scan elapsed:{0:0.00}s. Current: {1}/{2}, read memory...{3}MB", tickerMajor.Elapsed.TotalSeconds, readCnt, sectionKeys.Length, processedMemoryLen / (1024 * 1024));
                                     }));
 
                                     ulong bufferSize = sectionEnd.Start + (ulong)sectionEnd.Length - sectionStart.Start;
@@ -563,7 +509,7 @@ namespace PS4CheaterNeo
 
                                     for (int rIdx = range.start; rIdx <= range.end; rIdx++)
                                     {
-                                        Section addrSection = sections[rIdx];
+                                        Section addrSection = sectionKeys[rIdx];
                                         int scanOffset = (int)(addrSection.Start - sectionStart.Start);
 
                                         pointerSource.Token.ThrowIfCancellationRequested();
@@ -676,6 +622,77 @@ namespace PS4CheaterNeo
 
             return true;
         });
+
+        /// <summary>
+        /// Filter sections based on whether they need to be processed, 
+        /// and when their memory size is smaller than the queried buffer, 
+        /// set consecutive sections as a group, and finally return a list that is grouped accordingly.
+        /// </summary>
+        /// <param name="sectionKeys"></param>
+        /// <param name="isFilter"></param>
+        /// <param name="isFilterSize"></param>
+        /// <param name="minLength">minimum buffer size (in bytes) in querying and pointerFinder, enter 0 to not use buffer, setting this value to 0 is better when the total number of Sections in the game is low. If the game has more than a thousand Sections, Buffer must be set</param>
+        /// <param name="SectionFilterKeys"></param>
+        /// <param name="SectionFilterSize"></param>
+        /// <returns></returns>
+        private (List<(int start, int end)>, int ignoreCnt) GetSectionRangeList(Section[] sectionKeys, bool isFilter, bool isFilterSize, ulong minLength, string SectionFilterKeys, uint SectionFilterSize)
+        {
+            List<(int start, int end)> rangeList = new List<(int start, int end)>();
+            int ignoreCnt = 0;
+            (int start, int end) rangeIdx = (-1, -1);
+            for (int sectionIdx = 0; sectionIdx < sectionKeys.Length; sectionIdx++)
+            {
+                bool isContinue = false;
+                Section currentSection = sectionKeys[sectionIdx];
+
+                if (!isFilter && currentSection.Name.StartsWith("libSce") ||
+                isFilter && sectionTool.SectionIsFilter(currentSection.Name, SectionFilterKeys) ||
+                isFilterSize && currentSection.Length < SectionFilterSize)
+                {
+                    ignoreCnt++;
+                    isContinue = true; //Check if section is not scanned
+                }
+                else if ((ulong)currentSection.Length > minLength)
+                {
+                    rangeList.Add((sectionIdx, sectionIdx));
+                    isContinue = true;
+                }
+
+                if (isContinue)
+                {
+                    if (rangeIdx.start != -1) //add rangeIdx when the start index is set
+                    {
+                        rangeList.Add(rangeIdx);
+                        rangeIdx = (-1, -1);
+                    }
+                    continue;
+                }
+                else if (rangeIdx.start == -1) rangeIdx = (sectionIdx, sectionIdx);//set start and end index when not set
+
+                Section startSection = sectionKeys[rangeIdx.start];
+                ulong bufferSize = currentSection.Start + (ulong)currentSection.Length - startSection.Start;
+                if (bufferSize >= int.MaxValue) //check the size of the scan to be executed, whether the scan size has been reached the upper limit
+                {
+                    if (rangeIdx.start != -1) //add rangeIdx when the start index is set
+                    {
+                        rangeList.Add(rangeIdx);
+                        rangeIdx = (-1, -1);
+                    }
+                    rangeIdx = (sectionIdx, sectionIdx);
+                    continue;
+                }
+                else if (bufferSize < minLength && (sectionIdx != sectionKeys.Length - 1))
+                {
+                    rangeIdx.end = sectionIdx;//update end index
+                    continue;
+                }
+
+                rangeIdx.end = sectionIdx;//update end index
+                rangeList.Add(rangeIdx);
+                rangeIdx = (-1, -1); //initialize start and end index for non-isPerform scan
+            }
+            return (rangeList, ignoreCnt);
+        }
 
         private bool TaskComparer(ulong queryAddress, int maxOffsetLevel, int maxOffsetRange, int nextScanCheckNumber, System.Diagnostics.Stopwatch tickerMajor)
         {

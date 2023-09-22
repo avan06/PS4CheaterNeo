@@ -481,6 +481,18 @@ namespace PS4CheaterNeo.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute(@"False|3_Query|5_SectionView|Determine whether to enable writing detected hidden section configurations to the ""path to PS4CheaterNeo\sections\[GAME_ID].conf"" path. \nThis option must be enabled when using the ""SCAN for Hidden Sections"" query window scan type. \nNote: Enabling this option will result in longer startup times for the Query window as it queries [GAME_ID] information every time the program starts. \nDefault disabled")]
+        public global::OptionTreeView.Option<bool> WriteHiddenSectionConf {
+            get {
+                return ((global::OptionTreeView.Option<bool>)(this["WriteHiddenSectionConf"]));
+            }
+            set {
+                this["WriteHiddenSectionConf"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False|4_HexEditor|Hex|Determines whether to enable Auto Refresh in HexEditor. \\nD" +
             "efault disabled")]
         public global::OptionTreeView.Option<bool> AutoRefresh {
