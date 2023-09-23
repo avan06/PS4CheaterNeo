@@ -544,11 +544,12 @@ namespace PS4CheaterNeo
 
                 using (Mutex mutex = new Mutex())
                 {
-                    byte MaxQueryThreads        = Properties.Settings.Default.MaxQueryThreads.Value;
-                    uint QueryBufferSize        = Properties.Settings.Default.QueryBufferSize.Value;
-                    uint SectionFilterSize      = Properties.Settings.Default.SectionFilterSize.Value;
-                    string SectionFilterKeys    = Properties.Settings.Default.SectionFilterKeys.Value;
-                    sbyte MinResultAccessFactor = Properties.Settings.Default.MinResultAccessFactor.Value;
+                    byte MaxQueryThreads                = Properties.Settings.Default.MaxQueryThreads.Value;
+                    uint QueryBufferSize                = Properties.Settings.Default.QueryBufferSize.Value;
+                    uint SectionFilterSize              = Properties.Settings.Default.SectionFilterSize.Value;
+                    string SectionFilterKeys            = Properties.Settings.Default.SectionFilterKeys.Value;
+                    sbyte MinResultAccessFactor         = Properties.Settings.Default.MinResultAccessFactor.Value;
+                    uint MinResultAccessFactorThreshold = Properties.Settings.Default.MinResultAccessFactorThreshold.Value;
                     MaxQueryThreads = MaxQueryThreads == (byte)0 ? (byte)1 : MaxQueryThreads;
                     SectionFilterKeys = Regex.Replace(SectionFilterKeys, " *[,;] *", "|");
 
@@ -558,7 +559,7 @@ namespace PS4CheaterNeo
                     Section[] sectionKeys   = sectionTool.GetSectionSortByAddr();
                     SemaphoreSlim semaphore = new SemaphoreSlim(MaxQueryThreads);
                     List<Task<bool>> tasks  = new List<Task<bool>>();
-                    List<(int start, int end)> rangeList = GetSectionRangeList(sectionKeys, isFilter, isFilterSize, minLength, AddrMin, AddrMax, MinResultAccessFactor);
+                    List<(int start, int end)> rangeList = GetSectionRangeList(sectionKeys, isFilter, isFilterSize, minLength, AddrMin, AddrMax, MinResultAccessFactor, MinResultAccessFactorThreshold);
 
                     int sectionSelectedCnt = 0;
                     int sectionFoundCnt = 0;
@@ -700,8 +701,9 @@ namespace PS4CheaterNeo
         /// <param name="AddrMin"></param>
         /// <param name="AddrMax"></param>
         /// <param name="MinResultAccessFactor">Access value directly by address when the number of query results for the same Section is less than this factor, used to control whether to read Section data completely, or directly access the value by address. Default value is 50</param>
+        /// <param name="MinResultAccessFactorThreshold">The MinResultAccessFactor option will only take effect when the section size is greater than this value, Default size is 1048576(1MB)</param>
         /// <returns></returns>
-        private List<(int start, int end)> GetSectionRangeList(Section[] sectionKeys, bool isFilter, bool isFilterSize, ulong minLength, ulong AddrMin, ulong AddrMax, sbyte MinResultAccessFactor)
+        private List<(int start, int end)> GetSectionRangeList(Section[] sectionKeys, bool isFilter, bool isFilterSize, ulong minLength, ulong AddrMin, ulong AddrMax, sbyte MinResultAccessFactor, uint MinResultAccessFactorThreshold)
         {
             int readCnt = 0;
             List<(int start, int end)> rangeList = new List<(int start, int end)>();
@@ -712,8 +714,8 @@ namespace PS4CheaterNeo
                 bool isContinue = false;
                 Section currentSection = sectionKeys[sectionIdx];
                 if (!currentSection.Check || isFilter && currentSection.IsFilter || isFilterSize && currentSection.IsFilterSize) isContinue = true; //Check if section is not scanned
-                else if (AddrMin > 0 && AddrMax > 0 && currentSection.Start + (ulong)currentSection.Length < AddrMin || currentSection.Start > AddrMax) isContinue = true;
-                else if (bitsDictDicts["_s1"].Count > 0 && bitsDictDicts["_s1"].ContainsKey(currentSection.SID) && bitsDictDicts["_s1"][currentSection.SID].Count is int chkCnt && chkCnt > 0 && chkCnt < MinResultAccessFactor)
+                else if (AddrMin > 0 && AddrMax > 0 && (currentSection.Start + (ulong)currentSection.Length < AddrMin || currentSection.Start > AddrMax)) isContinue = true;
+                else if (currentSection.Length > MinResultAccessFactorThreshold && bitsDictDicts["_s1"].Count > 0 && bitsDictDicts["_s1"].ContainsKey(currentSection.SID) && bitsDictDicts["_s1"][currentSection.SID].Count is int chkCnt && chkCnt > 0 && chkCnt < MinResultAccessFactor)
                 { //Access value directly by address when the number of query results for the same Section is less than this MinResultAccessFactor
                     rangeList.Add((-1, sectionIdx));
                     isContinue = true;
@@ -1243,12 +1245,13 @@ namespace PS4CheaterNeo
 
                 Invoke(new MethodInvoker(() => { ToolStripBar.Value = 1; }));
 
-                byte MaxQueryThreads        = Properties.Settings.Default.MaxQueryThreads.Value;
-                uint QueryBufferSize        = Properties.Settings.Default.QueryBufferSize.Value;
-                uint MaxResultShow          = Properties.Settings.Default.MaxResultShow.Value;
-                uint SectionFilterSize      = Properties.Settings.Default.SectionFilterSize.Value;
-                string SectionFilterKeys    = Properties.Settings.Default.SectionFilterKeys.Value;
-                sbyte MinResultAccessFactor = Properties.Settings.Default.MinResultAccessFactor.Value;
+                byte MaxQueryThreads                = Properties.Settings.Default.MaxQueryThreads.Value;
+                uint QueryBufferSize                = Properties.Settings.Default.QueryBufferSize.Value;
+                uint MaxResultShow                  = Properties.Settings.Default.MaxResultShow.Value;
+                uint SectionFilterSize              = Properties.Settings.Default.SectionFilterSize.Value;
+                string SectionFilterKeys            = Properties.Settings.Default.SectionFilterKeys.Value;
+                sbyte MinResultAccessFactor         = Properties.Settings.Default.MinResultAccessFactor.Value;
+                uint MinResultAccessFactorThreshold = Properties.Settings.Default.MinResultAccessFactorThreshold.Value;
                 MaxQueryThreads = MaxQueryThreads == (byte)0 ? (byte)1 : MaxQueryThreads;
                 MaxResultShow = MaxResultShow == 0 ? 0x2000 : MaxResultShow;
                 SectionFilterKeys = Regex.Replace(SectionFilterKeys, " *[,;] *", "|");
@@ -1258,7 +1261,7 @@ namespace PS4CheaterNeo
                 Section[] sectionKeys   = sectionTool.GetSectionSortByAddr(bitsDictDicts["_s1"].Keys);
                 SemaphoreSlim semaphore = new SemaphoreSlim(MaxQueryThreads);
                 List<Task<bool>> tasks  = new List<Task<bool>>();
-                List<(int start, int end)> rangeList = GetSectionRangeList(sectionKeys, isFilter, isFilterSize, minLength, 0, 0, MinResultAccessFactor);
+                List<(int start, int end)> rangeList = GetSectionRangeList(sectionKeys, isFilter, isFilterSize, minLength, 0, 0, MinResultAccessFactor, MinResultAccessFactorThreshold);
 
                 int sectionSelectedCnt = 0;
                 for (int idx = 0; idx < rangeList.Count; idx++)

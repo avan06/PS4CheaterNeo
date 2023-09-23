@@ -59,6 +59,9 @@
     <Setting Name="MinResultAccessFactor" Type="OptionTreeView.Option&lt;sbyte&gt;" Scope="User">
       <Value Profile="(Default)">50|3_Query|1_Query|Access value directly by address when the number of query results for the same Section is less than this factor, \nused to control whether to read Section data completely, or directly access the value by address. \nDefault value is 50</Value>
     </Setting>
+    <Setting Name="MinResultAccessFactorThreshold" Type="OptionTreeView.Option&lt;uint&gt;" Scope="User">
+      <Value Profile="(Default)">1048576|3_Query|1_Query|Set a value for the section size (in bytes). \nThe MinResultAccessFactor option will only take effect when the section size is greater than this value. \nDefault size is 1048576(1MB)</Value>
+    </Setting>
     <Setting Name="UndoScan" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
       <Value Profile="(Default)">True|3_Query|1_Query|Determines whether to enable undo scan(revert to the previous scan result), \nif enabled, more memory needs to be used during scanning. \nDefault enable</Value>
     </Setting>

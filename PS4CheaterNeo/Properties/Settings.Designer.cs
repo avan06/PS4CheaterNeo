@@ -269,6 +269,20 @@ namespace PS4CheaterNeo.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1048576|3_Query|1_Query|Set a value for the section size (in bytes). \\nThe MinRes" +
+            "ultAccessFactor option will only take effect when the section size is greater th" +
+            "an this value. \\nDefault size is 1048576(1MB)")]
+        public global::OptionTreeView.Option<uint> MinResultAccessFactorThreshold {
+            get {
+                return ((global::OptionTreeView.Option<uint>)(this["MinResultAccessFactorThreshold"]));
+            }
+            set {
+                this["MinResultAccessFactorThreshold"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True|3_Query|1_Query|Determines whether to enable undo scan(revert to the previou" +
             "s scan result), \\nif enabled, more memory needs to be used during scanning. \\nDe" +
             "fault enable")]

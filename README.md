@@ -2,7 +2,7 @@
 
 PS4CheaterNeo is a program to find game cheat codes, and it is based on [`ps4debug`](https://github.com/jogolden/ps4debug) and [`.Net Framework 4.8`](https://support.microsoft.com/en-us/topic/microsoft-net-framework-4-8-offline-installer-for-windows-9d23f658-3b97-68ab-d013-aa3c3e7495e0).
 
-Currently in `version 0.9.9.10-beta`
+Currently in `version 0.9.9.11-beta`
 
 
 ## Table of Contents
@@ -538,6 +538,8 @@ Set the default selected program when perform get processes, `Default is eboot.b
 Enter the number of threads to use when querying, `Default is 3 threads`.  
 - `MinResultAccessFactor`:  
 Access value directly by address when the number of query results for the same Section is less than this factor, Used to control whether to read Section data completely, or directly access the value by address, `Default value is 50`. (0.9.4.2)  
+- `MinResultAccessFactorThreshold`:  
+Set a value for the section size (`in bytes`). The `MinResultAccessFactor` option will only take effect when the section size is greater than this value. `Default size is 1048576(1MB)`. (0.9.9.11)  
 - `FilterQuery`:  
 Determine whether to enable filtering Sections when opening the query window, `Default enabled`.  
 - `SectionFilterKeys`:  
@@ -549,7 +551,7 @@ Filter out when section size is less than this value(unit is bytes), `Default is
 - `MaxResultShow`:  
 Enter the maximum number of displayed query results. will only affect the number of results displayed in the ResultView, `Default value is 8192`.  
 - `QueryBufferSize`:  
-Set the minimum buffer size (in MB) in querying and pointerFinder, enter 0 to not use buffer, Setting this value to 0 is better when the total number of Sections in the game is low. If the game has more than a thousand Sections, Buffer must be set. (0.9.4.10)  
+Set the minimum buffer size (`in MB`) in querying and pointerFinder, enter 0 to not use buffer, Setting this value to 0 is better when the total number of Sections in the game is low. If the game has more than a thousand Sections, Buffer must be set. (0.9.4.10)  
 - `UndoScan`:  
 Determines whether to enable undo scan(revert to the previous scan result), if enabled, more memory needs to be used during scanning. `Default enable`. (0.9.7.0)  
 - `ScanAutoPause`:  
