@@ -2,7 +2,7 @@
 
 PS4CheaterNeo is a program to find game cheat codes, and it is based on [`ps4debug`](https://github.com/jogolden/ps4debug) and [`.Net Framework 4.8`](https://support.microsoft.com/en-us/topic/microsoft-net-framework-4-8-offline-installer-for-windows-9d23f658-3b97-68ab-d013-aa3c3e7495e0).
 
-Currently in `version 0.9.9.12-beta`
+Currently in `version 0.9.9.13-beta`
 
 
 ## Table of Contents
@@ -108,6 +108,7 @@ Currently in `version 0.9.9.12-beta`
 - Added an "`Auto Refresh` Cheat" button in the main window. When enabled, it will automatically reload cheat values from the PS4 at intervals specified by the `CheatAutoRefreshTimerInterval` option. (0.9.9.2)
 - Added support for automatically removing non-Hex characters from input Hex text. When you select HexView from the ToolStrip in the main window, this prevents the program from encountering Hex conversion errors. (0.9.9.5)
 - Added the CheatGridViewGroupByEnabled option, which allows you to enable or disable the grouping feature in CheatGridView. (0.9.9.6)
+- When closing the main window, a confirmation prompt will ask if you want to close the window. (0.9.9.13)
 
 ![cheat_1](assets/cheat_1.webp)
 ![cheat_2](assets/cheat_2.webp)

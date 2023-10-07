@@ -123,6 +123,15 @@ namespace PS4CheaterNeo
             CheatGridView.EnableHeadersVisualStyles = false;
         }
 
+        private void Main_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (MessageBox.Show("Do you want to close PS4CheaterNeo?", "PS4CheaterNeo", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+            {
+                e.Cancel = true;
+                return;
+            }
+        }
+
         #region ToolStrip
         private void ToolStripSend_Click(object sender, EventArgs e)
         {
@@ -663,9 +672,9 @@ namespace PS4CheaterNeo
 
                 string inputValue = "";
 
-                if (CheatGridView.SelectedRows.Count == 1)
+                DataGridViewSelectedRowCollection rows = CheatGridView.SelectedRows;
+                if (rows.Count == 1)
                 {
-                    DataGridViewSelectedRowCollection rows = CheatGridView.SelectedRows;
                     var cheatRow = rows[0];
                     (section, offsetAddr) = ((Section section, uint offsetAddr))cheatRow.Tag;
                     inputValue = (section.Start + offsetAddr).ToString("X");
@@ -1237,10 +1246,9 @@ namespace PS4CheaterNeo
         {
             try
             {
-                if (CheatGridView.SelectedRows == null || CheatGridView.SelectedRows.Count == 0) return;
-                if (CheatGridView.SelectedRows.Count != 1) return;
-
                 DataGridViewSelectedRowCollection rows = CheatGridView.SelectedRows;
+                if (rows == null || rows.Count == 0) return;
+                if (rows.Count != 1) return;
 
                 var cheatRow = rows[0];
                 (Section section, uint offsetAddr) = ((Section section, uint offsetAddr))cheatRow.Tag;
@@ -1256,29 +1264,29 @@ namespace PS4CheaterNeo
 
         private void CheatGridMenuLock_Click(object sender, EventArgs e)
         {
-            if (CheatGridView.SelectedRows == null || CheatGridView.SelectedRows.Count == 0) return;
-
             DataGridViewSelectedRowCollection rows = CheatGridView.SelectedRows;
+            if (rows == null || rows.Count == 0) return;
+
             for (int i = 0; i < rows.Count; ++i) rows[i].Cells[(int)ChertCol.CheatListLock].Value = true;
         }
 
         private void CheatGridMenuUnlock_Click(object sender, EventArgs e)
         {
-            if (CheatGridView.SelectedRows == null || CheatGridView.SelectedRows.Count == 0) return;
-
             DataGridViewSelectedRowCollection rows = CheatGridView.SelectedRows;
+            if (rows == null || rows.Count == 0) return;
+
             for (int i = 0; i < rows.Count; ++i) rows[i].Cells[(int)ChertCol.CheatListLock].Value = false;
         }
 
         private void CheatGridMenuActive_Click(object sender, EventArgs e)
         {
-            if (CheatGridView.SelectedRows == null || CheatGridView.SelectedRows.Count == 0) return;
-
             DataGridViewSelectedRowCollection rows = CheatGridView.SelectedRows;
+            if (rows == null || rows.Count == 0) return;
 
-            for (int i = 0; i < rows.Count; ++i)
+            for (int idx = 0; idx < rows.Count; ++idx)
             {
-                var cheatRow = rows[i];
+                int index = rows[idx].Index;
+                var cheatRow = cheatGridRowList[index];
                 (Section section, uint offsetAddr) = ((Section section, uint offsetAddr))cheatRow.Tag;
                 ScanType scanType = this.ParseFromDescription<ScanType>(cheatRow.Cells[(int)ChertCol.CheatListType].Value.ToString());
                 byte[] data = ScanTool.ValueStringToByte(scanType, cheatRow.Cells[(int)ChertCol.CheatListValue].Value.ToString());
@@ -1288,23 +1296,24 @@ namespace PS4CheaterNeo
 
         private void CheatGridMenuEdit_Click(object sender, EventArgs e)
         {
-            if (CheatGridView.SelectedRows == null || CheatGridView.SelectedRows.Count == 0) return;
+            DataGridViewSelectedRowCollection rows = CheatGridView.SelectedRows;
+            if (rows == null || rows.Count == 0) return;
 
             string errorMsg = "";
             try
             {
                 DataGridViewRow cheatRow = null;
-                if (CheatGridView.SelectedRows.Count > 1)
+                if (rows.Count > 1)
                 {
                     string inputValue = "";
                     if (InputBox.Show("Multiple Addresses Edit", "Please enter a value and write to multiple addresses", ref inputValue) != DialogResult.OK) return;
-                    DataGridViewSelectedRowCollection rows = CheatGridView.SelectedRows;
 
-                    for (int i = 0; i < rows.Count; ++i)
+                    for (int idx = 0; idx < rows.Count; ++idx)
                     {
                         try
                         {
-                            cheatRow = rows[i];
+                            int index = rows[idx].Index;
+                            cheatRow = cheatGridRowList[index];
                             (Section section, uint offsetAddr) row = ((Section section, uint offsetAddr))cheatRow.Tag;
                             ScanType rowScanType = this.ParseFromDescription<ScanType>(cheatRow.Cells[(int)ChertCol.CheatListType].Value.ToString());
                             byte[] rowData = ScanTool.ValueStringToByte(rowScanType, inputValue);
@@ -1321,7 +1330,7 @@ namespace PS4CheaterNeo
                     return;
                 }
 
-                cheatRow = CheatGridView.SelectedRows[0];
+                cheatRow = rows[0];
                 ScanType scanType = this.ParseFromDescription<ScanType>(cheatRow.Cells[(int)ChertCol.CheatListType].Value.ToString());
                 string oldValue = cheatRow.Cells[(int)ChertCol.CheatListValue].Value.ToString();
                 (Section section, uint offsetAddr) = ((Section section, uint offsetAddr))cheatRow.Tag;
@@ -1388,13 +1397,14 @@ namespace PS4CheaterNeo
 
         private void CheatGridMenuCopyAddress_Click(object sender, EventArgs e)
         {
-            if (CheatGridView.SelectedRows == null || CheatGridView.SelectedRows.Count == 0) return;
+            DataGridViewSelectedRowCollection rows = CheatGridView.SelectedRows;
+            if (rows == null || rows.Count == 0) return;
 
             string clipStr = "";
-            DataGridViewSelectedRowCollection rows = CheatGridView.SelectedRows;
-            for (int i = 0; i < rows.Count; ++i)
+            for (int idx = 0; idx < rows.Count; ++idx)
             {
-                var cheatRow = rows[i];
+                int index = rows[idx].Index;
+                var cheatRow = cheatGridRowList[index];
                 (Section section, uint offsetAddr) = ((Section section, uint offsetAddr))cheatRow.Tag;
                 if (clipStr.Length > 0) clipStr += " \n";
                 clipStr += (offsetAddr + section.Start).ToString("X");
@@ -1404,11 +1414,9 @@ namespace PS4CheaterNeo
 
         private void CheatGridMenuFindPointer_Click(object sender, EventArgs e)
         {
-            if (CheatGridView.SelectedRows == null || CheatGridView.SelectedRows.Count == 0) return;
-
-            if (CheatGridView.SelectedRows.Count != 1) return;
-
             DataGridViewSelectedRowCollection rows = CheatGridView.SelectedRows;
+            if (rows == null || rows.Count == 0) return;
+            if (rows.Count != 1) return;
 
             try
             {

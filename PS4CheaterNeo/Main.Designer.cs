@@ -602,6 +602,7 @@ namespace PS4CheaterNeo
             this.Controls.Add(this.panel1);
             this.Name = "Main";
             this.Text = "PS4 Cheater Neo";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Main_FormClosing);
             this.Shown += new System.EventHandler(this.Main_Shown);
             this.CheatGridMenu.ResumeLayout(false);
             this.ToolStrip1.ResumeLayout(false);
