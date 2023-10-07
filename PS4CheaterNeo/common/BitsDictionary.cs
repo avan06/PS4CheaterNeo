@@ -377,8 +377,12 @@ namespace PS4CheaterNeo
         /// <param name="value"></param>
         public void Add<T>(UInt32 key, T value)
         {
-            byte[] data = GetBytes<T>(value);
-            Add(key, data);
+            if (value is byte[] bArr) Add(key, bArr);
+            else
+            {
+                byte[] data = GetBytes<T>(value);
+                Add(key, data);
+            }
         }
 
         /// <summary>
@@ -388,8 +392,12 @@ namespace PS4CheaterNeo
         /// <param name="newValue"></param>
         public void Set<T>(T newValue)
         {
-            byte[] data = GetBytes<T>(newValue);
-            Set(data);
+            if (newValue is byte[] bArr) Set(bArr);
+            else
+            {
+                byte[] data = GetBytes<T>(newValue);
+                Set(data);
+            }
         }
 
         /// <summary>

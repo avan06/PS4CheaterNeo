@@ -97,7 +97,7 @@ namespace PS4CheaterNeo
                     mutexs[idx] = new Mutex(false, mutexId + "_" + idx, out _, mSec);
                     if (ps4s[idx] != null && (!ps4s[idx].IsConnected || reCreateInstance))
                     {
-                        try { ps4s[idx].Disconnect(); } catch (Exception ex) { Console.WriteLine(ex.Message + "\n" + ex.StackTrace); }
+                        try { ps4s[idx].Disconnect(); } catch (Exception ex) { Console.WriteLine(ex.ToString()); }
                         ps4s[idx] = null;
                     }
                     if (ps4s[idx] == null) ps4s[idx] = new libdebug.PS4DBG(ip);

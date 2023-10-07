@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 namespace PS4CheaterNeo
@@ -120,7 +121,7 @@ namespace PS4CheaterNeo
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show(ex.ToString(), ex.Source + ":ApplyUI", MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
 
@@ -163,7 +164,7 @@ namespace PS4CheaterNeo
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show(ex.ToString(), ex.Source + ":SaveBtn_Click", MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
 
@@ -174,6 +175,7 @@ namespace PS4CheaterNeo
             if (!isCheckAddressBox) return;
             try
             {
+                AddressBox.Text = Regex.Replace(AddressBox.Text, "[^0-9a-fA-F]", "");
                 Address = ulong.Parse(AddressBox.Text, System.Globalization.NumberStyles.HexNumber);
                 uint SID = mainForm.sectionTool.GetSectionID(Address);
                 if (SID == 0) throw new Exception("Address verification failed"); //-1(int) => 0(uint)
@@ -309,7 +311,7 @@ namespace PS4CheaterNeo
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show(ex.ToString(), ex.Source + ":ScanTypeBox_SelectedIndexChanged", MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
             CheatType = newCheatType;
         }

@@ -130,7 +130,7 @@ namespace PS4CheaterNeo
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source + ":ApplyUI", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show(ex.ToString(), ex.Source + ":ApplyUI", MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
 
@@ -191,7 +191,7 @@ namespace PS4CheaterNeo
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source + ":GetProcessesBtn_Click", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show(ex.ToString(), ex.Source + ":GetProcessesBtn_Click", MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
 
@@ -263,7 +263,7 @@ namespace PS4CheaterNeo
             }
             catch (Exception ex)
             {
-                if (!ex.Message.Contains("Map is null")) MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source + ":ProcessesBox_SelectedIndexChanged", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                if (!ex.Message.Contains("Map is null")) MessageBox.Show(ex.ToString(), ex.Source + ":ProcessesBox_SelectedIndexChanged", MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
 
@@ -424,7 +424,7 @@ namespace PS4CheaterNeo
                             return;
                         }
                     }
-                    
+
                     ulong AddrMin = ParseHexAddrText(AddrMinBox.Text);
                     ulong AddrMax = ParseHexAddrText(AddrMaxBox.Text);
                     if (AddrMin > AddrMax && MessageBox.Show(String.Format("AddrMin({1:X}) > AddrMax({0:X})", AddrMin, AddrMax), "Scan", MessageBoxButtons.OK, MessageBoxIcon.Error) == DialogResult.OK) return;
@@ -433,8 +433,8 @@ namespace PS4CheaterNeo
                     if (value1 == "") value1 = "0";
                     if (isHex)
                     {
-                        value0 = value0.Replace("0x", "").Replace(" ", "").Replace("-", "").Replace("_", "");
-                        value1 = value1.Replace("0x", "").Replace(" ", "").Replace("-", "").Replace("_", "");
+                        value0 = Regex.Replace(value0, "[^0-9a-fA-F]", "");
+                        value1 = Regex.Replace(value1, "[^0-9a-fA-F]", "");
                     }
 
                     if (!isUnknownInitial) isUnknownInitial = compareType == CompareType.UnknownInitial;
@@ -475,7 +475,7 @@ namespace PS4CheaterNeo
             catch (Exception ex)
             {
                 if (!ex.Message.Contains("CancellationTokenSource"))
-                    MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source + ":ScanBtn_Click", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                    MessageBox.Show(ex.ToString(), ex.Source + ":ScanBtn_Click", MessageBoxButtons.OK, MessageBoxIcon.Hand);
                 if (AutoResumeBox.Checked) ResumeBtn.PerformClick();
             }
         }
@@ -1230,7 +1230,7 @@ namespace PS4CheaterNeo
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source + ":RefreshBtn_Click", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show(ex.ToString(), ex.Source + ":RefreshBtn_Click", MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
 
@@ -1352,7 +1352,7 @@ namespace PS4CheaterNeo
                         ToolStripMsg.Text = string.Format("Refresh elapsed:{0:0.00}s. RefreshTask canceled. {1}", tickerMajor.Elapsed.TotalSeconds, ex.InnerException.Message);
                     }));
                 }
-                else MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source + ":RefreshTask", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                else MessageBox.Show(ex.ToString(), ex.Source + ":RefreshTask", MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
             return true;
         });
@@ -1750,7 +1750,7 @@ namespace PS4CheaterNeo
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source + ":SectionViewImport_Click", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show(ex.ToString(), ex.Source + ":SectionViewImport_Click", MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
 
@@ -1918,10 +1918,14 @@ namespace PS4CheaterNeo
             (uint sid, _) = ((uint sid, int resultIdx))resultItem.Tag;
             Section section = sectionTool.GetSection(sid);
             ScanType scanType = this.ParseFromDescription<ScanType>(resultItem.SubItems[(int)ResultCol.ResultListType].Text);
-            uint offsetAddr = (uint)(ulong.Parse(resultItem.SubItems[(int)ResultCol.ResultListAddress].Text, NumberStyles.HexNumber) - section.Start);
+            ulong address = ulong.Parse(resultItem.SubItems[(int)ResultCol.ResultListAddress].Text, NumberStyles.HexNumber);
+            if (address < section.Start) return;
+
+            uint offsetAddr = (uint)(address - section.Start);
             string oldValue = resultItem.SubItems[(int)ResultCol.ResultListValue].Text;
 
-            if (offsetAddr > 0) mainForm.AddToCheatGrid(section, offsetAddr, scanType, oldValue);
+            mainForm.AddToCheatGrid(section, offsetAddr, scanType, oldValue);
+            selectedItems.Clear();
         }
 
         private void ResultViewAddToCheatGrid_Click(object sender, EventArgs e)
@@ -1935,12 +1939,17 @@ namespace PS4CheaterNeo
                 (uint sid, _) = ((uint sid, int resultIdx))resultItem.Tag;
                 Section section = sectionTool.GetSection(sid);
                 ScanType scanType = this.ParseFromDescription<ScanType>(resultItem.SubItems[(int)ResultCol.ResultListType].Text);
-                uint offsetAddr = (uint)(ulong.Parse(resultItem.SubItems[(int)ResultCol.ResultListAddress].Text, NumberStyles.HexNumber) - section.Start);
+                ulong address = ulong.Parse(resultItem.SubItems[(int)ResultCol.ResultListAddress].Text, NumberStyles.HexNumber);
+                if (address < section.Start) continue;
+
+                uint offsetAddr = (uint)(address - section.Start);
                 string oldValue = resultItem.SubItems[(int)ResultCol.ResultListValue].Text;
 
-                if (offsetAddr > 0) mainForm.AddToCheatGrid(section, offsetAddr, scanType, oldValue, false, "", null, null, -1, false);
+                mainForm.AddToCheatGrid(section, offsetAddr, scanType, oldValue, false, "", null, null, -1, false);
             }
             mainForm.CheatGridViewRowCountUpdate();
+            selectedItems.Clear();
+            GC.Collect();
         }
 
         private void ResultViewHexEditor_Click(object sender, EventArgs e)

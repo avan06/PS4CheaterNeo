@@ -11,23 +11,23 @@ namespace PS4CheaterNeo
     public enum ScanType
     {
         [Description("Byte")]
-        Byte_,
+        Byte_   = 0,
         [Description("2 Bytes")]
-        Bytes_2,
+        Bytes_2 = 2,
         [Description("4 Bytes")]
-        Bytes_4,
+        Bytes_4 = 4,
         [Description("8 Bytes")]
-        Bytes_8,
+        Bytes_8 = 6,
         [Description("Float")]
-        Float_,
+        Float_  = 8,
         [Description("Double")]
-        Double_,
+        Double_ = 9,
+        Hex     = 10,
+        [Description("String")]
+        String_ = 11,
+        Group,
         [Description("Auto determine numeric")]
         AutoNumeric,
-        [Description("String")]
-        String_,
-        Hex,
-        Group,
         [Description("SCAN for Hidden Sections")]
         HiddenSections,
     }
@@ -36,19 +36,19 @@ namespace PS4CheaterNeo
     {
         Exact,
         Fuzzy,
+        [Description("Bigger than")]
+        BiggerThan,
+        [Description("Smaller than")]
+        SmallerThan,
+        Between,
         Increased,
         [Description("Increased by")]
         IncreasedBy,
         Decreased,
         [Description("Decreased by")]
         DecreasedBy,
-        [Description("Bigger than")]
-        BiggerThan,
-        [Description("Smaller than")]
-        SmallerThan,
         Changed,
         Unchanged,
-        Between,
         [Description("Unknown Initial")]
         UnknownInitial,
     }

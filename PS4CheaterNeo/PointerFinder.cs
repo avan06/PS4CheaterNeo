@@ -79,7 +79,7 @@ namespace PS4CheaterNeo
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show(ex.ToString(), ex.Source + ":ApplyUI", MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
 
@@ -129,6 +129,7 @@ namespace PS4CheaterNeo
             {
                 Section[] sections = sectionTool.GetSectionSortByAddr(addrPointerDict.Keys);
                 List<string> lines = new List<string>();
+                AddressBox.Text = Regex.Replace(AddressBox.Text, "[^0-9a-fA-F]", "");
                 lines.Add($"FindAddress: {AddressBox.Text}({ulong.Parse(AddressBox.Text, NumberStyles.HexNumber)})");
                 for (int sIdx = 0; sIdx < sections.Length; sIdx++)
                 {
@@ -147,7 +148,7 @@ namespace PS4CheaterNeo
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Save memory failed, " + ex.Message, ex.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show("Save memory failed, " + ex.Message, ex.Source + ":SaveBtn_Click", MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
 
@@ -255,7 +256,7 @@ namespace PS4CheaterNeo
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Save memory failed, " + ex.Message, ex.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show("Save memory failed, " + ex.Message, ex.Source + ":LoadBtn_Click", MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
 
@@ -279,6 +280,7 @@ namespace PS4CheaterNeo
                 {
                     int maxOffsetLevel = (int)LevelUpdown.Value;
                     int maxOffsetRange = (int)MaxRangeUpDown.Value;
+                    AddressBox.Text = Regex.Replace(AddressBox.Text, "[^0-9a-fA-F]", "");
                     ulong queryAddress = ulong.Parse(AddressBox.Text, NumberStyles.HexNumber);
 
                     PointerListView.VirtualListSize = 0;
@@ -301,7 +303,7 @@ namespace PS4CheaterNeo
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show(ex.ToString(), ex.Source + ":ScanBtn_Click", MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
 
@@ -375,7 +377,7 @@ namespace PS4CheaterNeo
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show(ex.ToString(), ex.Source + ":PointerListView_DoubleClick", MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
 
@@ -616,7 +618,7 @@ namespace PS4CheaterNeo
                         ToolStripMsg.Text = string.Format("Scan elapsed:{0:0.00}s. ScanTask canceled. {1}", tickerMajor.Elapsed.TotalSeconds, ex.InnerException.Message);
                     }));
                 }
-                else MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                else MessageBox.Show(ex.ToString(), ex.Source + ":ScanTask", MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
             finally { }
 

@@ -67,7 +67,7 @@ namespace PS4CheaterNeo
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Source + ":HexEditor\n" + ex.Message + "\n" + ex.StackTrace);
+                Console.WriteLine(ex.Source + ":HexEditor\n" + ex.ToString());
             }
 
             HexBox.ByteGroupingType[] byteGroupingTypes = (HexBox.ByteGroupingType[])Enum.GetValues(typeof(HexBox.ByteGroupingType));
@@ -186,7 +186,7 @@ namespace PS4CheaterNeo
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source + ":ApplyUI", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show(ex.ToString(), ex.Source + ":ApplyUI", MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
 
@@ -573,7 +573,7 @@ namespace PS4CheaterNeo
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message + "\n" + ex.StackTrace, ex.Source + ":FindBtn_Click", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show(ex.ToString(), ex.Source + ":FindBtn_Click", MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
 
