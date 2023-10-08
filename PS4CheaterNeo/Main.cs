@@ -706,11 +706,28 @@ namespace PS4CheaterNeo
         {
             if (cheatGridRowList.Count == 0 || (refreshCheatTask != null && !refreshCheatTask.IsCompleted)) return;
 
+            refreshCheatSource = new CancellationTokenSource();
             refreshCheatTask = RefreshCheatTask(true);
+            refreshCheatTask.ContinueWith(t => {
+                refreshCheatSource?.Dispose();
+                refreshCheatSource = null;
+                refreshCheatTask?.Dispose();
+                refreshCheatTask = null;
+            });
             ToolStripMsg.Text = string.Format("{0:000}%, Refresh Cheat finished.", 100);
         }
 
-        private void ToolStripLockEnable_Click(object sender, EventArgs e) => ToolStripLockEnable.Checked = !ToolStripLockEnable.Checked;
+        private void ToolStripRefreshCheat_DoubleClick(object sender, EventArgs e)
+        {
+            if (cheatGridRowList.Count == 0) return;
+            if (refreshCheatTask != null && !refreshCheatTask.IsCompleted) refreshCheatSource.Cancel();
+        }
+
+        private void ToolStripLockEnable_Click(object sender, EventArgs e)
+        {
+            ToolStripLockEnable.Checked = !ToolStripLockEnable.Checked;
+            if (!ToolStripLockEnable.Checked) refreshLockSource.Cancel();
+        }
 
         private void ToolStripLockEnable_CheckedChanged(object sender, EventArgs e)
         {
@@ -718,7 +735,11 @@ namespace PS4CheaterNeo
             ToolStripLockEnable.Image = CheckBoxImage(ToolStripLockEnable.Checked);
         }
 
-        private void ToolStripAutoRefresh_Click(object sender, EventArgs e) => ToolStripAutoRefresh.Checked = !ToolStripAutoRefresh.Checked;
+        private void ToolStripAutoRefresh_Click(object sender, EventArgs e)
+        {
+            ToolStripAutoRefresh.Checked = !ToolStripAutoRefresh.Checked;
+            if (!ToolStripAutoRefresh.Checked) refreshCheatSource.Cancel();
+        }
 
         private void ToolStripAutoRefresh_CheckedChanged(object sender, EventArgs e)
         {
@@ -747,6 +768,7 @@ namespace PS4CheaterNeo
 
         #region Task
         Task<bool> refreshCheatTask;
+        CancellationTokenSource refreshCheatSource = null;
         private void AutoRefreshTimer_Tick(object sender, EventArgs e)
         {
             if (!(ToolStripProcessInfo.Tag is bool) && ProcessName != (string)ToolStripProcessInfo.Tag)
@@ -765,7 +787,14 @@ namespace PS4CheaterNeo
                 return;
             }
 
+            refreshCheatSource = new CancellationTokenSource();
             refreshCheatTask = RefreshCheatTask();
+            refreshCheatTask.ContinueWith(t => {
+                refreshCheatSource?.Dispose();
+                refreshCheatSource = null;
+                refreshCheatTask?.Dispose();
+                refreshCheatTask = null;
+            });
         }
 
         private async Task<bool> RefreshCheatTask(bool isShowStatus = false) => await Task.Run(() => {
@@ -786,6 +815,7 @@ namespace PS4CheaterNeo
             List<(int cIdx, ScanType scanType, bool isSign)> cheatList = new List<(int cIdx, ScanType scanType, bool isSign)>();
             for (int cIdx = 0; cIdx < cheatGridRowList.Count; cIdx++)
             {
+                refreshCheatSource.Token.ThrowIfCancellationRequested();
                 try
                 {
                     string msg = string.Format("{0}/{1}", cIdx + 1, cheatGridRowList.Count);
@@ -910,6 +940,7 @@ namespace PS4CheaterNeo
         }
 
         Task<bool> refreshLockTask;
+        CancellationTokenSource refreshLockSource = null;
         private void RefreshLock_Tick(object sender, EventArgs e)
         {
             if (!(ToolStripProcessInfo.Tag is bool) && ProcessName != (string)ToolStripProcessInfo.Tag)
@@ -928,7 +959,14 @@ namespace PS4CheaterNeo
                 return;
             }
 
+            refreshLockSource = new CancellationTokenSource();
             refreshLockTask = RefreshLockTask();
+            refreshLockTask.ContinueWith(t => {
+                refreshLockSource?.Dispose();
+                refreshLockSource = null;
+                refreshLockTask?.Dispose();
+                refreshLockTask = null;
+            });
         }
 
         private async Task<bool> RefreshLockTask() => await Task.Run(() => {
@@ -947,6 +985,7 @@ namespace PS4CheaterNeo
             List<(ulong address, byte[] data)> writeData = new List<(ulong address, byte[] data)>();
             for (int cIdx = 0; cIdx < cheatGridRowList.Count; cIdx++)
             {
+                refreshLockSource.Token.ThrowIfCancellationRequested();
                 try
                 {
                     DataGridViewRow cheatRow = cheatGridRowList[cIdx];
@@ -1035,6 +1074,7 @@ namespace PS4CheaterNeo
 
             for (int idx = 0; idx < readDataList.Count; idx++)
             {
+                refreshCheatSource.Token.ThrowIfCancellationRequested();
                 List<(ulong address, int length)> subReadData = readDataList[idx];
                 try
                 {
@@ -1075,6 +1115,7 @@ namespace PS4CheaterNeo
 
             for (int idx = 0; idx < writeDataList.Count; idx++)
             {
+                refreshLockSource.Token.ThrowIfCancellationRequested();
                 try
                 {
                     List<(ulong address, byte[] data)> subWriteData = writeDataList[idx];

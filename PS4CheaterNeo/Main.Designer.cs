@@ -310,12 +310,14 @@ namespace PS4CheaterNeo
             // ToolStripRefreshCheat
             // 
             this.ToolStripRefreshCheat.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.ToolStripRefreshCheat.DoubleClickEnabled = true;
             this.ToolStripRefreshCheat.Image = ((System.Drawing.Image)(resources.GetObject("ToolStripRefreshCheat.Image")));
             this.ToolStripRefreshCheat.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.ToolStripRefreshCheat.Name = "ToolStripRefreshCheat";
             this.ToolStripRefreshCheat.Size = new System.Drawing.Size(23, 22);
             this.ToolStripRefreshCheat.Text = "RefreshCheat";
             this.ToolStripRefreshCheat.Click += new System.EventHandler(this.ToolStripRefreshCheat_Click);
+            this.ToolStripRefreshCheat.DoubleClick += new System.EventHandler(this.ToolStripRefreshCheat_DoubleClick);
             // 
             // toolStripSeparator12
             // 
