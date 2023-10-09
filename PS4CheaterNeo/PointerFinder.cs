@@ -415,6 +415,7 @@ namespace PS4CheaterNeo
 
             Dictionary<ulong, ulong> pointerCaches = new Dictionary<ulong, ulong>();
             ScanType scanType = (ScanType)((ComboItem)(ScanTypeBox.SelectedItem)).Value;
+            mainForm.CheatGridViewRowCountUpdate(false);
             for (int itemIdx = 0; itemIdx < selectedItems.Count; ++itemIdx)
             {
                 try
@@ -432,13 +433,14 @@ namespace PS4CheaterNeo
                         msg += "_" + offset.ToString("X");
                         pointerOffsets.Add(offset);
                     });
-                    mainForm.AddToCheatGrid(baseSection, 0, scanType, "0", false, msg, pointerOffsets, pointerCaches); //FIXME oldValue is 0
+                    mainForm.AddToCheatGrid(baseSection, 0, scanType, "0", false, msg, pointerOffsets, pointerCaches, -1, false); //FIXME oldValue is 0
                 }
                 catch (Exception ex)
                 {
                     ToolStripMsg.Text = string.Format("Add Pointer To CheatGrid failed...{0}, {1}", ex.Message, ex.StackTrace);
                 }
             }
+            mainForm.CheatGridViewRowCountUpdate();
         }
 
         private void PointerListViewSelectAll_Click(object sender, EventArgs e)

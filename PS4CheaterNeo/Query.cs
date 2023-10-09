@@ -1933,6 +1933,7 @@ namespace PS4CheaterNeo
             List<ListViewItem> selectedItems = ListViewLVITEM.GetSelectedItems(ResultView);
             if (selectedItems.Count == 0) return;
 
+            mainForm.CheatGridViewRowCountUpdate(false);
             for (int i = 0; i < selectedItems.Count; ++i)
             {
                 ListViewItem resultItem = selectedItems[i];

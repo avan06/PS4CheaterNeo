@@ -78,6 +78,10 @@ namespace PS4CheaterNeo
             this.ToolStripMsg = new System.Windows.Forms.ToolStripStatusLabel();
             this.panel1 = new System.Windows.Forms.Panel();
             this.CheatGridView = new GroupGridView.GroupGridView();
+            this.RefreshLock = new System.Windows.Forms.Timer(this.components);
+            this.OpenCheatDialog = new System.Windows.Forms.OpenFileDialog();
+            this.SaveCheatDialog = new System.Windows.Forms.SaveFileDialog();
+            this.AutoRefreshTimer = new System.Windows.Forms.Timer(this.components);
             this.CheatGridViewDel = new System.Windows.Forms.DataGridViewButtonColumn();
             this.CheatGridViewAddress = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.CheatGridViewType = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -87,10 +91,6 @@ namespace PS4CheaterNeo
             this.CheatGridViewSID = new GroupGridView.DataGridViewUpDownColumn();
             this.CheatGridViewLock = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.CheatGridViewDescription = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.RefreshLock = new System.Windows.Forms.Timer(this.components);
-            this.OpenCheatDialog = new System.Windows.Forms.OpenFileDialog();
-            this.SaveCheatDialog = new System.Windows.Forms.SaveFileDialog();
-            this.AutoRefreshTimer = new System.Windows.Forms.Timer(this.components);
             this.CheatGridMenu.SuspendLayout();
             this.ToolStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
@@ -486,9 +486,20 @@ namespace PS4CheaterNeo
             this.CheatGridView.EditingControlShowing += new System.Windows.Forms.DataGridViewEditingControlShowingEventHandler(this.CheatGridView_EditingControlShowing);
             this.CheatGridView.RowPostPaint += new System.Windows.Forms.DataGridViewRowPostPaintEventHandler(this.CheatGridView_RowPostPaint);
             // 
+            // RefreshLock
+            // 
+            this.RefreshLock.Enabled = true;
+            this.RefreshLock.Interval = 500;
+            this.RefreshLock.Tick += new System.EventHandler(this.RefreshLock_Tick);
+            // 
+            // AutoRefreshTimer
+            // 
+            this.AutoRefreshTimer.Interval = 2500;
+            this.AutoRefreshTimer.Tick += new System.EventHandler(this.AutoRefreshTimer_Tick);
+            // 
             // CheatGridViewDel
             // 
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.BottomRight;
             dataGridViewCellStyle1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             dataGridViewCellStyle1.ForeColor = System.Drawing.Color.White;
             dataGridViewCellStyle1.NullValue = "Delete";
@@ -584,17 +595,6 @@ namespace PS4CheaterNeo
             this.CheatGridViewDescription.Name = "CheatGridViewDescription";
             this.CheatGridViewDescription.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             // 
-            // RefreshLock
-            // 
-            this.RefreshLock.Enabled = true;
-            this.RefreshLock.Interval = 500;
-            this.RefreshLock.Tick += new System.EventHandler(this.RefreshLock_Tick);
-            // 
-            // AutoRefreshTimer
-            // 
-            this.AutoRefreshTimer.Interval = 2500;
-            this.AutoRefreshTimer.Tick += new System.EventHandler(this.AutoRefreshTimer_Tick);
-            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -658,6 +658,9 @@ namespace PS4CheaterNeo
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
         private System.Windows.Forms.ToolStripButton ToolStripHexView;
         private System.Windows.Forms.ToolStripMenuItem CheatGridMenuCopyAddress;
+        private System.Windows.Forms.Timer AutoRefreshTimer;
+        private System.Windows.Forms.ToolStripButton ToolStripAutoRefresh;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
         private System.Windows.Forms.DataGridViewButtonColumn CheatGridViewDel;
         private System.Windows.Forms.DataGridViewTextBoxColumn CheatGridViewAddress;
         private System.Windows.Forms.DataGridViewTextBoxColumn CheatGridViewType;
@@ -667,9 +670,6 @@ namespace PS4CheaterNeo
         private GroupGridView.DataGridViewUpDownColumn CheatGridViewSID;
         private System.Windows.Forms.DataGridViewCheckBoxColumn CheatGridViewLock;
         private System.Windows.Forms.DataGridViewTextBoxColumn CheatGridViewDescription;
-        private System.Windows.Forms.Timer AutoRefreshTimer;
-        private System.Windows.Forms.ToolStripButton ToolStripAutoRefresh;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
     }
 }
 
