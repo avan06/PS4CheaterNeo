@@ -2,7 +2,7 @@
 
 PS4CheaterNeo is a program to find game cheat codes, and it is based on [`ps4debug`](https://github.com/jogolden/ps4debug) and [`.Net Framework 4.8`](https://support.microsoft.com/en-us/topic/microsoft-net-framework-4-8-offline-installer-for-windows-9d23f658-3b97-68ab-d013-aa3c3e7495e0).
 
-Currently in `version 0.9.9.13-beta`
+Currently in `version 0.9.9.14-beta`
 
 
 ## Table of Contents
@@ -107,8 +107,11 @@ Currently in `version 0.9.9.13-beta`
 - Editing cheat values in UpDown can be automatically written to PS4 when CheatCellDirtyValueCommit is enabled. (0.9.5.3)
 - Added an "`Auto Refresh` Cheat" button in the main window. When enabled, it will automatically reload cheat values from the PS4 at intervals specified by the `CheatAutoRefreshTimerInterval` option. (0.9.9.2)
 - Added support for automatically removing non-Hex characters from input Hex text. When you select HexView from the ToolStrip in the main window, this prevents the program from encountering Hex conversion errors. (0.9.9.5)
-- Added the CheatGridViewGroupByEnabled option, which allows you to enable or disable the grouping feature in CheatGridView. (0.9.9.6)
+- Added the `CheatGridViewGroupByEnabled` option, which allows you to enable or disable the grouping feature in CheatGridView. (0.9.9.6)
 - When closing the main window, a confirmation prompt will ask if you want to close the window. (0.9.9.13)
+- When `unchecked LockEnable` in the Cheat window, it will `immediately stop the Task` that locks cheats. (0.9.9.14)
+- When `unchecked AutoRefresh` in the Cheat window, it will `immediately stop the Task` that refreshes cheats. (0.9.9.14)
+- When `double-clicking the Refresh button` in the Cheat window, it will `immediately stop the Task` that refreshes cheats. (0.9.9.14)
 
 ![cheat_1](assets/cheat_1.webp)
 ![cheat_2](assets/cheat_2.webp)
@@ -552,7 +555,7 @@ Filter out when section size is less than this value(unit is bytes), `Default is
 - `MaxResultShow`:  
 Enter the maximum number of displayed query results. will only affect the number of results displayed in the ResultView, `Default value is 8192`.  
 - `QueryBufferSize`:  
-Set the minimum buffer size (`in MB`) in querying and pointerFinder, enter 0 to not use buffer, Setting this value to 0 is better when the total number of Sections in the game is low. If the game has more than a thousand Sections, Buffer must be set. (0.9.4.10)  
+Set the minimum buffer size (`in MB`) in querying and pointerFinder, enter 0 to not use buffer, Setting this value to 0 is better when the total number of Sections in the game is low. If the game has more than a thousand Sections, Buffer must be set. `Default 50` (0.9.4.10)  
 - `UndoScan`:  
 Determines whether to enable undo scan(revert to the previous scan result), if enabled, more memory needs to be used during scanning. `Default enable`. (0.9.7.0)  
 - `ScanAutoPause`:  
@@ -570,11 +573,11 @@ Determine the `exponents value of the simple value of floating`. this option val
 - `SectionViewFullRowSelect`:  
 Determine whether to enable the `FullRowSelect` feature in the `SectionView` of the Query window. `Default disabled`. (0.9.9.1)  
 - `SectionViewDetectHiddenSection`:  
-Determine whether to enable automatic detection of hidden sections. This is currently an experimental feature. Default disabled. (0.9.9.7)  
+Determine whether to enable automatic detection of hidden sections. This is currently an experimental feature. `Default disabled`. (0.9.9.7)  
 - `LastHiddenSectionLengthHex`:  
-Specify the Hex length of the last hidden section. This only takes effect when `SectionViewDetectHiddenSection` is enabled. Default value is 0x40000000. (0.9.9.7)  
+Specify the Hex length of the last hidden section. This only takes effect when `SectionViewDetectHiddenSection` is enabled. `Default value is 0x40000000`. (0.9.9.7)  
 - `HiddenSectionStartAtPreviousEnd`:  
-Determine whether to enable the starting address of the Hidden Section to be the end address of the previous section. If not enabled, the starting address will be the end address of the previous section plus 1. Default enable. (0.9.9.9)  
+Determine whether to enable the starting address of the Hidden Section to be the end address of the previous section. If not enabled, the starting address will be the end address of the previous section plus 1. `Default enable`. (0.9.9.9)  
 - `WriteHiddenSectionConf`:  
 Determine whether to enable writing detected hidden section configurations to the "`path to PS4CheaterNeo\sections\[GAME_ID].conf`" path. This option must be enabled when using the "`SCAN for Hidden Sections`" query window scan type. Note: Enabling this option will result in longer startup times for the Query window as it queries [GAME_ID] information every time the program starts. `Default disabled`. (0.9.9.10)  
 
