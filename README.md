@@ -2,7 +2,7 @@
 
 PS4CheaterNeo is a program to find game cheat codes, and it is based on [`ps4debug`](https://github.com/jogolden/ps4debug) and [`.Net Framework 4.8`](https://support.microsoft.com/en-us/topic/microsoft-net-framework-4-8-offline-installer-for-windows-9d23f658-3b97-68ab-d013-aa3c3e7495e0).
 
-Currently in `version 0.9.9.14-beta`
+Currently in `version 1.0.0`
 
 
 ## Table of Contents
@@ -179,6 +179,11 @@ Note: Enabling this option will significantly increase the number of results and
 
 ![query_SectionViewMenu](assets/query_SectionViewMenu.webp)
 
+- Added Filter CheckBox in the Min and Max Address fields of the Query window. (1.0.0)
+- Whether selected or not, the search will be limited by the input Minimum and Maximum address range for query targets. If selected, it will also filter the SectionView content based on the input Minimum and Maximum address range.
+
+![query_AddrIsFilterBox](assets/query_AddrIsFilterBox.webp)
+
 
 ### Query window: SlowMotion and Pause
 
@@ -245,7 +250,7 @@ The relevant execution steps are as follows:
 1. Enable the "`SectionViewDetectHiddenSection`" and "`WriteHiddenSectionConf`" options in the Options window.
 2. Open the Query window and wait for the Hidden Sections conf file to be generated. Verify if the "`path to PS4CheaterNeo\sections\[GAME_ID].conf`" file exists.
 3. Once the conf file is confirmed to exist, select the "`SCAN for Hidden Sections`" scan type and begin the scan, which will take at least one hour.
-4. After completing the scan, you can check if there have been any changes in the conf file's contents.
+4. After completing the scan, you can check if there have been any changes in the conf file's contents and the Prot of `executable` sections will automatically be set to `7`.
 5. When opening a new Query window, it will automatically load the corresponding game ID's conf file and display Hidden Section addresses and whether they should be shown, based on the configuration.
 6. The conf file format is "`SID, Start, End, Valid, Prot, Name`" with each line recording a local Hidden Section. When `"Valid" is false`, it means that this `section has no data`.
 

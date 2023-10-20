@@ -813,6 +813,7 @@ namespace PS4CheaterNeo
                     {
                         (uint key, byte[] _) = bitsDict.Get(bitsDict.Count - 1);
                         localHiddenSection.End = section.Start + key;
+                        localHiddenSection.Prot = 7;
                     }
                 }
             }
@@ -858,6 +859,7 @@ namespace PS4CheaterNeo
                     {
                         (uint key, byte[] _) = newBitsDict.Get(newBitsDict.Count - 1);
                         localHiddenSection.End = section.Start + key;
+                        localHiddenSection.Prot = 7;
                     }
                 }
                 bitsDict.Clear();
@@ -1567,14 +1569,22 @@ namespace PS4CheaterNeo
             {
                 sectionTool.TotalSelected += 1;
                 sectionTool.TotalMemorySize += (ulong)section.Length;
-                if (AddrMinBox.Tag == null) AddrMinBox.Tag = section.Start;
+                if (AddrMinBox.Tag == null)
+                {
+                    if (AddrMinBox.Text != "") AddrMinBox.Tag = ParseHexAddrText(AddrMinBox.Text); 
+                    else AddrMinBox.Tag = section.Start;
+                }
                 else
                 {
                     var AddrMin = (ulong)AddrMinBox.Tag;//ParseHexAddrText(AddrMinBox.Text);
                     if (section.Start < AddrMin) AddrMinBox.Tag = section.Start;
                 }
                 ulong sectionEnd = section.Start + (ulong)section.Length;
-                if (AddrMaxBox.Tag == null) AddrMaxBox.Tag = sectionEnd;
+                if (AddrMaxBox.Tag == null)
+                {
+                    if (AddrMaxBox.Text != "") AddrMaxBox.Tag = ParseHexAddrText(AddrMaxBox.Text);
+                    else AddrMaxBox.Tag = sectionEnd;
+                }
                 else
                 {
                     var AddrMax = (ulong)AddrMinBox.Tag;//ParseHexAddrText(AddrMaxBox.Text);
@@ -1614,6 +1624,14 @@ namespace PS4CheaterNeo
             }
         }
 
+        private void AddrMinMaxBox_Leave(object sender, EventArgs e)
+        {
+            if (!AddrIsFilterBox.Checked) return;
+            FilterChecked("filterAddr", AddrIsFilterBox.Checked);
+        }
+
+        private void AddrIsFilterBox_CheckedChanged(object sender, EventArgs e) => FilterChecked("filterAddr", AddrIsFilterBox.Checked);
+
         private void IsFilterSizeBox_CheckedChanged(object sender, EventArgs e) => FilterChecked("filterSize", IsFilterSizeBox.Checked);
 
         private void IsFilterBox_CheckedChanged(object sender, EventArgs e) => FilterChecked("filter", IsFilterBox.Checked);
@@ -1622,7 +1640,11 @@ namespace PS4CheaterNeo
         {
             int idx = ProcessesBox.SelectedIndex;
             if (idx == -1) return;
-
+            if (filter == "filterAddr" && AddrMinBox.Text.Length > 0 && AddrMaxBox.Text.Length > 0)
+            {
+                AddrMinBox.Tag = null;
+                AddrMaxBox.Tag = null;
+            }
             if (!isFilterChecked) ProcessesBox_SelectedIndexChanged(ProcessesBox, null);
             else
             {
@@ -1631,7 +1653,19 @@ namespace PS4CheaterNeo
                 {
                     ListViewItem item = sectionItems[sIdx];
 
-                    if (!filter.Equals(item.Tag)) continue;
+                    if (filter == "filterAddr" && AddrMinBox.Text.Length > 0 && AddrMaxBox.Text.Length > 0)
+                    {
+                        ulong start = ulong.Parse(item.SubItems[(int)SectionCol.SectionViewAddress].Text, NumberStyles.HexNumber);
+                        uint length = uint.Parse(item.SubItems[(int)SectionCol.SectionViewLength].Text.Replace("KB", "")) * 1024;
+                        if (AddrMinBox.Tag == null) AddrMinBox.Tag = ParseHexAddrText(AddrMinBox.Text);
+                        if (AddrMaxBox.Tag == null)
+                        {
+                            AddrMaxBox.Tag = ParseHexAddrText(AddrMaxBox.Text);
+                            if ((ulong)AddrMinBox.Tag >= (ulong)AddrMaxBox.Tag) break;
+                        }
+                        if ((ulong)AddrMinBox.Tag <= start && (ulong)AddrMaxBox.Tag >= start + length) continue;
+                    }
+                    else if (!filter.Equals(item.Tag)) continue;
 
                     uint sid = uint.Parse(item.SubItems[(int)SectionCol.SectionViewSID].Text);
                     SectionCheckUpdate(false, sid);

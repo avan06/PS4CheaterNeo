@@ -91,6 +91,7 @@ namespace PS4CheaterNeo
             this.SectionViewEnd = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.TableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.label4 = new System.Windows.Forms.Label();
+            this.AddrIsFilterBox = new System.Windows.Forms.CheckBox();
             this.label5 = new System.Windows.Forms.Label();
             this.AddrMaxBox = new System.Windows.Forms.TextBox();
             this.AddrMinBox = new System.Windows.Forms.TextBox();
@@ -712,13 +713,14 @@ namespace PS4CheaterNeo
             // 
             // TableLayoutPanel2
             // 
-            this.TableLayoutPanel2.ColumnCount = 4;
-            this.TableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 35F));
+            this.TableLayoutPanel2.ColumnCount = 5;
+            this.TableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this.TableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.TableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 35F));
+            this.TableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this.TableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.TableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.TableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this.TableLayoutPanel2.Controls.Add(this.label4, 0, 0);
+            this.TableLayoutPanel2.Controls.Add(this.AddrIsFilterBox, 4, 0);
             this.TableLayoutPanel2.Controls.Add(this.label5, 2, 0);
             this.TableLayoutPanel2.Controls.Add(this.AddrMaxBox, 3, 0);
             this.TableLayoutPanel2.Controls.Add(this.AddrMinBox, 1, 0);
@@ -737,15 +739,27 @@ namespace PS4CheaterNeo
             this.label4.AutoSize = true;
             this.label4.Location = new System.Drawing.Point(3, 8);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(29, 12);
+            this.label4.Size = new System.Drawing.Size(27, 12);
             this.label4.TabIndex = 1;
             this.label4.Text = "Min:";
+            // 
+            // AddrIsFilterBox
+            // 
+            this.AddrIsFilterBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.AddrIsFilterBox.AutoSize = true;
+            this.AddrIsFilterBox.Location = new System.Drawing.Point(236, 3);
+            this.AddrIsFilterBox.Name = "AddrIsFilterBox";
+            this.AddrIsFilterBox.Size = new System.Drawing.Size(48, 16);
+            this.AddrIsFilterBox.TabIndex = 21;
+            this.AddrIsFilterBox.Text = "Filter";
+            this.AddrIsFilterBox.UseVisualStyleBackColor = true;
+            this.AddrIsFilterBox.CheckedChanged += new System.EventHandler(this.AddrIsFilterBox_CheckedChanged);
             // 
             // label5
             // 
             this.label5.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(146, 8);
+            this.label5.Location = new System.Drawing.Point(118, 8);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(29, 12);
             this.label5.TabIndex = 20;
@@ -758,10 +772,11 @@ namespace PS4CheaterNeo
             this.AddrMaxBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(36)))), ((int)(((byte)(36)))));
             this.AddrMaxBox.ForeColor = System.Drawing.Color.White;
             this.AddrMaxBox.ImeMode = System.Windows.Forms.ImeMode.Off;
-            this.AddrMaxBox.Location = new System.Drawing.Point(181, 3);
+            this.AddrMaxBox.Location = new System.Drawing.Point(153, 3);
             this.AddrMaxBox.Name = "AddrMaxBox";
-            this.AddrMaxBox.Size = new System.Drawing.Size(103, 22);
+            this.AddrMaxBox.Size = new System.Drawing.Size(76, 22);
             this.AddrMaxBox.TabIndex = 19;
+            this.AddrMaxBox.Leave += new System.EventHandler(this.AddrMinMaxBox_Leave);
             // 
             // AddrMinBox
             // 
@@ -770,10 +785,11 @@ namespace PS4CheaterNeo
             this.AddrMinBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(36)))), ((int)(((byte)(36)))));
             this.AddrMinBox.ForeColor = System.Drawing.Color.White;
             this.AddrMinBox.ImeMode = System.Windows.Forms.ImeMode.Off;
-            this.AddrMinBox.Location = new System.Drawing.Point(38, 3);
+            this.AddrMinBox.Location = new System.Drawing.Point(36, 3);
             this.AddrMinBox.Name = "AddrMinBox";
-            this.AddrMinBox.Size = new System.Drawing.Size(102, 22);
+            this.AddrMinBox.Size = new System.Drawing.Size(76, 22);
             this.AddrMinBox.TabIndex = 18;
+            this.AddrMinBox.Leave += new System.EventHandler(this.AddrMinMaxBox_Leave);
             // 
             // CompareFirstBox
             // 
@@ -1258,5 +1274,6 @@ namespace PS4CheaterNeo
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator8;
         private System.Windows.Forms.ToolStripMenuItem SectionViewCheckAllHidden;
         private System.Windows.Forms.ToolStripMenuItem SectionViewUnCheckAllHidden;
+        private System.Windows.Forms.CheckBox AddrIsFilterBox;
     }
 }

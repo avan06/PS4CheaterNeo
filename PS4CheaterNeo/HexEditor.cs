@@ -157,6 +157,8 @@ namespace PS4CheaterNeo
                 InfoBox0.BackColor        = BackColor;
                 InputBox.ForeColor        = ForeColor;
                 InputBox.BackColor        = BackColor;
+                SectionBox.ForeColor      = ForeColor;
+                SectionBox.BackColor      = BackColor;
                 PageBox.ForeColor         = ForeColor;
                 PageBox.BackColor         = BackColor;
                 InfoBoxB.ForeColor        = ForeColor;
