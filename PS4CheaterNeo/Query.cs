@@ -1587,7 +1587,7 @@ namespace PS4CheaterNeo
                 }
                 else
                 {
-                    var AddrMax = (ulong)AddrMinBox.Tag;//ParseHexAddrText(AddrMaxBox.Text);
+                    var AddrMax = (ulong)AddrMaxBox.Tag;//ParseHexAddrText(AddrMaxBox.Text);
                     if (sectionEnd > AddrMax) AddrMaxBox.Tag = sectionEnd;
                 }
             }
@@ -1645,8 +1645,8 @@ namespace PS4CheaterNeo
                 AddrMinBox.Tag = null;
                 AddrMaxBox.Tag = null;
             }
-            if (!isFilterChecked) ProcessesBox_SelectedIndexChanged(ProcessesBox, null);
-            else
+            ProcessesBox_SelectedIndexChanged(ProcessesBox, null);
+            if (isFilterChecked)
             {
                 SectionView.BeginUpdate();
                 for (int sIdx = 0; sIdx < sectionItems.Count; sIdx++)
