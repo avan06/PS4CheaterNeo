@@ -2,7 +2,7 @@
 
 PS4CheaterNeo is a program to find game cheat codes, and it is based on [`ps4debug`](https://github.com/jogolden/ps4debug) and [`.Net Framework 4.8`](https://support.microsoft.com/en-us/topic/microsoft-net-framework-4-8-offline-installer-for-windows-9d23f658-3b97-68ab-d013-aa3c3e7495e0).
 
-Currently in `version 1.0.0.1`
+Currently in `version 1.0.1.0`
 
 
 ## Table of Contents
@@ -198,9 +198,10 @@ Note: Enabling this option will significantly increase the number of results and
 
 ### Query window: Undo scan and auto pause
 
-- Support undo scan(revert to the previous scan result), need to enable `EnableUndoScan` in the options. (0.9.7.0)
+- Support undo scan(~~revert to the previous scan result~~), need to enable `EnableUndoScan` in the options. (0.9.7.0)
 - Support automatically pause the game when starting the scan in query, need to enable `EnableScanAutoPause` in the options. (0.9.7.0)
 - Support automatically resume the game when the scan is complete in query, need to enable `EnableScanDoneResume` in the options. (0.9.7.0)
+- Supports undo or redo to any scanned result position. (1.0.1.0)
 
 ![experimental1](assets/experimental1.webp)
 
