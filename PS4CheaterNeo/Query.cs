@@ -278,6 +278,7 @@ namespace PS4CheaterNeo
             resultItems.Clear();
             ResultView.Items.Clear();
             bitsDictDicts.Clear();
+            bitsDictDictsIdx = 0;
 
             comparerTool = null;
             GC.Collect();
@@ -712,7 +713,7 @@ namespace PS4CheaterNeo
                 Section currentSection = sectionKeys[sectionIdx];
                 if (!currentSection.Check || isFilter && currentSection.IsFilter || isFilterSize && currentSection.IsFilterSize) isContinue = true; //Check if section is not scanned
                 else if (AddrMin > 0 && AddrMax > 0 && (currentSection.Start + (ulong)currentSection.Length < AddrMin || currentSection.Start > AddrMax)) isContinue = true;
-                else if (currentSection.Length > MinResultAccessFactorThreshold && bitsDictDicts[bitsDictDictsIdx].Count > 0 && bitsDictDicts[bitsDictDictsIdx].ContainsKey(currentSection.SID) && bitsDictDicts[bitsDictDictsIdx][currentSection.SID].Count is int chkCnt && chkCnt > 0 && chkCnt < MinResultAccessFactor)
+                else if (currentSection.Length > MinResultAccessFactorThreshold && bitsDictDicts.Count > bitsDictDictsIdx && bitsDictDicts[bitsDictDictsIdx].Count > 0 && bitsDictDicts[bitsDictDictsIdx].ContainsKey(currentSection.SID) && bitsDictDicts[bitsDictDictsIdx][currentSection.SID].Count is int chkCnt && chkCnt > 0 && chkCnt < MinResultAccessFactor)
                 { //Access value directly by address when the number of query results for the same Section is less than this MinResultAccessFactor
                     rangeList.Add((-1, sectionIdx));
                     isContinue = true;
