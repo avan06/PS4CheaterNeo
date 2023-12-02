@@ -1402,7 +1402,7 @@ namespace PS4CheaterNeo
                         }
                     }
                     CheatGridView.Refresh();
-                    if (errorMsg != "") InputBox.Show("CheatGridMenuEdit_Click Exception", "", ref errorMsg, 100);
+                    if (errorMsg != "") InputBox.MsgBox("CheatGridMenuEdit_Click Exception", "", errorMsg, 100);
                     return;
                 }
 
@@ -1744,8 +1744,7 @@ namespace PS4CheaterNeo
             }
             catch (Exception ex)
             {
-                string msg = ex.ToString();
-                InputBox.Show("Read Local HiddenSections Exception", "", ref msg, 100);
+                InputBox.MsgBox("Read Local HiddenSections Exception", "", ex.ToString(), 100);
             }
         }
 
@@ -1801,8 +1800,7 @@ namespace PS4CheaterNeo
             }
             catch (Exception ex)
             {
-                string msg = ex.ToString();
-                InputBox.Show("Write Local HiddenSection Exception", "", ref msg, 100);
+                InputBox.MsgBox("Write Local HiddenSection Exception", "", ex.ToString(), 100);
             }
         }
         #endregion

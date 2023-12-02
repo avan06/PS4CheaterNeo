@@ -2,14 +2,14 @@
 
 PS4CheaterNeo is a program to find game cheat codes, and it is based on [`ps4debug`](https://github.com/jogolden/ps4debug) and [`.Net Framework 4.8`](https://support.microsoft.com/en-us/topic/microsoft-net-framework-4-8-offline-installer-for-windows-9d23f658-3b97-68ab-d013-aa3c3e7495e0).
 
-Currently in `version 1.0.1.1`
+Currently in `version 1.0.1.2`
 
 
 ## Table of Contents
   * [Building](#building)
   * [Description](#description)
   * [SendPayload](#sendpayload)
-    + [ps4debug](#ps4debug)
+    + [Payload](#payload)
   * [Cheat window](#cheat-window)
     + [Cheat file support](#cheat-file-support)
     + [Add Address](#add-address)
@@ -51,6 +51,7 @@ Currently in `version 1.0.1.1`
 
 ## Building	[🔼](#table-of-contents)
 
+- If you want to use this program, you can directly download the latest version from [Releases](https://github.com/avan06/PS4CheaterNeo/releases). If you wish to contribute to development, please follow the steps below.
 - Open `PS4CheaterNeo.sln` with Visual Studio([Community](https://visualstudio.microsoft.com/vs/community/) also available) and built with [.Net Framework 4.8](https://support.microsoft.com/en-us/topic/microsoft-net-framework-4-8-offline-installer-for-windows-9d23f658-3b97-68ab-d013-aa3c3e7495e0).
 
 
@@ -66,23 +67,25 @@ Currently in `version 1.0.1.1`
 
 ## SendPayload	[🔼](#table-of-contents)
 
-- Opening the `PS4CheaterNeo` program will automatically detect whether `ps4debug` is enabled.
-- If not enabled, `SendPayload` will be executed to enable `ps4debug`.
+- When opening `PS4CheaterNeo`, it will automatically check if `ps4debug` is enabled.
+- If it is not enabled, a `SendPayload` window will pop up, allowing manual enable of the `ps4debug` payload.
 - You must specify the ps4 connection `IP` in SendPayload.
 - `SendPayload` requires the `ps4debug.bin` file that conforms to the `FW` version.
-- Port is `9090` when using `GoldHEN2.x` to `Enable BinLoader Server`, Other `Bin Loader` tool port is usually `9021`.
+- The `FW` version configured in this program only affects the comments for the `saves` and the path location for loading the `ps4debug` payload.
+- Port is `9090` when using `GoldHEN2.x` to `Enable BinLoader Server`, Other `Bin Loader` tool port is usually `9021` or `9020`.
 
 ![sendpayload](assets/sendpayload.webp)
 
 
-### ps4debug
+### Payload
 
-- You must manually copy `ps4debug.bin` to the `same path as PS4CheaterNeo.exe`\payloads\\[`FW version`]\ directory.
+- `ps4debug` or `ps5debug` can be directly placed in the payloads folder, no longer needing to be placed in the specified path for the FW version. (1.0.1.2)
+- You must manually place the downloaded payload in the `\Path\to\PS4CheaterNeo\payloads\` or `\Path\to\PS4CheaterNeo\payloads\\[FW version]\` folder.
 
-> ex.  
-> path to PS4CheaterNeo\payloads\\[FW version]\ps4debug.bin  
-> path\PS4CheaterNeo\bin\Debug\payloads\\[FW version]\ps4debug.bin  
-> path\PS4CheaterNeo\bin\Release\payloads\\[FW version]\ps4debug.bin  
+> ex. Paths without FW will be prioritized for loading.  
+> path\to\PS4CheaterNeo\payloads\ps5debug.elf  
+> path\to\PS4CheaterNeo\payloads\ps4debug.bin  
+> path\to\PS4CheaterNeo\payloads\\[FW version]\ps4debug.bin  
 
 - It can be downloaded at the following URL(`Only ps4debug 6.72 has been tested`).
 
@@ -92,6 +95,7 @@ Currently in `version 1.0.1.1`
 > [ps4debug 7.55 by Joonie86](https://github.com/Joonie86/ps4debug/releases)  
 > [ps4debug 9.00 by Karo](https://twitter.com/i/web/status/1471590847707856905)  
 > [ps4debug all firmware (5.0X, 6.72, 7.02, 7.5X, 9.00) by ctn123](https://github.com/ctn123/PS4_Cheater/releases/)
+> [ps5debug Coded by ctn123 & SiSTRo](https://github.com/GoldHEN/ps5debug/releases)
 
 
 ## Cheat window	[🔼](#table-of-contents)

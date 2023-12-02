@@ -107,8 +107,6 @@ namespace PS4CheaterNeo
             this.ToolStripMsg.Size = new System.Drawing.Size(231, 17);
             this.ToolStripMsg.Spring = true;
             this.ToolStripMsg.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.ToolStripMsg.MouseHover += new System.EventHandler(this.ToolStripMsg_MouseHover);
-            this.ToolStripMsg.TextChanged += new System.EventHandler(this.ToolStripMsg_TextChanged);
             // 
             // OKBtn
             // 

@@ -440,11 +440,7 @@ namespace PS4CheaterNeo
                     System.Diagnostics.Stopwatch tickerMajor = System.Diagnostics.Stopwatch.StartNew();
                     scanTask = ScanTask(alignment, isFilter, isFilterSize, AddrMin, AddrMax, CompareFirstBox.Checked, tickerMajor);
                     scanTask.ContinueWith(t => {
-                        if (t.Exception != null)
-                        {
-                            string errMsg = t.Exception.ToString();
-                            InputBox.Show("ScanTask Exception", "", ref errMsg, 100);
-                        }
+                        if (t.Exception != null) InputBox.MsgBox("ScanTask Exception", "", t.Exception.ToString(), 100);
                     }, TaskContinuationOptions.OnlyOnFaulted)
                     .ContinueWith(t => TaskCompleted(tickerMajor))
                     .ContinueWith(t => Invoke(new MethodInvoker(() => { 

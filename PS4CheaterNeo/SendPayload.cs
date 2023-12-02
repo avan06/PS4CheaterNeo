@@ -84,21 +84,27 @@ namespace PS4CheaterNeo
                     return;
                 }
 
-                string patchPath = string.Format(@"{0}\payloads\{1}\", Application.StartupPath, VersionComboBox.SelectedItem);
-                if (!File.Exists(patchPath + @"ps4debug.bin"))
+                string payloadsPath = string.Format(@"{0}\payloads\", Application.StartupPath);
+                string patchPath = payloadsPath;
+                string patchName = "ps5debug.elf";
+                if (!File.Exists(patchPath + patchName))
                 {
-                    throw new ArgumentException(string.Format("ps4debug.bin({0}) not found!", patchPath));
+                    patchName = "ps4debug.bin";
+                    if (!File.Exists(patchPath + patchName)) patchPath = string.Format(@"{0}\payloads\{1}\", Application.StartupPath, VersionComboBox.SelectedItem);
+                    if (!File.Exists(patchPath + patchName)) throw new ArgumentException(string.Format("payload not found! ({0})\n" +
+                        "You must manually place the downloaded ps4debug.bin or ps5debug.elf in the folder \n\\Path\\to\\PS4CheaterNeo\\payloads\\", payloadsPath));
                 }
-                SendPayLoad(IpBox.Text, Convert.ToInt32(PortBox.Text), patchPath + @"ps4debug.bin");
+                SendPayLoad(IpBox.Text, Convert.ToInt32(PortBox.Text), patchPath + patchName);
                 Thread.Sleep(1000);
 
                 ToolStripMsg.ForeColor = Color.Green;
-                ToolStripMsg.Text = "ps4debug.bin injected successfully!";
+                ToolStripMsg.Text = patchName + " injected successfully!";
             }
             catch (Exception ex)
             {
                 ToolStripMsg.ForeColor = Color.Red;
-                ToolStripMsg.Text = ex.Message;
+                ToolStripMsg.Text = "SendPayloadBtn_Click Exception";
+                InputBox.MsgBox("SendPayloadBtn_Click Exception", "", ex.Message, 100);
             }
         }
 
@@ -141,22 +147,5 @@ namespace PS4CheaterNeo
         }
 
         private void VersionComboBox_SelectedIndexChanged(object sender, EventArgs e) => VersionBox.Text = (string)VersionComboBox.SelectedItem;
-
-        private void ToolStripMsg_MouseHover(object sender, EventArgs e)
-        {
-            if ((ToolStripMsg.Text ?? "").Trim().Length == 0) return;
-
-            if (MsgBox.form == null || MsgBox.form.IsDisposed) MsgBox.Show(this, ToolStripMsg.Text);
-            else MsgBox.label.Text = ToolStripMsg.Text;
-            MsgBox.form.Refresh();
-        }
-
-        private void ToolStripMsg_TextChanged(object sender, EventArgs e)
-        {
-            if (MsgBox.form == null || MsgBox.form.IsDisposed) return;
-
-            MsgBox.label.Text = ToolStripMsg.Text;
-            MsgBox.form.Refresh();
-        }
     }
 }

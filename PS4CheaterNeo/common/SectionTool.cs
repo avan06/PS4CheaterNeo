@@ -472,11 +472,7 @@ namespace PS4CheaterNeo
                 }
             }
             if (WriteHiddenSectionConf && localSectionSB.Length > 0) WriteLocalHiddenSection(localSectionSB);
-            if (errors.Length > 0)
-            {
-                string msg = errors.ToString();
-                InputBox.Show("Detect Hidden Section Exception", "", ref msg, 100);
-            }
+            if (errors.Length > 0) InputBox.MsgBox("Detect Hidden Section Exception", "", errors.ToString(), 100);
         }
 
         private void WriteLocalHiddenSection(StringBuilder sectionSB)
@@ -495,8 +491,7 @@ namespace PS4CheaterNeo
             }
             catch (Exception ex)
             {
-                string msg = ex.ToString();
-                InputBox.Show("Write Local HiddenSection Exception", "", ref msg, 100);
+                InputBox.MsgBox("Write Local HiddenSection Exception", "", ex.ToString(), 100);
             }
         }
 
