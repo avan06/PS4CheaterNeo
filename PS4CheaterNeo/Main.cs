@@ -23,6 +23,7 @@ namespace PS4CheaterNeo
         private bool VerifySectionWhenLock;
         private bool VerifySectionWhenRefresh;
         private bool CheatAutoRefreshShowStatus;
+        private uint CheatGridGroupRefreshThreshold;
 
         public class CheatRow
         {
@@ -53,6 +54,7 @@ namespace PS4CheaterNeo
             AutoRefreshTimer.Interval = (int)Properties.Settings.Default.CheatAutoRefreshTimerInterval.Value;
             VerifySectionWhenLock = Properties.Settings.Default.VerifySectionWhenLock.Value;
             VerifySectionWhenRefresh = Properties.Settings.Default.VerifySectionWhenRefresh.Value;
+            CheatGridGroupRefreshThreshold = Properties.Settings.Default.CheatGridGroupRefreshThreshold.Value;
             CheatGridView.GroupByEnabled = Properties.Settings.Default.CheatGridViewGroupByEnabled.Value;
 
             Text += " " + Application.ProductVersion; //Assembly.GetExecutingAssembly().GetName().Version.ToString(); // Assembly.GetEntryAssembly().GetName().Version.ToString();
@@ -98,7 +100,7 @@ namespace PS4CheaterNeo
                 CheatGridViewLock.DefaultCellStyle.ForeColor        = MainCheatGridCellForeColor; //Color.White;
                 CheatGridViewDescription.DefaultCellStyle.BackColor = MainCheatGridCellBackColor; //Color.FromArgb(64, 64, 64);
                 CheatGridViewDescription.DefaultCellStyle.ForeColor = MainCheatGridCellForeColor; //Color.White;
-                if (cheatGridRowList.Count < 100000 && CheatGridView.GroupByEnabled) CheatGridView.GroupRefresh();
+                if (cheatGridRowList.Count < CheatGridGroupRefreshThreshold && CheatGridView.GroupByEnabled) CheatGridView.GroupRefresh();
             }
             catch (Exception ex)
             {
@@ -278,7 +280,7 @@ namespace PS4CheaterNeo
                         CheatGridViewRowCountUpdate();
                     }
                 }
-                if (cheatGridRowList.Count < 100000 && CheatGridView.GroupByEnabled) CheatGridView.GroupRefresh();
+                if (cheatGridRowList.Count < CheatGridGroupRefreshThreshold && CheatGridView.GroupByEnabled) CheatGridView.GroupRefresh();
                 CheatGridView.ResumeLayout();
                 SaveCheatDialog.FileName = OpenCheatDialog.FileName;
                 SaveCheatDialog.FilterIndex = OpenCheatDialog.FilterIndex;
@@ -660,6 +662,11 @@ namespace PS4CheaterNeo
             }
             catch (Exception ex)
             {
+                if (ex.Message == "No Process currently")
+                {
+                    InputBox.MsgBox("ToolStripAdd_Click", ex.Message, "Process isn't connected. Please connect first");
+                    return;
+                }
                 MessageBox.Show(ex.ToString(), ex.Source + ":ToolStripAdd_Click", MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
@@ -710,6 +717,11 @@ namespace PS4CheaterNeo
             }
             catch (Exception ex)
             {
+                if (ex.Message == "No Process currently")
+                {
+                    InputBox.MsgBox("ToolStripHexView_Click", ex.Message, "Process isn't connected. Please connect first");
+                    return;
+                }
                 MessageBox.Show(ex.ToString(), ex.Source + ":ToolStripHexView_Click", MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
         }
@@ -1231,7 +1243,7 @@ namespace PS4CheaterNeo
                         cheatGridRowList.RemoveAt(e.RowIndex);
                         CheatGridView.RowCount = cheatGridRowList.Count;
                         CheatGridView.Refresh();
-                        if (cheatGridRowList.Count < 100000 && CheatGridView.GroupByEnabled) CheatGridView.GroupRefresh();
+                        if (cheatGridRowList.Count < CheatGridGroupRefreshThreshold && CheatGridView.GroupByEnabled) CheatGridView.GroupRefresh();
                         CheatGridView.SuspendLayout();
                         break;
                     case (int)ChertCol.CheatListLock:
@@ -1529,7 +1541,7 @@ namespace PS4CheaterNeo
             CheatGridView.RowCount = cheatGridRowList.Count;
             CheatGridView.VirtualMode = true;
             CheatGridView.Refresh();
-            if (cheatGridRowList.Count < 100000 && CheatGridView.GroupByEnabled) CheatGridView.GroupRefresh();
+            if (cheatGridRowList.Count < CheatGridGroupRefreshThreshold && CheatGridView.GroupByEnabled) CheatGridView.GroupRefresh();
             CheatGridView.ResumeLayout();
             CheatGridView.CellValidating += CheatGridView_CellValidating;
             rows = null;

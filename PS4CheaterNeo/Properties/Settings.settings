@@ -20,8 +20,14 @@
     <Setting Name="CheatGridViewGroupByEnabled" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
       <Value Profile="(Default)">True|1_General|2_UI|Determines whether to enable the GroupByEnabled feature in CheatGridView. \nWhen enabled, Cheat items will be grouped. \nIf you have a large number of Cheat items, \nyou may consider disabling this feature to speed up Cheat loading. \nAfter setting this, you need to restart the program for it to take effect. \nDefault enabled</Value>
     </Setting>
+    <Setting Name="CheatGridGroupRefreshThreshold" Type="OptionTreeView.Option&lt;uint&gt;" Scope="User">
+      <Value Profile="(Default)">10000|1_General|2_UI|To prevent excessive wait times during GroupRefresh, \nthe GridView's GroupRefresh mechanism is activated only when the number of cheats is less than this value. \nDefault is 10000.</Value>
+    </Setting>
     <Setting Name="PS4DBGMutexFactor" Type="OptionTreeView.Option&lt;byte&gt;" Scope="User">
       <Value Profile="(Default)">3|1_General|3_PS4Tool|It is not recommended to adjust this value, and changes take effect only after a restart. \nThe Mutex factor determines the number of connections that PS4DBG can occupy during initialization. \nFor ReadMemory, the number of connections is from 0 to (but not including) mutexFactor. \nFor WriteMemory, the number of connections is from mutexFactor to (but not including) 2*mutexFactor. \nDefault value is 3.</Value>
+    </Setting>
+    <Setting Name="DisplayChangesListWhenSaving" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
+      <Value Profile="(Default)">True|1_General|4_Option|Determines whether to display the list of change options when saving in Option windows. \nDefault enabled</Value>
     </Setting>
     <Setting Name="CheatCellDirtyValueCommit" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
       <Value Profile="(Default)">True|2_Cheat|Cheat|Determine whether to automatically write to PS4 when editing cheat values in UpDown</Value>

@@ -2,7 +2,7 @@
 
 PS4CheaterNeo is a program to find game cheat codes, and it is based on [`ps4debug`](https://github.com/jogolden/ps4debug) and [`.Net Framework 4.8`](https://support.microsoft.com/en-us/topic/microsoft-net-framework-4-8-offline-installer-for-windows-9d23f658-3b97-68ab-d013-aa3c3e7495e0).
 
-Currently in `version 1.0.1.2`
+Currently in `version 1.0.1.3`
 
 
 ## Table of Contents
@@ -87,15 +87,15 @@ Currently in `version 1.0.1.2`
 > path\to\PS4CheaterNeo\payloads\ps4debug.bin  
 > path\to\PS4CheaterNeo\payloads\\[FW version]\ps4debug.bin  
 
-- It can be downloaded at the following URL(`Only ps4debug 6.72 has been tested`).
+- It can be downloaded at the following URL(`Only ps4debug 6.72 and ctn123 version has been tested`).
 
 > [ps4debug 5.05 by jogolden](https://github.com/jogolden/ps4debug/releases)  
 > [ps4debug 6.72 by GiantPluto](https://github.com/GiantPluto/ps4debug/releases)  
 > [ps4debug 7.02 by ChendoChap](https://github.com/ChendoChap/ps4debug/tags)  
 > [ps4debug 7.55 by Joonie86](https://github.com/Joonie86/ps4debug/releases)  
 > [ps4debug 9.00 by Karo](https://twitter.com/i/web/status/1471590847707856905)  
-> [ps4debug all firmware (5.0X, 6.72, 7.02, 7.5X, 9.00) by ctn123](https://github.com/ctn123/PS4_Cheater/releases/)
-> [ps5debug Coded by ctn123 & SiSTRo](https://github.com/GoldHEN/ps5debug/releases)
+> [ps4debug all firmware (5.0X, 6.72, 7.02, 7.5X, 9.00) by ctn123](https://github.com/ctn123/PS4_Cheater/releases/)  
+> [ps5debug Coded by ctn123 & SiSTRo](https://github.com/GoldHEN/ps5debug/releases)  
 
 
 ## Cheat window	[🔼](#table-of-contents)
@@ -524,8 +524,12 @@ Determines whether to enable `collapsible split container` ui in `Query and HexE
 Determines the opacity of the window, the maximum is 1 (opaque), `Default is 0.95`. (0.9.7.7)  
 - `CheatGridViewGroupByEnabled`:  
 Determines whether to enable the GroupByEnabled feature in CheatGridView. When enabled, Cheat items will be grouped. If you have a large number of Cheat items, you may consider disabling this feature to speed up Cheat loading. After setting this, you need to restart the program for it to take effect. `Default enabled` (0.9.9.6)  
+- `CheatGridGroupRefreshThreshold`:  
+To prevent excessive wait times during GroupRefresh, the GridView's GroupRefresh mechanism is activated only when the number of cheats is less than this value. `Default is 10000`. (1.0.1.3)  
 - `PS4DBGMutexFactor`:  
 It is not recommended to adjust this value, and changes take effect only after a restart. The Mutex factor determines the number of connections that PS4DBG can occupy during initialization. For ReadMemory, the number of connections is from 0 to (but not including) mutexFactor. For WriteMemory, the number of connections is from mutexFactor to (but not including) 2*mutexFactor. `Default value is 3` (0.9.9.2)  
+- `DisplayChangesListWhenSaving`:  
+Determines whether to display the list of change options when saving in Option windows. `Default enabled`. (1.0.1.3)  
 
 ### Cheat  
 - `CheatLock`:  

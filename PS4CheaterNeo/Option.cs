@@ -1,5 +1,4 @@
-﻿using System;
-using System.Drawing;
+﻿using System.Drawing;
 using System.Windows.Forms;
 
 namespace PS4CheaterNeo
@@ -19,6 +18,7 @@ namespace PS4CheaterNeo
             optionTreeView1.BackColor = Properties.Settings.Default.UiBackColor.Value;
             optionTreeView1.ForeColorLeftView = Properties.Settings.Default.UiForeColor.Value;
             optionTreeView1.BackColorLeftView = Properties.Settings.Default.UiBackColor.Value;
+            optionTreeView1.DisplayChangesListWhenSaving = Properties.Settings.Default.DisplayChangesListWhenSaving.Value;
 
             optionTreeView1.InitSettings(Properties.Settings.Default);
         }

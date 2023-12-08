@@ -15,10 +15,10 @@ namespace PS4CheaterNeo
             form.Show();
         }
 
-        public static DialogResult Show(string title, string promptText, ref string value, int textHeight = 20, InputBoxValidation validation = null, int boxWidth = 400, bool showCancelBtn = true, bool handleNewLine = true)
+        public static DialogResult Show(string title, string promptText, ref string value, int textHeight = 20, InputBoxValidation validation = null, int boxWidth = 400, bool showBtn = true, bool handleNewLine = true)
         {
             TextBox textBox = new TextBox();
-            Form form = CreateForm(title, promptText, value, textHeight, validation, boxWidth, showCancelBtn, handleNewLine, textBox);
+            Form form = CreateForm(title, promptText, value, textHeight, validation, boxWidth, showBtn, handleNewLine, textBox);
             DialogResult dialogResult = form.ShowDialog();
             value = textBox.Text;
             return dialogResult;
@@ -69,6 +69,17 @@ namespace PS4CheaterNeo
                 buttonCancel.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
                 form.CancelButton = buttonCancel;
             }
+            else
+            {
+                labelYOffset -= 28;
+                textBox.ReadOnly = true;
+                textBox.BackColor = Color.Silver;
+            }
+            if (textBox.Text != null)
+            {
+                textBox.SelectionStart = textBox.Text.Length;
+                textBox.ScrollToCaret();
+            }
 
             form.ClientSize = new Size(boxWidth, textHeight + 55 + labelYOffset);
             form.Controls.AddRange(new Control[] { label, textBox });
@@ -92,7 +103,6 @@ namespace PS4CheaterNeo
                     }
                 };
             }
-
             return form;
         }
     }

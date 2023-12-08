@@ -12,7 +12,7 @@ namespace PS4CheaterNeo.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.7.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.8.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -100,6 +100,20 @@ namespace PS4CheaterNeo.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("10000|1_General|2_UI|To prevent excessive wait times during GroupRefresh, \\nthe G" +
+            "ridView\'s GroupRefresh mechanism is activated only when the number of cheats is " +
+            "less than this value. \\nDefault is 10000.")]
+        public global::OptionTreeView.Option<uint> CheatGridGroupRefreshThreshold {
+            get {
+                return ((global::OptionTreeView.Option<uint>)(this["CheatGridGroupRefreshThreshold"]));
+            }
+            set {
+                this["CheatGridGroupRefreshThreshold"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute(@"3|1_General|3_PS4Tool|It is not recommended to adjust this value, and changes take effect only after a restart. \nThe Mutex factor determines the number of connections that PS4DBG can occupy during initialization. \nFor ReadMemory, the number of connections is from 0 to (but not including) mutexFactor. \nFor WriteMemory, the number of connections is from mutexFactor to (but not including) 2*mutexFactor. \nDefault value is 3.")]
         public global::OptionTreeView.Option<byte> PS4DBGMutexFactor {
             get {
@@ -107,6 +121,19 @@ namespace PS4CheaterNeo.Properties {
             }
             set {
                 this["PS4DBGMutexFactor"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True|1_General|4_Option|Determines whether to display the list of change options " +
+            "when saving in Option windows. \\nDefault enabled")]
+        public global::OptionTreeView.Option<bool> DisplayChangesListWhenSaving {
+            get {
+                return ((global::OptionTreeView.Option<bool>)(this["DisplayChangesListWhenSaving"]));
+            }
+            set {
+                this["DisplayChangesListWhenSaving"] = value;
             }
         }
         
