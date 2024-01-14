@@ -32,6 +32,7 @@ namespace PS4CheaterNeo
         bool UnknownInitialScanDoNotSkip0   = Properties.Settings.Default.UnknownInitialScanDoNotSkip0.Value;
         bool SectionViewDetectHiddenSection = Properties.Settings.Default.SectionViewDetectHiddenSection.Value;
         bool WriteHiddenSectionConf         = Properties.Settings.Default.WriteHiddenSectionConf.Value;
+        bool isCloneScan = false;
 
         List<ListViewItem> sectionItems = new List<ListViewItem>();
         List<ListViewItem> resultItems = new List<ListViewItem>();
@@ -57,6 +58,16 @@ namespace PS4CheaterNeo
             AutoPauseBox.Checked      = Properties.Settings.Default.ScanAutoPause.Value;
             AutoResumeBox.Checked     = Properties.Settings.Default.ScanAutoResume.Value;
             SectionView.FullRowSelect = Properties.Settings.Default.SectionViewFullRowSelect.Value;
+        }
+
+        public Query(Main mainForm, ComparerTool comparerTool = null, int bitsDictDictsIdx = 0, List<Dictionary<uint, BitsDictionary>> bitsDictDicts = null) : this(mainForm)
+        {
+            if (bitsDictDicts == null || bitsDictDicts.Count <= 0) return;
+
+            this.isCloneScan = true;
+            this.comparerTool = comparerTool;
+            this.bitsDictDictsIdx = bitsDictDictsIdx;
+            this.bitsDictDicts = new List<Dictionary<uint, BitsDictionary>>(bitsDictDicts);
         }
 
         public void ApplyUI()
@@ -115,8 +126,8 @@ namespace PS4CheaterNeo
                 SectionSearchBtn.BackColor = BackColor;
                 GetProcessesBtn.ForeColor  = ForeColor;
                 GetProcessesBtn.BackColor  = BackColor;
-                FilterRuleBtn.ForeColor    = ForeColor;
-                FilterRuleBtn.BackColor    = BackColor;
+                CloneScanBtn.ForeColor     = ForeColor;
+                CloneScanBtn.BackColor     = BackColor;
                 RedoBtn.BackColor          = BackColor;
                 UndoBtn.BackColor          = BackColor;
                 NewBtn.BackColor           = BackColor;
@@ -138,6 +149,12 @@ namespace PS4CheaterNeo
             }
             ScanTypeBox.SelectedIndex = 2;
             if (Properties.Settings.Default.AutoPerformGetProcesses.Value) GetProcessesBtn.PerformClick();
+            if (isCloneScan)
+            {
+                SyncSections("Clone scan");
+                TaskCompleted(System.Diagnostics.Stopwatch.StartNew());
+                NewBtn.Enabled = true;
+            }
         }
 
         private void Query_FormClosing(object sender, FormClosingEventArgs e)
@@ -286,6 +303,8 @@ namespace PS4CheaterNeo
             ScanBtn.Text = "First Scan";
             ScanTypeBox.Enabled = true;
             AlignmentBox.Enabled = true;
+            AddrIsFilterBox.Enabled = true;
+            ProcessesBox.Enabled = true;
             NewBtn.Enabled = false;
             UndoBtn.Enabled = false;
             RedoBtn.Enabled = false;
@@ -333,6 +352,13 @@ namespace PS4CheaterNeo
             else if (!isUnDo && bitsDictDictsIdx < bitsDictDicts.Count - 1) bitsDictDictsIdx++;
             else return false;
 
+            SyncSections(msg);
+
+            return true;
+        });
+
+        private void SyncSections(string msg)
+        {
             Invoke(new MethodInvoker(() => { SectionView.BeginUpdate(); }));
             for (int sectionIdx = 0; sectionIdx < sectionItems.Count; ++sectionIdx)
             {
@@ -359,9 +385,7 @@ namespace PS4CheaterNeo
                 RedoBtn.Enabled = bitsDictDictsIdx < bitsDictDicts.Count - 1;
                 SectionView.EndUpdate();
             }));
-
-            return true;
-        });
+        }
 
         Task<bool> scanTask = null;
         CancellationTokenSource scanSource = null;
@@ -457,6 +481,7 @@ namespace PS4CheaterNeo
 
                     ScanTypeBox.Enabled = false;
                     AlignmentBox.Enabled = false;
+                    ProcessesBox.Enabled = false;
                     NewBtn.Enabled = true;
                 }
             }
@@ -1187,6 +1212,7 @@ namespace PS4CheaterNeo
                     ResultView.EndUpdate();
                     ScanTypeBox_SelectedIndexChanged(null, null);
                     ScanBtn.Text = "Next Scan";
+                    if (AddrIsFilterBox.Checked) AddrIsFilterBox.Enabled = false;
                     if (!CompareFirstBox.Enabled) CompareFirstBox.Enabled = true;
                 }));
             }
@@ -1621,7 +1647,11 @@ namespace PS4CheaterNeo
             FilterChecked("filterAddr", AddrIsFilterBox.Checked);
         }
 
-        private void AddrIsFilterBox_CheckedChanged(object sender, EventArgs e) => FilterChecked("filterAddr", AddrIsFilterBox.Checked);
+        private void AddrIsFilterBox_CheckedChanged(object sender, EventArgs e)
+        {
+            FilterChecked("filterAddr", AddrIsFilterBox.Checked);
+            if (AddrIsFilterBox.Checked && bitsDictDicts.Count > 0) AddrIsFilterBox.Enabled = false;
+        }
 
         private void IsFilterSizeBox_CheckedChanged(object sender, EventArgs e) => FilterChecked("filterSize", IsFilterSizeBox.Checked);
 
@@ -1636,7 +1666,7 @@ namespace PS4CheaterNeo
                 AddrMinBox.Tag = null;
                 AddrMaxBox.Tag = null;
             }
-            ProcessesBox_SelectedIndexChanged(ProcessesBox, null);
+            if (filter != "filterAddr" || !isFilterChecked) ProcessesBox_SelectedIndexChanged(ProcessesBox, null);
             if (isFilterChecked)
             {
                 SectionView.BeginUpdate();
@@ -1686,13 +1716,10 @@ namespace PS4CheaterNeo
             SectionView.Items[item.Index].EnsureVisible();
         }
 
-        private void FilterRuleBtn_Click(object sender, EventArgs e)
+        private void CloneScanBtn_Click(object sender, EventArgs e)
         {
-            string SectionFilterKeys = Properties.Settings.Default.SectionFilterKeys.Value;
-
-            if (InputBox.Show("Section Filter", "Enter the value of the filter keys", ref SectionFilterKeys) != DialogResult.OK) return;
-
-            Properties.Settings.Default.SectionFilterKeys.Value = SectionFilterKeys;
+            Query query = new Query(mainForm, comparerTool, bitsDictDictsIdx, bitsDictDicts);
+            query.Show();
         }
 
         private void SectionViewHexEditor_Click(object sender, EventArgs e)
@@ -1849,11 +1876,13 @@ namespace PS4CheaterNeo
             List<ListViewItem> selectedItems = ListViewLVITEM.GetSelectedItems(SectionView);
             if (selectedItems.Count == 0) return;
 
+            bool? isChecked = null;
             SectionView.BeginUpdate();
             for (int idx = 0; idx < selectedItems.Count; ++idx)
             {
                 ListViewItem item = selectedItems[idx];
-                item.Checked = !item.Checked;
+                if (isChecked == null) isChecked = !item.Checked;
+                item.Checked = (bool)isChecked;
                 uint sid = uint.Parse(item.SubItems[(int)SectionCol.SectionViewSID].Text);
                 SectionCheckUpdate(item.Checked, sid);
             }

@@ -2,7 +2,7 @@
 
 PS4CheaterNeo is a program to find game cheat codes, and it is based on [`ps4debug`](https://github.com/jogolden/ps4debug) and [`.Net Framework 4.8`](https://support.microsoft.com/en-us/topic/microsoft-net-framework-4-8-offline-installer-for-windows-9d23f658-3b97-68ab-d013-aa3c3e7495e0).
 
-Currently in `version 1.0.1.4`
+Currently in `version 1.0.1.5`
 
 
 ## Table of Contents
@@ -20,6 +20,7 @@ Currently in `version 1.0.1.4`
     + [Query window: Dump Import PS4 section memory block](#query-window-dump-import-ps4-section-memory-block)
     + [Query window: Compare to first scan](#query-window-compare-to-first-scan)
     + [Query window: Detect Hidden Section](#query-window-detect-hidden-section)
+    + [Query window: Clone scan result](#query-window-clone-scan-result)
   * [Scan Type](#scan-type)
     + [Scan Type: Byte](#scan-type-byte)
     + [Scan Type: 2 Bytes](#scan-type-2-bytes)
@@ -153,7 +154,7 @@ Cheat format used by PS4 Trainer and GoldHEN Cheat (0.9.6.0)
 - In addition to query types such as `Byte, Float, Double, Hex`, etc., ScanType also supports `Group` types.
 - Make the `section` of the suspected target more obvious.
 - The query value will skip the filtered `section` list when the `Filter` checkbox is clicked.
-- The preset `section` filter rules is `libSce, libc.prx, SceShell, SceLib, SceNp, SceVoice, SceFios, libkernel, SceVdec`, these rules can also be customized.
+- The preset `section` filter rules is `libSce, libc.prx, SceShell, SceLib, SceNp, SceVoice, SceFios, libkernel, SceVdec`, these rules can also be customized in the Query page of the Options window.
 - The `section` list whose length is less than `SectionFilterSize` (default is 200K, can be modified in Option) will be filtered when the `FilterSize` checkbox is clicked. (0.9.4.9)
 - Support dump `section` to binary files in `section` list. (0.9.6.2)
 - Added collapsible split container ui in Query and HexEditor and PointerFinder (can be set in `EnableCollapsibleContainer` options to enable or not). (0.9.7.3)
@@ -258,6 +259,13 @@ The relevant execution steps are as follows:
 4. After completing the scan, you can check if there have been any changes in the conf file's contents and the Prot of `executable` sections will automatically be set to `7`.
 5. When opening a new Query window, it will automatically load the corresponding game ID's conf file and display Hidden Section addresses and whether they should be shown, based on the configuration.
 6. The conf file format is "`SID, Start, End, Valid, Prot, Name`" with each line recording a local Hidden Section. When `"Valid" is false`, it means that this `section has no data`.
+
+
+### Query window: Clone scan result
+
+- Added a "Clone" button in the Query window, allowing the current scanning state and results to be duplicated into a new Query window. For example, after performing an "Unknown Initial" scan, you can copy the scan results into multiple new Query windows and then execute different scans. (1.0.1.5)  
+
+![query_ColneBtn](assets/query_ColneBtn.webp)
 
 
 ## Scan Type	[🔼](#table-of-contents)

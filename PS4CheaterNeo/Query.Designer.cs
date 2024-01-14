@@ -103,7 +103,7 @@ namespace PS4CheaterNeo
             this.AutoPauseBox = new System.Windows.Forms.CheckBox();
             this.RedoBtn = new System.Windows.Forms.Button();
             this.UndoBtn = new System.Windows.Forms.Button();
-            this.FilterRuleBtn = new System.Windows.Forms.Button();
+            this.CloneScanBtn = new System.Windows.Forms.Button();
             this.IsFilterBox = new System.Windows.Forms.CheckBox();
             this.IsFilterSizeBox = new System.Windows.Forms.CheckBox();
             this.ScanTypeBox = new System.Windows.Forms.ComboBox();
@@ -498,7 +498,7 @@ namespace PS4CheaterNeo
             this.SplitContainer2.Panel2.Controls.Add(this.AutoPauseBox);
             this.SplitContainer2.Panel2.Controls.Add(this.RedoBtn);
             this.SplitContainer2.Panel2.Controls.Add(this.UndoBtn);
-            this.SplitContainer2.Panel2.Controls.Add(this.FilterRuleBtn);
+            this.SplitContainer2.Panel2.Controls.Add(this.CloneScanBtn);
             this.SplitContainer2.Panel2.Controls.Add(this.IsFilterBox);
             this.SplitContainer2.Panel2.Controls.Add(this.IsFilterSizeBox);
             this.SplitContainer2.Panel2.Controls.Add(this.ScanTypeBox);
@@ -888,21 +888,20 @@ namespace PS4CheaterNeo
             this.UndoBtn.UseVisualStyleBackColor = false;
             this.UndoBtn.Click += new System.EventHandler(this.UndoBtn_Click);
             // 
-            // FilterRuleBtn
+            // CloneScanBtn
             // 
-            this.FilterRuleBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.FilterRuleBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(36)))), ((int)(((byte)(36)))));
-            this.FilterRuleBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.FilterRuleBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.75F);
-            this.FilterRuleBtn.ForeColor = System.Drawing.Color.White;
-            this.FilterRuleBtn.Location = new System.Drawing.Point(251, 0);
-            this.FilterRuleBtn.Name = "FilterRuleBtn";
-            this.FilterRuleBtn.Size = new System.Drawing.Size(35, 22);
-            this.FilterRuleBtn.TabIndex = 2;
-            this.FilterRuleBtn.Text = "Rule";
-            this.FilterRuleBtn.TextAlign = System.Drawing.ContentAlignment.TopLeft;
-            this.FilterRuleBtn.UseVisualStyleBackColor = false;
-            this.FilterRuleBtn.Click += new System.EventHandler(this.FilterRuleBtn_Click);
+            this.CloneScanBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.CloneScanBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(36)))), ((int)(((byte)(36)))));
+            this.CloneScanBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.75F);
+            this.CloneScanBtn.ForeColor = System.Drawing.Color.White;
+            this.CloneScanBtn.Location = new System.Drawing.Point(252, 0);
+            this.CloneScanBtn.Name = "CloneScanBtn";
+            this.CloneScanBtn.Size = new System.Drawing.Size(37, 22);
+            this.CloneScanBtn.TabIndex = 2;
+            this.CloneScanBtn.Text = "Clone";
+            this.CloneScanBtn.TextAlign = System.Drawing.ContentAlignment.TopLeft;
+            this.CloneScanBtn.UseVisualStyleBackColor = false;
+            this.CloneScanBtn.Click += new System.EventHandler(this.CloneScanBtn_Click);
             // 
             // IsFilterBox
             // 
@@ -1204,7 +1203,7 @@ namespace PS4CheaterNeo
         private System.Windows.Forms.Panel Panel1;
         private System.Windows.Forms.StatusStrip StatusStrip1;
         private System.Windows.Forms.ToolStripStatusLabel ToolStripMsg;
-        private System.Windows.Forms.Button FilterRuleBtn;
+        private System.Windows.Forms.Button CloneScanBtn;
         private System.Windows.Forms.CheckBox IsFilterBox;
         private System.Windows.Forms.ProgressBar ToolStripBar;
         private System.Windows.Forms.ContextMenuStrip ResultViewMenu;
