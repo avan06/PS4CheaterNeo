@@ -40,6 +40,7 @@ namespace PS4CheaterNeo
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle9 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle10 = new System.Windows.Forms.DataGridViewCellStyle();
             this.CheatGridMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.CheatGridMenuHexEditor = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
@@ -78,10 +79,6 @@ namespace PS4CheaterNeo
             this.ToolStripMsg = new System.Windows.Forms.ToolStripStatusLabel();
             this.panel1 = new System.Windows.Forms.Panel();
             this.CheatGridView = new GroupGridView.GroupGridView();
-            this.RefreshLock = new System.Windows.Forms.Timer(this.components);
-            this.OpenCheatDialog = new System.Windows.Forms.OpenFileDialog();
-            this.SaveCheatDialog = new System.Windows.Forms.SaveFileDialog();
-            this.AutoRefreshTimer = new System.Windows.Forms.Timer(this.components);
             this.CheatGridViewDel = new System.Windows.Forms.DataGridViewButtonColumn();
             this.CheatGridViewAddress = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.CheatGridViewType = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -91,6 +88,10 @@ namespace PS4CheaterNeo
             this.CheatGridViewSID = new GroupGridView.DataGridViewUpDownColumn();
             this.CheatGridViewLock = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.CheatGridViewDescription = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.RefreshLock = new System.Windows.Forms.Timer(this.components);
+            this.OpenCheatDialog = new System.Windows.Forms.OpenFileDialog();
+            this.SaveCheatDialog = new System.Windows.Forms.SaveFileDialog();
+            this.AutoRefreshTimer = new System.Windows.Forms.Timer(this.components);
             this.CheatGridMenu.SuspendLayout();
             this.ToolStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
@@ -327,9 +328,8 @@ namespace PS4CheaterNeo
             // ToolStripProcessInfo
             // 
             this.ToolStripProcessInfo.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
-            this.ToolStripProcessInfo.Font = new System.Drawing.Font("Microsoft JhengHei UI", 9F, System.Drawing.FontStyle.Bold);
             this.ToolStripProcessInfo.Name = "ToolStripProcessInfo";
-            this.ToolStripProcessInfo.Size = new System.Drawing.Size(131, 22);
+            this.ToolStripProcessInfo.Size = new System.Drawing.Size(123, 22);
             this.ToolStripProcessInfo.Text = "ToolStripProcessInfo";
             this.ToolStripProcessInfo.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
@@ -441,6 +441,8 @@ namespace PS4CheaterNeo
             this.CheatGridView.BaseRowGroupOrder = GroupGridView.GroupGridView.Order.Ascending;
             this.CheatGridView.BaseRowGroupOrderColumn = -1;
             this.CheatGridView.BaseRowSingleGroupEnabled = false;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            this.CheatGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             this.CheatGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.CheatGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.CheatGridViewDel,
@@ -486,6 +488,104 @@ namespace PS4CheaterNeo
             this.CheatGridView.EditingControlShowing += new System.Windows.Forms.DataGridViewEditingControlShowingEventHandler(this.CheatGridView_EditingControlShowing);
             this.CheatGridView.RowPostPaint += new System.Windows.Forms.DataGridViewRowPostPaintEventHandler(this.CheatGridView_RowPostPaint);
             // 
+            // CheatGridViewDel
+            // 
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.BottomRight;
+            dataGridViewCellStyle2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            dataGridViewCellStyle2.ForeColor = System.Drawing.Color.White;
+            dataGridViewCellStyle2.NullValue = "Delete";
+            this.CheatGridViewDel.DefaultCellStyle = dataGridViewCellStyle2;
+            this.CheatGridViewDel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.CheatGridViewDel.HeaderText = "Delete";
+            this.CheatGridViewDel.Name = "CheatGridViewDel";
+            this.CheatGridViewDel.Width = 50;
+            // 
+            // CheatGridViewAddress
+            // 
+            dataGridViewCellStyle3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            dataGridViewCellStyle3.ForeColor = System.Drawing.Color.White;
+            this.CheatGridViewAddress.DefaultCellStyle = dataGridViewCellStyle3;
+            this.CheatGridViewAddress.HeaderText = "Address";
+            this.CheatGridViewAddress.Name = "CheatGridViewAddress";
+            this.CheatGridViewAddress.ReadOnly = true;
+            this.CheatGridViewAddress.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // CheatGridViewType
+            // 
+            dataGridViewCellStyle4.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            dataGridViewCellStyle4.ForeColor = System.Drawing.Color.White;
+            this.CheatGridViewType.DefaultCellStyle = dataGridViewCellStyle4;
+            this.CheatGridViewType.HeaderText = "Type";
+            this.CheatGridViewType.Name = "CheatGridViewType";
+            this.CheatGridViewType.ReadOnly = true;
+            this.CheatGridViewType.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.CheatGridViewType.Width = 60;
+            // 
+            // CheatGridViewActive
+            // 
+            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle5.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            dataGridViewCellStyle5.ForeColor = System.Drawing.Color.White;
+            dataGridViewCellStyle5.NullValue = "X";
+            this.CheatGridViewActive.DefaultCellStyle = dataGridViewCellStyle5;
+            this.CheatGridViewActive.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.CheatGridViewActive.HeaderText = "X";
+            this.CheatGridViewActive.Name = "CheatGridViewActive";
+            this.CheatGridViewActive.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.CheatGridViewActive.Text = "X";
+            this.CheatGridViewActive.Width = 25;
+            // 
+            // CheatGridViewValue
+            // 
+            dataGridViewCellStyle6.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            dataGridViewCellStyle6.ForeColor = System.Drawing.Color.White;
+            this.CheatGridViewValue.DefaultCellStyle = dataGridViewCellStyle6;
+            this.CheatGridViewValue.HeaderText = "Value";
+            this.CheatGridViewValue.Name = "CheatGridViewValue";
+            // 
+            // CheatGridViewSection
+            // 
+            dataGridViewCellStyle7.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            dataGridViewCellStyle7.ForeColor = System.Drawing.Color.White;
+            this.CheatGridViewSection.DefaultCellStyle = dataGridViewCellStyle7;
+            this.CheatGridViewSection.HeaderText = "Section";
+            this.CheatGridViewSection.Name = "CheatGridViewSection";
+            this.CheatGridViewSection.ReadOnly = true;
+            this.CheatGridViewSection.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // CheatGridViewSID
+            // 
+            dataGridViewCellStyle8.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            dataGridViewCellStyle8.ForeColor = System.Drawing.Color.White;
+            this.CheatGridViewSID.DefaultCellStyle = dataGridViewCellStyle8;
+            this.CheatGridViewSID.HeaderText = "SID";
+            this.CheatGridViewSID.Name = "CheatGridViewSID";
+            this.CheatGridViewSID.ReadOnly = true;
+            this.CheatGridViewSID.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.CheatGridViewSID.Width = 20;
+            // 
+            // CheatGridViewLock
+            // 
+            dataGridViewCellStyle9.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle9.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            dataGridViewCellStyle9.ForeColor = System.Drawing.Color.White;
+            dataGridViewCellStyle9.NullValue = false;
+            this.CheatGridViewLock.DefaultCellStyle = dataGridViewCellStyle9;
+            this.CheatGridViewLock.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.CheatGridViewLock.HeaderText = "Lock";
+            this.CheatGridViewLock.Name = "CheatGridViewLock";
+            this.CheatGridViewLock.Width = 35;
+            // 
+            // CheatGridViewDescription
+            // 
+            this.CheatGridViewDescription.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            dataGridViewCellStyle10.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            dataGridViewCellStyle10.ForeColor = System.Drawing.Color.White;
+            this.CheatGridViewDescription.DefaultCellStyle = dataGridViewCellStyle10;
+            this.CheatGridViewDescription.HeaderText = "Description";
+            this.CheatGridViewDescription.Name = "CheatGridViewDescription";
+            this.CheatGridViewDescription.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
             // RefreshLock
             // 
             this.RefreshLock.Enabled = true;
@@ -496,104 +596,6 @@ namespace PS4CheaterNeo
             // 
             this.AutoRefreshTimer.Interval = 2500;
             this.AutoRefreshTimer.Tick += new System.EventHandler(this.AutoRefreshTimer_Tick);
-            // 
-            // CheatGridViewDel
-            // 
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.BottomRight;
-            dataGridViewCellStyle1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            dataGridViewCellStyle1.ForeColor = System.Drawing.Color.White;
-            dataGridViewCellStyle1.NullValue = "Delete";
-            this.CheatGridViewDel.DefaultCellStyle = dataGridViewCellStyle1;
-            this.CheatGridViewDel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.CheatGridViewDel.HeaderText = "Delete";
-            this.CheatGridViewDel.Name = "CheatGridViewDel";
-            this.CheatGridViewDel.Width = 50;
-            // 
-            // CheatGridViewAddress
-            // 
-            dataGridViewCellStyle2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            dataGridViewCellStyle2.ForeColor = System.Drawing.Color.White;
-            this.CheatGridViewAddress.DefaultCellStyle = dataGridViewCellStyle2;
-            this.CheatGridViewAddress.HeaderText = "Address";
-            this.CheatGridViewAddress.Name = "CheatGridViewAddress";
-            this.CheatGridViewAddress.ReadOnly = true;
-            this.CheatGridViewAddress.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // CheatGridViewType
-            // 
-            dataGridViewCellStyle3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            dataGridViewCellStyle3.ForeColor = System.Drawing.Color.White;
-            this.CheatGridViewType.DefaultCellStyle = dataGridViewCellStyle3;
-            this.CheatGridViewType.HeaderText = "Type";
-            this.CheatGridViewType.Name = "CheatGridViewType";
-            this.CheatGridViewType.ReadOnly = true;
-            this.CheatGridViewType.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.CheatGridViewType.Width = 60;
-            // 
-            // CheatGridViewActive
-            // 
-            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle4.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            dataGridViewCellStyle4.ForeColor = System.Drawing.Color.White;
-            dataGridViewCellStyle4.NullValue = "X";
-            this.CheatGridViewActive.DefaultCellStyle = dataGridViewCellStyle4;
-            this.CheatGridViewActive.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.CheatGridViewActive.HeaderText = "X";
-            this.CheatGridViewActive.Name = "CheatGridViewActive";
-            this.CheatGridViewActive.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-            this.CheatGridViewActive.Text = "X";
-            this.CheatGridViewActive.Width = 25;
-            // 
-            // CheatGridViewValue
-            // 
-            dataGridViewCellStyle5.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            dataGridViewCellStyle5.ForeColor = System.Drawing.Color.White;
-            this.CheatGridViewValue.DefaultCellStyle = dataGridViewCellStyle5;
-            this.CheatGridViewValue.HeaderText = "Value";
-            this.CheatGridViewValue.Name = "CheatGridViewValue";
-            // 
-            // CheatGridViewSection
-            // 
-            dataGridViewCellStyle6.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            dataGridViewCellStyle6.ForeColor = System.Drawing.Color.White;
-            this.CheatGridViewSection.DefaultCellStyle = dataGridViewCellStyle6;
-            this.CheatGridViewSection.HeaderText = "Section";
-            this.CheatGridViewSection.Name = "CheatGridViewSection";
-            this.CheatGridViewSection.ReadOnly = true;
-            this.CheatGridViewSection.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // CheatGridViewSID
-            // 
-            dataGridViewCellStyle7.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            dataGridViewCellStyle7.ForeColor = System.Drawing.Color.White;
-            this.CheatGridViewSID.DefaultCellStyle = dataGridViewCellStyle7;
-            this.CheatGridViewSID.HeaderText = "SID";
-            this.CheatGridViewSID.Name = "CheatGridViewSID";
-            this.CheatGridViewSID.ReadOnly = true;
-            this.CheatGridViewSID.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.CheatGridViewSID.Width = 20;
-            // 
-            // CheatGridViewLock
-            // 
-            dataGridViewCellStyle8.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle8.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            dataGridViewCellStyle8.ForeColor = System.Drawing.Color.White;
-            dataGridViewCellStyle8.NullValue = false;
-            this.CheatGridViewLock.DefaultCellStyle = dataGridViewCellStyle8;
-            this.CheatGridViewLock.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.CheatGridViewLock.HeaderText = "Lock";
-            this.CheatGridViewLock.Name = "CheatGridViewLock";
-            this.CheatGridViewLock.Width = 35;
-            // 
-            // CheatGridViewDescription
-            // 
-            this.CheatGridViewDescription.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            dataGridViewCellStyle9.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            dataGridViewCellStyle9.ForeColor = System.Drawing.Color.White;
-            this.CheatGridViewDescription.DefaultCellStyle = dataGridViewCellStyle9;
-            this.CheatGridViewDescription.HeaderText = "Description";
-            this.CheatGridViewDescription.Name = "CheatGridViewDescription";
-            this.CheatGridViewDescription.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             // 
             // Main
             // 

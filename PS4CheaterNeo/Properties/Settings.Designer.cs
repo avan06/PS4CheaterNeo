@@ -62,14 +62,26 @@ namespace PS4CheaterNeo.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True|1_General|2_UI|Determines whether to enable collapsible split container ui i" +
-            "n Query and HexEditor and PointerFinder windows. \\nDefault enabled")]
-        public global::OptionTreeView.Option<bool> CollapsibleContainer {
+        [global::System.Configuration.DefaultSettingValueAttribute("0|1_General|2_UI|Determine the language displayed. Default english.")]
+        public global::OptionTreeView.Option<PS4CheaterNeo.LanguageCodes> UILanguage {
             get {
-                return ((global::OptionTreeView.Option<bool>)(this["CollapsibleContainer"]));
+                return ((global::OptionTreeView.Option<PS4CheaterNeo.LanguageCodes>)(this["UILanguage"]));
             }
             set {
-                this["CollapsibleContainer"] = value;
+                this["UILanguage"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("DefaultFont|1_General|2_UI|Determine the UI Font Family. Default SystemFonts.Defa" +
+            "ultFont.")]
+        public global::OptionTreeView.Option<System.Drawing.FontFamily> UIFont {
+            get {
+                return ((global::OptionTreeView.Option<System.Drawing.FontFamily>)(this["UIFont"]));
+            }
+            set {
+                this["UIFont"] = value;
             }
         }
         
@@ -83,6 +95,19 @@ namespace PS4CheaterNeo.Properties {
             }
             set {
                 this["UIOpacity"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True|1_General|2_UI|Determines whether to enable collapsible split container ui i" +
+            "n Query and HexEditor and PointerFinder windows. \\nDefault enabled")]
+        public global::OptionTreeView.Option<bool> CollapsibleContainer {
+            get {
+                return ((global::OptionTreeView.Option<bool>)(this["CollapsibleContainer"]));
+            }
+            set {
+                this["CollapsibleContainer"] = value;
             }
         }
         
@@ -140,7 +165,7 @@ namespace PS4CheaterNeo.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True|2_Cheat|Cheat|Determine whether to automatically write to PS4 when editing c" +
-            "heat values in UpDown")]
+            "heat values in UpDown. \\nDefault enabled")]
         public global::OptionTreeView.Option<bool> CheatCellDirtyValueCommit {
             get {
                 return ((global::OptionTreeView.Option<bool>)(this["CheatCellDirtyValueCommit"]));
@@ -269,7 +294,7 @@ namespace PS4CheaterNeo.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute(@"50|3_Query|1_Query|Set the minimum buffer size (in MB) in querying and pointerFinder, \nenter 0 to not use buffer, setting this value to 0 is better when the total number of Sections in the game is low. \nIf the game has more than a thousand Sections, Buffer must be set")]
+        [global::System.Configuration.DefaultSettingValueAttribute(@"50|3_Query|1_Query|Set the minimum buffer size (in MB) in querying and pointerFinder, \nenter 0 to not use buffer, setting this value to 0 is better when the total number of Sections in the game is low. \nIf the game has more than a thousand Sections, Buffer must be set. \nDefault value is 50")]
         public global::OptionTreeView.Option<uint> QueryBufferSize {
             get {
                 return ((global::OptionTreeView.Option<uint>)(this["QueryBufferSize"]));

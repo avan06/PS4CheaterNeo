@@ -35,6 +35,7 @@ namespace PS4CheaterNeo
             this.PointerListView = new System.Windows.Forms.ListView();
             this.PointerListViewMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.PointerListViewAddToCheatGrid = new System.Windows.Forms.ToolStripMenuItem();
+            this.PointerListViewSelectAll = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.ToolStripMsg = new System.Windows.Forms.ToolStripStatusLabel();
             this.FilterSizeRuleBtn = new System.Windows.Forms.Button();
@@ -42,7 +43,7 @@ namespace PS4CheaterNeo
             this.NegativeOffsetBox = new System.Windows.Forms.CheckBox();
             this.ScanTypeBox = new System.Windows.Forms.ComboBox();
             this.NewBtn = new System.Windows.Forms.Button();
-            this.label3 = new System.Windows.Forms.Label();
+            this.LevelLabel = new System.Windows.Forms.Label();
             this.MaxRangeUpDown = new System.Windows.Forms.NumericUpDown();
             this.LevelUpdown = new System.Windows.Forms.NumericUpDown();
             this.ProgBar = new System.Windows.Forms.ProgressBar();
@@ -52,13 +53,12 @@ namespace PS4CheaterNeo
             this.IsFilterBox = new System.Windows.Forms.CheckBox();
             this.FastScanBox = new System.Windows.Forms.CheckBox();
             this.IsInitScan = new System.Windows.Forms.CheckBox();
-            this.label2 = new System.Windows.Forms.Label();
+            this.MaxRangeLabel = new System.Windows.Forms.Label();
             this.ScanBtn = new System.Windows.Forms.Button();
             this.AddressBox = new System.Windows.Forms.TextBox();
-            this.label1 = new System.Windows.Forms.Label();
+            this.AddressLabel = new System.Windows.Forms.Label();
             this.SaveDialog = new System.Windows.Forms.SaveFileDialog();
             this.OpenDialog = new System.Windows.Forms.OpenFileDialog();
-            this.PointerListViewSelectAll = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.SplitContainer1)).BeginInit();
             this.SplitContainer1.Panel1.SuspendLayout();
             this.SplitContainer1.Panel2.SuspendLayout();
@@ -89,7 +89,7 @@ namespace PS4CheaterNeo
             this.SplitContainer1.Panel2.Controls.Add(this.NegativeOffsetBox);
             this.SplitContainer1.Panel2.Controls.Add(this.ScanTypeBox);
             this.SplitContainer1.Panel2.Controls.Add(this.NewBtn);
-            this.SplitContainer1.Panel2.Controls.Add(this.label3);
+            this.SplitContainer1.Panel2.Controls.Add(this.LevelLabel);
             this.SplitContainer1.Panel2.Controls.Add(this.MaxRangeUpDown);
             this.SplitContainer1.Panel2.Controls.Add(this.LevelUpdown);
             this.SplitContainer1.Panel2.Controls.Add(this.ProgBar);
@@ -99,10 +99,10 @@ namespace PS4CheaterNeo
             this.SplitContainer1.Panel2.Controls.Add(this.IsFilterBox);
             this.SplitContainer1.Panel2.Controls.Add(this.FastScanBox);
             this.SplitContainer1.Panel2.Controls.Add(this.IsInitScan);
-            this.SplitContainer1.Panel2.Controls.Add(this.label2);
+            this.SplitContainer1.Panel2.Controls.Add(this.MaxRangeLabel);
             this.SplitContainer1.Panel2.Controls.Add(this.ScanBtn);
             this.SplitContainer1.Panel2.Controls.Add(this.AddressBox);
-            this.SplitContainer1.Panel2.Controls.Add(this.label1);
+            this.SplitContainer1.Panel2.Controls.Add(this.AddressLabel);
             this.SplitContainer1.Size = new System.Drawing.Size(800, 450);
             this.SplitContainer1.SplitterButtonBitmap = ((System.Drawing.Bitmap)(resources.GetObject("SplitContainer1.SplitterButtonBitmap")));
             this.SplitContainer1.SplitterButtonLocation = PS4CheaterNeo.ButtonLocation.Panel1;
@@ -137,14 +137,21 @@ namespace PS4CheaterNeo
             this.PointerListViewAddToCheatGrid,
             this.PointerListViewSelectAll});
             this.PointerListViewMenu.Name = "contextMenuStrip1";
-            this.PointerListViewMenu.Size = new System.Drawing.Size(181, 70);
+            this.PointerListViewMenu.Size = new System.Drawing.Size(177, 48);
             // 
             // PointerListViewAddToCheatGrid
             // 
             this.PointerListViewAddToCheatGrid.Name = "PointerListViewAddToCheatGrid";
-            this.PointerListViewAddToCheatGrid.Size = new System.Drawing.Size(180, 22);
+            this.PointerListViewAddToCheatGrid.Size = new System.Drawing.Size(176, 22);
             this.PointerListViewAddToCheatGrid.Text = "Add to Cheat Grid";
             this.PointerListViewAddToCheatGrid.Click += new System.EventHandler(this.PointerListViewAddToCheatGrid_Click);
+            // 
+            // PointerListViewSelectAll
+            // 
+            this.PointerListViewSelectAll.Name = "PointerListViewSelectAll";
+            this.PointerListViewSelectAll.Size = new System.Drawing.Size(176, 22);
+            this.PointerListViewSelectAll.Text = "Select All";
+            this.PointerListViewSelectAll.Click += new System.EventHandler(this.PointerListViewSelectAll_Click);
             // 
             // statusStrip1
             // 
@@ -225,14 +232,14 @@ namespace PS4CheaterNeo
             this.NewBtn.UseVisualStyleBackColor = false;
             this.NewBtn.Click += new System.EventHandler(this.NewBtn_Click);
             // 
-            // label3
+            // LevelLabel
             // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(0, 0);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(34, 12);
-            this.label3.TabIndex = 2;
-            this.label3.Text = "Level:";
+            this.LevelLabel.AutoSize = true;
+            this.LevelLabel.Location = new System.Drawing.Point(0, 0);
+            this.LevelLabel.Name = "LevelLabel";
+            this.LevelLabel.Size = new System.Drawing.Size(34, 12);
+            this.LevelLabel.TabIndex = 2;
+            this.LevelLabel.Text = "Level:";
             // 
             // MaxRangeUpDown
             // 
@@ -367,14 +374,14 @@ namespace PS4CheaterNeo
             this.IsInitScan.Text = "InitScan";
             this.IsInitScan.UseVisualStyleBackColor = true;
             // 
-            // label2
+            // MaxRangeLabel
             // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(0, 136);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(59, 12);
-            this.label2.TabIndex = 4;
-            this.label2.Text = "MaxRange:";
+            this.MaxRangeLabel.AutoSize = true;
+            this.MaxRangeLabel.Location = new System.Drawing.Point(0, 136);
+            this.MaxRangeLabel.Name = "MaxRangeLabel";
+            this.MaxRangeLabel.Size = new System.Drawing.Size(59, 12);
+            this.MaxRangeLabel.TabIndex = 4;
+            this.MaxRangeLabel.Text = "MaxRange:";
             // 
             // ScanBtn
             // 
@@ -401,21 +408,14 @@ namespace PS4CheaterNeo
             this.AddressBox.Size = new System.Drawing.Size(120, 22);
             this.AddressBox.TabIndex = 2;
             // 
-            // label1
+            // AddressLabel
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(0, 40);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(45, 12);
-            this.label1.TabIndex = 1;
-            this.label1.Text = "Address:";
-            // 
-            // PointerListViewSelectAll
-            // 
-            this.PointerListViewSelectAll.Name = "PointerListViewSelectAll";
-            this.PointerListViewSelectAll.Size = new System.Drawing.Size(180, 22);
-            this.PointerListViewSelectAll.Text = "Select All";
-            this.PointerListViewSelectAll.Click += new System.EventHandler(this.PointerListViewSelectAll_Click);
+            this.AddressLabel.AutoSize = true;
+            this.AddressLabel.Location = new System.Drawing.Point(0, 40);
+            this.AddressLabel.Name = "AddressLabel";
+            this.AddressLabel.Size = new System.Drawing.Size(45, 12);
+            this.AddressLabel.TabIndex = 1;
+            this.AddressLabel.Text = "Address:";
             // 
             // PointerFinder
             // 
@@ -447,9 +447,9 @@ namespace PS4CheaterNeo
 
         private CollapsibleSplitContainer SplitContainer1;
         private System.Windows.Forms.TextBox AddressBox;
-        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label AddressLabel;
         private System.Windows.Forms.Button ScanBtn;
-        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label MaxRangeLabel;
         private System.Windows.Forms.CheckBox FastScanBox;
         private System.Windows.Forms.CheckBox IsInitScan;
         private System.Windows.Forms.CheckBox IsFilterBox;
@@ -461,7 +461,7 @@ namespace PS4CheaterNeo
         private System.Windows.Forms.ToolStripStatusLabel ToolStripMsg;
         private System.Windows.Forms.NumericUpDown LevelUpdown;
         private System.Windows.Forms.NumericUpDown MaxRangeUpDown;
-        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label LevelLabel;
         private System.Windows.Forms.SaveFileDialog SaveDialog;
         private System.Windows.Forms.OpenFileDialog OpenDialog;
         private System.Windows.Forms.ListView PointerListView;

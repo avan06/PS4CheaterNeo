@@ -2,7 +2,7 @@
 
 PS4CheaterNeo is a program to find game cheat codes, and it is based on [`ps4debug`](https://github.com/jogolden/ps4debug) and [`.Net Framework 4.8`](https://support.microsoft.com/en-us/topic/microsoft-net-framework-4-8-offline-installer-for-windows-9d23f658-3b97-68ab-d013-aa3c3e7495e0).
 
-Currently in `version 1.0.1.5`
+Currently in `version 1.0.2.0`
 
 
 ## Table of Contents
@@ -526,10 +526,14 @@ Enter PS4 IP location.
 Enter PS4 Port.  
 - `PS4FWVersion`:  
 Enter PS4 FW Version (Confirm the fw version only when perform sendpayload).  
-- `CollapsibleContainer`:  
-Determines whether to enable `collapsible split container` ui in `Query and HexEditor and PointerFinder` windows. Default enabled. (0.9.7.3)  
+- `UILanguage`:  
+Determine the language displayed. Default english. (1.0.2.0)  
+- `UIFont`:  
+Determine the UI Font Family. Default Consolas. (1.0.2.0)  
 - `UIOpacity`:  
 Determines the opacity of the window, the maximum is 1 (opaque), `Default is 0.95`. (0.9.7.7)  
+- `CollapsibleContainer`:  
+Determines whether to enable `collapsible split container` ui in `Query and HexEditor and PointerFinder` windows. Default enabled. (0.9.7.3)  
 - `CheatGridViewGroupByEnabled`:  
 Determines whether to enable the GroupByEnabled feature in CheatGridView. When enabled, Cheat items will be grouped. If you have a large number of Cheat items, you may consider disabling this feature to speed up Cheat loading. After setting this, you need to restart the program for it to take effect. `Default enabled` (0.9.9.6)  
 - `CheatGridGroupRefreshThreshold`:  

@@ -11,11 +11,17 @@
     <Setting Name="PS4FWVersion" Type="OptionTreeView.Option&lt;string&gt;" Scope="User">
       <Value Profile="(Default)">|1_General|1_SendPayload|Enter PS4 FW Version (Confirm the fw version only when perform sendpayload)</Value>
     </Setting>
-    <Setting Name="CollapsibleContainer" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
-      <Value Profile="(Default)">True|1_General|2_UI|Determines whether to enable collapsible split container ui in Query and HexEditor and PointerFinder windows. \nDefault enabled</Value>
+    <Setting Name="UILanguage" Type="OptionTreeView.Option&lt;PS4CheaterNeo.LanguageCodes&gt;" Scope="User">
+      <Value Profile="(Default)">0|1_General|2_UI|Determine the language displayed. Default english.</Value>
+    </Setting>
+    <Setting Name="UIFont" Type="OptionTreeView.Option&lt;System.Drawing.FontFamily&gt;" Scope="User">
+      <Value Profile="(Default)">DefaultFont|1_General|2_UI|Determine the UI Font Family. Default SystemFonts.DefaultFont.</Value>
     </Setting>
     <Setting Name="UIOpacity" Type="OptionTreeView.Option&lt;float&gt;" Scope="User">
       <Value Profile="(Default)">0.95|1_General|2_UI|Determines the opacity of the window, the maximum is 1 (opaque), \nDefault 0.95|0.2|1</Value>
+    </Setting>
+    <Setting Name="CollapsibleContainer" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
+      <Value Profile="(Default)">True|1_General|2_UI|Determines whether to enable collapsible split container ui in Query and HexEditor and PointerFinder windows. \nDefault enabled</Value>
     </Setting>
     <Setting Name="CheatGridViewGroupByEnabled" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
       <Value Profile="(Default)">True|1_General|2_UI|Determines whether to enable the GroupByEnabled feature in CheatGridView. \nWhen enabled, Cheat items will be grouped. \nIf you have a large number of Cheat items, \nyou may consider disabling this feature to speed up Cheat loading. \nAfter setting this, you need to restart the program for it to take effect. \nDefault enabled</Value>
@@ -30,7 +36,7 @@
       <Value Profile="(Default)">True|1_General|4_Option|Determines whether to display the list of change options when saving in Option windows. \nDefault enabled</Value>
     </Setting>
     <Setting Name="CheatCellDirtyValueCommit" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
-      <Value Profile="(Default)">True|2_Cheat|Cheat|Determine whether to automatically write to PS4 when editing cheat values in UpDown</Value>
+      <Value Profile="(Default)">True|2_Cheat|Cheat|Determine whether to automatically write to PS4 when editing cheat values in UpDown. \nDefault enabled</Value>
     </Setting>
     <Setting Name="CheatLock" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
       <Value Profile="(Default)">True|2_Cheat|CheatLock|Determines whether to enable cheat lock in the main window. \nDefault enabled</Value>
@@ -60,7 +66,7 @@
       <Value Profile="(Default)">3|3_Query|1_Query|Enter the number of threads to use when querying. \nDefault is 3 threads</Value>
     </Setting>
     <Setting Name="QueryBufferSize" Type="OptionTreeView.Option&lt;uint&gt;" Scope="User">
-      <Value Profile="(Default)">50|3_Query|1_Query|Set the minimum buffer size (in MB) in querying and pointerFinder, \nenter 0 to not use buffer, setting this value to 0 is better when the total number of Sections in the game is low. \nIf the game has more than a thousand Sections, Buffer must be set</Value>
+      <Value Profile="(Default)">50|3_Query|1_Query|Set the minimum buffer size (in MB) in querying and pointerFinder, \nenter 0 to not use buffer, setting this value to 0 is better when the total number of Sections in the game is low. \nIf the game has more than a thousand Sections, Buffer must be set. \nDefault value is 50</Value>
     </Setting>
     <Setting Name="MinResultAccessFactor" Type="OptionTreeView.Option&lt;sbyte&gt;" Scope="User">
       <Value Profile="(Default)">50|3_Query|1_Query|Access value directly by address when the number of query results for the same Section is less than this factor, \nused to control whether to read Section data completely, or directly access the value by address. \nDefault value is 50</Value>

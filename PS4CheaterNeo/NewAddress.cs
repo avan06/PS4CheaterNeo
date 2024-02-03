@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
@@ -13,8 +12,6 @@ namespace PS4CheaterNeo
 
         Button AddOffsetBtn;
         Button DelOffsetBtn;
-        List<TextBox> OffsetBoxList;
-        List<Label> OffsetLabelList;
 
         public ulong Address { get; private set; }
         public string Value { get; private set; }
@@ -29,8 +26,9 @@ namespace PS4CheaterNeo
             this(mainForm, section, null, address, scanType, value, cheatLock, cheatDesc, null, isEdit) { }
         public NewAddress(Main mainForm, Section addrSection, Section baseSection, ulong address, ScanType scanType, string value, bool cheatLock, string cheatDesc, List<long> pointerOffsets, bool isEdit)
         {
+            this.Font = mainForm.Font;
             InitializeComponent();
-            ApplyUI();
+            ApplyUI(mainForm.langJson);
 
             if (mainForm.ProcessName == "") throw new Exception("No Process currently");
 
@@ -52,9 +50,6 @@ namespace PS4CheaterNeo
             DelOffsetBtn.Size = CloseBtn.Size;
             DelOffsetBtn.Click -= DelOffset_Click;
             DelOffsetBtn.Click += DelOffset_Click;
-
-            OffsetBoxList = new List<TextBox>();
-            OffsetLabelList = new List<Label>();
 
             mainForm.sectionTool.InitSections(mainForm.ProcessName);
 
@@ -90,8 +85,27 @@ namespace PS4CheaterNeo
             isCheckAddressBox = true;
         }
 
-        public void ApplyUI()
+        public void ApplyUI(LanguageJson langJson)
         {
+            try
+            {
+                if (langJson != null)
+                {
+                    AddressLabel.Text     = langJson.NewAddressForm.AddressLabel;
+                    ValueLabel.Text       = langJson.NewAddressForm.ValueLabel;
+                    TypeLabel.Text        = langJson.NewAddressForm.TypeLabel;
+
+                    LockBox.Text          = langJson.NewAddressForm.LockBox;
+                    DescriptionLabel.Text = langJson.NewAddressForm.DescriptionLabel;
+                    PointerBox.Text       = langJson.NewAddressForm.PointerBox;
+                    SaveBtn.Text          = langJson.NewAddressForm.SaveBtn;
+                    CloseBtn.Text         = langJson.NewAddressForm.CloseBtn;
+                }
+            }
+            catch (Exception ex)
+            {
+                InputBox.MsgBox("Apply UI language Exception", "", ex.Message, 100);
+            }
             try
             {
                 Opacity = Properties.Settings.Default.UIOpacity.Value;
@@ -99,12 +113,12 @@ namespace PS4CheaterNeo
                 ForeColor = Properties.Settings.Default.UiForeColor.Value; //Color.White;
                 BackColor = Properties.Settings.Default.UiBackColor.Value; //Color.FromArgb(36, 36, 36);
 
-                label1.ForeColor     = ForeColor;
-                label2.ForeColor     = ForeColor;
-                label3.ForeColor     = ForeColor;
-                label4.ForeColor     = ForeColor;
-                LockBox.ForeColor    = ForeColor;
-                PointerBox.ForeColor = ForeColor;
+                AddressLabel.ForeColor     = ForeColor;
+                ValueLabel.ForeColor       = ForeColor;
+                TypeLabel.ForeColor        = ForeColor;
+                DescriptionLabel.ForeColor = ForeColor;
+                LockBox.ForeColor          = ForeColor;
+                PointerBox.ForeColor       = ForeColor;
 
                 AddressBox.ForeColor     = ForeColor;
                 AddressBox.BackColor     = BackColor;
@@ -141,7 +155,7 @@ namespace PS4CheaterNeo
                 foreach (long offset in PointerOffsets)
                 {
                     AddOffsetBtn.PerformClick();
-                    OffsetBoxList[OffsetBoxList.Count - 1].Text = offset.ToString("X");
+                    TableLayoutBottomBox.Controls[TableLayoutBottomBox.Controls.Count - 1].Text = offset.ToString("X");
                 }
             }
         }
@@ -190,101 +204,95 @@ namespace PS4CheaterNeo
 
         private void PointerBox_CheckedChanged(object sender, EventArgs e)
         {
-            Point savePosition = SaveBtn.Location;
-            Point cancelPosition = CloseBtn.Location;
-            savePosition.Y = PointerBox.Location.Y + PointerBox.Height + 5;
-            cancelPosition.Y = PointerBox.Location.Y + PointerBox.Height + 5;
-
             if (PointerBox.Checked)
             {
                 IsPointer = PointerBox.Checked;
                 PointerOffsets = new List<long>();
-                savePosition.Y += 30;
-                cancelPosition.Y += 30;
 
-                AddOffsetBtn.Location = SaveBtn.Location;
-                DelOffsetBtn.Location = CloseBtn.Location;
+                TableLayoutBottom.Controls.Add(AddOffsetBtn, 0, 0);
+                TableLayoutBottom.Controls.Add(DelOffsetBtn, 1, 0);
+                Height += AddOffsetBtn.Height;
 
-                Controls.Add(AddOffsetBtn);
-                Controls.Add(DelOffsetBtn);
+                //When enable pointer, set Row 1 size to 100 percentage because the number of controls in Row 1 dynamically adjusts.
+                TableLayoutBottom.RowStyles[1].SizeType = SizeType.Percent;
+                TableLayoutBottom.RowStyles[1].Height = 100F;
+
+                TableLayoutBottomBox.RowCount = 0;
+                TableLayoutBottomBox.RowStyles.Clear();
+                TableLayoutBottomBox.Controls.Clear();
+                TableLayoutBottomLabel.RowCount = 0;
+                TableLayoutBottomLabel.RowStyles.Clear();
+                TableLayoutBottomLabel.Controls.Clear();
             }
             else
             {
-                Controls.Remove(DelOffsetBtn);
-                Controls.Remove(AddOffsetBtn);
+                if (TableLayoutBottomBox.Height > 1) Height -= TableLayoutBottomBox.Height;
+                TableLayoutBottomBox.RowCount = 0;
+                TableLayoutBottomBox.RowStyles.Clear();
+                TableLayoutBottomBox.Controls.Clear();
+                TableLayoutBottomLabel.RowCount = 0;
+                TableLayoutBottomLabel.RowStyles.Clear();
+                TableLayoutBottomLabel.Controls.Clear();
 
-                for (int i = 0; i < OffsetBoxList.Count; ++i)
-                {
-                    Controls.Remove(OffsetBoxList[i]);
-                    Controls.Remove(OffsetLabelList[i]);
-                }
+                TableLayoutBottom.Controls.Remove(AddOffsetBtn);
+                TableLayoutBottom.Controls.Remove(DelOffsetBtn);
 
-                OffsetLabelList.Clear();
-                OffsetBoxList.Clear();
+                TableLayoutBottom.RowStyles[1].SizeType = SizeType.AutoSize;
+                TableLayoutBottom.RowStyles[1].Height = 0;
+                Height -= AddOffsetBtn.Height;
             }
-
-            SaveBtn.Location = savePosition;
-            CloseBtn.Location = cancelPosition;
-            Height = savePosition.Y + SaveBtn.Height + 50;
         }
-
-        private void DelOffset_Click(object sender, EventArgs e) => SetOffsetBoxs(false);
 
         private void AddOffset_Click(object sender, EventArgs e) => SetOffsetBoxs(true);
 
+        private void DelOffset_Click(object sender, EventArgs e) => SetOffsetBoxs(false);
+
         private void SetOffsetBoxs(bool isAdd)
         {
-            int offsetHeight = 30;
+            //TableLayoutBottom's Row 0 consists of AddOffset and DelOffset buttons, Row 1 includes TextBox and Label controls, and Row 2 features Save and Close buttons.
             if (isAdd)
             {
-                TextBox textBox = new TextBox();
-                textBox.Text = "0";
-                textBox.Size = AddOffsetBtn.Size;
-                textBox.Location = AddOffsetBtn.Location;
-                textBox.ForeColor = ForeColor;
-                textBox.BackColor = BackColor;
+                TextBox textBox = new TextBox
+                {
+                    Text = "0",
+                    Location = AddOffsetBtn.Location,
+                    ForeColor = ForeColor,
+                    BackColor = BackColor,
+                    Dock = DockStyle.Fill,
+                    Margin = new Padding(3)
+                };
 
-                Label label = new Label();
-                label.Text = "";
-                label.Size = DelOffsetBtn.Size;
-                label.Location = DelOffsetBtn.Location;
-                label.ForeColor = ForeColor;
-                label.BackColor = BackColor;
+                Label label = new Label
+                {
+                    Text = "",
+                    Location = DelOffsetBtn.Location,
+                    ForeColor = ForeColor,
+                    BackColor = BackColor,
+                    Dock = DockStyle.Fill,
+                    Margin = new Padding(3)
+                };
 
-                Controls.Add(textBox);
-                Controls.Add(label);
-                OffsetBoxList.Add(textBox);
-                OffsetLabelList.Add(label);
+                TableLayoutBottomBox.RowCount += 1;
+                TableLayoutBottomBox.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+                TableLayoutBottomBox.Controls.Add(textBox, 0, TableLayoutBottomBox.Controls.Count);
+                TableLayoutBottomLabel.RowCount += 1;
+                TableLayoutBottomLabel.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+                TableLayoutBottomLabel.Controls.Add(label, 0, TableLayoutBottomLabel.Controls.Count);
+
+                Height += TableLayoutBottomBox.Controls[TableLayoutBottomBox.Controls.Count - 1].Height;
             }
             else
             {
-                if (OffsetLabelList.Count == 0) return;
+                if (TableLayoutBottomBox.Controls.Count == 0) return;
 
-                offsetHeight *= -1;
-                TextBox textBox = OffsetBoxList[OffsetLabelList.Count - 1];
-                Label label = OffsetLabelList[OffsetLabelList.Count - 1];
-                Controls.Remove(textBox);
-                Controls.Remove(label);
-                OffsetBoxList.RemoveAt(OffsetLabelList.Count - 1);
-                OffsetLabelList.RemoveAt(OffsetLabelList.Count - 1);
+                Height -= TableLayoutBottomBox.Controls[TableLayoutBottomBox.Controls.Count - 1].Height;
+                TableLayoutBottomBox.Controls.RemoveAt(TableLayoutBottomBox.Controls.Count - 1);
+                TableLayoutBottomBox.RowCount -= 1;
+                TableLayoutBottomBox.RowStyles.Remove(TableLayoutBottomBox.RowStyles[TableLayoutBottomBox.RowStyles.Count - 1]);
+                TableLayoutBottomLabel.Controls.RemoveAt(TableLayoutBottomLabel.Controls.Count - 1);
+                TableLayoutBottomLabel.RowCount -= 1;
+                TableLayoutBottomLabel.RowStyles.Remove(TableLayoutBottomLabel.RowStyles[TableLayoutBottomLabel.RowStyles.Count - 1]);
             }
-
-            Point addOffsetPosition = AddOffsetBtn.Location;
-            Point delOffsetPosition = DelOffsetBtn.Location;
-            Point savePosition = SaveBtn.Location;
-            Point cancelPosition = CloseBtn.Location;
-
-            addOffsetPosition.Y += offsetHeight;
-            delOffsetPosition.Y += offsetHeight;
-            savePosition.Y += offsetHeight;
-            cancelPosition.Y += offsetHeight;
-
-            AddOffsetBtn.Location = addOffsetPosition;
-            DelOffsetBtn.Location = delOffsetPosition;
-            SaveBtn.Location = savePosition;
-            CloseBtn.Location = cancelPosition;
-
-            Height += offsetHeight;
         }
 
         private void ScanTypeBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -329,35 +337,35 @@ namespace PS4CheaterNeo
 
                 long baseAddress = 0;
 
-                for (int idx = 0; idx < OffsetBoxList.Count; ++idx)
+                for (int idx = 0; idx < TableLayoutBottomBox.Controls.Count; ++idx)
                 {
-                    long address = long.Parse(OffsetBoxList[idx].Text, System.Globalization.NumberStyles.HexNumber);
+                    long address = long.Parse(TableLayoutBottomBox.Controls[idx].Text, System.Globalization.NumberStyles.HexNumber);
 
                     if (idx == 0 && address == 0) break;
                     else if (idx == 0 && BaseSection == null) BaseSection = mainForm.sectionTool.GetSection(mainForm.sectionTool.GetSectionID((ulong)address));
 
                     if (BaseSection == null) break;
 
-                    if (OffsetBoxList.Count > PointerOffsets.Count) PointerOffsets.Add(address);
+                    if (TableLayoutBottomBox.Controls.Count > PointerOffsets.Count) PointerOffsets.Add(address);
                     else PointerOffsets[idx] = address;
 
-                    if (idx != OffsetBoxList.Count - 1)
+                    if (idx != TableLayoutBottomBox.Controls.Count - 1)
                     {
                         if (AddrSection == null || AddrSection.SID == 0) AddrSection = mainForm.sectionTool.GetSection(mainForm.sectionTool.GetSectionID((ulong)(address + baseAddress)));
                         byte[] nextAddress = PS4Tool.ReadMemory(AddrSection.PID, (ulong)(address + baseAddress), 8);
                         baseAddress = BitConverter.ToInt64(nextAddress, 0);
-                        OffsetLabelList[idx].Text = baseAddress.ToString("X");
+                        TableLayoutBottomLabel.Controls[idx].Text = baseAddress.ToString("X");
                     }
                     else
                     {
                         if (address == 0 && baseAddress == 0) continue;
                         byte[] data = PS4Tool.ReadMemory(BaseSection.PID, (ulong)(address + baseAddress), ScanTool.ScanTypeLengthDict[CheatType]);
-                        OffsetLabelList[idx].Text = ScanTool.BytesToString(CheatType, data);
+                        TableLayoutBottomLabel.Controls[idx].Text = ScanTool.BytesToString(CheatType, data);
                         AddressBox.Text = (address + baseAddress).ToString("X");
                         if (!ValueBox.Enabled || changedCheatType)
                         {
                             ValueBox.Enabled = true;
-                            ValueBox.Text = OffsetLabelList[idx].Text;
+                            ValueBox.Text = TableLayoutBottomLabel.Controls[idx].Text;
                         }
                     }
                 }

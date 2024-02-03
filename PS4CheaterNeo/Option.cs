@@ -1,4 +1,10 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
 using System.Windows.Forms;
 
 namespace PS4CheaterNeo
@@ -6,12 +12,17 @@ namespace PS4CheaterNeo
     public partial class Option : Form
     {
         readonly Main mainForm;
+        readonly LanguageCodes UILanguage;
         readonly ColorTheme colorTheme;
         public Option(Main mainForm)
         {
             this.mainForm = mainForm;
             InitializeComponent();
+            Font = new Font(mainForm.UIFont, Font.Size);
+            optionTreeView1.Font = Font;
+            optionTreeView1.FontLeftView = new Font(mainForm.UIFont, Font.Size, FontStyle.Bold);
 
+            UILanguage = Properties.Settings.Default.UILanguage.Value;
             colorTheme = Properties.Settings.Default.ColorTheme.Value;
             Opacity = Properties.Settings.Default.UIOpacity.Value;
             optionTreeView1.ForeColor = Properties.Settings.Default.UiForeColor.Value;
@@ -20,8 +31,43 @@ namespace PS4CheaterNeo
             optionTreeView1.BackColorLeftView = Properties.Settings.Default.UiBackColor.Value;
             optionTreeView1.DisplayChangesListWhenSaving = Properties.Settings.Default.DisplayChangesListWhenSaving.Value;
 
+            if (mainForm != null && mainForm.langJson != null)
+            {
+                OptionForm OptionFormJson = mainForm.langJson.OptionForm;
+                IDictionary<string, object> descriptionDict = ExpressionToDictionary(OptionFormJson);
+                optionTreeView1.AdditionalInfoDict = descriptionDict;
+            }
             optionTreeView1.InitSettings(Properties.Settings.Default);
         }
+
+        private readonly MethodInfo AddToDictionaryMethod = typeof(IDictionary<string, object>).GetMethod("Add");
+        private readonly ConcurrentDictionary<Type, Func<object, IDictionary<string, object>>> Converters = new ConcurrentDictionary<Type, Func<object, IDictionary<string, object>>>();
+        private readonly ConstructorInfo DictionaryConstructor = typeof(Dictionary<string, object>).GetConstructors().FirstOrDefault(c => c.IsPublic && !c.GetParameters().Any());
+        /// <summary>
+        /// Let Object's fields and value convert to dictionary by Linq.Expression
+        /// https://blog.yowko.com/csharp-object-to-dictionary/
+        /// </summary>
+        private IDictionary<string, object> ExpressionToDictionary(object obj) => obj == null ? null : Converters.GetOrAdd(obj.GetType(), o =>
+        {
+            Type outputType = typeof(IDictionary<string, object>);
+            Type inputType = obj.GetType();
+            ParameterExpression inputExpression = Expression.Parameter(typeof(object), "input");
+            UnaryExpression typedInputExpression = Expression.Convert(inputExpression, inputType);
+            ParameterExpression outputVariable = Expression.Variable(outputType, "output");
+            LabelTarget returnTarget = Expression.Label(outputType);
+            var body = new List<Expression> { Expression.Assign(outputVariable, Expression.New(DictionaryConstructor)) };
+            body.AddRange(
+                from field in inputType.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy)
+                where field.IsPublic && (field.FieldType.IsPrimitive || field.FieldType == typeof(string))
+                let getExpression = Expression.Field(typedInputExpression, field)
+                select Expression.Call(outputVariable, AddToDictionaryMethod, Expression.Constant(field.Name), getExpression));
+            body.Add(Expression.Return(returnTarget, outputVariable));
+            body.Add(Expression.Label(returnTarget, Expression.Constant(null, outputType)));
+            var lambdaExpression = Expression.Lambda<Func<object, IDictionary<string, object>>>(
+                Expression.Block(new[] { outputVariable }, body),
+                inputExpression);
+            return lambdaExpression.Compile();
+        })(obj);
 
         private void Option_FormClosed(object sender, FormClosedEventArgs e)
         {
@@ -105,6 +151,7 @@ namespace PS4CheaterNeo
 
                 Properties.Settings.Default.Save();
             }
+            if (Properties.Settings.Default.UILanguage.Value != UILanguage) mainForm.ParseLanguageJson();
 
             mainForm.ApplyUI();
         }

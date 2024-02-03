@@ -23,8 +23,9 @@ namespace PS4CheaterNeo
 
         public PointerFinder(Main mainForm, ulong address, ScanType scanType)
         {
+            this.Font = mainForm.Font;
             InitializeComponent();
-            ApplyUI();
+            ApplyUI(mainForm.langJson);
             listViewItemComparer = new ListViewItemComparer();
             pointerItems = new List<ListViewItem>();
             if (!Properties.Settings.Default.CollapsibleContainer.Value) SplitContainer1.SplitterButtonStyle = ButtonStyle.None;
@@ -49,8 +50,35 @@ namespace PS4CheaterNeo
             IsFilterSizeBox.Checked = Properties.Settings.Default.FilterSizeQuery.Value;
         }
 
-        public void ApplyUI()
+        public void ApplyUI(LanguageJson langJson)
         {
+            try
+            {
+                if (langJson != null)
+                {
+                    LevelLabel.Text        = langJson.PointerFinderForm.LevelLabel;
+                    AddressLabel.Text      = langJson.PointerFinderForm.AddressLabel;
+                    ScanBtn.Text           = langJson.PointerFinderForm.ScanBtn;
+                    NewBtn.Text            = langJson.PointerFinderForm.NewBtn;
+                    MaxRangeLabel.Text     = langJson.PointerFinderForm.MaxRangeLabel;
+                    IsInitScan.Text        = langJson.PointerFinderForm.IsInitScan;
+                    FastScanBox.Text       = langJson.PointerFinderForm.FastScanBox;
+                    NegativeOffsetBox.Text = langJson.PointerFinderForm.NegativeOffsetBox;
+                    IsFilterBox.Text       = langJson.PointerFinderForm.IsFilterBox;
+                    FilterRuleBtn.Text     = langJson.PointerFinderForm.FilterRuleBtn;
+                    IsFilterSizeBox.Text   = langJson.PointerFinderForm.IsFilterSizeBox;
+                    FilterSizeRuleBtn.Text = langJson.PointerFinderForm.FilterSizeRuleBtn;
+                    SaveBtn.Text           = langJson.PointerFinderForm.SaveBtn;
+                    LoadBtn.Text           = langJson.PointerFinderForm.LoadBtn;
+
+                    PointerListViewAddToCheatGrid.Text = langJson.PointerFinderForm.PointerListViewAddToCheatGrid;
+                    PointerListViewSelectAll.Text      = langJson.PointerFinderForm.PointerListViewSelectAll;
+                }
+            }
+            catch (Exception ex)
+            {
+                InputBox.MsgBox("Apply UI language Exception", "", ex.Message, 100);
+            }
             try
             {
                 Opacity = Properties.Settings.Default.UIOpacity.Value;

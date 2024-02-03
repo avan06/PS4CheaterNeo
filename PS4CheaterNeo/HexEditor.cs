@@ -37,6 +37,7 @@ namespace PS4CheaterNeo
 
         private HexEditor(Main mainForm)
         {
+            this.Font = mainForm.Font;
             this.mainForm = mainForm;
             changedPosDic = new Dictionary<long, long>();
 
@@ -46,7 +47,10 @@ namespace PS4CheaterNeo
             mutex = new Mutex(false, "HexEditor", out _, mSec);
 
             InitializeComponent();
-            ApplyUI();
+            InfoBox0.Font  = new System.Drawing.Font(mainForm.UIFont, 8.25F);
+            AsmBox1.Font   = new System.Drawing.Font(mainForm.UIFont, 8.25F);
+
+            ApplyUI(mainForm.langJson);
 
             delimitedDash = Properties.Settings.Default.HexInfoDash.Value;
             if (!Properties.Settings.Default.CollapsibleContainer.Value)
@@ -125,8 +129,37 @@ namespace PS4CheaterNeo
             PageBox.SelectedIndex = PageBox.Items.Count > Page ? Page : PageBox.Items.Count - 1;
         }
 
-        public void ApplyUI()
+        public void ApplyUI(LanguageJson langJson)
         {
+            try
+            {
+                if (langJson != null)
+                {
+                    PreviousBtn.Text       = langJson.HexEditorForm.PreviousBtn;
+                    NextBtn.Text           = langJson.HexEditorForm.NextBtn;
+                    AutoRefreshBox.Text    = langJson.HexEditorForm.AutoRefreshBox;
+                    RefreshBtn.Text        = langJson.HexEditorForm.RefreshBtn;
+                    CommitBtn.Text         = langJson.HexEditorForm.CommitBtn;
+                    AddToCheatGridBtn.Text = langJson.HexEditorForm.AddToCheatGridBtn;
+                    HexBox.Text            = langJson.HexEditorForm.HexBox;
+                    LittleEndianBox.Text   = langJson.HexEditorForm.LittleEndianBox;
+                    ForwardBox.Text        = langJson.HexEditorForm.ForwardBox;
+                    FindBtn.Text           = langJson.HexEditorForm.FindBtn;
+                    SwapBytesBox.Text      = langJson.HexEditorForm.SwapBytesBox;
+                    AssemblerBtn.Text      = langJson.HexEditorForm.AssemblerBtn;
+                    GroupBoxAsm.Text       = langJson.HexEditorForm.GroupBoxAsm;
+
+                    HexViewMenuByteGroup.Text = langJson.HexEditorForm.HexViewMenuByteGroup;
+                    HexViewMenuGroupSize.Text = langJson.HexEditorForm.HexViewMenuGroupSize;
+                    HexViewMenuCopyAddress.Text = langJson.HexEditorForm.HexViewMenuCopyAddress;
+                    HexViewMenuJumpToAddress.Text = langJson.HexEditorForm.HexViewMenuJumpToAddress;
+                    HexViewMenuJumpToOffset.Text = langJson.HexEditorForm.HexViewMenuJumpToOffset;
+                }
+            }
+            catch (Exception ex)
+            {
+                PS4CheaterNeo.InputBox.MsgBox("Apply UI language Exception", "", ex.Message, 100);
+            }
             try
             {
                 Opacity = Properties.Settings.Default.UIOpacity.Value;

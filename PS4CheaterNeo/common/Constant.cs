@@ -2,6 +2,17 @@
 
 namespace PS4CheaterNeo
 {
+    public enum LanguageCodes
+    {
+        English,
+        Japanese,
+        Chinese,
+        Spanish,
+        Russian,
+        French,
+        German,
+    }
+
     public enum SectionCol
     {
         SectionViewID,

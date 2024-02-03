@@ -24,6 +24,7 @@ namespace PS4CheaterNeo
         private bool VerifySectionWhenRefresh;
         private bool CheatAutoRefreshShowStatus;
         private uint CheatGridGroupRefreshThreshold;
+        private (string msg, string name) processInfo = ("Current Processes: ", "");
 
         public class CheatRow
         {
@@ -36,6 +37,8 @@ namespace PS4CheaterNeo
 
         List<CheatRow> cheatGridRowList = new List<CheatRow>();
 
+        public FontFamily UIFont { get; private set; } = null;
+        public LanguageJson langJson { get; private set; } = null;
         public SectionTool sectionTool { get; private set; }
         public string GameID { get; private set; }
         public string GameVer { get; private set; }
@@ -47,6 +50,7 @@ namespace PS4CheaterNeo
             Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture; //Avoid the case where CurrentCulture.NumberFormatInfo.NumberDecimalSeparator is not "."
             if ((Properties.Settings.Default.PS4IP.Value ?? "") == "") Properties.Settings.Default.Upgrade(); //Need to get the settings again when the AssemblyVersion is changed
             InitializeComponent();
+            ParseLanguageJson();
             ApplyUI();
             ToolStripLockEnable.Checked = Properties.Settings.Default.CheatLock.Value;
             ToolStripAutoRefresh.Checked = Properties.Settings.Default.CheatAutoRefresh.Value;
@@ -66,6 +70,53 @@ namespace PS4CheaterNeo
 
         public void ApplyUI()
         {
+            try
+            {
+                if (langJson != null)
+                {
+                    ToolStripLockEnable.Text          = langJson.MainForm.ToolStripLockEnable;
+                    ToolStripAutoRefresh.Text         = langJson.MainForm.ToolStripAutoRefresh;
+                    ToolStripSend.ToolTipText         = langJson.MainForm.ToolStripSendToolTipText;
+                    ToolStripOpen.ToolTipText         = langJson.MainForm.ToolStripOpenToolTipText;
+                    ToolStripSave.ToolTipText         = langJson.MainForm.ToolStripSaveToolTipText;
+                    ToolStripNewQuery.ToolTipText     = langJson.MainForm.ToolStripNewQueryToolTipText;
+                    ToolStripAdd.ToolTipText          = langJson.MainForm.ToolStripAddToolTipText;
+                    ToolStripHexView.ToolTipText      = langJson.MainForm.ToolStripHexViewToolTipText;
+                    ToolStripRefreshCheat.ToolTipText = langJson.MainForm.ToolStripRefreshCheatToolTipText;
+                    ToolStripExpandAll.ToolTipText    = langJson.MainForm.ToolStripExpandAllToolTipText;
+                    ToolStripCollapseAll.ToolTipText  = langJson.MainForm.ToolStripCollapseAllToolTipText;
+                    ToolStripLockEnable.ToolTipText   = langJson.MainForm.ToolStripLockEnableToolTipText;
+                    ToolStripAutoRefresh.ToolTipText  = langJson.MainForm.ToolStripAutoRefreshToolTipText;
+                    ToolStripSettings.ToolTipText     = langJson.MainForm.ToolStripSettingsToolTipText;
+                    processInfo.msg                   = langJson.MainForm.ToolStripProcessInfoMsg;
+                    ToolStripProcessInfo.Text         = processInfo.msg + processInfo.name;
+
+                    CheatGridViewDel.HeaderText         = langJson.MainForm.CheatGridViewDel;
+                    CheatGridViewAddress.HeaderText     = langJson.MainForm.CheatGridViewAddress;
+                    CheatGridViewType.HeaderText        = langJson.MainForm.CheatGridViewType;
+                    CheatGridViewActive.HeaderText      = langJson.MainForm.CheatGridViewActive;
+                    CheatGridViewValue.HeaderText       = langJson.MainForm.CheatGridViewValue;
+                    CheatGridViewSection.HeaderText     = langJson.MainForm.CheatGridViewSection;
+                    CheatGridViewSID.HeaderText         = langJson.MainForm.CheatGridViewSID;
+                    CheatGridViewLock.HeaderText        = langJson.MainForm.CheatGridViewLock;
+                    CheatGridViewDescription.HeaderText = langJson.MainForm.CheatGridViewDescription;
+
+                    CheatGridMenuHexEditor.Text   = langJson.MainForm.CheatGridMenuHexEditor;
+                    CheatGridMenuLock.Text        = langJson.MainForm.CheatGridMenuLock;
+                    CheatGridMenuUnlock.Text      = langJson.MainForm.CheatGridMenuUnlock;
+                    CheatGridMenuActive.Text      = langJson.MainForm.CheatGridMenuActive;
+                    CheatGridMenuEdit.Text        = langJson.MainForm.CheatGridMenuEdit;
+                    CheatGridMenuCopyAddress.Text = langJson.MainForm.CheatGridMenuCopyAddress;
+                    CheatGridMenuFindPointer.Text = langJson.MainForm.CheatGridMenuFindPointer;
+                    CheatGridMenuDelete.Text      = langJson.MainForm.CheatGridMenuDelete;
+                }
+                UIFont = Properties.Settings.Default.UIFont.Value;
+                Font = new Font(UIFont, Font.Size);
+            }
+            catch (Exception ex)
+            {
+                InputBox.MsgBox("Apply UI language Exception", "", ex.Message, 100);
+            }
             try
             {
                 Opacity = Properties.Settings.Default.UIOpacity.Value;
@@ -143,7 +194,7 @@ namespace PS4CheaterNeo
         #region ToolStrip
         private void ToolStripSend_Click(object sender, EventArgs e)
         {
-            if (sendPayload == null || sendPayload.IsDisposed) sendPayload = new SendPayload();
+            if (sendPayload == null || sendPayload.IsDisposed) sendPayload = new SendPayload(this);
             sendPayload.StartPosition = FormStartPosition.CenterParent;
             sendPayload.TopMost = true;
             sendPayload.Show();
@@ -463,6 +514,21 @@ namespace PS4CheaterNeo
             }
 
             return code;
+        }
+
+        public void ParseLanguageJson()
+        {
+            string codes = Properties.Settings.Default.UILanguage.Value.ToString();
+            string path = "languages\\LanguageFile_" + codes + ".json";
+
+            if (!File.Exists(path)) return;
+
+            using (StreamReader sr = new StreamReader(path))
+            using (Stream stream = sr.BaseStream)
+            {
+                DataContractJsonSerializer deseralizer = new DataContractJsonSerializer(typeof(LanguageJson));
+                langJson = (LanguageJson)deseralizer.ReadObject(stream);
+            }
         }
 
         /// <summary>
@@ -797,8 +863,9 @@ namespace PS4CheaterNeo
         {
             if (!(ToolStripProcessInfo.Tag is bool) && ProcessName != (string)ToolStripProcessInfo.Tag)
             {
+                processInfo.name = ProcessName == "" ? "Empty" : (ProcessName + (ProcessPid > 0 ? "(" + ProcessPid + ")" : ""));
                 ToolStripProcessInfo.Tag = ProcessName;
-                ToolStripProcessInfo.Text = "Current Processes: " + (ProcessName == "" ? "Empty" : (ProcessName + (ProcessPid > 0 ? "(" + ProcessPid + ")" : "")));
+                ToolStripProcessInfo.Text = processInfo.msg + processInfo.name;
             }
             if (!ToolStripAutoRefresh.Checked || cheatGridRowList.Count == 0 || (refreshCheatTask != null && !refreshCheatTask.IsCompleted)) return;
 
@@ -973,8 +1040,9 @@ namespace PS4CheaterNeo
         {
             if (!(ToolStripProcessInfo.Tag is bool) && ProcessName != (string)ToolStripProcessInfo.Tag)
             {
+                processInfo.name = ProcessName == "" ? "Empty" : (ProcessName + (ProcessPid > 0 ? "(" + ProcessPid + ")" : ""));
                 ToolStripProcessInfo.Tag = ProcessName;
-                ToolStripProcessInfo.Text = "Current Processes: " + (ProcessName == "" ? "Empty" : (ProcessName + (ProcessPid > 0 ? "(" + ProcessPid + ")" : "")));
+                ToolStripProcessInfo.Text = processInfo.msg + processInfo.name;
             }
             if (!ToolStripLockEnable.Checked || cheatGridRowList.Count == 0 || (refreshLockTask != null && !refreshLockTask.IsCompleted)) return;
 

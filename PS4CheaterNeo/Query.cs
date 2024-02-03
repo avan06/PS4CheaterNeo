@@ -23,7 +23,7 @@ namespace PS4CheaterNeo
         Color querySectionViewItemCheck1BackColor;
         Color querySectionViewItemCheck2BackColor;
 
-        int hitCnt;
+        (string first, string next) scanInfo = ("First Scan", "Next Scan");
         bool enableFloatingResultExact = true;
         byte floatingSimpleValueExponents = 10;
 
@@ -41,14 +41,20 @@ namespace PS4CheaterNeo
 
         public Query(Main mainForm)
         {
+            this.Font = mainForm.Font;
             InitializeComponent();
-            ApplyUI();
+            CloneScanBtn.Font = new Font(mainForm.UIFont, 8.25F);
+            ApplyUI(mainForm.langJson);
 
             if (!Properties.Settings.Default.CollapsibleContainer.Value)
             {
                 SplitContainer1.SplitterButtonStyle = ButtonStyle.None;
                 SplitContainer2.SplitterButtonStyle = ButtonStyle.None;
             }
+            SplitContainer1.SplitterDistance = ResultView.Width;
+            SplitContainer1.FixedPanel = FixedPanel.Panel2;
+            SplitContainer2.SplitterDistance = SplitContainer2.Height - TableLayoutRightBottom.Height - SplitContainer2.SplitterWidth;
+            SplitContainer2.FixedPanel = FixedPanel.Panel2;
             this.mainForm = mainForm;
 
             sectionTool = new SectionTool(mainForm);
@@ -70,8 +76,76 @@ namespace PS4CheaterNeo
             this.bitsDictDicts = new List<Dictionary<uint, BitsDictionary>>(bitsDictDicts);
         }
 
-        public void ApplyUI()
+        public void ApplyUI(LanguageJson langJson)
         {
+            try
+            {
+                if (langJson != null)
+                {
+                    ResultViewAddress.Text = langJson.QueryForm.ResultViewAddress;
+                    ResultViewType.Text    = langJson.QueryForm.ResultViewType;
+                    ResultViewValue.Text   = langJson.QueryForm.ResultViewValue;
+                    ResultViewHex.Text     = langJson.QueryForm.ResultViewHex;
+                    ResultViewSection.Text = langJson.QueryForm.ResultViewSection;
+
+                    ResultViewAddToCheatGrid.Text = langJson.QueryForm.ResultViewAddToCheatGrid;
+                    ResultViewSelectAll.Text      = langJson.QueryForm.ResultViewSelectAll;
+                    ResultViewHexEditor.Text      = langJson.QueryForm.ResultViewHexEditor;
+                    ResultViewCopyAddress.Text    = langJson.QueryForm.ResultViewCopyAddress;
+                    ResultViewDump.Text           = langJson.QueryForm.ResultViewDump;
+                    ResultViewFindPointer.Text    = langJson.QueryForm.ResultViewFindPointer;
+
+                    GetProcessesBtn.Text    = langJson.QueryForm.GetProcessesBtn;
+                    SectionViewAddress.Text = langJson.QueryForm.SectionViewAddress;
+                    SectionViewName.Text    = langJson.QueryForm.SectionViewName;
+                    SectionViewProt.Text    = langJson.QueryForm.SectionViewProt;
+                    SectionViewLength.Text  = langJson.QueryForm.SectionViewLength;
+                    SectionViewSID.Text     = langJson.QueryForm.SectionViewSID;
+                    SectionViewOffset.Text  = langJson.QueryForm.SectionViewOffset;
+                    SectionViewEnd.Text     = langJson.QueryForm.SectionViewEnd;
+
+                    SectionViewHexEditor.Text        = langJson.QueryForm.SectionViewHexEditor;
+                    SectionViewCheck.Text            = langJson.QueryForm.SectionViewCheck;
+                    SectionViewCheckAll.Text         = langJson.QueryForm.SectionViewCheckAll;
+                    SectionViewUnCheckAll.Text       = langJson.QueryForm.SectionViewUnCheckAll;
+                    SectionViewInvertChecked.Text    = langJson.QueryForm.SectionViewInvertChecked;
+                    SectionViewCheckContains.Text    = langJson.QueryForm.SectionViewCheckContains;
+                    SectionViewUnCheckContains.Text  = langJson.QueryForm.SectionViewUnCheckContains;
+                    SectionViewCheckProt.Text        = langJson.QueryForm.SectionViewCheckProt;
+                    SectionViewUnCheckProt.Text      = langJson.QueryForm.SectionViewUnCheckProt;
+                    SectionViewCheckAllHidden.Text   = langJson.QueryForm.SectionViewCheckAllHidden;
+                    SectionViewUnCheckAllHidden.Text = langJson.QueryForm.SectionViewUnCheckAllHidden;
+                    SectionViewDump.Text             = langJson.QueryForm.SectionViewDump;
+                    SectionViewImport.Text           = langJson.QueryForm.SectionViewImport;
+
+                    AddrMinLabel.Text    = langJson.QueryForm.AddrMinLabel;
+                    AddrMaxLabel.Text    = langJson.QueryForm.AddrMaxLabel;
+                    AddrIsFilterBox.Text = langJson.QueryForm.AddrIsFilterBox;
+                    SelectAllBox.Text    = langJson.QueryForm.SelectAllBox;
+                    AlignmentBox.Text    = langJson.QueryForm.AlignmentBox;
+                    IsFilterSizeBox.Text = langJson.QueryForm.IsFilterSizeBox;
+                    IsFilterBox.Text     = langJson.QueryForm.IsFilterBox;
+                    CloneScanBtn.Text    = langJson.QueryForm.CloneScanBtn;
+                    AutoPauseBox.Text    = langJson.QueryForm.AutoPauseBox;
+                    AutoResumeBox.Text   = langJson.QueryForm.AutoResumeBox;
+                    SlowMotionBox.Text   = langJson.QueryForm.SlowMotionBox;
+                    SimpleValuesBox.Text = langJson.QueryForm.SimpleValuesBox;
+                    NotBox.Text          = langJson.QueryForm.NotBox;
+                    Value0Label.Text     = langJson.QueryForm.Value0Label;
+                    Value1Label.Text     = langJson.QueryForm.Value1Label;
+                    ValueAndLabel.Text   = langJson.QueryForm.ValueAndLabel;
+                    HexBox.Text          = langJson.QueryForm.HexBox;
+                    CompareFirstBox.Text = langJson.QueryForm.CompareFirstBox;
+                    NewBtn.Text          = langJson.QueryForm.NewBtn;
+                    RefreshBtn.Text      = langJson.QueryForm.RefreshBtn;
+                    scanInfo             = (langJson.QueryForm.ScanBtn, langJson.QueryForm.NextScan);
+                    ScanBtn.Text         = scanInfo.first;
+                }
+            }
+            catch (Exception ex)
+            {
+                InputBox.MsgBox("Apply UI language Exception", "", ex.Message, 100);
+            }
             try
             {
                 Opacity = Properties.Settings.Default.UIOpacity.Value;
@@ -300,7 +374,7 @@ namespace PS4CheaterNeo
             comparerTool = null;
             GC.Collect();
 
-            ScanBtn.Text = "First Scan";
+            ScanBtn.Text = scanInfo.first;
             ScanTypeBox.Enabled = true;
             AlignmentBox.Enabled = true;
             AddrIsFilterBox.Enabled = true;
@@ -402,7 +476,7 @@ namespace PS4CheaterNeo
                         if (AutoResumeBox.Checked) ResumeBtn.PerformClick();
                     }
                 }
-                else if (Properties.Settings.Default.ShowSearchSizeFirstScan.Value && resultItems.Count == 0 && MessageBox.Show("Search size:" + (sectionTool.TotalMemorySize / (1024 * 1024)).ToString() + "MB", "First Scan",
+                else if (Properties.Settings.Default.ShowSearchSizeFirstScan.Value && resultItems.Count == 0 && MessageBox.Show("Search size:" + (sectionTool.TotalMemorySize / (1024 * 1024)).ToString() + "MB", scanInfo.first,
                     MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) return;
                 else
                 {
@@ -1037,7 +1111,7 @@ namespace PS4CheaterNeo
                 string msg = "";
                 Invoke(new MethodInvoker(() => { msg = ToolStripMsg.Text; }));
 
-                hitCnt = 0;
+                int hitCnt = 0;
                 int chkHitCnt = 0;
                 uint MaxResultShow = Properties.Settings.Default.MaxResultShow.Value;
                 MaxResultShow = MaxResultShow == 0 ? 0x2000 : MaxResultShow;
@@ -1211,7 +1285,7 @@ namespace PS4CheaterNeo
                     ResultView.VirtualMode = true;
                     ResultView.EndUpdate();
                     ScanTypeBox_SelectedIndexChanged(null, null);
-                    ScanBtn.Text = "Next Scan";
+                    ScanBtn.Text = scanInfo.next;
                     if (AddrIsFilterBox.Checked) AddrIsFilterBox.Enabled = false;
                     if (!CompareFirstBox.Enabled) CompareFirstBox.Enabled = true;
                 }));
@@ -1458,15 +1532,15 @@ namespace PS4CheaterNeo
             switch (compareType)
             { //Show second input column when Between
                 case CompareType.Between:
-                    TableLayoutPanel1.ColumnStyles[1].Width = 50;
-                    TableLayoutPanel1.ColumnStyles[2].SizeType = SizeType.AutoSize;
-                    TableLayoutPanel1.ColumnStyles[3].Width = 50;
+                    TableLayoutRightBottom2.ColumnStyles[1].Width = 50;
+                    TableLayoutRightBottom2.ColumnStyles[2].SizeType = SizeType.AutoSize;
+                    TableLayoutRightBottom2.ColumnStyles[3].Width = 50;
                     break;
                 default:
-                    TableLayoutPanel1.ColumnStyles[1].Width = 100;
-                    TableLayoutPanel1.ColumnStyles[2].SizeType = SizeType.Percent;
-                    TableLayoutPanel1.ColumnStyles[2].Width = 0;
-                    TableLayoutPanel1.ColumnStyles[3].Width = 0;
+                    TableLayoutRightBottom2.ColumnStyles[1].Width = 100;
+                    TableLayoutRightBottom2.ColumnStyles[2].SizeType = SizeType.Percent;
+                    TableLayoutRightBottom2.ColumnStyles[2].Width = 0;
+                    TableLayoutRightBottom2.ColumnStyles[3].Width = 0;
                     break;
             }
             switch (compareType)

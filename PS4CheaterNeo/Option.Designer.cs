@@ -39,8 +39,6 @@
             this.optionTreeView1.ContextMenuStripLeftView = null;
             this.optionTreeView1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.optionTreeView1.FloatingPointDecimalPlaces = 2;
-            this.optionTreeView1.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.optionTreeView1.FontLeftView = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.optionTreeView1.ForeColor = System.Drawing.Color.White;
             this.optionTreeView1.ForeColorLeftView = System.Drawing.Color.White;
             this.optionTreeView1.FullRowSelectLeftView = true;
@@ -60,7 +58,7 @@
             this.optionTreeView1.SortTreeBeforeUnderline = true;
             this.optionTreeView1.SplitterDistance = 160;
             this.optionTreeView1.SplitterIncrement = 1;
-            this.optionTreeView1.SplitterWidth = 4;
+            this.optionTreeView1.SplitterWidth = 3;
             this.optionTreeView1.TabIndex = 0;
             // 
             // Option

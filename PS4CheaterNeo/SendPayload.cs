@@ -10,15 +10,28 @@ namespace PS4CheaterNeo
 {
     public partial class SendPayload : Form
     {
-        public SendPayload()
+        public SendPayload(Main mainForm)
         {
+            this.Font = mainForm.Font;
             InitializeComponent();
-            ApplyUI();
+            ApplyUI(mainForm.langJson);
             VersionComboBox.Items.AddRange(Constant.Versions);
         }
 
-        public void ApplyUI()
+        public void ApplyUI(LanguageJson langJson)
         {
+            try
+            {
+                if (langJson != null)
+                {
+                    SendPayloadBtn.Text = langJson.SendPayloadForm.SendPayloadBtn;
+                    OKBtn.Text          = langJson.SendPayloadForm.OKBtn;
+                }
+            }
+            catch (Exception ex)
+            {
+                InputBox.MsgBox("Apply UI language Exception", "", ex.Message, 100);
+            }
             try
             {
                 Opacity = Properties.Settings.Default.UIOpacity.Value;

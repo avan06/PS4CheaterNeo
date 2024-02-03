@@ -151,7 +151,6 @@
             this.HexView.EnablePaste = true;
             this.HexView.EnableRetainChangedFinishPos = true;
             this.HexView.EnableRetainChangedPos = true;
-            this.HexView.Font = new System.Drawing.Font("Microsoft JhengHei UI", 9F);
             this.HexView.ForeColor = System.Drawing.Color.White;
             this.HexView.GroupSeparatorVisible = true;
             this.HexView.KeyDownControlCContentType = Be.Windows.Forms.HexBox.StringContentType.Hex;
@@ -324,7 +323,6 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.InfoBox0.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(36)))), ((int)(((byte)(36)))));
             this.InfoBox0.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.InfoBox0.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.InfoBox0.ForeColor = System.Drawing.Color.White;
             this.InfoBox0.Location = new System.Drawing.Point(-3, 0);
             this.InfoBox0.Margin = new System.Windows.Forms.Padding(0);
@@ -608,7 +606,6 @@
             this.InfoBoxB.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(36)))), ((int)(((byte)(36)))));
             this.InfoBoxB.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.InfoBoxB.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.InfoBoxB.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.InfoBoxB.ForeColor = System.Drawing.Color.White;
             this.InfoBoxB.Location = new System.Drawing.Point(50, 215);
             this.InfoBoxB.Margin = new System.Windows.Forms.Padding(0);
@@ -653,7 +650,6 @@
             this.InfoBox4S.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(36)))), ((int)(((byte)(36)))));
             this.InfoBox4S.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.InfoBox4S.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.InfoBox4S.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.InfoBox4S.ForeColor = System.Drawing.Color.White;
             this.InfoBox4S.Location = new System.Drawing.Point(50, 190);
             this.InfoBox4S.Margin = new System.Windows.Forms.Padding(0);
@@ -667,7 +663,6 @@
             this.InfoBox3S.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(36)))), ((int)(((byte)(36)))));
             this.InfoBox3S.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.InfoBox3S.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.InfoBox3S.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.InfoBox3S.ForeColor = System.Drawing.Color.White;
             this.InfoBox3S.Location = new System.Drawing.Point(50, 170);
             this.InfoBox3S.Margin = new System.Windows.Forms.Padding(0);
@@ -692,7 +687,6 @@
             this.InfoBox2S.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(36)))), ((int)(((byte)(36)))));
             this.InfoBox2S.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.InfoBox2S.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.InfoBox2S.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.InfoBox2S.ForeColor = System.Drawing.Color.White;
             this.InfoBox2S.Location = new System.Drawing.Point(50, 150);
             this.InfoBox2S.Margin = new System.Windows.Forms.Padding(0);
@@ -728,7 +722,6 @@
             this.InfoBoxF.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(36)))), ((int)(((byte)(36)))));
             this.InfoBoxF.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.InfoBoxF.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.InfoBoxF.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.InfoBoxF.ForeColor = System.Drawing.Color.White;
             this.InfoBoxF.Location = new System.Drawing.Point(50, 85);
             this.InfoBoxF.Margin = new System.Windows.Forms.Padding(0);
@@ -742,7 +735,6 @@
             this.InfoBox4U.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(36)))), ((int)(((byte)(36)))));
             this.InfoBox4U.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.InfoBox4U.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.InfoBox4U.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.InfoBox4U.ForeColor = System.Drawing.Color.White;
             this.InfoBox4U.Location = new System.Drawing.Point(50, 60);
             this.InfoBox4U.Margin = new System.Windows.Forms.Padding(0);
@@ -756,7 +748,6 @@
             this.InfoBox3U.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(36)))), ((int)(((byte)(36)))));
             this.InfoBox3U.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.InfoBox3U.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.InfoBox3U.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.InfoBox3U.ForeColor = System.Drawing.Color.White;
             this.InfoBox3U.Location = new System.Drawing.Point(50, 40);
             this.InfoBox3U.Margin = new System.Windows.Forms.Padding(0);
@@ -781,7 +772,6 @@
             this.InfoBox1U.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(36)))), ((int)(((byte)(36)))));
             this.InfoBox1U.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.InfoBox1U.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.InfoBox1U.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.InfoBox1U.ForeColor = System.Drawing.Color.White;
             this.InfoBox1U.Location = new System.Drawing.Point(50, 0);
             this.InfoBox1U.Margin = new System.Windows.Forms.Padding(0);
@@ -806,7 +796,6 @@
             this.InfoBox2U.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(36)))), ((int)(((byte)(36)))));
             this.InfoBox2U.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.InfoBox2U.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.InfoBox2U.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.InfoBox2U.ForeColor = System.Drawing.Color.White;
             this.InfoBox2U.Location = new System.Drawing.Point(50, 20);
             this.InfoBox2U.Margin = new System.Windows.Forms.Padding(0);
@@ -853,7 +842,6 @@
             this.InfoBoxD.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(36)))), ((int)(((byte)(36)))));
             this.InfoBoxD.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.InfoBoxD.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.InfoBoxD.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.InfoBoxD.ForeColor = System.Drawing.Color.White;
             this.InfoBoxD.Location = new System.Drawing.Point(50, 105);
             this.InfoBoxD.Margin = new System.Windows.Forms.Padding(0);
@@ -878,7 +866,6 @@
             this.InfoBox1S.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(36)))), ((int)(((byte)(36)))));
             this.InfoBox1S.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.InfoBox1S.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.InfoBox1S.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.InfoBox1S.ForeColor = System.Drawing.Color.White;
             this.InfoBox1S.Location = new System.Drawing.Point(50, 130);
             this.InfoBox1S.Margin = new System.Windows.Forms.Padding(0);
@@ -980,7 +967,6 @@
             this.AsmBox1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(36)))), ((int)(((byte)(36)))));
             this.AsmBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.AsmBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.AsmBox1.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.AsmBox1.ForeColor = System.Drawing.Color.White;
             this.AsmBox1.Location = new System.Drawing.Point(3, 18);
             this.AsmBox1.Name = "AsmBox1";
