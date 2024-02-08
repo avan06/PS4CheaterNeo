@@ -47,6 +47,7 @@ namespace PS4CheaterNeo
             this.TableLayoutBottom = new System.Windows.Forms.TableLayoutPanel();
             this.TableLayoutBottomLabel = new System.Windows.Forms.TableLayoutPanel();
             this.TableLayoutBottomBox = new System.Windows.Forms.TableLayoutPanel();
+            this.OnOffBox = new System.Windows.Forms.CheckBox();
             this.TableLayoutBase.SuspendLayout();
             this.TableLayoutBottom.SuspendLayout();
             this.SuspendLayout();
@@ -210,15 +211,14 @@ namespace PS4CheaterNeo
             // 
             // TableLayoutBase
             // 
-            this.TableLayoutBase.ColumnCount = 6;
+            this.TableLayoutBase.ColumnCount = 5;
             this.TableLayoutBase.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this.TableLayoutBase.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this.TableLayoutBase.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this.TableLayoutBase.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this.TableLayoutBase.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.TableLayoutBase.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this.TableLayoutBase.Controls.Add(this.AddressLabel, 0, 0);
-            this.TableLayoutBase.Controls.Add(this.PointerBox, 1, 3);
+            this.TableLayoutBase.Controls.Add(this.PointerBox, 1, 4);
             this.TableLayoutBase.Controls.Add(this.AddressBox, 1, 0);
             this.TableLayoutBase.Controls.Add(this.ValueLabel, 2, 0);
             this.TableLayoutBase.Controls.Add(this.ValueBox, 3, 0);
@@ -227,12 +227,14 @@ namespace PS4CheaterNeo
             this.TableLayoutBase.Controls.Add(this.DescriptionLabel, 0, 2);
             this.TableLayoutBase.Controls.Add(this.LockBox, 3, 1);
             this.TableLayoutBase.Controls.Add(this.TypeLabel, 0, 1);
-            this.TableLayoutBase.Controls.Add(this.TableLayoutBottom, 1, 4);
+            this.TableLayoutBase.Controls.Add(this.TableLayoutBottom, 1, 5);
+            this.TableLayoutBase.Controls.Add(this.OnOffBox, 3, 4);
             this.TableLayoutBase.Dock = System.Windows.Forms.DockStyle.Fill;
             this.TableLayoutBase.Location = new System.Drawing.Point(0, 0);
             this.TableLayoutBase.Margin = new System.Windows.Forms.Padding(0, 3, 0, 0);
             this.TableLayoutBase.Name = "TableLayoutBase";
-            this.TableLayoutBase.RowCount = 5;
+            this.TableLayoutBase.RowCount = 6;
+            this.TableLayoutBase.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.TableLayoutBase.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.TableLayoutBase.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.TableLayoutBase.RowStyles.Add(new System.Windows.Forms.RowStyle());
@@ -288,6 +290,17 @@ namespace PS4CheaterNeo
             this.TableLayoutBottomBox.Size = new System.Drawing.Size(143, 1);
             this.TableLayoutBottomBox.TabIndex = 15;
             // 
+            // OnOffBox
+            // 
+            this.OnOffBox.AutoSize = true;
+            this.OnOffBox.Location = new System.Drawing.Point(230, 76);
+            this.OnOffBox.Name = "OnOffBox";
+            this.OnOffBox.Size = new System.Drawing.Size(81, 16);
+            this.OnOffBox.TabIndex = 17;
+            this.OnOffBox.Text = "OnOffValue";
+            this.OnOffBox.UseVisualStyleBackColor = true;
+            this.OnOffBox.CheckedChanged += new System.EventHandler(this.OnOffBox_CheckedChanged);
+            // 
             // NewAddress
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -326,5 +339,6 @@ namespace PS4CheaterNeo
         private System.Windows.Forms.TableLayoutPanel TableLayoutBottom;
         private System.Windows.Forms.TableLayoutPanel TableLayoutBottomBox;
         private System.Windows.Forms.TableLayoutPanel TableLayoutBottomLabel;
+        private System.Windows.Forms.CheckBox OnOffBox;
     }
 }

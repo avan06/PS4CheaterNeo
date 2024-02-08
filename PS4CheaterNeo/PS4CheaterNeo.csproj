@@ -94,6 +94,7 @@
     <Compile Include="common\PS4Tool.cs" />
     <Compile Include="common\BitsDictionary.cs" />
     <Compile Include="common\SectionTool.cs" />
+    <Compile Include="common\Self.cs" />
     <Compile Include="HexEditor.cs">
       <SubType>Form</SubType>
     </Compile>

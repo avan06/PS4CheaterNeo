@@ -88,10 +88,14 @@ namespace PS4CheaterNeo
             this.CheatGridViewSID = new GroupGridView.DataGridViewUpDownColumn();
             this.CheatGridViewLock = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.CheatGridViewDescription = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.CheatGridViewOn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.CheatGridViewOff = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.RefreshLock = new System.Windows.Forms.Timer(this.components);
             this.OpenCheatDialog = new System.Windows.Forms.OpenFileDialog();
             this.SaveCheatDialog = new System.Windows.Forms.SaveFileDialog();
             this.AutoRefreshTimer = new System.Windows.Forms.Timer(this.components);
+            this.CheatGridMenuOnValue = new System.Windows.Forms.ToolStripMenuItem();
+            this.CheatGridMenuOffValue = new System.Windows.Forms.ToolStripMenuItem();
             this.CheatGridMenu.SuspendLayout();
             this.ToolStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
@@ -116,6 +120,7 @@ namespace PS4CheaterNeo
             this.CheatGridMenuDelete});
             this.CheatGridMenu.Name = "CheatGridMenu";
             this.CheatGridMenu.Size = new System.Drawing.Size(153, 204);
+            this.CheatGridMenu.Opening += new System.ComponentModel.CancelEventHandler(this.CheatGridMenu_Opening);
             // 
             // CheatGridMenuHexEditor
             // 
@@ -145,6 +150,9 @@ namespace PS4CheaterNeo
             // 
             // CheatGridMenuActive
             // 
+            this.CheatGridMenuActive.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.CheatGridMenuOnValue,
+            this.CheatGridMenuOffValue});
             this.CheatGridMenuActive.Name = "CheatGridMenuActive";
             this.CheatGridMenuActive.Size = new System.Drawing.Size(152, 22);
             this.CheatGridMenuActive.Text = "Active";
@@ -453,7 +461,9 @@ namespace PS4CheaterNeo
             this.CheatGridViewSection,
             this.CheatGridViewSID,
             this.CheatGridViewLock,
-            this.CheatGridViewDescription});
+            this.CheatGridViewDescription,
+            this.CheatGridViewOn,
+            this.CheatGridViewOff});
             this.CheatGridView.ContextMenuStrip = this.CheatGridMenu;
             this.CheatGridView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.CheatGridView.GridColor = System.Drawing.Color.Silver;
@@ -586,6 +596,20 @@ namespace PS4CheaterNeo
             this.CheatGridViewDescription.Name = "CheatGridViewDescription";
             this.CheatGridViewDescription.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             // 
+            // CheatGridViewOn
+            // 
+            this.CheatGridViewOn.HeaderText = "On";
+            this.CheatGridViewOn.Name = "CheatGridViewOn";
+            this.CheatGridViewOn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.CheatGridViewOn.Visible = false;
+            // 
+            // CheatGridViewOff
+            // 
+            this.CheatGridViewOff.HeaderText = "Off";
+            this.CheatGridViewOff.Name = "CheatGridViewOff";
+            this.CheatGridViewOff.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.CheatGridViewOff.Visible = false;
+            // 
             // RefreshLock
             // 
             this.RefreshLock.Enabled = true;
@@ -596,6 +620,22 @@ namespace PS4CheaterNeo
             // 
             this.AutoRefreshTimer.Interval = 2500;
             this.AutoRefreshTimer.Tick += new System.EventHandler(this.AutoRefreshTimer_Tick);
+            // 
+            // CheatGridMenuOnValue
+            // 
+            this.CheatGridMenuOnValue.Name = "CheatGridMenuOnValue";
+            this.CheatGridMenuOnValue.Size = new System.Drawing.Size(180, 22);
+            this.CheatGridMenuOnValue.Text = "OnValue";
+            this.CheatGridMenuOnValue.Visible = false;
+            this.CheatGridMenuOnValue.Click += new System.EventHandler(this.CheatGridMenuOnValue_Click);
+            // 
+            // CheatGridMenuOffValue
+            // 
+            this.CheatGridMenuOffValue.Name = "CheatGridMenuOffValue";
+            this.CheatGridMenuOffValue.Size = new System.Drawing.Size(180, 22);
+            this.CheatGridMenuOffValue.Text = "OffValue";
+            this.CheatGridMenuOffValue.Visible = false;
+            this.CheatGridMenuOffValue.Click += new System.EventHandler(this.CheatGridMenuOffValue_Click);
             // 
             // Main
             // 
@@ -672,6 +712,10 @@ namespace PS4CheaterNeo
         private GroupGridView.DataGridViewUpDownColumn CheatGridViewSID;
         private System.Windows.Forms.DataGridViewCheckBoxColumn CheatGridViewLock;
         private System.Windows.Forms.DataGridViewTextBoxColumn CheatGridViewDescription;
+        private System.Windows.Forms.DataGridViewTextBoxColumn CheatGridViewOn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn CheatGridViewOff;
+        private System.Windows.Forms.ToolStripMenuItem CheatGridMenuOnValue;
+        private System.Windows.Forms.ToolStripMenuItem CheatGridMenuOffValue;
     }
 }
 

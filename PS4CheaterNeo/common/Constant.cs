@@ -44,6 +44,8 @@ namespace PS4CheaterNeo
         CheatListSID,
         CheatListLock,
         CheatListDesc,
+        CheatListOn,
+        CheatListOff,
     }
 
     public enum ColorTheme

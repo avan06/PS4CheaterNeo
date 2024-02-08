@@ -10,6 +10,10 @@ namespace PS4CheaterNeo
         readonly Main mainForm;
         bool isCheckAddressBox;
 
+        Label OnLabel;
+        Label OffLabel;
+        TextBox OnBox;
+        TextBox OffBox;
         Button AddOffsetBtn;
         Button DelOffsetBtn;
 
@@ -22,9 +26,11 @@ namespace PS4CheaterNeo
         public List<long> PointerOffsets { get; private set; }
         public Section AddrSection { get; private set; }
         public Section BaseSection { get; private set; }
-        public NewAddress(Main mainForm, Section section, ulong address, ScanType scanType, string value, bool cheatLock, string cheatDesc, bool isEdit) : 
-            this(mainForm, section, null, address, scanType, value, cheatLock, cheatDesc, null, isEdit) { }
-        public NewAddress(Main mainForm, Section addrSection, Section baseSection, ulong address, ScanType scanType, string value, bool cheatLock, string cheatDesc, List<long> pointerOffsets, bool isEdit)
+        public string OnValue { get; private set; }
+        public string OffValue { get; private set; }
+        public NewAddress(Main mainForm, Section section, ulong address, ScanType scanType, string value, bool cheatLock, string cheatDesc, bool isEdit, string onValue = null, string offValue = null) : 
+            this(mainForm, section, null, address, scanType, value, cheatLock, cheatDesc, null, isEdit, onValue, offValue) { }
+        public NewAddress(Main mainForm, Section addrSection, Section baseSection, ulong address, ScanType scanType, string value, bool cheatLock, string cheatDesc, List<long> pointerOffsets, bool isEdit, string onValue = null, string offValue = null)
         {
             this.Font = mainForm.Font;
             InitializeComponent();
@@ -32,24 +38,59 @@ namespace PS4CheaterNeo
 
             if (mainForm.ProcessName == "") throw new Exception("No Process currently");
 
+            OnLabel  = new Label();
+            OffLabel = new Label();
+            OnBox    = new TextBox();
+            OffBox   = new TextBox();
+
+            OnLabel.Anchor   = AnchorStyles.Top | AnchorStyles.Right;
+            OnLabel.AutoSize = true;
+            OnLabel.Margin   = AddressLabel.Margin;
+            OnLabel.Name     = "OnLabel";
+            OnLabel.TabIndex = 1;
+            OnLabel.Text     = "On";
+
+            OffLabel.AutoSize  = true;
+            OffLabel.Dock      = DockStyle.Right;
+            OffLabel.ForeColor = ForeColor;
+            OffLabel.Margin    = ValueLabel.Margin;
+            OffLabel.Name      = "OffLabel";
+            OffLabel.Text      = "Off";
+
+            OnBox.BackColor = BackColor;
+            OnBox.ForeColor = ForeColor;
+            OnBox.Dock   = DockStyle.Fill;
+            OnBox.Margin = ValueBox.Margin;
+            OnBox.Name   = "OnBox";
+            if (onValue  != null) OnBox.Text = onValue.ToString();
+
+            OffBox.BackColor = BackColor;
+            OffBox.ForeColor = ForeColor;
+            OffBox.Dock   = DockStyle.Fill;
+            OffBox.Margin = ValueBox.Margin;
+            OffBox.Name   = "OffBox";
+            if (offValue != null) OffBox.Text = offValue.ToString();
+
+            OnOffBox.Checked = onValue != null;
+
             AddOffsetBtn = new Button();
             DelOffsetBtn = new Button();
 
-            AddOffsetBtn.Text = "Add Offset";
+            AddOffsetBtn.Text      = "Add Offset";
             AddOffsetBtn.BackColor = BackColor;
             AddOffsetBtn.ForeColor = ForeColor;
             AddOffsetBtn.FlatStyle = FlatStyle.Flat;
-            AddOffsetBtn.Size = SaveBtn.Size;
-            AddOffsetBtn.Click -= AddOffset_Click;
-            AddOffsetBtn.Click += AddOffset_Click;
+            AddOffsetBtn.Size      = SaveBtn.Size;
+            AddOffsetBtn.Click    -= AddOffset_Click;
+            AddOffsetBtn.Click    += AddOffset_Click;
 
-            DelOffsetBtn.Text = "Del Offset";
+            DelOffsetBtn.Text      = "Del Offset";
             DelOffsetBtn.BackColor = BackColor;
             DelOffsetBtn.ForeColor = ForeColor;
             DelOffsetBtn.FlatStyle = FlatStyle.Flat;
-            DelOffsetBtn.Size = CloseBtn.Size;
-            DelOffsetBtn.Click -= DelOffset_Click;
-            DelOffsetBtn.Click += DelOffset_Click;
+            DelOffsetBtn.Size      = CloseBtn.Size;
+            DelOffsetBtn.Click    -= DelOffset_Click;
+            DelOffsetBtn.Click    += DelOffset_Click;
 
             mainForm.sectionTool.InitSections(mainForm.ProcessName);
 
@@ -168,6 +209,8 @@ namespace PS4CheaterNeo
                 CheatType = (ScanType)((ComboItem)(ScanTypeBox.SelectedItem)).Value;
                 ScanTool.ValueStringToULong(CheatType, ValueBox.Text);
                 Value = ValueBox.Text;
+                OnValue = OnBox.Text;
+                OffValue = OffBox.Text;
                 IsLock = LockBox.Checked;
                 Descriptioin = DescriptionBox.Text;
 
@@ -243,13 +286,36 @@ namespace PS4CheaterNeo
             }
         }
 
+        private void OnOffBox_CheckedChanged(object sender, EventArgs e)
+        {
+            if (OnOffBox.Checked)
+            {
+                TableLayoutBase.Controls.Add(OnLabel, 0, 3);
+                TableLayoutBase.Controls.Add(OnBox, 1, 3);
+                TableLayoutBase.Controls.Add(OffLabel, 2, 3);
+                TableLayoutBase.Controls.Add(OffBox, 3, 3);
+                Height += OnBox.Height;
+            }
+            else
+            {
+                TableLayoutBase.Controls.Remove(OnLabel);
+                TableLayoutBase.Controls.Remove(OnBox);
+                TableLayoutBase.Controls.Remove(OffLabel);
+                TableLayoutBase.Controls.Remove(OffBox);
+                Height -= OnBox.Height;
+            }
+        }
+
         private void AddOffset_Click(object sender, EventArgs e) => SetOffsetBoxs(true);
 
         private void DelOffset_Click(object sender, EventArgs e) => SetOffsetBoxs(false);
 
         private void SetOffsetBoxs(bool isAdd)
         {
-            //TableLayoutBottom's Row 0 consists of AddOffset and DelOffset buttons, Row 1 includes TextBox and Label controls, and Row 2 features Save and Close buttons.
+            //TableLayoutBottom's
+            // Row 0 consists of AddOffset and DelOffset buttons,
+            // Row 1 includes TextBox and Label controls, and
+            // Row 2 features Save and Close buttons.
             if (isAdd)
             {
                 TextBox textBox = new TextBox
@@ -301,6 +367,11 @@ namespace PS4CheaterNeo
 
             var newCheatType = (ScanType)((ComboItem)(ScanTypeBox.SelectedItem)).Value;
             if (newCheatType == ScanType.String_) return;
+            else if (CheatType == ScanType.Hex && ValueBox.Text.Length > 32)
+            {
+                ScanTypeBox.SelectedIndex = ScanTypeBox.FindStringExact(CheatType.GetDescription());
+                return;
+            }
 
             try
             {
