@@ -111,27 +111,32 @@ namespace PS4CheaterNeo
         /// Whether the length of the section is a filtering target.
         /// </summary>
         public bool IsFilterSize;
+        /// <summary>
+        /// The sequence number of the section.
+        /// </summary>
+        public int SN = -1;
 
         public Section Clone()
         {
             Section section = new Section
             {
-                PID = PID,
-                SID = SID,
-                SIDv1 = SIDv1,
-                Start = Start,
-                Length = Length,
-                Name = Name,
-                Check = Check,
-                Prot = Prot,
-                Offset = Offset,
-                IsFilter = IsFilter,
-                IsFilterSize = IsFilterSize
+                PID          = PID,
+                SID          = SID,
+                SIDv1        = SIDv1,
+                Start        = Start,
+                Length       = Length,
+                Name         = Name,
+                Check        = Check,
+                Prot         = Prot,
+                Offset       = Offset,
+                IsFilter     = IsFilter,
+                IsFilterSize = IsFilterSize,
+                SN           = SN,
             };
             return section;
         }
 
-        public override string ToString() => $"{Start:X},{(float)Length / 1024} KB,{Name},{Prot:X},{Offset:X},{IsFilter},{IsFilterSize},{Check},{PID},{SID}";
+        public override string ToString() => $"{Start:X},{(float)Length / 1024} KB,{Name},{Prot:X},{Offset:X},{IsFilter},{IsFilterSize},{Check},{PID},{SID},{SN}";
     }
 
     /// <summary>

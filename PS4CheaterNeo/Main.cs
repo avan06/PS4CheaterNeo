@@ -6,11 +6,15 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Json;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web;
 using System.Windows.Forms;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace PS4CheaterNeo
 {
@@ -19,6 +23,7 @@ namespace PS4CheaterNeo
         private Option option;
         private SendPayload sendPayload;
         private CheatJson cheatJson = null;
+        private CheatTrainer cheatTrainer = null;
         private Brush cheatGridViewRowIndexForeBrush;
         private bool VerifySectionWhenLock;
         private bool VerifySectionWhenRefresh;
@@ -44,6 +49,7 @@ namespace PS4CheaterNeo
         public string GameVer { get; private set; }
         public Dictionary<uint, (ulong Start, ulong End, bool Valid, byte Prot, string Name)> LocalHiddenSections { get; private set; }
         public string ProcessName;
+        public string ProcessContentid;
         public int ProcessPid;
         public Main()
         {
@@ -66,6 +72,21 @@ namespace PS4CheaterNeo
 
             CheatGridView.Rows.Clear();
             CheatGridView.RowCount = 0;
+        }
+
+        public void ParseLanguageJson()
+        {
+            string codes = Properties.Settings.Default.UILanguage.Value.ToString();
+            string path = "languages\\LanguageFile_" + codes + ".json";
+
+            if (!File.Exists(path)) return;
+
+            using (StreamReader sr = new StreamReader(path))
+            using (Stream stream = sr.BaseStream)
+            {
+                DataContractJsonSerializer deseralizer = new DataContractJsonSerializer(typeof(LanguageJson));
+                langJson = (LanguageJson)deseralizer.ReadObject(stream);
+            }
         }
 
         public void ApplyUI()
@@ -201,11 +222,13 @@ namespace PS4CheaterNeo
         }
 
         #region ToolStripOpenAndSave
+        private const string dialogFilter = "Cheat (*.cht)|*.cht|Cheat Relative (*.chtr)|*.chtr|Cheat Json (*.json)|*.json|Cheat Shn (*.shn)|*.shn";
         private void ToolStripOpen_Click(object sender, EventArgs e)
         {
             try
             {
-                OpenCheatDialog.Filter = "Cheat files(*.cht;*.chtr;*.json;eboot.bin)|*.cht;*.chtr;*.json;eboot.bin|Cheat (*.cht)|*.cht|Cheat Relative (*.chtr)|*.chtr|Cheat Json (*.json)|*.json|eboot.bin (eboot.bin)|*.bin";
+                OpenCheatDialog.Filter = 
+                    "Cheat files(*.cht;*.chtr;*.json;*.shn;*.mc4;eboot.bin)|*.cht;*.chtr;*.json;*.shn;*.mc4;eboot.bin|" + dialogFilter + "|Cheat MC4 (*.mc4)|*.mc4|eboot.bin (eboot.bin)|*.bin";
                 OpenCheatDialog.AddExtension = true;
                 OpenCheatDialog.RestoreDirectory = true;
 
@@ -216,6 +239,8 @@ namespace PS4CheaterNeo
                 using (StreamReader sr = new StreamReader(OpenCheatDialog.FileName))
                 {
                     if (OpenCheatDialog.FileName.ToUpper().EndsWith("JSON")) count = ParseCheatJson(sr.BaseStream);
+                    else if (OpenCheatDialog.FileName.ToUpper().EndsWith("SHN")) count = ParseCheatSHN(sr.ReadToEnd());
+                    else if (OpenCheatDialog.FileName.ToUpper().EndsWith("MC4")) count = ParseCheatMC4(sr);
                     else if (OpenCheatDialog.FileName.ToUpper().EndsWith("BIN")) count = ParseExecutableBIN(sr.BaseStream);
                     else
                     {
@@ -250,12 +275,7 @@ namespace PS4CheaterNeo
                         string PS4FWVersion = Properties.Settings.Default.PS4FWVersion.Value ?? "";
                         string FWVer        = PS4FWVersion != "" ? PS4FWVersion : Constant.Versions[0];
 
-                        InitGameInfo();
-
-                        if (GameID != cheatGameID && MessageBox.Show(string.Format("Your Game ID({0}) is different with cheat file({1}), still load?", GameID, cheatGameID),
-                            "GameID", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes) return;
-                        if (GameVer != cheatGameVer && MessageBox.Show(string.Format("Your Game version({0}) is different with cheat file({1}), still load?", GameVer, cheatGameVer),
-                            "GameVer", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes) return;
+                        if (!LoadCheatGameValid(cheatGameID, cheatGameVer)) return;
                         if (FWVer != cheatFWVer && MessageBox.Show(string.Format("Your Firmware version({0}) is different with cheat file({1}), still load?", FWVer, cheatFWVer),
                             "FWVer", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes) return;
                         #endregion
@@ -268,7 +288,7 @@ namespace PS4CheaterNeo
 
                             if (string.IsNullOrWhiteSpace(cheatStr)) continue;
 
-                            string[] cheatElements = cheatStr.Split('|');
+                            string[] cheatElements = cheatStr.Split(new Char[] { '|' }, 10);
 
                             if (cheatElements.Length < 5) continue;
 
@@ -276,6 +296,7 @@ namespace PS4CheaterNeo
                             bool isRelativeV1a     = cheatElements[5].StartsWith("++");
                             if (isRelativeV1a) cheatElements[5] = cheatElements[5].Substring(1);
                             bool isPointer         = !cheatElements[5].Contains("[") && Regex.IsMatch(cheatElements[5], "[0-9A-F]+_", RegexOptions.IgnoreCase);
+                            int relativeOffset     = isRelative ? int.Parse(cheatElements[5].Substring(1), NumberStyles.HexNumber) : -1;
                             uint sid               = isRelative ? preData.sid : uint.Parse(cheatElements[0]);
                             string name            = isRelative ? preData.name : cheatElements[2];
                             uint prot              = isRelative ? preData.prot : uint.Parse(cheatElements[3], NumberStyles.HexNumber);
@@ -283,7 +304,14 @@ namespace PS4CheaterNeo
                             bool cheatLock         = bool.Parse(cheatElements[7]);
                             string cheatValue      = cheatElements[8];
                             string cheatDesc       = cheatElements[9];
-                            int relativeOffset     = isRelative ? int.Parse(cheatElements[5].Substring(1), NumberStyles.HexNumber) : -1;
+                            string onValue         = null;
+                            string offValue        = null;
+                            if (Regex.Match(cheatDesc, @"(.*)\|([0-9A-Fa-f]+)\|([0-9A-Fa-f]+)") is Match m1 && m1.Success)
+                            {
+                                cheatDesc = m1.Groups[1].Value;
+                                onValue   = m1.Groups[2].Value;
+                                offValue  = m1.Groups[3].Value;
+                            }
 
                             Section section = isSIDv1 ? sectionTool.GetSectionBySIDv1(sid, name, prot) : sectionTool.GetSection(sid, name, prot);
                             if (section == null && (ToolStripLockEnable.Checked || ToolStripAutoRefresh.Checked))
@@ -313,7 +341,7 @@ namespace PS4CheaterNeo
                             }
                             else offsetAddr = uint.Parse(cheatElements[5], NumberStyles.HexNumber);
 
-                            CheatRow row = AddToCheatGrid(section, offsetAddr, cheatScanType, cheatValue, cheatLock, cheatDesc, pointerOffsets, pointerCaches, isRelative ? (int)preData.offsetAddr : -1, false);
+                            CheatRow row = AddToCheatGrid(section, offsetAddr, cheatScanType, cheatValue, cheatLock, cheatDesc, pointerOffsets, pointerCaches, isRelative ? (int)preData.offsetAddr : -1, false, onValue, offValue);
                             if (row.Cells == null || row.Cells.Count == 0)
                             {
                                 preData = (0, "", 0, 0, 0);
@@ -335,8 +363,7 @@ namespace PS4CheaterNeo
                 if (cheatGridRowList.Count < CheatGridGroupRefreshThreshold && CheatGridView.GroupByEnabled) CheatGridView.GroupRefresh();
                 CheatGridView.ResumeLayout();
                 SaveCheatDialog.FileName = OpenCheatDialog.FileName;
-                SaveCheatDialog.FilterIndex = OpenCheatDialog.FilterIndex;
-
+                if (OpenCheatDialog.FilterIndex < 6) SaveCheatDialog.FilterIndex = OpenCheatDialog.FilterIndex;
                 ToolStripMsg.Text = string.Format("Successfully loaded {0} cheat items.", count);
             }
             catch (Exception ex)
@@ -345,6 +372,7 @@ namespace PS4CheaterNeo
             }
         }
 
+        #region ParseLoadCheat
         /// <summary>
         /// PS4 Cheat Files Example:
         /// 1.5|eboot.bin|ID:CUSA99999|VER:09.99|FM:672
@@ -381,13 +409,13 @@ namespace PS4CheaterNeo
                 {
                     if (cheatElements[1] != "data") continue;
 
-                    sequence = int.Parse(cheatElements[2]);
-                    offsetAddrStr = cheatElements[3];
-                    section = sequence < sections.Length ? sections[sequence] : null;
+                    sequence         = int.Parse(cheatElements[2]);
+                    offsetAddrStr    = cheatElements[3];
+                    section          = sequence < sections.Length ? sections[sequence] : null;
                     string cheatCode = cheatElements[6];
-                    cheatLockStr = cheatElements[7];
-                    cheatDesc = cheatElements[8];
-                    string[] datas = cheatCode.Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
+                    cheatLockStr     = cheatElements[7];
+                    cheatDesc        = cheatElements[8];
+                    string[] datas   = cheatCode.Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
 
                     sectionStr = string.Format("{0}|{1}|{2}|{3}|{4}",
                        section.SID,
@@ -424,26 +452,26 @@ namespace PS4CheaterNeo
                 }
                 if (isPointer)
                 {
-                    string[] pointerList = cheatElements[3].Split('+');
+                    string[] pointerList     = cheatElements[3].Split('+');
                     string[] addressElements = pointerList[0].Split('_');
-                    sequence = int.Parse(addressElements[1]);
-                    offsetAddrStr = addressElements[2];
-                    section = sequence < sections.Length ? sections[sequence] : null;
-                    for (int offsetIdx = 1; offsetIdx < pointerList.Length; ++offsetIdx) offsetAddrStr += "_" + pointerList[offsetIdx];
-                    scanTypeStr = cheatElements[5];
-                    cheatValue = cheatElements[6];
-                    cheatLockStr = cheatElements[7];
-                    cheatDesc = cheatElements[8];
+                    sequence                 = int.Parse(addressElements[1]);
+                    offsetAddrStr            = addressElements[2];
+                    section                  = sequence < sections.Length ? sections[sequence] : null;
+                    for (int offsetIdx       = 1; offsetIdx < pointerList.Length; ++offsetIdx) offsetAddrStr += "_" + pointerList[offsetIdx];
+                    scanTypeStr              = cheatElements[5];
+                    cheatValue               = cheatElements[6];
+                    cheatLockStr             = cheatElements[7];
+                    cheatDesc                = cheatElements[8];
                 }
                 else
                 {
-                    sequence = int.Parse(cheatElements[1]);
+                    sequence      = int.Parse(cheatElements[1]);
                     offsetAddrStr = cheatElements[2];
-                    section = sequence < sections.Length ? sections[sequence] : null;
-                    scanTypeStr = cheatElements[3];
-                    cheatValue = cheatElements[4];
-                    cheatLockStr = cheatElements[5];
-                    cheatDesc = cheatElements[6];
+                    section       = sequence < sections.Length ? sections[sequence] : null;
+                    scanTypeStr   = cheatElements[3];
+                    cheatValue    = cheatElements[4];
+                    cheatLockStr  = cheatElements[5];
+                    cheatDesc     = cheatElements[6];
                 }
                 sectionStr = string.Format("{0}|{1}|{2}|{3}|{4}",
                    section.SID,
@@ -517,25 +545,9 @@ namespace PS4CheaterNeo
             return code;
         }
 
-        public void ParseLanguageJson()
-        {
-            string codes = Properties.Settings.Default.UILanguage.Value.ToString();
-            string path = "languages\\LanguageFile_" + codes + ".json";
-
-            if (!File.Exists(path)) return;
-
-            using (StreamReader sr = new StreamReader(path))
-            using (Stream stream = sr.BaseStream)
-            {
-                DataContractJsonSerializer deseralizer = new DataContractJsonSerializer(typeof(LanguageJson));
-                langJson = (LanguageJson)deseralizer.ReadObject(stream);
-            }
-        }
-
         /// <summary>
         /// Load a Cheat file in JSON format.
         /// </summary>
-        /// <param name="cheatTexts"></param>
         /// <returns></returns>
         private int ParseCheatJson(Stream stream)
         {
@@ -547,18 +559,7 @@ namespace PS4CheaterNeo
 
                 ProcessName = cheatJson.Process;
                 if (!InitSections(ProcessName)) return 0;
-
-                #region cheatHeaderItems Check
-                string cheatGameID = cheatJson.Id;
-                string cheatGameVer = cheatJson.Version;
-
-                InitGameInfo();
-
-                if (GameID != cheatGameID && MessageBox.Show(string.Format("Your Game ID({0}) is different with cheat file({1}), still load?", GameID, cheatGameID),
-                    "GameID", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes) return 0;
-                if (GameVer != cheatGameVer && MessageBox.Show(string.Format("Your Game version({0}) is different with cheat file({1}), still load?", GameVer, cheatGameVer),
-                    "GameVer", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes) return 0;
-                #endregion
+                if (!LoadCheatGameValid(cheatJson.Id, cheatJson.Version)) return 0;
 
                 Section section;
                 Section sectionFirst = sectionTool.GetSectionSortByAddr()[0];
@@ -566,11 +567,14 @@ namespace PS4CheaterNeo
                 foreach (CheatJson.Mod cheatMod in cheatJson.Mods)
                 {
                     bool cheatLock = false;
-                    string cheatDesc = cheatMod.Name;
                     ScanType cheatScanType = ScanType.Hex;
                     section = sectionFirst;
-                    foreach (CheatJson.Memory memory in cheatMod.Memory)
+                    for (int idx = 0; idx < cheatMod.Memory.Count; idx++)
                     {
+                        CheatJson.Memory memory = cheatMod.Memory[idx];
+                        string cheatDesc = cheatMod.Name;
+                        if (cheatMod.Memory.Count > 1) cheatDesc += string.Format("_{0:00}", idx);
+
                         string cheatValue = memory.On;
                         ulong offsetAddr = ulong.Parse(memory.Offset, NumberStyles.HexNumber);
                         if (offsetAddr >= (ulong)sectionFirst.Length)
@@ -590,6 +594,76 @@ namespace PS4CheaterNeo
                     }
                 }
                 CheatGridViewRowCountUpdate();
+            }
+            return count;
+        }
+
+        private int ParseCheatSHN(string shnXML)
+        {
+            int count = 0;
+            using (StringReader readerXml = new StringReader(shnXML))
+            {
+                XmlSerializer serializer = new XmlSerializer(typeof(CheatTrainer));
+                cheatTrainer = (CheatTrainer)serializer.Deserialize(readerXml);
+
+                ProcessName = cheatTrainer.Process;
+                if (!InitSections(ProcessName)) return 0;
+                if (!LoadCheatGameValid(cheatTrainer.Cusa, cheatTrainer.Version)) return 0;
+
+                Section[] sections = sectionTool.GetSectionSortByAddr();
+                CheatGridViewRowCountUpdate(false);
+                foreach (CheatTrainer.Cheat startUP in cheatTrainer.StartUPs)
+                {
+                    ParseCheatline(startUP.Text, startUP.Description, startUP.Cheatlines, sections);
+                    count++;
+                }
+                foreach (CheatTrainer.Cheat cheat in cheatTrainer.Cheats)
+                {
+                    ParseCheatline(cheat.Text, cheat.Description, cheat.Cheatlines, sections);
+                    count++;
+                }
+                CheatGridViewRowCountUpdate();
+            }
+            void ParseCheatline(string text, string desc, List<CheatTrainer.Cheatline> cheatlines, Section[] sections)
+            {
+                bool cheatLock = false;
+                ScanType cheatScanType = ScanType.Hex;
+                for (int idx = 0; idx < cheatlines.Count; idx++)
+                {
+                    CheatTrainer.Cheatline cheatline = cheatlines[idx];
+                    Section section = sections[cheatline.SectionId];
+                    string onValue = cheatline.ValueOn.Replace("-", "");
+                    string offValue = cheatline.ValueOff.Replace("-", "");
+                    ulong offsetAddr = ulong.Parse(cheatline.Offset, NumberStyles.HexNumber);
+
+                    string cheatDesc = text;
+                    if (cheatlines.Count > 1) cheatDesc += string.Format("_{0:00}", idx);
+
+                    AddToCheatGrid(section, (uint)offsetAddr, cheatScanType, onValue, cheatLock, cheatDesc, null, null, -1, false, onValue, offValue);
+                }
+            }
+            return count;
+        }
+
+        private int ParseCheatMC4(StreamReader reader)
+        {
+            /// Decrypted by bucanero/save-decrypters.
+            /// https://github.com/bucanero/save-decrypters
+            byte[] aes256cbcKey = Encoding.ASCII.GetBytes("304c6528f659c766110239a51cl5dd9c");
+            byte[] aes256cbcIv = Encoding.ASCII.GetBytes("u@}kzW2u[u(8DWar");
+
+            int count = 0;
+            using (AesCryptoServiceProvider aes = new AesCryptoServiceProvider())
+            {
+                string raw = reader.ReadToEnd();
+                byte[] rawData = Convert.FromBase64String(raw);
+                var decryptor = aes.CreateDecryptor(aes256cbcKey, aes256cbcIv);
+                byte[] decBytes = decryptor.TransformFinalBlock(rawData, 0, rawData.Length);
+                string decXml = Encoding.UTF8.GetString(decBytes);
+                decXml = HttpUtility.HtmlDecode(decXml);
+                decXml = Regex.Unescape(decXml);
+                Console.WriteLine(decXml);
+                count = ParseCheatSHN(decXml);
             }
             return count;
         }
@@ -623,7 +697,7 @@ namespace PS4CheaterNeo
                     if (seEntry0.props >> 20 == 0) break;
                 }
 
-                if (seEntry0.fileSz == 0  && seEntry0.props >> 20 != 0 && MessageBox.Show("The information of Segment00 in the loaded \"eboot.bin\" file cannot be parsed.", "Load eboot.bin", MessageBoxButtons.OK, MessageBoxIcon.Warning) == DialogResult.OK) return 0;
+                if (seEntry0.fileSz == 0 && seEntry0.props >> 20 != 0 && MessageBox.Show("The information of Segment00 in the loaded \"eboot.bin\" file cannot be parsed.", "Load eboot.bin", MessageBoxButtons.OK, MessageBoxIcon.Warning) == DialogResult.OK) return 0;
 
                 Section section = sectionTool.GetSection("executable", 5);
                 byte[] checkBytes = PS4Tool.ReadMemory(ProcessPid, section.Start, 48);
@@ -682,71 +756,48 @@ namespace PS4CheaterNeo
             return count;
         }
 
+        private bool LoadCheatGameValid(string cheatGameID, string cheatGameVer)
+        {
+            InitGameInfo();
+
+            if (GameID != cheatGameID && MessageBox.Show(string.Format("Your Game ID({0}) is different with cheat file({1}), still load?", GameID, cheatGameID),
+                "GameID", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes) return false;
+            if (GameVer != cheatGameVer && MessageBox.Show(string.Format("Your Game version({0}) is different with cheat file({1}), still load?", GameVer, cheatGameVer),
+                "GameVer", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes) return false;
+            
+            return true;
+        }
+        #endregion
+
         private void ToolStripSave_Click(object sender, EventArgs e)
         {
             if (cheatGridRowList.Count == 0) return;
 
             string FWVer = Properties.Settings.Default.PS4FWVersion.Value;
             InitGameInfo();
-            SaveCheatDialog.Filter = "Cheat (*.cht)|*.cht|Cheat Relative (*.chtr)|*.chtr|Cheat Json (*.json)|*.json";
+            SaveCheatDialog.Filter = "Cheat files(*.cht;*.chtr;*.json;*.shn)|*.cht;*.chtr;*.json;*.shn|" + dialogFilter;
             SaveCheatDialog.AddExtension = true;
             SaveCheatDialog.RestoreDirectory = true;
-            if (string.IsNullOrWhiteSpace(SaveCheatDialog.FileName)) SaveCheatDialog.FileName = GameID;
+            if (string.IsNullOrWhiteSpace(SaveCheatDialog.FileName))
+            {
+                if (string.IsNullOrWhiteSpace(ProcessContentid))
+                {
+                    try
+                    {
+                        var processInfo = PS4Tool.GetProcessInfo(ProcessName);
+                        ProcessPid = processInfo.pid;
+                        ProcessContentid = processInfo.contentid;
+                    }
+                    catch {}
+                }
+                SaveCheatDialog.FileName = string.IsNullOrWhiteSpace(ProcessContentid) ? GameID : ProcessContentid;
+            }
 
             if (SaveCheatDialog.ShowDialog() != DialogResult.OK) return;
             if (!InitSections(ProcessName)) return;
-            
-            if (SaveCheatDialog.FileName.ToUpper().EndsWith("JSON"))
-            {
-                if (cheatJson == null || cheatJson.Id != GameID) cheatJson = new CheatJson(GameID, GameID, GameVer, ProcessName);
-                else cheatJson.Mods = new List<CheatJson.Mod>();
 
-                CheatJson.Mod modBak = null;
-                Section sectionFirst = sectionTool.GetSectionSortByAddr()[0];
-                for (int cIdx = 0; cIdx < cheatGridRowList.Count; cIdx++)
-                {
-                    CheatRow row = cheatGridRowList[cIdx];
-
-                    (Section section, ulong offsetAddr) = (row.Section_, row.OffsetAddr);
-                    if (section.SID != sectionFirst.SID) offsetAddr += section.Start - sectionFirst.Start;
-
-                    string cheatDesc = row.Cells[(int)ChertCol.CheatListDesc].ToString();
-                    ScanType scanType = this.ParseFromDescription<ScanType>(row.Cells[(int)ChertCol.CheatListType].ToString());
-                    string on = row.Cells[(int)ChertCol.CheatListValue].ToString();
-                    if (scanType != ScanType.Hex)
-                    {
-                        byte[] bytes = ScanTool.ValueStringToByte(scanType, on);
-                        on = ScanTool.BytesToString(scanType, bytes, true, on.StartsWith("-"));
-                        on = ScanTool.ReverseHexString(on);
-                    }
-                    string off = on;
-                    if (Regex.Match(cheatDesc, @"(.*) *__ *\[ *on: *([0-9a-zA-Z]+) *off: *([0-9a-zA-Z]+)") is Match m1 && m1.Success)
-                    { //Attempt to restore off value from desc
-                        cheatDesc = m1.Groups[1].Value;
-                        off = m1.Groups[3].Value;
-                    }
-
-                    if (modBak != null && modBak.Name == cheatDesc) cheatJson.Mods[cheatJson.Mods.Count - 1].Memory.Add(new CheatJson.Memory(offsetAddr.ToString("X"), on, off));
-                    else
-                    {
-                        CheatJson.Mod mod = new CheatJson.Mod(cheatDesc, "checkbox");
-                        mod.Memory.Add(new CheatJson.Memory(offsetAddr.ToString("X"), on, off));
-
-                        cheatJson.Mods.Add(mod);
-                        modBak = mod;
-                    }
-
-                }
-
-                DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(CheatJson));
-                using (var msObj = new MemoryStream())
-                {
-                    serializer.WriteObject(msObj, cheatJson);
-                    var bytes = msObj.ToArray();
-                    string json = Encoding.UTF8.GetString(bytes, 0, bytes.Length);
-                    using (var myStream = new StreamWriter(SaveCheatDialog.FileName)) myStream.Write(json);
-                }
-            }
+            if (SaveCheatDialog.FileName.ToUpper().EndsWith("JSON")) SaveCheatJson();
+            else if (SaveCheatDialog.FileName.ToUpper().EndsWith("SHN")) SaveCheatShn();
             else
             {
                 string processName = ProcessName;
@@ -770,8 +821,8 @@ namespace PS4CheaterNeo
                         newSection = sectionTool.GetSection(sid, sectionArr[1], uint.Parse(sectionArr[2]));
                         addressStr = sectionArr[sectionArr.Length - 1];
                     }
-                    else if (SaveCheatDialog.FilterIndex == 2 && isRelative)
-                    {
+                    else if (SaveCheatDialog.FilterIndex == 3 && isRelative)
+                    { //Cheat Relative (*.chtr)
                         addressStr = "+" + (offsetAddr - preAddr).ToString("X");
                         sectionStr = "||||";
                     }
@@ -783,7 +834,7 @@ namespace PS4CheaterNeo
                         newSection.Prot.ToString("X"),
                         newSection.Offset.ToString("X"));
 
-                    saveBuf.AppendLine(string.Format("{0}|{1}|{2}|{3}|{4}|{5}",
+                    saveBuf.Append(string.Format("{0}|{1}|{2}|{3}|{4}|{5}",
                         sectionStr,
                         addressStr,
                         row.Cells[(int)ChertCol.CheatListType],
@@ -791,7 +842,13 @@ namespace PS4CheaterNeo
                         row.Cells[(int)ChertCol.CheatListValue],
                         row.Cells[(int)ChertCol.CheatListDesc]
                         ));
-                    if (SaveCheatDialog.FilterIndex == 2 && !isRelative) preAddr = offsetAddr;
+                    if (!string.IsNullOrWhiteSpace((string)row.Cells[(int)ChertCol.CheatListOn]))
+                        saveBuf.AppendLine(string.Format("|{0}|{1}",
+                            row.Cells[(int)ChertCol.CheatListOn],
+                            row.Cells[(int)ChertCol.CheatListOff]
+                            ));
+                    else saveBuf.AppendLine();
+                    if (SaveCheatDialog.FilterIndex == 3 && !isRelative) preAddr = offsetAddr; //Cheat Relative (*.chtr)
                 }
 
                 using (var myStream = new StreamWriter(SaveCheatDialog.FileName)) myStream.Write(saveBuf.ToString());
@@ -799,6 +856,120 @@ namespace PS4CheaterNeo
 
             OpenCheatDialog.FileName = SaveCheatDialog.FileName;
             OpenCheatDialog.FilterIndex = SaveCheatDialog.FilterIndex;
+        }
+
+        private void SaveCheatJson()
+        {
+            if (cheatJson == null || cheatJson.Id != GameID) cheatJson = new CheatJson(ProcessContentid, GameID, GameVer, ProcessName);
+            else cheatJson.Mods = new List<CheatJson.Mod>();
+
+            CheatJson.Mod modBak = null;
+            Section sectionFirst = sectionTool.GetSectionSortByAddr()[0];
+            for (int cIdx = 0; cIdx < cheatGridRowList.Count; cIdx++)
+            {
+                CheatRow row = cheatGridRowList[cIdx];
+
+                (Section section, ulong offsetAddr) = (row.Section_, row.OffsetAddr);
+                if (section.SID != sectionFirst.SID) offsetAddr += section.Start - sectionFirst.Start;
+
+                string cheatDesc = row.Cells[(int)ChertCol.CheatListDesc].ToString();
+                ScanType scanType = this.ParseFromDescription<ScanType>(row.Cells[(int)ChertCol.CheatListType].ToString());
+                string on = row.Cells[(int)ChertCol.CheatListValue].ToString();
+                if (scanType != ScanType.Hex)
+                {
+                    byte[] bytes = ScanTool.ValueStringToByte(scanType, on);
+                    on = ScanTool.BytesToString(scanType, bytes, true, on.StartsWith("-"));
+                    on = ScanTool.ReverseHexString(on);
+                }
+                string off = row.Cells[(int)ChertCol.CheatListOff].ToString();
+                if (Regex.Match(cheatDesc, @"(.*) *__ *\[ *on: *([0-9a-zA-Z]+) *off: *([0-9a-zA-Z]+)") is Match m1 && m1.Success)
+                { //Attempt to restore off value from desc
+                    cheatDesc = m1.Groups[1].Value;
+                    off = m1.Groups[3].Value;
+                }
+                cheatDesc = Regex.Replace(cheatDesc, @"_\d+$", "");
+
+                if (modBak != null && modBak.Name == cheatDesc) cheatJson.Mods[cheatJson.Mods.Count - 1].Memory.Add(new CheatJson.Memory(offsetAddr.ToString("X"), on, off));
+                else
+                {
+                    CheatJson.Mod mod = new CheatJson.Mod(cheatDesc, "checkbox");
+                    mod.Memory.Add(new CheatJson.Memory(offsetAddr.ToString("X"), on, off));
+
+                    cheatJson.Mods.Add(mod);
+                    modBak = mod;
+                }
+            }
+
+            using (var myStream = new FileStream(SaveCheatDialog.FileName, FileMode.Create))
+            using (var writer = JsonReaderWriterFactory.CreateJsonWriter(myStream, Encoding.UTF8, true, true, "  "))
+            {
+                var serializer = new DataContractJsonSerializer(typeof(CheatJson));
+                serializer.WriteObject(writer, cheatJson);
+                writer.Flush();
+            }
+        }
+
+        private void SaveCheatShn()
+        {
+            if (cheatTrainer == null || cheatTrainer.Cusa != GameID) cheatTrainer = new CheatTrainer(ProcessContentid, GameID, GameVer, ProcessName);
+            else
+            {
+                cheatTrainer.StartUPs = new List<CheatTrainer.Cheat>();
+                cheatTrainer.Cheats = new List<CheatTrainer.Cheat>();
+                cheatTrainer.Genress = new List<CheatTrainer.Genres>();
+            }
+
+
+            CheatTrainer.Cheat cheatBak = null;
+            Section[] sections = sectionTool.GetSectionSortByAddr();
+            for (int idx = 0; idx < sections.Length; idx++)
+            {
+                Section section = sections[idx];
+                section.SN = idx;
+            }
+            for (int cIdx = 0; cIdx < cheatGridRowList.Count; cIdx++)
+            {
+                CheatRow row = cheatGridRowList[cIdx];
+
+                (Section section, ulong offsetAddr) = (row.Section_, row.OffsetAddr);
+
+                string cheatDesc = row.Cells[(int)ChertCol.CheatListDesc].ToString();
+                ScanType scanType = this.ParseFromDescription<ScanType>(row.Cells[(int)ChertCol.CheatListType].ToString());
+                string on = row.Cells[(int)ChertCol.CheatListValue].ToString();
+                if (scanType != ScanType.Hex)
+                {
+                    byte[] bytes = ScanTool.ValueStringToByte(scanType, on);
+                    on = ScanTool.BytesToString(scanType, bytes, true, on.StartsWith("-"));
+                    on = ScanTool.ReverseHexString(on);
+                }
+                string off = row.Cells[(int)ChertCol.CheatListOff].ToString();
+                if (Regex.Match(cheatDesc, @"(.*) *__ *\[ *on: *([0-9a-zA-Z]+) *off: *([0-9a-zA-Z]+)") is Match m1 && m1.Success)
+                { //Attempt to restore off value from desc
+                    cheatDesc = m1.Groups[1].Value;
+                    off = m1.Groups[3].Value;
+                }
+                on = Regex.Replace(on, @"(\w\w)(?=\w)", @"$1-");
+                off = Regex.Replace(off, @"(\w\w)(?=\w)", @"$1-");
+                cheatDesc = Regex.Replace(cheatDesc, @"_\d+$", "");
+
+                if (cheatBak != null && cheatBak.Text == cheatDesc) cheatTrainer.Cheats[cheatTrainer.Cheats.Count - 1].Cheatlines.Add(new CheatTrainer.Cheatline(offsetAddr.ToString("X"), section.SN, on, off));
+                else
+                {
+                    CheatTrainer.Cheat cheat = new CheatTrainer.Cheat(cheatDesc);
+                    cheat.Cheatlines.Add(new CheatTrainer.Cheatline(offsetAddr.ToString("X"), section.SN, on, off));
+
+                    cheatTrainer.Cheats.Add(cheat);
+                    cheatBak = cheat;
+                }
+            }
+            XmlSerializer serializer = new XmlSerializer(typeof(CheatTrainer));
+            using (var myStream = new StreamWriter(SaveCheatDialog.FileName))
+            using (XmlTextWriter xmlWriter = new XmlTextWriter(myStream))
+            {
+                xmlWriter.Formatting = Formatting.Indented;
+                xmlWriter.Indentation = 2;
+                serializer.Serialize(xmlWriter, cheatTrainer);
+            }
         }
         #endregion
 
@@ -1491,7 +1662,7 @@ namespace PS4CheaterNeo
             if (rows == null || rows.Count == 0) return;
 
             DataGridViewRow row = rows[0];
-            bool isOnOffVisible = row.Cells[(int)ChertCol.CheatListOn] != null && row.Cells[(int)ChertCol.CheatListOn].ToString().Trim() != "";
+            bool isOnOffVisible = !string.IsNullOrWhiteSpace((string)row.Cells[(int)ChertCol.CheatListOn].Value);
             CheatGridMenuOnValue.Visible = isOnOffVisible;
             CheatGridMenuOffValue.Visible = isOnOffVisible;
         }
@@ -1904,6 +2075,7 @@ namespace PS4CheaterNeo
 
             ProcessPid = processInfo.pid;
             ProcessName = processInfo.name;
+            ProcessContentid = processInfo.contentid;
             if (pMap == null) sectionTool.InitSections(processInfo.pid, ProcessName);
             else sectionTool.InitSections(pMap, processInfo.pid, ProcessName);
 

@@ -298,13 +298,18 @@ namespace PS4CheaterNeo
 
                 ComboItem process = (ComboItem)ProcessesBox.SelectedItem;
                 sectionTool.InitSections((int)process.Value, (string)process.Text);
-                mainForm.ProcessPid = (int)process.Value;
-                mainForm.ProcessName = (string)process.Text;
+                if (mainForm.GameID != null)
+                {
+                    mainForm.ProcessPid = (int)process.Value;
+                    mainForm.ProcessName = (string)process.Text;
+                }
+                else mainForm.InitSections((string)process.Text);
 
                 Section[] sections = sectionTool.GetSectionSortByAddr();
                 for (int sectionIdx = 0; sectionIdx < sections.Length; sectionIdx++)
                 {
                     Section section = sections[sectionIdx];
+                    section.SN = sectionIdx;
                     if ((IsFilterBox.Checked && section.IsFilter) || (IsFilterSizeBox.Checked && section.IsFilterSize)) continue;
 
                     string start = String.Format("{0:X9}", section.Start);

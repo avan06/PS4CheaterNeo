@@ -11,6 +11,8 @@ namespace PS4CheaterNeo
         Russian,
         French,
         German,
+        Korean,
+        Italian,
     }
 
     public enum SectionCol

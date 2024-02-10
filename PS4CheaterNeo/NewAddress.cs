@@ -43,19 +43,21 @@ namespace PS4CheaterNeo
             OnBox    = new TextBox();
             OffBox   = new TextBox();
 
-            OnLabel.Anchor   = AnchorStyles.Top | AnchorStyles.Right;
             OnLabel.AutoSize = true;
+            OnLabel.Dock = DockStyle.Fill;
             OnLabel.Margin   = AddressLabel.Margin;
             OnLabel.Name     = "OnLabel";
             OnLabel.TabIndex = 1;
             OnLabel.Text     = "On";
+            OnLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 
             OffLabel.AutoSize  = true;
-            OffLabel.Dock      = DockStyle.Right;
+            OffLabel.Dock      = DockStyle.Fill;
             OffLabel.ForeColor = ForeColor;
             OffLabel.Margin    = ValueLabel.Margin;
             OffLabel.Name      = "OffLabel";
             OffLabel.Text      = "Off";
+            OffLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 
             OnBox.BackColor = BackColor;
             OnBox.ForeColor = ForeColor;
@@ -160,6 +162,7 @@ namespace PS4CheaterNeo
                 DescriptionLabel.ForeColor = ForeColor;
                 LockBox.ForeColor          = ForeColor;
                 PointerBox.ForeColor       = ForeColor;
+                OnOffBox.ForeColor         = ForeColor;
 
                 AddressBox.ForeColor     = ForeColor;
                 AddressBox.BackColor     = BackColor;
@@ -209,12 +212,12 @@ namespace PS4CheaterNeo
                 CheatType = (ScanType)((ComboItem)(ScanTypeBox.SelectedItem)).Value;
                 ScanTool.ValueStringToULong(CheatType, ValueBox.Text);
                 Value = ValueBox.Text;
-                OnValue = OnBox.Text;
-                OffValue = OffBox.Text;
+                OnValue = string.IsNullOrWhiteSpace(OnBox.Text) ? null : OnBox.Text;
+                OffValue = string.IsNullOrWhiteSpace(OffBox.Text) ? null : OffBox.Text;
                 IsLock = LockBox.Checked;
                 Descriptioin = DescriptionBox.Text;
 
-                if (!AddressBox.ReadOnly) mainForm.AddToCheatGrid(AddrSection, (uint)(Address - AddrSection.Start), CheatType, Value, IsLock, Descriptioin, PointerOffsets);
+                if (!AddressBox.ReadOnly) mainForm.AddToCheatGrid(AddrSection, (uint)(Address - AddrSection.Start), CheatType, Value, IsLock, Descriptioin, PointerOffsets, null, -1, true, OnValue, OffValue);
 
                 DialogResult = DialogResult.OK;
                 Close();
@@ -320,24 +323,26 @@ namespace PS4CheaterNeo
             {
                 TextBox textBox = new TextBox
                 {
-                    Text = "0",
-                    Location = AddOffsetBtn.Location,
+                    Text      = "0",
+                    Location  = AddOffsetBtn.Location,
                     ForeColor = ForeColor,
                     BackColor = BackColor,
-                    Dock = DockStyle.Fill,
-                    Margin = new Padding(3)
+                    Dock      = DockStyle.Fill,
+                    Margin    = new Padding(3)
                 };
 
-                Label label = new Label
+                TextBox label = new TextBox
                 {
-                    Text = "",
-                    Location = DelOffsetBtn.Location,
-                    ForeColor = ForeColor,
-                    BackColor = BackColor,
-                    Dock = DockStyle.Fill,
-                    Margin = new Padding(3)
-                };
-
+                    Text        = "",
+                    Location    = DelOffsetBtn.Location,
+                    ForeColor   = ForeColor,
+                    BackColor   = BackColor,
+                    Dock        = DockStyle.Fill,
+                    Margin      = new Padding(3, 6, 3, 3),
+                    ReadOnly    = true,
+                    BorderStyle = BorderStyle.None,
+            };
+                PointerOffsets.Add(0);
                 TableLayoutBottomBox.RowCount += 1;
                 TableLayoutBottomBox.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
                 TableLayoutBottomBox.Controls.Add(textBox, 0, TableLayoutBottomBox.Controls.Count);
@@ -351,6 +356,7 @@ namespace PS4CheaterNeo
             {
                 if (TableLayoutBottomBox.Controls.Count == 0) return;
 
+                PointerOffsets.RemoveAt(PointerOffsets.Count - 1);
                 Height -= TableLayoutBottomBox.Controls[TableLayoutBottomBox.Controls.Count - 1].Height;
                 TableLayoutBottomBox.Controls.RemoveAt(TableLayoutBottomBox.Controls.Count - 1);
                 TableLayoutBottomBox.RowCount -= 1;
@@ -366,27 +372,42 @@ namespace PS4CheaterNeo
             if (IsPointer || PointerOffsets != null) return;
 
             var newCheatType = (ScanType)((ComboItem)(ScanTypeBox.SelectedItem)).Value;
-            if (newCheatType == ScanType.String_) return;
-            else if (CheatType == ScanType.Hex && ValueBox.Text.Length > 32)
+            if (CheatType == ScanType.Hex && ValueBox.Text.Length > 16)
             {
                 ScanTypeBox.SelectedIndex = ScanTypeBox.FindStringExact(CheatType.GetDescription());
                 return;
             }
+            else if (newCheatType == ScanType.String_) return;
 
             try
             {
                 var newValue = ScanTool.ValueStringToULong(CheatType, ValueBox.Text);
                 if (newValue == 0) return;
 
-                if (newCheatType == ScanType.Byte_ && newValue > byte.MaxValue) return;
-                else if (newCheatType == ScanType.Bytes_2 && newValue > UInt16.MaxValue) return;
-                else if (newCheatType == ScanType.Bytes_4 && newValue > UInt32.MaxValue) return;
+                if (newCheatType == ScanType.Byte_ && newValue > byte.MaxValue ||
+                    newCheatType == ScanType.Bytes_2 && newValue > UInt16.MaxValue ||
+                    newCheatType == ScanType.Bytes_4 && newValue > UInt32.MaxValue ||
+                    newCheatType == ScanType.Float_ && newValue > float.MaxValue)
+                {
+                    ScanTypeBox.SelectedIndex = ScanTypeBox.FindStringExact(CheatType.GetDescription());
+                    return;
+                }
 
                 var newText = ScanTool.ULongToString(newCheatType, newValue);
                 if (newText == "0") return;
 
                 Value = newValue.ToString();
                 ValueBox.Text = newText;
+
+                //var newOnValue = ScanTool.ValueStringToULong(CheatType, OnBox.Text);
+                //var newOnText = ScanTool.ULongToString(newCheatType, newOnValue);
+                //OnValue = newOnValue.ToString();
+                //OnBox.Text = newOnText;
+
+                //var newOffValue = ScanTool.ValueStringToULong(CheatType, OffBox.Text);
+                //var newOffText = ScanTool.ULongToString(newCheatType, newOffValue);
+                //OffValue = newOffValue.ToString();
+                //OffBox.Text = newOffText;
             }
             catch (Exception ex)
             {
@@ -417,26 +438,30 @@ namespace PS4CheaterNeo
 
                     if (BaseSection == null) break;
 
-                    if (TableLayoutBottomBox.Controls.Count > PointerOffsets.Count) PointerOffsets.Add(address);
-                    else PointerOffsets[idx] = address;
+                    PointerOffsets[idx] = address;
 
                     if (idx != TableLayoutBottomBox.Controls.Count - 1)
                     {
                         if (AddrSection == null || AddrSection.SID == 0) AddrSection = mainForm.sectionTool.GetSection(mainForm.sectionTool.GetSectionID((ulong)(address + baseAddress)));
                         byte[] nextAddress = PS4Tool.ReadMemory(AddrSection.PID, (ulong)(address + baseAddress), 8);
                         baseAddress = BitConverter.ToInt64(nextAddress, 0);
-                        TableLayoutBottomLabel.Controls[idx].Text = baseAddress.ToString("X");
+                        TableLayoutBottomLabel.Controls[idx].Text = string.Format("=> {0:X2} +", baseAddress);
                     }
                     else
                     {
                         if (address == 0 && baseAddress == 0) continue;
-                        byte[] data = PS4Tool.ReadMemory(BaseSection.PID, (ulong)(address + baseAddress), ScanTool.ScanTypeLengthDict[CheatType]);
-                        TableLayoutBottomLabel.Controls[idx].Text = ScanTool.BytesToString(CheatType, data);
+                        int length = 0;
+                        if (CheatType != ScanType.Hex) length = ScanTool.ScanTypeLengthDict[CheatType];
+                        else if (ValueBox.Text.Length > 1) length = ValueBox.Text.Length / 2;
+                        else length = 8;
+                        byte[] data = PS4Tool.ReadMemory(BaseSection.PID, (ulong)(address + baseAddress), length);
+                        string value = ScanTool.BytesToString(CheatType, data);
+                        TableLayoutBottomLabel.Controls[idx].Text = string.Format("=> {0}", value);
                         AddressBox.Text = (address + baseAddress).ToString("X");
                         if (!ValueBox.Enabled || changedCheatType)
                         {
                             ValueBox.Enabled = true;
-                            ValueBox.Text = TableLayoutBottomLabel.Controls[idx].Text;
+                            ValueBox.Text = value;
                         }
                     }
                 }
