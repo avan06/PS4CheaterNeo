@@ -663,7 +663,7 @@ namespace PS4CheaterNeo
                 decXml = HttpUtility.HtmlDecode(decXml);
                 decXml = Regex.Unescape(decXml);
                 Console.WriteLine(decXml);
-                count = ParseCheatSHN(decXml);
+                count = ParseCheatSHN(decXml); 
             }
             return count;
         }
@@ -881,7 +881,7 @@ namespace PS4CheaterNeo
                     on = ScanTool.BytesToString(scanType, bytes, true, on.StartsWith("-"));
                     on = ScanTool.ReverseHexString(on);
                 }
-                string off = row.Cells[(int)ChertCol.CheatListOff].ToString();
+                string off = string.IsNullOrWhiteSpace((string)row.Cells[(int)ChertCol.CheatListOff]) ? on : row.Cells[(int)ChertCol.CheatListOff].ToString();
                 if (Regex.Match(cheatDesc, @"(.*) *__ *\[ *on: *([0-9a-zA-Z]+) *off: *([0-9a-zA-Z]+)") is Match m1 && m1.Success)
                 { //Attempt to restore off value from desc
                     cheatDesc = m1.Groups[1].Value;

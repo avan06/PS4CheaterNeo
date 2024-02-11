@@ -107,7 +107,14 @@ namespace PS4CheaterNeo
             IsPointer = pointerOffsets != null;
 
             AddressBox.Text = Address.ToString("X");
-            ScanTypeBox.SelectedIndex = ScanTypeBox.FindStringExact(CheatType.GetDescription());
+            foreach (ScanType filterEnum in (ScanType[])Enum.GetValues(typeof(ScanType)))
+            {
+                if (filterEnum == ScanType.Group) continue;
+                string scanTypeStr = filterEnum.GetDescription();
+                ComboItem item = new ComboItem(scanTypeStr, filterEnum);
+                ScanTypeBox.Items.Add(item);
+                if (filterEnum == CheatType) ScanTypeBox.SelectedItem = item;
+            }
             ValueBox.Text = Value;
             LockBox.Checked = IsLock;
             DescriptionBox.Text = Descriptioin;
@@ -185,22 +192,12 @@ namespace PS4CheaterNeo
 
         private void NewAddress_Load(object sender, EventArgs e)
         {
-            foreach (ScanType filterEnum in (ScanType[])Enum.GetValues(typeof(ScanType)))
-            {
-                if (filterEnum == ScanType.Group) continue;
-                string scanTypeStr = filterEnum.GetDescription();
-                ComboItem item = new ComboItem(scanTypeStr, filterEnum);
-                ScanTypeBox.Items.Add(item);
-                if (filterEnum == CheatType) ScanTypeBox.SelectedItem = item;
-            }
+            if (PointerOffsets == null || PointerOffsets.Count <= 0) return;
 
-            if (PointerOffsets != null && PointerOffsets.Count > 0)
+            foreach (long offset in PointerOffsets)
             {
-                foreach (long offset in PointerOffsets)
-                {
-                    AddOffsetBtn.PerformClick();
-                    TableLayoutBottomBox.Controls[TableLayoutBottomBox.Controls.Count - 1].Text = offset.ToString("X");
-                }
+                AddOffsetBtn.PerformClick();
+                TableLayoutBottomBox.Controls[TableLayoutBottomBox.Controls.Count - 1].Text = offset.ToString("X");
             }
         }
 
@@ -341,8 +338,7 @@ namespace PS4CheaterNeo
                     Margin      = new Padding(3, 6, 3, 3),
                     ReadOnly    = true,
                     BorderStyle = BorderStyle.None,
-            };
-                PointerOffsets.Add(0);
+                };
                 TableLayoutBottomBox.RowCount += 1;
                 TableLayoutBottomBox.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
                 TableLayoutBottomBox.Controls.Add(textBox, 0, TableLayoutBottomBox.Controls.Count);
@@ -377,6 +373,7 @@ namespace PS4CheaterNeo
                 ScanTypeBox.SelectedIndex = ScanTypeBox.FindStringExact(CheatType.GetDescription());
                 return;
             }
+            else if (CheatType == ScanType.Hex && newCheatType == ScanType.Hex) return;
             else if (newCheatType == ScanType.String_) return;
 
             try
@@ -438,7 +435,8 @@ namespace PS4CheaterNeo
 
                     if (BaseSection == null) break;
 
-                    PointerOffsets[idx] = address;
+                    if (TableLayoutBottomBox.Controls.Count > PointerOffsets.Count) PointerOffsets.Add(address);
+                    else PointerOffsets[idx] = address;
 
                     if (idx != TableLayoutBottomBox.Controls.Count - 1)
                     {
