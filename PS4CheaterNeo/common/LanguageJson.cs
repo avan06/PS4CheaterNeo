@@ -666,6 +666,9 @@ namespace PS4CheaterNeo
         public string SectionViewDetectHiddenSection;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
+        public string DetectHiddenSectionStartFromTheEnd;
+
+        [System.Runtime.Serialization.DataMemberAttribute()]
         public string LastHiddenSectionLengthHex;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
@@ -898,6 +901,9 @@ namespace PS4CheaterNeo
 
         [System.Runtime.Serialization.DataMemberAttribute()]
         public string description_SectionViewDetectHiddenSection;
+
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string description_DetectHiddenSectionStartFromTheEnd;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
         public string description_LastHiddenSectionLengthHex;

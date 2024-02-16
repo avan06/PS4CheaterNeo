@@ -228,7 +228,7 @@ namespace PS4CheaterNeo
             try
             {
                 OpenCheatDialog.Filter = 
-                    "Cheat files(*.cht;*.chtr;*.json;*.shn;*.mc4;eboot.bin)|*.cht;*.chtr;*.json;*.shn;*.mc4;eboot.bin|" + dialogFilter + "|Cheat MC4 (*.mc4)|*.mc4|eboot.bin (eboot.bin)|*.bin";
+                    "Cheat files(*.cht;*.chtr;*.json;*.shn;*.mc4;eboot.bin)|*.cht;*.chtr;*.json;*.shn;*.mc4;*.bin|" + dialogFilter + "|Cheat MC4 (*.mc4)|*.mc4|eboot.bin (eboot.bin)|*.bin";
                 OpenCheatDialog.AddExtension = true;
                 OpenCheatDialog.RestoreDirectory = true;
 
@@ -1714,6 +1714,7 @@ namespace PS4CheaterNeo
             DataGridViewSelectedRowCollection rows = CheatGridView.SelectedRows;
             if (rows == null || rows.Count == 0) return;
 
+            bool refresh = false;
             for (int idx = 0; idx < rows.Count; ++idx)
             {
                 int index = rows[idx].Index;
@@ -1725,20 +1726,22 @@ namespace PS4CheaterNeo
                 if (isOnValue == null) value = row.Cells[(int)ChertCol.CheatListValue].ToString();
                 else
                 {
-                    if ((bool)isOnValue) value = row.Cells[(int)ChertCol.CheatListOn].ToString();
-                    else value = row.Cells[(int)ChertCol.CheatListOff].ToString();
+                    int cellIdx = (bool)isOnValue ? (int)ChertCol.CheatListOn : (int)ChertCol.CheatListOff;
+                    if (row.Cells[cellIdx] is object obj && obj != null) value = obj.ToString();
+                    else value = row.Cells[(int)ChertCol.CheatListValue].ToString();
+
                     if (value != null && value.Trim() != "")
                     {
                         row.Cells[(int)ChertCol.CheatListValue] = value;
-                        CheatGridView.Refresh();
+                        refresh = true;
                     }
                     else value = row.Cells[(int)ChertCol.CheatListValue].ToString();
                 }
 
-
                 byte[] data = ScanTool.ValueStringToByte(scanType, value);
                 PS4Tool.WriteMemory(section.PID, offsetAddr + section.Start, data);
             }
+            if (refresh) CheatGridView.Refresh();
         }
 
         private void CheatGridMenuEdit_Click(object sender, EventArgs e)

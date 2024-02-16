@@ -521,6 +521,19 @@ namespace PS4CheaterNeo.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False|3_Query|5_SectionView|Determine whether to enable detecting hidden sections" +
+            " starting from the end address of the last section. \\nDefault disabled")]
+        public global::OptionTreeView.Option<bool> DetectHiddenSectionStartFromTheEnd {
+            get {
+                return ((global::OptionTreeView.Option<bool>)(this["DetectHiddenSectionStartFromTheEnd"]));
+            }
+            set {
+                this["DetectHiddenSectionStartFromTheEnd"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("0x40000000|3_Query|5_SectionView|Specify the Hex length of the last hidden sectio" +
             "n. \\nThis only takes effect when SectionViewDetectHiddenSection is enabled. \\nDe" +
             "fault value is 0x40000000.")]

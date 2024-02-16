@@ -116,6 +116,9 @@
     <Setting Name="SectionViewDetectHiddenSection" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
       <Value Profile="(Default)">False|3_Query|5_SectionView|Determine whether to enable automatic detection of hidden sections. \nThis is currently an experimental feature. \nDefault disabled</Value>
     </Setting>
+    <Setting Name="DetectHiddenSectionStartFromTheEnd" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
+      <Value Profile="(Default)">False|3_Query|5_SectionView|Determine whether to enable detecting hidden sections starting from the end address of the last section. \nDefault disabled</Value>
+    </Setting>
     <Setting Name="LastHiddenSectionLengthHex" Type="OptionTreeView.Option&lt;ulong&gt;" Scope="User">
       <Value Profile="(Default)">0x40000000|3_Query|5_SectionView|Specify the Hex length of the last hidden section. \nThis only takes effect when SectionViewDetectHiddenSection is enabled. \nDefault value is 0x40000000.</Value>
     </Setting>

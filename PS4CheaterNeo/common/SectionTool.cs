@@ -350,7 +350,7 @@ namespace PS4CheaterNeo
                     tmpEntry = entry;
                 }
                 bool SectionViewDetectHiddenSection = Properties.Settings.Default.SectionViewDetectHiddenSection.Value;
-                if (SectionViewDetectHiddenSection) DetectHiddenSection(Properties.Settings.Default.LastHiddenSectionLengthHex.Value);
+                if (SectionViewDetectHiddenSection) DetectHiddenSection(Properties.Settings.Default.LastHiddenSectionLengthHex.Value, Properties.Settings.Default.DetectHiddenSectionStartFromTheEnd.Value);
             }
             catch (Exception) { throw; }
             finally { mutex.ReleaseMutex(); }
@@ -363,7 +363,8 @@ namespace PS4CheaterNeo
         /// This detection process is executed when the SectionViewDetectHiddenSection option is enabled in the Option windows.
         /// </summary>
         /// <param name="LastHiddenSectionLengthHex">Specify the Hex length of the last hidden section.</param>
-        public void DetectHiddenSection(ulong LastHiddenSectionLengthHex)
+        /// <param name="DetectHiddenSectionStartFromTheEnd">Determine whether to enable detecting hidden sections starting from the end address of the last section.</param>
+        public void DetectHiddenSection(ulong LastHiddenSectionLengthHex, bool DetectHiddenSectionStartFromTheEnd)
         {
             bool WriteHiddenSectionConf = Properties.Settings.Default.WriteHiddenSectionConf.Value;
             if (WriteHiddenSectionConf)
@@ -381,6 +382,8 @@ namespace PS4CheaterNeo
             {
                 try
                 {
+                    if (DetectHiddenSectionStartFromTheEnd && sIdx < sections.Length - 1) continue;
+
                     Section section1 = sections[sIdx];
                     ulong section1End = section1.Start + (uint)section1.Length;
                     ulong sectionNewStart = section1End + chkPlus1;
