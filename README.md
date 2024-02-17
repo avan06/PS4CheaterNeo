@@ -2,7 +2,7 @@
 
 PS4CheaterNeo is a program to find game cheat codes, and it is based on [`ps4debug`](https://github.com/jogolden/ps4debug) and [`.Net Framework 4.8`](https://support.microsoft.com/en-us/topic/microsoft-net-framework-4-8-offline-installer-for-windows-9d23f658-3b97-68ab-d013-aa3c3e7495e0).
 
-Currently in `version 1.0.2.4`
+Currently in `version 1.0.2.5`
 
 
 ## Table of Contents
@@ -168,7 +168,7 @@ The loaded "eboot.bin" here will be compared with the section memory content of 
 - Added Not CheckBox in the query window. When this feature is enabled, the scanning logic can be reversed. For example, if the compare type is exact and Not is enabled, it becomes not exact. (0.9.7.3)
 - Added AutoPause and DoneResume CheckBox in the query window, you can determine whether to enable or not. (0.9.7.3)
 - Added ScanType that supports Auto determine numeric (AutoNumeric) in Query. (0.9.8.3)
-- Added support for FullRowSelect in the SectionView of the Query window, this feature requires enabling `SectionViewFullRowSelect` in the Query of the Options window. (0.9.9.1)
+- Added support for FullRowSelect in the SectionView of the Query window, this feature requires enabling `FullRowSelect` in the Query of the Options window. (0.9.9.1)
 - Added support for `not skipping byte 0 values` when the Compare Type is `UnknownInitial` in the Query window. This feature needs to be enabled in the Option window under the Query's `UnknownInitialScanDoNotSkip0` option. (0.9.9.5)  
 Note: Enabling this option will significantly increase the number of results and restart the Query window for the setting to take effect. (0.9.9.5)  
 
@@ -244,9 +244,9 @@ Note: Enabling this option will significantly increase the number of results and
 ### Query window: Detect Hidden Section
 
 - Added support for automatically detecting hidden sections.  
-When the "`SectionViewDetectHiddenSection`" option is enabled, SectionView will automatically force the display of sections that are hidden due to undefined addresses by the system. This feature is currently experimental. (0.9.9.7)  
+When the "`DetectHiddenSection`" option is enabled, SectionView will automatically force the display of sections that are hidden due to undefined addresses by the system. This feature is currently experimental. (0.9.9.7)  
 - Automatically detecting hidden sections is done by arranging the existing sections  
-from the smallest Start address to the largest. If the memory addresses of two sections are not contiguous, a new section is automatically added to fill the addresses that are undefined by the system. This detection process is executed when the SectionViewDetectHiddenSection option is enabled in the settings. (0.9.9.7)  
+from the smallest Start address to the largest. If the memory addresses of two sections are not contiguous, a new section is automatically added to fill the addresses that are undefined by the system. This detection process is executed when the DetectHiddenSection option is enabled in the settings. (0.9.9.7)  
 - Changed the format of the LastHiddenSectionLengthHex option from int to ulong,  
 so now this option is not limited by the int32 upper limit, and when initializing the last hidden section, it will be automatically processed in segments according to the buffer length (128MB). (0.9.9.8)  
 - Previously, when detecting hidden sections, there was no segmentation processing for each section.  
@@ -259,7 +259,7 @@ avoiding starting addresses that do not end with an integer 0. You can enable/di
 - Added support for "`SCAN for Hidden Sections`" in the Query window.  
 When executed, it will scan all Hidden Sections and verify the actual start and end addresses of sections in the PS4's memory that contain data. This scan will take a significant amount of time, at least one hour or more. (0.9.9.10)  
 The relevant execution steps are as follows:
-1. Enable the "`SectionViewDetectHiddenSection`" and "`WriteHiddenSectionConf`" options in the Options window.
+1. Enable the "`DetectHiddenSection`" and "`WriteHiddenSectionConf`" options in the Options window.
 2. Open the Query window and wait for the Hidden Sections conf file to be generated. Verify if the "`path to PS4CheaterNeo\sections\[GAME_ID].conf`" file exists.
 3. Once the conf file is confirmed to exist, select the "`SCAN for Hidden Sections`" scan type and begin the scan, which will take at least one hour.
 4. After completing the scan, you can check if there have been any changes in the conf file's contents and the Prot of `executable` sections will automatically be set to `7`.
@@ -602,14 +602,14 @@ Determines whether to enable not skipping values with a byte of 0 when the Compa
 Determines whether to make the calculation result of `Floating(float, double) completely exact` in query window, there can be `0.0001 difference` in the old mechanism. `Default enabled`. (0.9.7.5)  
 - `FloatingSimpleValueExponents`:  
 Determine the `exponents value of the simple value of floating`. this option value is used in the query window when SimpleValues for floating point numbers is enabled. Cheat Engine is set to 11 (2 to the 11th power = 2^11 = plus or minus 2048). `Default value is 11`. (0.9.7.3)  
-- `SectionViewFullRowSelect`:  
+- `FullRowSelect`:  
 Determine whether to enable the `FullRowSelect` feature in the `SectionView` of the Query window. `Default disabled`. (0.9.9.1)  
-- `SectionViewDetectHiddenSection`:  
+- `DetectHiddenSection`:  
 Determine whether to enable automatic detection of hidden sections. This is currently an experimental feature. `Default disabled`. (0.9.9.7)  
 - `DetectHiddenSectionStartFromTheEnd`:
 Determine whether to enable detecting hidden sections starting from the end address of the last section. `Default disabled`. (1.0.2.4)  
 - `LastHiddenSectionLengthHex`:  
-Specify the Hex length of the last hidden section. This only takes effect when `SectionViewDetectHiddenSection` is enabled. `Default value is 0x40000000`. (0.9.9.7)  
+Specify the Hex length of the last hidden section. This only takes effect when `DetectHiddenSection` is enabled. `Default value is 0x40000000`. (0.9.9.7)  
 - `HiddenSectionStartAtPreviousEnd`:  
 Determine whether to enable the starting address of the Hidden Section to be the end address of the previous section. If not enabled, the starting address will be the end address of the previous section plus 1. `Default enable`. (0.9.9.9)  
 - `WriteHiddenSectionConf`:  
