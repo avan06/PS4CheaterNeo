@@ -34,34 +34,37 @@ namespace PS4CheaterNeo
             this.ResultViewMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.ResultViewAddToCheatGrid = new System.Windows.Forms.ToolStripMenuItem();
             this.ResultViewSelectAll = new System.Windows.Forms.ToolStripMenuItem();
-            this.ToolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.ResultViewMenu_ToolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.ResultViewHexEditor = new System.Windows.Forms.ToolStripMenuItem();
             this.ResultViewCopyAddress = new System.Windows.Forms.ToolStripMenuItem();
             this.ResultViewDump = new System.Windows.Forms.ToolStripMenuItem();
-            this.ToolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            this.ResultViewMenu_ToolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.ResultViewFindPointer = new System.Windows.Forms.ToolStripMenuItem();
             this.SectionViewMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.SectionViewHexEditor = new System.Windows.Forms.ToolStripMenuItem();
-            this.ToolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.SectionViewMenu_ToolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.SectionViewCheck = new System.Windows.Forms.ToolStripMenuItem();
-            this.ToolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
+            this.SectionViewMenu_ToolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            this.SectionViewItems = new System.Windows.Forms.ToolStripMenuItem();
             this.SectionViewCheckAll = new System.Windows.Forms.ToolStripMenuItem();
             this.SectionViewUnCheckAll = new System.Windows.Forms.ToolStripMenuItem();
             this.SectionViewInvertChecked = new System.Windows.Forms.ToolStripMenuItem();
-            this.ToolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
+            this.SectionViewMenu_ToolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.SectionViewCheckContains = new System.Windows.Forms.ToolStripMenuItem();
             this.SectionViewUnCheckContains = new System.Windows.Forms.ToolStripMenuItem();
             this.SectionViewTextContains = new System.Windows.Forms.ToolStripTextBox();
-            this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
+            this.SectionViewMenu_ToolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
             this.SectionViewCheckProt = new System.Windows.Forms.ToolStripMenuItem();
             this.SectionViewUnCheckProt = new System.Windows.Forms.ToolStripMenuItem();
             this.SectionViewTextProt = new System.Windows.Forms.ToolStripTextBox();
-            this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
+            this.SectionViewHiddens = new System.Windows.Forms.ToolStripMenuItem();
             this.SectionViewCheckAllHidden = new System.Windows.Forms.ToolStripMenuItem();
             this.SectionViewUnCheckAllHidden = new System.Windows.Forms.ToolStripMenuItem();
+            this.SectionViewInvertCheckedHidden = new System.Windows.Forms.ToolStripMenuItem();
+            this.SectionViewDisableCheckedHidden = new System.Windows.Forms.ToolStripMenuItem();
+            this.SectionViewMenu_ToolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.SectionViewDump = new System.Windows.Forms.ToolStripMenuItem();
             this.SectionViewImport = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator8 = new System.Windows.Forms.ToolStripSeparator();
             this.Panel1 = new System.Windows.Forms.Panel();
             this.SplitContainer1 = new PS4CheaterNeo.CollapsibleSplitContainer();
             this.ResultView = new System.Windows.Forms.ListView();
@@ -157,11 +160,11 @@ namespace PS4CheaterNeo
             this.ResultViewMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.ResultViewAddToCheatGrid,
             this.ResultViewSelectAll,
-            this.ToolStripSeparator1,
+            this.ResultViewMenu_ToolStripSeparator1,
             this.ResultViewHexEditor,
             this.ResultViewCopyAddress,
             this.ResultViewDump,
-            this.ToolStripSeparator2,
+            this.ResultViewMenu_ToolStripSeparator2,
             this.ResultViewFindPointer});
             this.ResultViewMenu.Name = "ResultViewMenu";
             this.ResultViewMenu.Size = new System.Drawing.Size(177, 148);
@@ -180,10 +183,10 @@ namespace PS4CheaterNeo
             this.ResultViewSelectAll.Text = "Select All";
             this.ResultViewSelectAll.Click += new System.EventHandler(this.ResultViewSelectAll_Click);
             // 
-            // ToolStripSeparator1
+            // ResultViewMenu_ToolStripSeparator1
             // 
-            this.ToolStripSeparator1.Name = "ToolStripSeparator1";
-            this.ToolStripSeparator1.Size = new System.Drawing.Size(173, 6);
+            this.ResultViewMenu_ToolStripSeparator1.Name = "ResultViewMenu_ToolStripSeparator1";
+            this.ResultViewMenu_ToolStripSeparator1.Size = new System.Drawing.Size(173, 6);
             // 
             // ResultViewHexEditor
             // 
@@ -207,10 +210,10 @@ namespace PS4CheaterNeo
             this.ResultViewDump.Text = "Dump";
             this.ResultViewDump.Click += new System.EventHandler(this.ResultViewDump_Click);
             // 
-            // ToolStripSeparator2
+            // ResultViewMenu_ToolStripSeparator2
             // 
-            this.ToolStripSeparator2.Name = "ToolStripSeparator2";
-            this.ToolStripSeparator2.Size = new System.Drawing.Size(173, 6);
+            this.ResultViewMenu_ToolStripSeparator2.Name = "ResultViewMenu_ToolStripSeparator2";
+            this.ResultViewMenu_ToolStripSeparator2.Size = new System.Drawing.Size(173, 6);
             // 
             // ResultViewFindPointer
             // 
@@ -223,78 +226,84 @@ namespace PS4CheaterNeo
             // 
             this.SectionViewMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.SectionViewHexEditor,
-            this.ToolStripSeparator3,
+            this.SectionViewMenu_ToolStripSeparator1,
             this.SectionViewCheck,
-            this.ToolStripSeparator4,
-            this.SectionViewCheckAll,
-            this.SectionViewUnCheckAll,
-            this.SectionViewInvertChecked,
-            this.ToolStripSeparator5,
-            this.SectionViewCheckContains,
-            this.SectionViewUnCheckContains,
-            this.SectionViewTextContains,
-            this.toolStripSeparator6,
-            this.SectionViewCheckProt,
-            this.SectionViewUnCheckProt,
-            this.SectionViewTextProt,
-            this.toolStripSeparator7,
-            this.SectionViewCheckAllHidden,
-            this.SectionViewUnCheckAllHidden,
+            this.SectionViewMenu_ToolStripSeparator2,
+            this.SectionViewItems,
+            this.SectionViewHiddens,
+            this.SectionViewMenu_ToolStripSeparator3,
             this.SectionViewDump,
-            this.SectionViewImport,
-            this.toolStripSeparator8});
+            this.SectionViewImport});
             this.SectionViewMenu.Name = "SectionViewMenu";
-            this.SectionViewMenu.Size = new System.Drawing.Size(208, 362);
+            this.SectionViewMenu.Size = new System.Drawing.Size(150, 154);
             // 
             // SectionViewHexEditor
             // 
             this.SectionViewHexEditor.Name = "SectionViewHexEditor";
-            this.SectionViewHexEditor.Size = new System.Drawing.Size(207, 22);
+            this.SectionViewHexEditor.Size = new System.Drawing.Size(149, 22);
             this.SectionViewHexEditor.Text = "Hex Editor";
             this.SectionViewHexEditor.Click += new System.EventHandler(this.SectionViewHexEditor_Click);
             // 
-            // ToolStripSeparator3
+            // SectionViewMenu_ToolStripSeparator1
             // 
-            this.ToolStripSeparator3.Name = "ToolStripSeparator3";
-            this.ToolStripSeparator3.Size = new System.Drawing.Size(204, 6);
+            this.SectionViewMenu_ToolStripSeparator1.Name = "SectionViewMenu_ToolStripSeparator1";
+            this.SectionViewMenu_ToolStripSeparator1.Size = new System.Drawing.Size(146, 6);
             // 
             // SectionViewCheck
             // 
             this.SectionViewCheck.Name = "SectionViewCheck";
-            this.SectionViewCheck.Size = new System.Drawing.Size(207, 22);
+            this.SectionViewCheck.Size = new System.Drawing.Size(149, 22);
             this.SectionViewCheck.Text = "Check";
             this.SectionViewCheck.Click += new System.EventHandler(this.SectionViewCheck_Click);
             // 
-            // ToolStripSeparator4
+            // SectionViewMenu_ToolStripSeparator2
             // 
-            this.ToolStripSeparator4.Name = "ToolStripSeparator4";
-            this.ToolStripSeparator4.Size = new System.Drawing.Size(204, 6);
+            this.SectionViewMenu_ToolStripSeparator2.Name = "SectionViewMenu_ToolStripSeparator2";
+            this.SectionViewMenu_ToolStripSeparator2.Size = new System.Drawing.Size(146, 6);
+            // 
+            // SectionViewItems
+            // 
+            this.SectionViewItems.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.SectionViewCheckAll,
+            this.SectionViewUnCheckAll,
+            this.SectionViewInvertChecked,
+            this.SectionViewMenu_ToolStripSeparator4,
+            this.SectionViewCheckContains,
+            this.SectionViewUnCheckContains,
+            this.SectionViewTextContains,
+            this.SectionViewMenu_ToolStripSeparator5,
+            this.SectionViewCheckProt,
+            this.SectionViewUnCheckProt,
+            this.SectionViewTextProt});
+            this.SectionViewItems.Name = "SectionViewItems";
+            this.SectionViewItems.Size = new System.Drawing.Size(149, 22);
+            this.SectionViewItems.Text = "Items";
             // 
             // SectionViewCheckAll
             // 
             this.SectionViewCheckAll.Name = "SectionViewCheckAll";
             this.SectionViewCheckAll.Size = new System.Drawing.Size(207, 22);
-            this.SectionViewCheckAll.Text = "Check All";
+            this.SectionViewCheckAll.Text = "Check all";
             this.SectionViewCheckAll.Click += new System.EventHandler(this.SectionViewCheckAll_Click);
             // 
             // SectionViewUnCheckAll
             // 
             this.SectionViewUnCheckAll.Name = "SectionViewUnCheckAll";
             this.SectionViewUnCheckAll.Size = new System.Drawing.Size(207, 22);
-            this.SectionViewUnCheckAll.Text = "Un-Check All";
+            this.SectionViewUnCheckAll.Text = "Un-Check all";
             this.SectionViewUnCheckAll.Click += new System.EventHandler(this.SectionViewUnCheckAll_Click);
             // 
             // SectionViewInvertChecked
             // 
             this.SectionViewInvertChecked.Name = "SectionViewInvertChecked";
             this.SectionViewInvertChecked.Size = new System.Drawing.Size(207, 22);
-            this.SectionViewInvertChecked.Text = "Invert Checked";
+            this.SectionViewInvertChecked.Text = "Invert checked";
             this.SectionViewInvertChecked.Click += new System.EventHandler(this.SectionViewInvertChecked_Click);
             // 
-            // ToolStripSeparator5
+            // SectionViewMenu_ToolStripSeparator4
             // 
-            this.ToolStripSeparator5.Name = "ToolStripSeparator5";
-            this.ToolStripSeparator5.Size = new System.Drawing.Size(204, 6);
+            this.SectionViewMenu_ToolStripSeparator4.Name = "SectionViewMenu_ToolStripSeparator4";
+            this.SectionViewMenu_ToolStripSeparator4.Size = new System.Drawing.Size(204, 6);
             // 
             // SectionViewCheckContains
             // 
@@ -314,13 +323,14 @@ namespace PS4CheaterNeo
             // 
             this.SectionViewTextContains.BackColor = System.Drawing.SystemColors.ActiveCaption;
             this.SectionViewTextContains.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.SectionViewTextContains.Font = new System.Drawing.Font("Microsoft JhengHei UI", 9F);
             this.SectionViewTextContains.Name = "SectionViewTextContains";
             this.SectionViewTextContains.Size = new System.Drawing.Size(145, 16);
             // 
-            // toolStripSeparator6
+            // SectionViewMenu_ToolStripSeparator5
             // 
-            this.toolStripSeparator6.Name = "toolStripSeparator6";
-            this.toolStripSeparator6.Size = new System.Drawing.Size(204, 6);
+            this.SectionViewMenu_ToolStripSeparator5.Name = "SectionViewMenu_ToolStripSeparator5";
+            this.SectionViewMenu_ToolStripSeparator5.Size = new System.Drawing.Size(204, 6);
             // 
             // SectionViewCheckProt
             // 
@@ -340,46 +350,67 @@ namespace PS4CheaterNeo
             // 
             this.SectionViewTextProt.BackColor = System.Drawing.SystemColors.ActiveCaption;
             this.SectionViewTextProt.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.SectionViewTextProt.Font = new System.Drawing.Font("Microsoft JhengHei UI", 9F);
             this.SectionViewTextProt.Name = "SectionViewTextProt";
             this.SectionViewTextProt.Size = new System.Drawing.Size(145, 16);
             // 
-            // toolStripSeparator7
+            // SectionViewHiddens
             // 
-            this.toolStripSeparator7.Name = "toolStripSeparator7";
-            this.toolStripSeparator7.Size = new System.Drawing.Size(204, 6);
+            this.SectionViewHiddens.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.SectionViewCheckAllHidden,
+            this.SectionViewUnCheckAllHidden,
+            this.SectionViewInvertCheckedHidden,
+            this.SectionViewDisableCheckedHidden});
+            this.SectionViewHiddens.Name = "SectionViewHiddens";
+            this.SectionViewHiddens.Size = new System.Drawing.Size(149, 22);
+            this.SectionViewHiddens.Text = "Hidden Items";
             // 
             // SectionViewCheckAllHidden
             // 
             this.SectionViewCheckAllHidden.Name = "SectionViewCheckAllHidden";
-            this.SectionViewCheckAllHidden.Size = new System.Drawing.Size(207, 22);
-            this.SectionViewCheckAllHidden.Text = "Check All Hidden";
+            this.SectionViewCheckAllHidden.Size = new System.Drawing.Size(211, 22);
+            this.SectionViewCheckAllHidden.Text = "Check all Hidden";
             this.SectionViewCheckAllHidden.Click += new System.EventHandler(this.SectionViewCheckAllHidden_Click);
             // 
             // SectionViewUnCheckAllHidden
             // 
             this.SectionViewUnCheckAllHidden.Name = "SectionViewUnCheckAllHidden";
-            this.SectionViewUnCheckAllHidden.Size = new System.Drawing.Size(207, 22);
-            this.SectionViewUnCheckAllHidden.Text = "Un-Check All Hidden";
+            this.SectionViewUnCheckAllHidden.Size = new System.Drawing.Size(211, 22);
+            this.SectionViewUnCheckAllHidden.Text = "Un-Check all Hidden";
             this.SectionViewUnCheckAllHidden.Click += new System.EventHandler(this.SectionViewUnCheckAllHidden_Click);
+            // 
+            // SectionViewInvertCheckedHidden
+            // 
+            this.SectionViewInvertCheckedHidden.Name = "SectionViewInvertCheckedHidden";
+            this.SectionViewInvertCheckedHidden.Size = new System.Drawing.Size(211, 22);
+            this.SectionViewInvertCheckedHidden.Text = "Invert checked Hidden";
+            this.SectionViewInvertCheckedHidden.Click += new System.EventHandler(this.SectionViewInvertCheckedHidden_Click);
+            // 
+            // SectionViewDisableCheckedHidden
+            // 
+            this.SectionViewDisableCheckedHidden.Name = "SectionViewDisableCheckedHidden";
+            this.SectionViewDisableCheckedHidden.Size = new System.Drawing.Size(211, 22);
+            this.SectionViewDisableCheckedHidden.Text = "Disable checked Hidden";
+            this.SectionViewDisableCheckedHidden.Click += new System.EventHandler(this.SectionViewDisableCheckedHidden_Click);
+            // 
+            // SectionViewMenu_ToolStripSeparator3
+            // 
+            this.SectionViewMenu_ToolStripSeparator3.Name = "SectionViewMenu_ToolStripSeparator3";
+            this.SectionViewMenu_ToolStripSeparator3.Size = new System.Drawing.Size(146, 6);
             // 
             // SectionViewDump
             // 
             this.SectionViewDump.Name = "SectionViewDump";
-            this.SectionViewDump.Size = new System.Drawing.Size(207, 22);
+            this.SectionViewDump.Size = new System.Drawing.Size(149, 22);
             this.SectionViewDump.Text = "Dump";
             this.SectionViewDump.Click += new System.EventHandler(this.SectionViewDump_Click);
             // 
             // SectionViewImport
             // 
             this.SectionViewImport.Name = "SectionViewImport";
-            this.SectionViewImport.Size = new System.Drawing.Size(207, 22);
+            this.SectionViewImport.Size = new System.Drawing.Size(149, 22);
             this.SectionViewImport.Text = "Import";
             this.SectionViewImport.Click += new System.EventHandler(this.SectionViewImport_Click);
-            // 
-            // toolStripSeparator8
-            // 
-            this.toolStripSeparator8.Name = "toolStripSeparator8";
-            this.toolStripSeparator8.Size = new System.Drawing.Size(204, 6);
             // 
             // Panel1
             // 
@@ -792,7 +823,7 @@ namespace PS4CheaterNeo
             this.TableLayoutRightBottom.Controls.Add(this.CompareTypeBox, 0, 4);
             this.TableLayoutRightBottom.Controls.Add(this.ScanTypeBox, 0, 3);
             this.TableLayoutRightBottom.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.TableLayoutRightBottom.Location = new System.Drawing.Point(0, 0);
+            this.TableLayoutRightBottom.Location = new System.Drawing.Point(0, 1);
             this.TableLayoutRightBottom.Margin = new System.Windows.Forms.Padding(0);
             this.TableLayoutRightBottom.Name = "TableLayoutRightBottom";
             this.TableLayoutRightBottom.Padding = new System.Windows.Forms.Padding(3, 0, 0, 0);
@@ -1263,7 +1294,6 @@ namespace PS4CheaterNeo
             this.Load += new System.EventHandler(this.Query_Load);
             this.ResultViewMenu.ResumeLayout(false);
             this.SectionViewMenu.ResumeLayout(false);
-            this.SectionViewMenu.PerformLayout();
             this.Panel1.ResumeLayout(false);
             this.SplitContainer1.Panel1.ResumeLayout(false);
             this.SplitContainer1.Panel1.PerformLayout();
@@ -1323,15 +1353,15 @@ namespace PS4CheaterNeo
         private System.Windows.Forms.ProgressBar ToolStripBar;
         private System.Windows.Forms.ContextMenuStrip ResultViewMenu;
         private System.Windows.Forms.ToolStripMenuItem ResultViewAddToCheatGrid;
-        private System.Windows.Forms.ToolStripSeparator ToolStripSeparator1;
+        private System.Windows.Forms.ToolStripSeparator ResultViewMenu_ToolStripSeparator1;
         private System.Windows.Forms.ToolStripMenuItem ResultViewHexEditor;
         private System.Windows.Forms.ToolStripMenuItem ResultViewDump;
-        private System.Windows.Forms.ToolStripSeparator ToolStripSeparator2;
+        private System.Windows.Forms.ToolStripSeparator ResultViewMenu_ToolStripSeparator2;
         private System.Windows.Forms.ToolStripMenuItem ResultViewFindPointer;
         private System.Windows.Forms.ContextMenuStrip SectionViewMenu;
         private System.Windows.Forms.ToolStripMenuItem SectionViewHexEditor;
         private System.Windows.Forms.ToolStripMenuItem SectionViewDump;
-        private System.Windows.Forms.ToolStripSeparator ToolStripSeparator3;
+        private System.Windows.Forms.ToolStripSeparator SectionViewMenu_ToolStripSeparator1;
         private System.Windows.Forms.ToolStripMenuItem SectionViewCheck;
         private System.Windows.Forms.TextBox AddrMinBox;
         private System.Windows.Forms.TextBox AddrMaxBox;
@@ -1370,29 +1400,32 @@ namespace PS4CheaterNeo
         private System.Windows.Forms.TableLayoutPanel TableLayoutRightTop;
         private System.Windows.Forms.TableLayoutPanel TableLayoutRightTop1;
         private System.Windows.Forms.Button SectionSearchBtn;
-        private System.Windows.Forms.ToolStripSeparator ToolStripSeparator4;
-        private System.Windows.Forms.ToolStripMenuItem SectionViewUnCheckAll;
-        private System.Windows.Forms.ToolStripMenuItem SectionViewInvertChecked;
-        private System.Windows.Forms.ToolStripSeparator ToolStripSeparator5;
-        private System.Windows.Forms.ToolStripMenuItem SectionViewCheckAll;
+        private System.Windows.Forms.ToolStripSeparator SectionViewMenu_ToolStripSeparator2;
+        private System.Windows.Forms.ToolStripSeparator SectionViewMenu_ToolStripSeparator3;
         private System.Windows.Forms.CheckBox CompareFirstBox;
-        private System.Windows.Forms.ToolStripMenuItem SectionViewCheckContains;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
-        private System.Windows.Forms.ToolStripMenuItem SectionViewUnCheckContains;
-        private System.Windows.Forms.ToolStripTextBox SectionViewTextContains;
-        private System.Windows.Forms.ToolStripMenuItem SectionViewCheckProt;
-        private System.Windows.Forms.ToolStripMenuItem SectionViewUnCheckProt;
-        private System.Windows.Forms.ToolStripTextBox SectionViewTextProt;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator7;
         private System.Windows.Forms.ToolStripMenuItem ResultViewSelectAll;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator8;
-        private System.Windows.Forms.ToolStripMenuItem SectionViewCheckAllHidden;
-        private System.Windows.Forms.ToolStripMenuItem SectionViewUnCheckAllHidden;
         private System.Windows.Forms.CheckBox AddrIsFilterBox;
         private System.Windows.Forms.TableLayoutPanel TableLayoutRightBottom1;
         private System.Windows.Forms.TableLayoutPanel TableLayoutRightBottom;
         private System.Windows.Forms.TableLayoutPanel TableLayoutRightBottom4;
         private System.Windows.Forms.TableLayoutPanel TableLayoutRightBottom5;
         private System.Windows.Forms.TableLayoutPanel TableLayoutRightBottom3;
+        private System.Windows.Forms.ToolStripMenuItem SectionViewItems;
+        private System.Windows.Forms.ToolStripMenuItem SectionViewCheckAll;
+        private System.Windows.Forms.ToolStripMenuItem SectionViewUnCheckAll;
+        private System.Windows.Forms.ToolStripMenuItem SectionViewInvertChecked;
+        private System.Windows.Forms.ToolStripSeparator SectionViewMenu_ToolStripSeparator4;
+        private System.Windows.Forms.ToolStripMenuItem SectionViewCheckContains;
+        private System.Windows.Forms.ToolStripMenuItem SectionViewUnCheckContains;
+        private System.Windows.Forms.ToolStripTextBox SectionViewTextContains;
+        private System.Windows.Forms.ToolStripSeparator SectionViewMenu_ToolStripSeparator5;
+        private System.Windows.Forms.ToolStripMenuItem SectionViewCheckProt;
+        private System.Windows.Forms.ToolStripMenuItem SectionViewUnCheckProt;
+        private System.Windows.Forms.ToolStripTextBox SectionViewTextProt;
+        private System.Windows.Forms.ToolStripMenuItem SectionViewHiddens;
+        private System.Windows.Forms.ToolStripMenuItem SectionViewCheckAllHidden;
+        private System.Windows.Forms.ToolStripMenuItem SectionViewUnCheckAllHidden;
+        private System.Windows.Forms.ToolStripMenuItem SectionViewInvertCheckedHidden;
+        private System.Windows.Forms.ToolStripMenuItem SectionViewDisableCheckedHidden;
     }
 }

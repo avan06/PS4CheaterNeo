@@ -83,6 +83,9 @@
     "SectionViewUnCheckProt": "Deseleziona Non Prot:",
     "SectionViewCheckAllHidden": "Seleziona Nascosto",
     "SectionViewUnCheckAllHidden": "Deseleziona Non Nascosto",
+    "SectionViewInvertCheckedHidden": "Inverti elementi nascosti selezionati",
+    "SectionViewDisableCheckedHidden": "Disattiva elementi nascosti selezionati",
+    "SectionViewDisableCheckedHiddenWarning": "Avviso! \n\nL'esecuzione di \"Disabilita nascosti selezionati\" imposterà il Valido delle sezioni nascoste selezionate su Disabilita e aggiornerà le impostazioni scritte nel file di configurazione nascosto nel percorso \"path to PS4CheaterNeo\\sections\\[GAME_ID].conf\". \n\nPer ripristinare, è necessaria la modifica manuale del file di configurazione, cambiando il Valido delle sezioni nascoste da Falso a Vero. \n\nVuoi continuare l'esecuzione? \n\nNota: La finestra di Query deve aggiornare i processi per incorporare le nuove impostazioni di configurazione nascoste.",
     "SectionViewDump": "Dump",
     "SectionViewImport": "Importa",
 

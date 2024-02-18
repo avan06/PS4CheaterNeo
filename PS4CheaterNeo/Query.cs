@@ -104,19 +104,21 @@ namespace PS4CheaterNeo
                     SectionViewOffset.Text  = langJson.QueryForm.SectionViewOffset;
                     SectionViewEnd.Text     = langJson.QueryForm.SectionViewEnd;
 
-                    SectionViewHexEditor.Text        = langJson.QueryForm.SectionViewHexEditor;
-                    SectionViewCheck.Text            = langJson.QueryForm.SectionViewCheck;
-                    SectionViewCheckAll.Text         = langJson.QueryForm.SectionViewCheckAll;
-                    SectionViewUnCheckAll.Text       = langJson.QueryForm.SectionViewUnCheckAll;
-                    SectionViewInvertChecked.Text    = langJson.QueryForm.SectionViewInvertChecked;
-                    SectionViewCheckContains.Text    = langJson.QueryForm.SectionViewCheckContains;
-                    SectionViewUnCheckContains.Text  = langJson.QueryForm.SectionViewUnCheckContains;
-                    SectionViewCheckProt.Text        = langJson.QueryForm.SectionViewCheckProt;
-                    SectionViewUnCheckProt.Text      = langJson.QueryForm.SectionViewUnCheckProt;
-                    SectionViewCheckAllHidden.Text   = langJson.QueryForm.SectionViewCheckAllHidden;
-                    SectionViewUnCheckAllHidden.Text = langJson.QueryForm.SectionViewUnCheckAllHidden;
-                    SectionViewDump.Text             = langJson.QueryForm.SectionViewDump;
-                    SectionViewImport.Text           = langJson.QueryForm.SectionViewImport;
+                    SectionViewHexEditor.Text            = langJson.QueryForm.SectionViewHexEditor;
+                    SectionViewCheck.Text                = langJson.QueryForm.SectionViewCheck;
+                    SectionViewCheckAll.Text             = langJson.QueryForm.SectionViewCheckAll;
+                    SectionViewUnCheckAll.Text           = langJson.QueryForm.SectionViewUnCheckAll;
+                    SectionViewInvertChecked.Text        = langJson.QueryForm.SectionViewInvertChecked;
+                    SectionViewCheckContains.Text        = langJson.QueryForm.SectionViewCheckContains;
+                    SectionViewUnCheckContains.Text      = langJson.QueryForm.SectionViewUnCheckContains;
+                    SectionViewCheckProt.Text            = langJson.QueryForm.SectionViewCheckProt;
+                    SectionViewUnCheckProt.Text          = langJson.QueryForm.SectionViewUnCheckProt;
+                    SectionViewCheckAllHidden.Text       = langJson.QueryForm.SectionViewCheckAllHidden;
+                    SectionViewUnCheckAllHidden.Text     = langJson.QueryForm.SectionViewUnCheckAllHidden;
+                    SectionViewInvertCheckedHidden.Text  = langJson.QueryForm.SectionViewInvertCheckedHidden;
+                    SectionViewDisableCheckedHidden.Text = langJson.QueryForm.SectionViewDisableCheckedHidden;
+                    SectionViewDump.Text                 = langJson.QueryForm.SectionViewDump;
+                    SectionViewImport.Text               = langJson.QueryForm.SectionViewImport;
 
                     AddrMinLabel.Text    = langJson.QueryForm.AddrMinLabel;
                     AddrMaxLabel.Text    = langJson.QueryForm.AddrMaxLabel;
@@ -284,8 +286,8 @@ namespace PS4CheaterNeo
         {
             try
             {
-                SectionViewCheckAllHidden.Visible   = SectionViewDetectHiddenSection;
-                SectionViewUnCheckAllHidden.Visible = SectionViewDetectHiddenSection;
+                SectionViewHiddens.Visible               = SectionViewDetectHiddenSection;
+                SectionViewDisableCheckedHidden.Visible  = WriteHiddenSectionConf;
 
                 SectionView.BeginUpdate();
                 SectionView.VirtualListSize = 0;
@@ -2035,6 +2037,62 @@ namespace PS4CheaterNeo
             if (AddrMaxBox.Tag != null) AddrMaxBox.Text = ((ulong)AddrMaxBox.Tag).ToString("X");
             ToolStripMsg.Text = string.Format("Total section: {0}, Selected section: {1}, Search size: {2}MB", sectionItems.Count, sectionTool.TotalSelected, sectionTool.TotalMemorySize / (1024 * 1024));
             SectionView.EndUpdate();
+        }
+
+        private void SectionViewInvertCheckedHidden_Click(object sender, EventArgs e)
+        {
+            if (sectionItems.Count == 0) return;
+
+            SectionView.BeginUpdate();
+            for (int idx = 0; idx < sectionItems.Count; ++idx)
+            {
+                ListViewItem item = sectionItems[idx];
+                uint sid = uint.Parse(item.SubItems[(int)SectionCol.SectionViewSID].Text);
+                string name = item.SubItems[(int)SectionCol.SectionViewName].Text;
+                if (!name.Contains("Hidden")) continue;
+
+                item.Checked = !item.Checked;
+                SectionCheckUpdate(item.Checked, sid);
+            }
+            if (AddrMinBox.Tag != null) AddrMinBox.Text = ((ulong)AddrMinBox.Tag).ToString("X");
+            if (AddrMaxBox.Tag != null) AddrMaxBox.Text = ((ulong)AddrMaxBox.Tag).ToString("X");
+            ToolStripMsg.Text = string.Format("Total section: {0}, Selected section: {1}, Search size: {2}MB", sectionItems.Count, sectionTool.TotalSelected, sectionTool.TotalMemorySize / (1024 * 1024));
+            SectionView.EndUpdate();
+        }
+
+        private void SectionViewDisableCheckedHidden_Click(object sender, EventArgs e)
+        {
+            if (sectionItems.Count == 0) return;
+            if (MessageBox.Show(mainForm.langJson != null ? mainForm.langJson.QueryForm.SectionViewDisableCheckedHiddenWarning : "Warning", "Disable checked Hidden", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) return;
+
+            mainForm.InitGameInfo();
+            mainForm.InitLocalHiddenSections();
+            if (mainForm.LocalHiddenSections.Count == 0)
+            {
+                MessageBox.Show(string.Format("Hidden Sections data (sections{0}{1}.conf) was not found locally. \nYou need to enable the \"WriteHiddenSectionConf\" option and \nrestart the Query window to initialize the configuration file.", Path.DirectorySeparatorChar, mainForm.GameID), "Scan", MessageBoxButtons.OK);
+                return;
+            }
+
+            SectionView.BeginUpdate();
+            for (int idx = 0; idx < sectionItems.Count; ++idx)
+            {
+                ListViewItem item = sectionItems[idx];
+                uint sid = uint.Parse(item.SubItems[(int)SectionCol.SectionViewSID].Text);
+                string name = item.SubItems[(int)SectionCol.SectionViewName].Text;
+                if (!name.Contains("Hidden") || !item.Checked) continue;
+
+                if (mainForm.LocalHiddenSections.TryGetValue(sid, out (ulong Start, ulong End, bool Valid, byte Prot, string Name) localHiddenSection))
+                {
+                    localHiddenSection.Valid = false;
+                    mainForm.LocalHiddenSections[sid] = localHiddenSection;
+                }
+                item.Checked = false;
+                SectionCheckUpdate(item.Checked, sid, true);
+            }
+            mainForm.UpdateLocalHiddenSections();
+            ToolStripMsg.Text = string.Format("Total section: {0}, Selected section: {1}, Search size: {2}MB", sectionItems.Count, sectionTool.TotalSelected, sectionTool.TotalMemorySize / (1024 * 1024));
+            SectionView.EndUpdate();
+
         }
         #endregion
 

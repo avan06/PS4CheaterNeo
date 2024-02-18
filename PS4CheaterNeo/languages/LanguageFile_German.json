@@ -83,6 +83,9 @@
     "SectionViewUnCheckProt": "Nicht überprüfen, dass es Prot hat:",
     "SectionViewCheckAllHidden": "Alle versteckten überprüfen",
     "SectionViewUnCheckAllHidden": "Alle versteckten nicht überprüfen",
+    "SectionViewInvertCheckedHidden": "Ausgewählte versteckte Elemente umkehren",
+    "SectionViewDisableCheckedHidden": "Ausgewählte versteckte Elemente deaktivieren",
+    "SectionViewDisableCheckedHiddenWarning": "Warnung! \n\nDie Ausführung von \"Ausgewählte versteckte deaktivieren\" setzt die Gültigkeit der ausgewählten versteckten Abschnitte auf Deaktiviert und aktualisiert die Einstellungen, die in der versteckten Konfigurationsdatei im Pfad \"path to PS4CheaterNeo\\sections\\[GAME_ID].conf\" geschrieben wurden. \n\nZurückkehren erfordert manuelles Bearbeiten der Konfigurationsdatei, indem die Gültigkeit der versteckten Abschnitte von Falsch auf Wahr geändert wird. \n\nMöchten Sie mit der Ausführung fortsetzen? \n\nHinweis: Das Abfragefenster muss die Prozesse aktualisieren, um die neuen versteckten Konfigurationseinstellungen zu übernehmen.",
     "SectionViewDump": "Dump",
     "SectionViewImport": "Importieren",
 

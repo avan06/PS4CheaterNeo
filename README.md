@@ -2,7 +2,7 @@
 
 PS4CheaterNeo is a program to find game cheat codes, and it is based on [`ps4debug`](https://github.com/jogolden/ps4debug) and [`.Net Framework 4.8`](https://support.microsoft.com/en-us/topic/microsoft-net-framework-4-8-offline-installer-for-windows-9d23f658-3b97-68ab-d013-aa3c3e7495e0).
 
-Currently in `version 1.0.2.5`
+Currently in `version 1.0.2.6`
 
 
 ## Table of Contents
@@ -183,10 +183,17 @@ Note: Enabling this option will significantly increase the number of results and
 ![query_section_count_1](assets/query_section_count_1.webp)
 ![query_section_count_2](assets/query_section_count_2.webp)
 
-- Added support for "Check All", "Uncheck All", and "Invert Checked" in the right-click context menu of the SectionView in the Query window.  (0.9.9.1)
+- Added support for "Check all", "Uncheck all", and "Invert checked" in the right-click context menu of the SectionView in the Query window.  (0.9.9.1)
 - Added support for "Check that contains", "Uncheck that contains", "Check that has prot" and "Uncheck that has prot" in the right-click menu of the SectionView in the Query window. (0.9.9.3)
 - Added support for inputting multiple prot values in the 'Check/Uncheck that has prot' function in SectionView. The program will now automatically detect delimiter symbols, including ',', '-', ';', '|', and spaces. (0.9.9.5)
 - Added support for "Check that contains Hidden", "Uncheck that contains Hidden" in the right-click menu of the SectionView in the Query window. (0.9.9.8)
+- Move the "Check all," "Uncheck all," "Invert checked," "Check that contains..." menus into the submenu of the Items menu. (1.0.2.6)  
+- Move the "Check all Hidden," "Un-Check all Hidden..." menus into the submenu of the Hidden Items menu. (1.0.2.6)  
+- Added support for "Invert checked Hidden" and "Disable checked Hidden" in the right-click context menu of the SectionView in the Query window. (1.0.2.6)  
+- Disable checked Hidden  
+Executing "Disable checked Hidden" will set the Valid of the checked Hidden sections to Disable, and update the settings written to the Hidden configuration file at the "path to PS4CheaterNeo\\sections\\[GAME_ID].conf" path. 
+To revert, manual editing of the conf file is required, changing the Valid of the Hidden sections from False to True. 
+Note: The Query window needs to Refresh Processes to incorporate the new Hidden conf settings.  
 
 ![query_SectionViewMenu](assets/query_SectionViewMenu.webp)
 

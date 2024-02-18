@@ -83,6 +83,9 @@
     "SectionViewUnCheckProt": "Décocher ceux qui ont le prot:",
     "SectionViewCheckAllHidden": "Tout cocher (caché)",
     "SectionViewUnCheckAllHidden": "Tout décocher (caché)",
+    "SectionViewInvertCheckedHidden": "Inverser les éléments masqués cochés",
+    "SectionViewDisableCheckedHidden": "Désactiver les éléments masqués cochés",
+    "SectionViewDisableCheckedHiddenWarning": "Attention ! \n\nL'exécution de \"Désactiver les sections cachées cochées\" définira la validité des sections cachées cochées sur Désactiver, et mettra à jour les paramètres écrits dans le fichier de configuration caché situé dans le chemin \"path to PS4CheaterNeo\\sections\\[GAME_ID].conf\". \n\nPour revenir en arrière, une édition manuelle du fichier de configuration est nécessaire, en changeant la validité des sections cachées de Faux à Vrai. \n\nVoulez-vous continuer l'exécution ? \n\nRemarque : La fenêtre de requête doit actualiser les processus pour incorporer les nouveaux paramètres de configuration cachés.",
     "SectionViewDump": "Extraction",
     "SectionViewImport": "Importer",
 

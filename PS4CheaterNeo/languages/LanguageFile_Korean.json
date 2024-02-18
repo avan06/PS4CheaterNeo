@@ -83,6 +83,9 @@
     "SectionViewUnCheckProt": "비Prot확인:",
     "SectionViewCheckAllHidden": "숨겨진 모두 확인",
     "SectionViewUnCheckAllHidden": "숨겨진 모두 해제",
+    "SectionViewInvertCheckedHidden": "선택된 숨겨진 항목 반전",
+    "SectionViewDisableCheckedHidden": "선택된 숨겨진 항목 비활성화",
+    "SectionViewDisableCheckedHiddenWarning": "경고!\n\n\"선택된 숨겨진 항목 비활성화\"를 실행하면 선택된 숨겨진 섹션의 유효성이 비활성화되고, \"path to PS4CheaterNeo\\sections\\[GAME_ID].conf\" 경로에 쓰여진 설정이 업데이트됩니다.\n\n복원하려면, conf 파일을 수동으로 편집하여 숨겨진 섹션의 유효성을 False에서 True로 변경해야 합니다.\n\n실행을 계속하시겠습니까?\n\n참고: 쿼리 창에서 새로운 숨겨진 설정을 반영하려면 프로세스를 새로 고쳐야 합니다.",
     "SectionViewDump": "덤프",
     "SectionViewImport": "가져오기",
 

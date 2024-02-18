@@ -83,6 +83,9 @@
     "SectionViewUnCheckProt": "Desmarcar los que tienen prot:",
     "SectionViewCheckAllHidden": "Marcar Todos Ocultos",
     "SectionViewUnCheckAllHidden": "Desmarcar Todos Ocultos",
+    "SectionViewInvertCheckedHidden": "Oculto marcado invertido",
+    "SectionViewDisableCheckedHidden": "Oculto marcado deshabilitado",
+    "SectionViewDisableCheckedHiddenWarning": "¡Advertencia! \n\nLa ejecución de \"Desactivar ocultos marcados\" establecerá el Valido de las secciones ocultas marcadas en Desactivado, y actualizará la configuración escrita en el archivo de configuración oculto en la ruta \"ruta a PS4CheaterNeo\\sections\\[GAME_ID].conf\". \n\nPara revertir, se requiere la edición manual del archivo de configuración, cambiando el Valido de las secciones ocultas de Falso a Verdadero. \n\n¿Desea continuar con la ejecución? \n\nNota: La ventana de consulta necesita actualizar los procesos para incorporar la nueva configuración de ocultos.",
     "SectionViewDump": "Volcar",
     "SectionViewImport": "Importar",
 

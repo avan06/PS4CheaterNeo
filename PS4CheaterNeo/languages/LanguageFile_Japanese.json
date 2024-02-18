@@ -83,6 +83,9 @@
     "SectionViewUnCheckProt": "指定したProt以外をチェック:",
     "SectionViewCheckAllHidden": "すべてHiddenをチェック",
     "SectionViewUnCheckAllHidden": "Hidden以外をチェック",
+    "SectionViewInvertCheckedHidden": "チェックされたHiddenを反転",
+    "SectionViewDisableCheckedHidden": "チェックされたHiddenを無効にする",
+    "SectionViewDisableCheckedHiddenWarning": "警告！\n\n\"チェックされたHiddenを無効にする\"を実行すると、選択した非表示セクションのValidがDisableに設定され、\"path to PS4CheaterNeo\\sections\\[GAME_ID].conf\"パスに書き込まれた設定が更新されます。\n\n元に戻すには、confファイルを手動で編集し、非表示セクションのValidをFalseからTrueに変更する必要があります。\n\n実行を続行しますか？\n\n注：新しい非表示の設定を取り込むには、クエリウィンドウでプロセスを更新する必要があります。",
     "SectionViewDump": "Dump",
     "SectionViewImport": "インポート",
 

@@ -279,6 +279,15 @@ namespace PS4CheaterNeo
         public string SectionViewUnCheckAllHidden;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
+        public string SectionViewInvertCheckedHidden;
+
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string SectionViewDisableCheckedHidden;
+
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string SectionViewDisableCheckedHiddenWarning;
+
+        [System.Runtime.Serialization.DataMemberAttribute()]
         public string SectionViewDump;
 
         [System.Runtime.Serialization.DataMemberAttribute()]

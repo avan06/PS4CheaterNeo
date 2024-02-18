@@ -83,6 +83,9 @@
     "SectionViewUnCheckProt": "勾選非Prot:",
     "SectionViewCheckAllHidden": "勾選Hidden",
     "SectionViewUnCheckAllHidden": "勾選非Hidden",
+    "SectionViewInvertCheckedHidden": "反轉勾選Hidden",
+    "SectionViewDisableCheckedHidden": "停用勾選的Hidden",
+    "SectionViewDisableCheckedHiddenWarning": "警告! \n\n執行\"停用勾選的Hidden\"會將已勾選的Hidden sections的Valid設置為Disable，並將設定更新寫入至\"path to PS4CheaterNeo\\sections\\[GAME_ID].conf\"路徑的Hidden設定檔案。\n\n若要復原需要手動編輯conf檔案，將Hidden sections的Valid由False改為True。\n\n是否繼續執行? \n\n注: Query視窗需要Refresh Processes才會帶入新的Hidden conf設定",
     "SectionViewDump": "傾印",
     "SectionViewImport": "匯入",
 

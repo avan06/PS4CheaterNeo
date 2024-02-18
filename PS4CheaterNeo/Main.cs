@@ -79,7 +79,11 @@ namespace PS4CheaterNeo
             string codes = Properties.Settings.Default.UILanguage.Value.ToString();
             string path = "languages\\LanguageFile_" + codes + ".json";
 
-            if (!File.Exists(path)) return;
+            if (!File.Exists(path))
+            {
+                path = "languages\\LanguageFile_" + LanguageCodes.English.ToString() + ".json";
+                if (!File.Exists(path)) return;
+            }
 
             using (StreamReader sr = new StreamReader(path))
             using (Stream stream = sr.BaseStream)
@@ -875,7 +879,8 @@ namespace PS4CheaterNeo
                 string cheatDesc = row.Cells[(int)ChertCol.CheatListDesc].ToString();
                 ScanType scanType = this.ParseFromDescription<ScanType>(row.Cells[(int)ChertCol.CheatListType].ToString());
                 string on = row.Cells[(int)ChertCol.CheatListValue].ToString();
-                if (scanType != ScanType.Hex)
+                if (!string.IsNullOrWhiteSpace((string)row.Cells[(int)ChertCol.CheatListOn])) on = row.Cells[(int)ChertCol.CheatListOn].ToString();
+                else if (scanType != ScanType.Hex)
                 {
                     byte[] bytes = ScanTool.ValueStringToByte(scanType, on);
                     on = ScanTool.BytesToString(scanType, bytes, true, on.StartsWith("-"));
@@ -887,6 +892,7 @@ namespace PS4CheaterNeo
                     cheatDesc = m1.Groups[1].Value;
                     off = m1.Groups[3].Value;
                 }
+                //When opening JSON or SHN files, if cheats have the same description, they will automatically be numbered. When saving the file, the automatically added numbers will be removed.
                 cheatDesc = Regex.Replace(cheatDesc, @"_\d+$", "");
 
                 if (modBak != null && modBak.Name == cheatDesc) cheatJson.Mods[cheatJson.Mods.Count - 1].Memory.Add(new CheatJson.Memory(offsetAddr.ToString("X"), on, off));
@@ -936,7 +942,8 @@ namespace PS4CheaterNeo
                 string cheatDesc = row.Cells[(int)ChertCol.CheatListDesc].ToString();
                 ScanType scanType = this.ParseFromDescription<ScanType>(row.Cells[(int)ChertCol.CheatListType].ToString());
                 string on = row.Cells[(int)ChertCol.CheatListValue].ToString();
-                if (scanType != ScanType.Hex)
+                if (!string.IsNullOrWhiteSpace((string)row.Cells[(int)ChertCol.CheatListOn])) on = row.Cells[(int)ChertCol.CheatListOn].ToString();
+                else if (scanType != ScanType.Hex)
                 {
                     byte[] bytes = ScanTool.ValueStringToByte(scanType, on);
                     on = ScanTool.BytesToString(scanType, bytes, true, on.StartsWith("-"));
@@ -948,8 +955,9 @@ namespace PS4CheaterNeo
                     cheatDesc = m1.Groups[1].Value;
                     off = m1.Groups[3].Value;
                 }
-                on = Regex.Replace(on, @"(\w\w)(?=\w)", @"$1-");
-                off = Regex.Replace(off, @"(\w\w)(?=\w)", @"$1-");
+                on = Regex.Replace(on, @"(\w\w)(?=\w)", @"$1-"); //Separate Hex values with "-"
+                off = Regex.Replace(off, @"(\w\w)(?=\w)", @"$1-"); //Separate Hex values with "-"
+                //When opening JSON or SHN files, if cheats have the same description, they will automatically be numbered. When saving the file, the automatically added numbers will be removed.
                 cheatDesc = Regex.Replace(cheatDesc, @"_\d+$", "");
 
                 if (cheatBak != null && cheatBak.Text == cheatDesc) cheatTrainer.Cheats[cheatTrainer.Cheats.Count - 1].Cheatlines.Add(new CheatTrainer.Cheatline(offsetAddr.ToString("X"), section.SN, on, off));
