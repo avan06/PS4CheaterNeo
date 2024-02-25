@@ -299,13 +299,13 @@ namespace PS4CheaterNeo
                 SectionView.VirtualMode = false;
 
                 ComboItem process = (ComboItem)ProcessesBox.SelectedItem;
-                sectionTool.InitSections((int)process.Value, (string)process.Text);
                 if (mainForm.GameID != null)
                 {
                     mainForm.ProcessPid = (int)process.Value;
                     mainForm.ProcessName = (string)process.Text;
                 }
-                else mainForm.InitSections((string)process.Text);
+                else mainForm.InitSections((string)process.Text, true);
+                sectionTool.InitSections((int)process.Value, (string)process.Text);
 
                 Section[] sections = sectionTool.GetSectionSortByAddr();
                 for (int sectionIdx = 0; sectionIdx < sections.Length; sectionIdx++)

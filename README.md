@@ -2,7 +2,7 @@
 
 PS4CheaterNeo is a program to find game cheat codes, and it is based on [`ps4debug`](https://github.com/jogolden/ps4debug) and [`.Net Framework 4.8`](https://support.microsoft.com/en-us/topic/microsoft-net-framework-4-8-offline-installer-for-windows-9d23f658-3b97-68ab-d013-aa3c3e7495e0).
 
-Currently in `version 1.0.2.6`
+Currently in `version 1.0.2.7`
 
 
 ## Table of Contents
@@ -613,7 +613,7 @@ Determine the `exponents value of the simple value of floating`. this option val
 Determine whether to enable the `FullRowSelect` feature in the `SectionView` of the Query window. `Default disabled`. (0.9.9.1)  
 - `DetectHiddenSection`:  
 Determine whether to enable automatic detection of hidden sections. This is currently an experimental feature. `Default disabled`. (0.9.9.7)  
-- `DetectHiddenSectionStartFromTheEnd`:
+- `DetectHiddenSectionStartFromTheEnd`:  
 Determine whether to enable detecting hidden sections starting from the end address of the last section. `Default disabled`. (1.0.2.4)  
 - `LastHiddenSectionLengthHex`:  
 Specify the Hex length of the last hidden section. This only takes effect when `DetectHiddenSection` is enabled. `Default value is 0x40000000`. (0.9.9.7)  
