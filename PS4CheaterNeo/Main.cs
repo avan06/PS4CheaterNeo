@@ -1066,7 +1066,7 @@ namespace PS4CheaterNeo
 
             refreshCheatSource = new CancellationTokenSource();
             refreshCheatTask = RefreshCheatTask(true);
-            refreshCheatTask.ContinueWith(t => {
+            refreshCheatTask?.ContinueWith(t => {
                 refreshCheatSource?.Dispose();
                 refreshCheatSource = null;
                 refreshCheatTask?.Dispose();
@@ -1148,7 +1148,7 @@ namespace PS4CheaterNeo
 
             refreshCheatSource = new CancellationTokenSource();
             refreshCheatTask = RefreshCheatTask();
-            refreshCheatTask.ContinueWith(t => {
+            refreshCheatTask?.ContinueWith(t => {
                 refreshCheatSource?.Dispose();
                 refreshCheatSource = null;
                 refreshCheatTask?.Dispose();
@@ -1438,47 +1438,51 @@ namespace PS4CheaterNeo
             int count = 0;
             int firstDisplayedScrollingRowIndex = CheatGridView.FirstDisplayedScrollingRowIndex;
             bool isRefreshFinish = false;
-            foreach ((Section Section_, uint MinOffset, uint MaxOffset, List<(uint OffsetAddr, int Length, int CIDX, ScanType ScanType, bool IsSign)> CheatList) cheat in cheatsDict.Values)
+            try
             {
-                refreshCheatSource.Token.ThrowIfCancellationRequested();
-                byte[] newDatas = PS4Tool.ReadMemory(processID, cheat.Section_.Start + cheat.MinOffset, (int)cheat.MaxOffset - (int)cheat.MinOffset);
-                for (int idx = 0; idx < cheat.CheatList.Count; idx++)
+                foreach ((Section Section_, uint MinOffset, uint MaxOffset, List<(uint OffsetAddr, int Length, int CIDX, ScanType ScanType, bool IsSign)> CheatList) cheat in cheatsDict.Values)
                 {
-                    count++;
                     refreshCheatSource.Token.ThrowIfCancellationRequested();
-                    (uint OffsetAddr, int Length, int CIDX, ScanType ScanType, bool IsSign) = cheat.CheatList[idx];
-                    Byte[] newData = new byte[Length];
-                    Buffer.BlockCopy(newDatas, (int)OffsetAddr - (int)cheat.MinOffset, newData, 0, Length);
+                    byte[] newDatas = PS4Tool.ReadMemory(processID, cheat.Section_.Start + cheat.MinOffset, (int)cheat.MaxOffset - (int)cheat.MinOffset);
+                    for (int idx = 0; idx < cheat.CheatList.Count; idx++)
+                    {
+                        count++;
+                        refreshCheatSource.Token.ThrowIfCancellationRequested();
+                        (uint OffsetAddr, int Length, int CIDX, ScanType ScanType, bool IsSign) = cheat.CheatList[idx];
+                        Byte[] newData = new byte[Length];
+                        Buffer.BlockCopy(newDatas, (int)OffsetAddr - (int)cheat.MinOffset, newData, 0, Length);
+                        Invoke(new MethodInvoker(() =>
+                        {
+                            cheatGridRowList[CIDX].Cells[(int)ChertCol.CheatListValue] = ScanTool.BytesToString(ScanType, newData, false, IsSign);
+                            if (idx % 1000 == 0 && (CheatAutoRefreshShowStatus || isShowStatus))
+                            {
+                                if (idx % 50000 == 0)
+                                {
+                                    if (firstDisplayedScrollingRowIndex != CheatGridView.FirstDisplayedScrollingRowIndex) isRefreshFinish = false;
+                                    if (!isRefreshFinish && CIDX > CheatGridView.FirstDisplayedScrollingRowIndex)
+                                    {
+                                        CheatGridView.Refresh();
+                                        isRefreshFinish = true;
+                                    }
+                                    firstDisplayedScrollingRowIndex = CheatGridView.FirstDisplayedScrollingRowIndex;
+                                }
+                                ToolStripMsg.Text = string.Format("{0:000}%, Refresh Cheat elapsed:{1:0.00}s. {2}/{3}",
+                                (int)(((float)count / cheatGridRowList.Count) * 100), tickerMajor.Elapsed.TotalSeconds, count, cheatGridRowList.Count);
+                            }
+                        }));
+                    }
                     Invoke(new MethodInvoker(() =>
                     {
-                        cheatGridRowList[CIDX].Cells[(int)ChertCol.CheatListValue] = ScanTool.BytesToString(ScanType, newData, false, IsSign);
-                        if (idx % 1000 == 0 && (CheatAutoRefreshShowStatus || isShowStatus))
+                        if (CheatAutoRefreshShowStatus || isShowStatus)
                         {
-                            if (idx % 50000 == 0)
-                            {
-                                if (firstDisplayedScrollingRowIndex != CheatGridView.FirstDisplayedScrollingRowIndex) isRefreshFinish = false;
-                                if (!isRefreshFinish && CIDX > CheatGridView.FirstDisplayedScrollingRowIndex)
-                                {
-                                    CheatGridView.Refresh();
-                                    isRefreshFinish = true;
-                                }
-                                firstDisplayedScrollingRowIndex = CheatGridView.FirstDisplayedScrollingRowIndex;
-                            }
+                            CheatGridView.Refresh();
                             ToolStripMsg.Text = string.Format("{0:000}%, Refresh Cheat elapsed:{1:0.00}s. {2}/{3}",
                             (int)(((float)count / cheatGridRowList.Count) * 100), tickerMajor.Elapsed.TotalSeconds, count, cheatGridRowList.Count);
                         }
                     }));
                 }
-                Invoke(new MethodInvoker(() =>
-                {
-                    if (CheatAutoRefreshShowStatus || isShowStatus)
-                    {
-                        CheatGridView.Refresh();
-                        ToolStripMsg.Text = string.Format("{0:000}%, Refresh Cheat elapsed:{1:0.00}s. {2}/{3}",
-                        (int)(((float)count / cheatGridRowList.Count) * 100), tickerMajor.Elapsed.TotalSeconds, count, cheatGridRowList.Count);
-                    }
-                }));
             }
+            catch (Exception ex) { InputBox.MsgBox("CheatBatchReadMemory", ex.Message, "Cheat Batch Read Memory error occurred"); }
         }
 
         /// <summary>
