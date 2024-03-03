@@ -74,6 +74,46 @@ namespace PS4CheaterNeo
             CheatGridView.RowCount = 0;
         }
 
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            switch (keyData)
+            {
+                case Keys.Control | Keys.O:
+                    ToolStripOpen.PerformClick();
+                    break;
+                case Keys.Control | Keys.S:
+                    ToolStripSave.PerformClick();
+                    break;
+                case Keys.Control | Keys.Q:
+                    ToolStripNewQuery.PerformClick();
+                    break;
+                case Keys.Control | Keys.A:
+                    ToolStripAdd.PerformClick();
+                    break;
+                case Keys.Control | Keys.H:
+                    ToolStripHexView.PerformClick();
+                    break;
+                case Keys.Control | Keys.R:
+                    ToolStripRefreshCheat.PerformClick();
+                    break;
+                case Keys.Alt | Keys.E:
+                    CheatGridView.CollapseExpandAll();
+                    break;
+                case Keys.Alt | Keys.L:
+                    ToolStripLockEnable.PerformClick();
+                    break;
+                case Keys.Alt | Keys.R:
+                    ToolStripAutoRefresh.PerformClick();
+                    break;
+                case Keys.Alt | Keys.S:
+                    ToolStripSettings.PerformClick();
+                    break;
+                default:
+                    return base.ProcessCmdKey(ref msg, keyData);
+            }
+            return true;
+        }
+
         public void ParseLanguageJson()
         {
             string codes = Properties.Settings.Default.UILanguage.Value.ToString();

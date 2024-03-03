@@ -2,7 +2,7 @@
 
 PS4CheaterNeo is a program to find game cheat codes, and it is based on [`ps4debug`](https://github.com/jogolden/ps4debug) and [`.Net Framework 4.8`](https://support.microsoft.com/en-us/topic/microsoft-net-framework-4-8-offline-installer-for-windows-9d23f658-3b97-68ab-d013-aa3c3e7495e0).
 
-Currently in `version 1.0.2.8`
+Currently in `version 1.0.2.9`
 
 
 ## Table of Contents
@@ -40,6 +40,10 @@ Currently in `version 1.0.2.8`
   * [Pointer finder](#pointer-finder)
   * [Section](#section)
     + [Section ID](#section-id)
+  * [Hotkey](#hotkey)
+    + [main window hotkey](#main-window-hotkey)
+    + [query window hotkey](#query-window-hotkey)
+    + [HexEditor window hotkey](#hexeditor-window-hotkey)
   * [Option](#option)
     + [General](#general)
     + [Cheat](#cheat)
@@ -524,6 +528,81 @@ AddrStart　　Prot　count　　　SIDv1　　　　　SID
 3890200000　　3　　1080　　200006700　　562000100
 3890600000　　3　　1081　　200006800　　562000200
 ```
+
+
+## Hotkey	[🔼](#table-of-contents)
+
+- Currently, the hotkeys are hardcoded in the program...(1.0.2.9)  
+
+### main window hotkey  
+- Control + O  
+Perform open file  
+- Control + S  
+Perform save file  
+- Control + Q  
+Open Query window  
+- Control + H  
+Open HexView window  
+- Alt + S  
+Open Settings window
+- Control + A  
+Perform add address  
+- Control + R  
+Perform refresh cheat list  
+- Alt + E  
+Perform Collapse or ExpandAll in the CheatGridView, automatically determining the current status  
+- Alt + L  
+Set LockEnable to enable or disable, depending on the current button activation status  
+- Alt + R  
+Set AutoRefresh to enable or disable, depending on the current button activation status  
+
+### query window hotkey  
+- Control + G  
+Perform get processes(retrieve all program lists again)  
+- Control + P  
+Perform pause or resume. If the current status is paused, execute resume; otherwise, do the opposite  
+- Alt + S  
+Perform the first or next scan  
+- Alt + U  
+Perform undo scan  
+- Alt + R  
+Perform redo scan  
+- Control + R  
+Perform refresh result list  
+- Control + N  
+Create a new scan, clearing the current scan results  
+- Alt + C  
+Clone the current scan results into a new Query window  
+- Control + Left:
+Collapse the left Split panel  
+- Control + Right:
+Expand the left Split panel  
+- Control + Up:
+Collapse the upper right Split panel  
+- Control + Down:
+Expand the upper right Split panel  
+
+### HexEditor window hotkey  
+- Control + P  
+Go to Previous Page  
+- Control + N  
+Go to Next Page  
+- Control + R  
+Refresh HexBox  
+- Control + S  
+Write Modifications to PS4  
+- Control + A  
+Add to Cheat Grid  
+- F3  
+Perform Find, forward or backward depending on whether "Forward" is checked  
+- Control + Left:
+Collapse the left Split panel  
+- Control + Right:
+Expand the left Split panel  
+- Control + Up:
+Collapse the upper right Split panel  
+- Control + Down:
+Expand the upper right Split panel  
 
 
 ## Option	[🔼](#table-of-contents)

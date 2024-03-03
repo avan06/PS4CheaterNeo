@@ -104,6 +104,46 @@ namespace PS4CheaterNeo
             InitPageData(section, baseAddr);
         }
 
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            switch (keyData)
+            {
+                case Keys.Control | Keys.P:
+                    PreviousBtn.PerformClick();
+                    break;
+                case Keys.Control | Keys.N:
+                    NextBtn.PerformClick();
+                    break;
+                case Keys.Control | Keys.R:
+                    RefreshBtn.PerformClick();
+                    break;
+                case Keys.Control | Keys.S:
+                    CommitBtn.PerformClick();
+                    break;
+                case Keys.Control | Keys.A:
+                    AddToCheatGridBtn.PerformClick();
+                    break;
+                case Keys.F3:
+                    FindBtn.PerformClick();
+                    break;
+                case Keys.Control | Keys.Left:
+                    SplitContainer1.SplitterPanelCollapseExpand(true);
+                    break;
+                case Keys.Control | Keys.Right:
+                    SplitContainer1.SplitterPanelCollapseExpand(false);
+                    break;
+                case Keys.Control | Keys.Up:
+                    SplitContainer2.SplitterPanelCollapseExpand(true);
+                    break;
+                case Keys.Control | Keys.Down:
+                    SplitContainer2.SplitterPanelCollapseExpand(false);
+                    break;
+                default:
+                    return base.ProcessCmdKey(ref msg, keyData);
+            }
+            return true;
+        }
+
         /// <summary>
         /// Initialize the contents of the PageBox menu based on the specified Section and 
         /// select the corresponding PageBox menu based on the relative address (baseAddr).

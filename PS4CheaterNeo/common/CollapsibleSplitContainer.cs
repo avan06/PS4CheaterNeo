@@ -32,8 +32,8 @@ namespace PS4CheaterNeo
         private ButtonPosition splitterButtonPosition;
         private CollapseDistance splitterCollapseDistance;
 
-        private Button splitterButton1;
-        private Button splitterButton2;
+        private Button SplitterButton1;
+        private Button SplitterButton2;
         private readonly string TableFillLeft = "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAuElEQVR4XqXTsQ3DIBAF0Is7iyYV9F4gK1hikWQEOjwBdIyQbJAsgJQVsgA9VGksSgdXJxFFoMs1V6D/kPjisG0btCbnfCxrHsfxUZ8NneHnuq73Ap27gDrsnDtpraEg1xoZesLee0gpQYwRdQTaYcYYGGNgmqZLeYdbBZDCCJDDCNDDCNAHgXLLu6xZKfWSUu6VwbIsEELA6n4BRAQBIoIAGUGgjXDOQQjR30KNWGv3ar8q/fs7fwCWA6ahjYFLQgAAAABJRU5ErkJggg==";
         #endregion
 
@@ -46,22 +46,22 @@ namespace PS4CheaterNeo
             MethodInfo objMethodInfo = typeof(Control).GetMethod("SetStyle", BindingFlags.NonPublic | BindingFlags.Instance);
             objMethodInfo.Invoke(Panel1, objArgs);
             objMethodInfo.Invoke(Panel2, objArgs);
-            splitterButton1 = new Button();
-            splitterButton2 = new Button();
-            splitterButton1.Size = new Size(16, 16);
-            splitterButton2.Size = new Size(16, 16);
-            splitterButton1.Margin = new Padding(0);
-            splitterButton2.Margin = new Padding(0);
-            splitterButton1.BackgroundImageLayout = ImageLayout.Zoom;
-            splitterButton2.BackgroundImageLayout = ImageLayout.Zoom;
-            splitterButton1.BackColor = Color.Transparent;
-            splitterButton2.BackColor = Color.Transparent;
-            splitterButton1.FlatStyle = FlatStyle.Flat;
-            splitterButton2.FlatStyle = FlatStyle.Flat;
-            splitterButton1.FlatAppearance.BorderSize = 0;
-            splitterButton2.FlatAppearance.BorderSize = 0;
-            splitterButton1.Click += SplitterButton1_Click;
-            splitterButton2.Click += SplitterButton2_Click;
+            SplitterButton1 = new Button();
+            SplitterButton2 = new Button();
+            SplitterButton1.Size = new Size(16, 16);
+            SplitterButton2.Size = new Size(16, 16);
+            SplitterButton1.Margin = new Padding(0);
+            SplitterButton2.Margin = new Padding(0);
+            SplitterButton1.BackgroundImageLayout = ImageLayout.Zoom;
+            SplitterButton2.BackgroundImageLayout = ImageLayout.Zoom;
+            SplitterButton1.BackColor = Color.Transparent;
+            SplitterButton2.BackColor = Color.Transparent;
+            SplitterButton1.FlatStyle = FlatStyle.Flat;
+            SplitterButton2.FlatStyle = FlatStyle.Flat;
+            SplitterButton1.FlatAppearance.BorderSize = 0;
+            SplitterButton2.FlatAppearance.BorderSize = 0;
+            SplitterButton1.Click += SplitterButton1_Click;
+            SplitterButton2.Click += SplitterButton2_Click;
 
             SplitterButtonSize = 16;
             SplitterButtonStyle = ButtonStyle.Image;
@@ -98,7 +98,7 @@ namespace PS4CheaterNeo
             }
         }
 
-        [Category("Collapsible"), Description("Where the collapse buttons are located on the splitter")]
+        [Category("Collapsible"), Description("Determines whether to place collapse buttons on both sides of the splitter or on one side of Panel1 and Panel2")]
         [DefaultValue(ButtonLocation.Panel)]
         public ButtonLocation SplitterButtonLocation
         {
@@ -108,31 +108,31 @@ namespace PS4CheaterNeo
                 splitterButtonLocation = value;
                 if (splitterCollapseDistance == CollapseDistance.Collapsed || splitterButtonLocation == ButtonLocation.Panel)
                 {
-                    if (!Panel1.Controls.Contains(splitterButton1)) Panel1.Controls.Add(splitterButton1);
-                    if (!Panel2.Controls.Contains(splitterButton2)) Panel2.Controls.Add(splitterButton2);
-                    if (Panel2.Controls.Contains(splitterButton1)) Panel2.Controls.Remove(splitterButton1);
-                    if (Panel1.Controls.Contains(splitterButton2)) Panel1.Controls.Remove(splitterButton2);
+                    if (!Panel1.Controls.Contains(SplitterButton1)) Panel1.Controls.Add(SplitterButton1);
+                    if (!Panel2.Controls.Contains(SplitterButton2)) Panel2.Controls.Add(SplitterButton2);
+                    if (Panel2.Controls.Contains(SplitterButton1)) Panel2.Controls.Remove(SplitterButton1);
+                    if (Panel1.Controls.Contains(SplitterButton2)) Panel1.Controls.Remove(SplitterButton2);
                 }
                 else if (splitterButtonLocation == ButtonLocation.Panel1)
                 {
-                    if (!Panel1.Controls.Contains(splitterButton1)) Panel1.Controls.Add(splitterButton1);
-                    if (!Panel1.Controls.Contains(splitterButton2)) Panel1.Controls.Add(splitterButton2);
-                    if (Panel2.Controls.Contains(splitterButton1)) Panel2.Controls.Remove(splitterButton1);
-                    if (Panel2.Controls.Contains(splitterButton2)) Panel2.Controls.Remove(splitterButton2);
+                    if (!Panel1.Controls.Contains(SplitterButton1)) Panel1.Controls.Add(SplitterButton1);
+                    if (!Panel1.Controls.Contains(SplitterButton2)) Panel1.Controls.Add(SplitterButton2);
+                    if (Panel2.Controls.Contains(SplitterButton1)) Panel2.Controls.Remove(SplitterButton1);
+                    if (Panel2.Controls.Contains(SplitterButton2)) Panel2.Controls.Remove(SplitterButton2);
                 }
                 else if (splitterButtonLocation == ButtonLocation.Panel2)
                 {
-                    if (!Panel2.Controls.Contains(splitterButton1)) Panel2.Controls.Add(splitterButton1);
-                    if (!Panel2.Controls.Contains(splitterButton2)) Panel2.Controls.Add(splitterButton2);
-                    if (Panel1.Controls.Contains(splitterButton1)) Panel1.Controls.Remove(splitterButton1);
-                    if (Panel1.Controls.Contains(splitterButton2)) Panel1.Controls.Remove(splitterButton2);
+                    if (!Panel2.Controls.Contains(SplitterButton1)) Panel2.Controls.Add(SplitterButton1);
+                    if (!Panel2.Controls.Contains(SplitterButton2)) Panel2.Controls.Add(SplitterButton2);
+                    if (Panel1.Controls.Contains(SplitterButton1)) Panel1.Controls.Remove(SplitterButton1);
+                    if (Panel1.Controls.Contains(SplitterButton2)) Panel1.Controls.Remove(SplitterButton2);
                 }
                 else
                 {
-                    Panel1.Controls.Remove(splitterButton1);
-                    Panel1.Controls.Remove(splitterButton2);
-                    Panel2.Controls.Remove(splitterButton1);
-                    Panel2.Controls.Remove(splitterButton2);
+                    Panel1.Controls.Remove(SplitterButton1);
+                    Panel1.Controls.Remove(SplitterButton2);
+                    Panel2.Controls.Remove(SplitterButton1);
+                    Panel2.Controls.Remove(SplitterButton2);
                 }
                 Refresh();
                 UpdateSplitterButtonsPosition();
@@ -153,7 +153,7 @@ namespace PS4CheaterNeo
             }
         }
 
-        [Category("Collapsible"), Description("The technique used to generate the splitter buttons")]
+        [Category("Collapsible"), Description("Determines the style of splitter buttons: Image - displayed on both sides of the panel; SingleImage - displayed on one side; None - not displayed.")]
         [DefaultValue(ButtonStyle.Image)]
         public ButtonStyle SplitterButtonStyle
         {
@@ -164,13 +164,13 @@ namespace PS4CheaterNeo
                 splitterButtonStyle = value;
                 if (splitterButtonStyle == ButtonStyle.None)
                 {
-                    splitterButton1.Hide();
-                    splitterButton2.Hide();
+                    SplitterButton1.Hide();
+                    SplitterButton2.Hide();
                 }
                 else
                 {
-                    splitterButton1.Show();
-                    splitterButton2.Show();
+                    SplitterButton1.Show();
+                    SplitterButton2.Show();
                 }
                 Refresh();
             }
@@ -185,16 +185,16 @@ namespace PS4CheaterNeo
             {
                 if (splitterButtonSize == value) return;
                 splitterButtonSize = value;
-                var size = splitterButton1.Size;
+                var size = SplitterButton1.Size;
                 size.Width = SplitterButtonSize;
                 size.Height = SplitterButtonSize;
-                splitterButton1.Size = size;
-                splitterButton2.Size = size;
+                SplitterButton1.Size = size;
+                SplitterButton2.Size = size;
                 Refresh();
             }
         }
 
-        [Category("Collapsible"), Description("How completely the affected panel collapses")]
+        [Category("Collapsible"), Description("Determines the style of the splitter after collapsing: MinSize - the panel collapses to the specified MinSize; Collapsed - One-sided panel completely collapsed")]
         [DefaultValue(CollapseDistance.MinSize)]
         public CollapseDistance SplitterCollapseDistance
         {
@@ -239,7 +239,7 @@ namespace PS4CheaterNeo
             }
         }
 
-        [Category("Collapsible"), Description("Determines whether to collapse Panel2 when SplitterButtonStyle is SingleImage, otherwise Panel1 collapse")]
+        [Category("Collapsible"), Description("Determines whether to collapse Panel2; if not, Panel1 will collapse. This setting only takes effect when SplitterButtonStyle is SingleImage and the location of the splitter button is on either Panel1 or Panel2.")]
         [DefaultValue(true)]
         public bool SingleImageCollapsePanel2 { get; set; } = true;
 
@@ -282,77 +282,66 @@ namespace PS4CheaterNeo
         #endregion
 
         #region General Event Handlers
-        private void SplitterButton1_Click(object sender, EventArgs e)
+        private void SplitterButton1_Click(object sender, EventArgs e) => SplitterPanelCollapseExpand(true);
+
+        private void SplitterButton2_Click(object sender, EventArgs e) => SplitterPanelCollapseExpand(false);
+
+        private bool clickSplitterButtonStaus = false;
+
+        /// <summary>
+        /// Trigger the collapse or expand of the splitter panel. 
+        /// When status parameter is true, Panel1 collapses; when status is false, Panel2 collapses. 
+        /// If the status parameter is not provided, it will automatically determine whether to collapse or expand.
+        /// </summary>
+        public void SplitterPanelCollapseExpand(bool? status = null)
         {
             if (splitterButtonStyle == ButtonStyle.None) return;
+
+            if (status == null)
+            {
+                status = clickSplitterButtonStaus;
+                clickSplitterButtonStaus = !clickSplitterButtonStaus;
+            }
+            object sender = (bool)status ? SplitterButton1 : SplitterButton2;
 
             if (splitterCollapseDistance == CollapseDistance.Collapsed)
             {
                 // Hide the panel associated with the clicked button
                 if (Panel1Collapsed && !Panel2Collapsed) Panel2Collapsed = !Panel2Collapsed;
                 else if (!Panel1Collapsed && Panel2Collapsed) Panel1Collapsed = !Panel1Collapsed;
-                else Panel1Collapsed = true;
+                else if (sender == SplitterButton1) Panel1Collapsed = true;
+                else if (sender == SplitterButton2) Panel2Collapsed = true;
             }
             else if (splitterCollapseDistance == CollapseDistance.MinSize)
             {
-                // If the panel for the clicked button is already minimized, do nothing
-                // Otherwise, have the panel shrink to or return from the minimum size
-                if (Panel1Minimized)
-                {
-                    if (splitterButtonStyle == ButtonStyle.SingleImage) splitterButton2.BringToFront();
-                    return;
-                }
-                else if (Panel2Minimized) // Panel 2
-                {
-                    SplitterDistance = splitterDistanceOriginal;
-                    Panel2Minimized = false;
-                }
-                else // Panel 1
+                if (!Panel1Minimized && !Panel2Minimized)
                 {
                     splitterDistanceOriginal = SplitterDistance;
-                    SplitterDistance = Panel1MinSize;
-                    Panel1Minimized = true;
+                    if (sender == SplitterButton1)
+                    { // Panel 1
+                        (SplitterDistance, Panel1Minimized) = (Panel1MinSize, true);
+                    }
+                    else if (sender == SplitterButton2)
+                    { // Panel 2
+                        // When the splitter is vertical, set the location of the splitter to
+                        // the splitcontainer control width minus the minimum size of panel 2.
+                        // For horizontal, set it to height minus panel 2 minimum size
+                        (SplitterDistance, Panel2Minimized) = (Orientation == Orientation.Vertical ? Width - Panel2MinSize : Height - Panel2MinSize, true);
+                    }
                 }
-            }
-            Refresh();
-        }
-
-        private void SplitterButton2_Click(object sender, EventArgs e)
-        {
-            if (splitterButtonStyle == ButtonStyle.None) return;
-
-            if (splitterCollapseDistance == CollapseDistance.Collapsed)
-            {
-                // Hide the panel associated with the clicked button
-                if (!Panel1Collapsed && Panel2Collapsed) Panel1Collapsed = !Panel1Collapsed;
-                else if (Panel1Collapsed && !Panel2Collapsed) Panel2Collapsed = !Panel2Collapsed;
-                else Panel2Collapsed = true;
-            }
-            else if (splitterCollapseDistance == CollapseDistance.MinSize)
-            {
                 // If the panel for the clicked button is already minimized, do nothing
                 // Otherwise, have the panel shrink to or return from the minimum size
-                if (Panel2Minimized)
+                else if (Panel1Minimized && sender == SplitterButton2)
+                    (SplitterDistance, Panel1Minimized) = (splitterDistanceOriginal, false);
+                else if (Panel2Minimized && sender == SplitterButton1)
+                    (SplitterDistance, Panel2Minimized) = (splitterDistanceOriginal, false);
+                else
                 {
-                    if (splitterButtonStyle == ButtonStyle.SingleImage) splitterButton1.BringToFront();
+                    if (Panel1Minimized && sender == SplitterButton1 && splitterButtonStyle == ButtonStyle.SingleImage)
+                        SplitterButton2.BringToFront();
+                    else if (Panel2Minimized && sender == SplitterButton2 && splitterButtonStyle == ButtonStyle.SingleImage)
+                        SplitterButton1.BringToFront();
                     return;
-                }
-                else if (Panel1Minimized) // Panel 1
-                {
-                    SplitterDistance = splitterDistanceOriginal;
-                    Panel1Minimized = false;
-                }
-                else // Panel 2
-                {
-                    splitterDistanceOriginal = SplitterDistance;
-
-                    // When the splitter is vertical, set the location of the splitter to
-                    // the splitcontainer control width minus the minimum size of panel 2.
-                    // For horizontal, set it to height minus panel 2 minimum size
-                    if (Orientation == Orientation.Vertical) SplitterDistance = Width - Panel2MinSize;
-                    else SplitterDistance = Height - Panel2MinSize;
-
-                    Panel2Minimized = true;
                 }
             }
             Refresh();
@@ -383,62 +372,65 @@ namespace PS4CheaterNeo
             int position = GetButtonPosition();
             if (Orientation == Orientation.Vertical)
             {
-                int width = splitterCollapseDistance == CollapseDistance.Collapsed ? 0 : (Panel1Collapsed ? Panel2.ClientRectangle.Right - splitterButton2.Width : Panel1.ClientRectangle.Right - splitterButton1.Width);
+                int width = splitterCollapseDistance == CollapseDistance.Collapsed ? 0 : (Panel1Collapsed ? Panel2.ClientRectangle.Right - SplitterButton2.Width : Panel1.ClientRectangle.Right - SplitterButton1.Width);
 
                 if (splitterCollapseDistance == CollapseDistance.Collapsed || splitterButtonLocation == ButtonLocation.Panel)
                 {
-                    splitterButton1.Location = new Point(width, position);
-                    splitterButton2.Location = new Point(0, position);
+                    SplitterButton1.Location = new Point(width, position);
+                    SplitterButton2.Location = new Point(0, position);
                 }
                 else if (SplitterButtonLocation == ButtonLocation.Panel1)
                 {
-                    splitterButton1.Location = new Point(width, position);
-                    splitterButton2.Location = new Point(width, position + (splitterButtonStyle == ButtonStyle.SingleImage ? 0 : splitterButton1.Height));
+                    SplitterButton1.Location = new Point(width, position);
+                    SplitterButton2.Location = new Point(width, position + (splitterButtonStyle == ButtonStyle.SingleImage ? 0 : SplitterButton1.Height));
                 }
                 else if (SplitterButtonLocation == ButtonLocation.Panel2)
                 {
-                    splitterButton1.Location = new Point(0, position);
-                    splitterButton2.Location = new Point(0, position + (splitterButtonStyle == ButtonStyle.SingleImage ? 0 : splitterButton1.Height));
+                    SplitterButton1.Location = new Point(0, position);
+                    SplitterButton2.Location = new Point(0, position + (splitterButtonStyle == ButtonStyle.SingleImage ? 0 : SplitterButton1.Height));
                 }
             }
             else
             {
-                int height = splitterCollapseDistance == CollapseDistance.Collapsed ? 0 : (Panel1Collapsed ? Panel2.ClientRectangle.Bottom - splitterButton2.Height : Panel1.ClientRectangle.Bottom - splitterButton1.Height);
+                int height = splitterCollapseDistance == CollapseDistance.Collapsed ? 0 : (Panel1Collapsed ? Panel2.ClientRectangle.Bottom - SplitterButton2.Height : Panel1.ClientRectangle.Bottom - SplitterButton1.Height);
 
                 if (splitterCollapseDistance == CollapseDistance.Collapsed || splitterButtonLocation == ButtonLocation.Panel)
                 {
-                    splitterButton1.Location = new Point(position, height);
-                    splitterButton2.Location = new Point(position, 0);
+                    SplitterButton1.Location = new Point(position, height);
+                    SplitterButton2.Location = new Point(position, 0);
                 }
                 else if (SplitterButtonLocation == ButtonLocation.Panel1)
                 {
-                    splitterButton1.Location = new Point(position, height);
-                    splitterButton2.Location = new Point(position + (splitterButtonStyle == ButtonStyle.SingleImage ? 0 : splitterButton1.Width), height);
+                    SplitterButton1.Location = new Point(position, height);
+                    SplitterButton2.Location = new Point(position + (splitterButtonStyle == ButtonStyle.SingleImage ? 0 : SplitterButton1.Width), height);
                 }
                 else if (SplitterButtonLocation == ButtonLocation.Panel2)
                 {
-                    splitterButton1.Location = new Point(position, 0);
-                    splitterButton2.Location = new Point(position + (splitterButtonStyle == ButtonStyle.SingleImage ? 0 : splitterButton1.Width), 0);
+                    SplitterButton1.Location = new Point(position, 0);
+                    SplitterButton2.Location = new Point(position + (splitterButtonStyle == ButtonStyle.SingleImage ? 0 : SplitterButton1.Width), 0);
                 }
             }
             if (splitterCollapseDistance == CollapseDistance.Collapsed || splitterButtonStyle == ButtonStyle.Image)
             {
-                splitterButton1.BringToFront();
-                splitterButton2.BringToFront();
+                SplitterButton1.BringToFront();
+                SplitterButton2.BringToFront();
             }
             else if (SplitterButtonStyle == ButtonStyle.SingleImage)
             {
-                if (SingleImageCollapsePanel2)
-                {
-                    if (Panel2Minimized) splitterButton1.BringToFront();
-                    else splitterButton2.BringToFront();
-                }
-                else
-                {
-                    if (Panel1Minimized) splitterButton2.BringToFront();
-                    else splitterButton1.BringToFront();
-                }
+                if (SingleImageCollapsePanel2) SplitterBtnBringToFront(!Panel2Minimized);
+                else SplitterBtnBringToFront(Panel1Minimized);
             }
+        }
+
+        private void SplitterBtnBringToFront(bool? Panel1Minimized = null)
+        {
+            if (Panel1Minimized == null)
+            {
+                SplitterButton1.BringToFront();
+                SplitterButton2.BringToFront();
+            }
+            if ((bool)Panel1Minimized) SplitterButton2.BringToFront();
+            else SplitterButton1.BringToFront();
         }
 
         /// <summary>
@@ -448,8 +440,8 @@ namespace PS4CheaterNeo
         {
             if (splitterButtonStyle == ButtonStyle.None) return;
 
-            splitterButton1.BackgroundImage = Orientation == Orientation.Vertical ? splitterButtonBitmap : bitmapUp;
-            splitterButton2.BackgroundImage = Orientation == Orientation.Vertical ? bitmapRight : bitmapDown;
+            SplitterButton1.BackgroundImage = Orientation == Orientation.Vertical ? splitterButtonBitmap : bitmapUp;
+            SplitterButton2.BackgroundImage = Orientation == Orientation.Vertical ? bitmapRight : bitmapDown;
         }
         #endregion
 
@@ -467,14 +459,14 @@ namespace PS4CheaterNeo
             if (Orientation == Orientation.Vertical)
             {
                 position = rect.Top;
-                if (splitterButtonPosition == ButtonPosition.Center) position = rect.Bottom / 2 - splitterButton1.Height / 2 - offset / 2;
-                else if (splitterButtonPosition == ButtonPosition.BottomRight) position = rect.Bottom - splitterButton1.Height - offset;
+                if (splitterButtonPosition == ButtonPosition.Center) position = rect.Bottom / 2 - SplitterButton1.Height / 2 - offset / 2;
+                else if (splitterButtonPosition == ButtonPosition.BottomRight) position = rect.Bottom - SplitterButton1.Height - offset;
             }
             else
             {
                 position = rect.Left;
-                if (splitterButtonPosition == ButtonPosition.Center) position = rect.Right / 2 - splitterButton1.Width / 2 - offset / 2;
-                else if (splitterButtonPosition == ButtonPosition.BottomRight) position = rect.Right - splitterButton1.Width - offset;
+                if (splitterButtonPosition == ButtonPosition.Center) position = rect.Right / 2 - SplitterButton1.Width / 2 - offset / 2;
+                else if (splitterButtonPosition == ButtonPosition.BottomRight) position = rect.Right - SplitterButton1.Width - offset;
             }
             return position;
         }

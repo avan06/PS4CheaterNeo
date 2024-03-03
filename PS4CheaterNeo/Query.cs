@@ -76,6 +76,52 @@ namespace PS4CheaterNeo
             this.bitsDictDicts = new List<Dictionary<uint, BitsDictionary>>(bitsDictDicts);
         }
 
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            switch (keyData)
+            {
+                case Keys.Control | Keys.G:
+                    GetProcessesBtn.PerformClick();
+                    break;
+                case Keys.Control | Keys.P:
+                    PauseResume();
+                    break;
+                case Keys.Alt | Keys.S:
+                    ScanBtn.PerformClick();
+                    break;
+                case Keys.Alt | Keys.U:
+                    UndoBtn.PerformClick();
+                    break;
+                case Keys.Alt | Keys.R:
+                    RedoBtn.PerformClick();
+                    break;
+                case Keys.Control | Keys.R:
+                    RefreshBtn.PerformClick();
+                    break;
+                case Keys.Control | Keys.N:
+                    NewBtn.PerformClick();
+                    break;
+                case Keys.Alt | Keys.C:
+                    CloneScanBtn.PerformClick();
+                    break;
+                case Keys.Control | Keys.Left:
+                    SplitContainer1.SplitterPanelCollapseExpand(true);
+                    break;
+                case Keys.Control | Keys.Right:
+                    SplitContainer1.SplitterPanelCollapseExpand(false);
+                    break;
+                case Keys.Control | Keys.Up:
+                    SplitContainer2.SplitterPanelCollapseExpand(true);
+                    break;
+                case Keys.Control | Keys.Down:
+                    SplitContainer2.SplitterPanelCollapseExpand(false);
+                    break;
+                default:
+                    return base.ProcessCmdKey(ref msg, keyData);
+            }
+            return true;
+        }
+
         public void ApplyUI(LanguageJson langJson)
         {
             try
@@ -1578,16 +1624,13 @@ namespace PS4CheaterNeo
             }
         }
 
-        private void ResumeBtn_Click(object sender, EventArgs e)
-        {
-            processStatus = ProcessStatus.Resume;
-            ComboItem process = (ComboItem)ProcessesBox.SelectedItem;
-            PS4Tool.AttachDebugger((int)process.Value, (string)process.Text, processStatus);
-        }
+        private void ResumeBtn_Click(object sender, EventArgs e) => PauseResume(ProcessStatus.Resume);
 
-        private void PauseBtn_Click(object sender, EventArgs e)
+        private void PauseBtn_Click(object sender, EventArgs e) => PauseResume(ProcessStatus.Pause);
+
+        private void PauseResume(ProcessStatus? newStatus = null)
         {
-            processStatus = ProcessStatus.Pause;
+            processStatus = newStatus != null ? (ProcessStatus)newStatus : (processStatus == ProcessStatus.Pause ? ProcessStatus.Resume : ProcessStatus.Pause);
             ComboItem process = (ComboItem)ProcessesBox.SelectedItem;
             PS4Tool.AttachDebugger((int)process.Value, (string)process.Text, processStatus);
         }
