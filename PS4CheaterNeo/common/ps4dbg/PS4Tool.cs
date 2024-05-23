@@ -1,4 +1,6 @@
-﻿using System;
+﻿using PS4CheaterNeo.libdebug;
+using PS4CheaterNeo.libframe4;
+using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Security.AccessControl;
@@ -25,7 +27,7 @@ namespace PS4CheaterNeo
 
         private static readonly Mutex mutex;
         private static readonly Mutex[] mutexs;
-        private static readonly libdebug.PS4DBG[] ps4s;
+        private static readonly IPS4DBG[] ps4s; //libdebug.PS4DBG
         private static System.Diagnostics.Stopwatch tickerMajor = System.Diagnostics.Stopwatch.StartNew();
 
         static PS4Tool()
@@ -41,7 +43,7 @@ namespace PS4CheaterNeo
             mutex = new Mutex(false, mutexId, out _, mSec);
 
             mutexs = new Mutex[mutexFactor*2];
-            ps4s = new libdebug.PS4DBG[mutexs.Length];
+            ps4s = new PS4DBG[mutexs.Length];
         }
 
         /// <summary>
@@ -90,6 +92,7 @@ namespace PS4CheaterNeo
             bool result = false;
             try
             {
+                PS4DebugLibType ps4DBGType = Properties.Settings.Default.PS4DBGType.Value;
                 mutex.WaitOne();
                 for (int idx = 0; idx < ps4s.Length; idx++)
                 {
@@ -100,16 +103,22 @@ namespace PS4CheaterNeo
                         try { ps4s[idx].Disconnect(); } catch (Exception ex) { Console.WriteLine(ex.ToString()); }
                         ps4s[idx] = null;
                     }
-                    if (ps4s[idx] == null) ps4s[idx] = new libdebug.PS4DBG(ip);
+                    if (ps4s[idx] == null)
+                    {
+                        if (ps4DBGType == PS4DebugLibType.ps4debug)
+                            ps4s[idx] = new PS4DBG(ip);
+                        else
+                            ps4s[idx] = new FRAME4(ip);
+                    }
 
                     if (idx == 0)
                     {
                         result = ps4s[idx].IsConnected ? true : ps4s[idx].Connect(connectTimeout, sendTimeout, receiveTimeout, true);
-                        if (result && ps4s[idx].ExtFWVersion == -1)
+                        if (result && (ps4s[idx] is FRAME4 || ((PS4DBG)ps4s[idx]).ExtFWVersion == -1))
                         {
                             ps4s[idx].Disconnect();
                             ps4s[idx] = null;
-                            ps4s[idx] = new libdebug.PS4DBG(ip);
+                            ps4s[idx] = new PS4DBG(ip);
                             result = ps4s[idx].Connect(connectTimeout, sendTimeout, receiveTimeout);
                         }
                     }
@@ -137,10 +146,10 @@ namespace PS4CheaterNeo
         /// Socket errorCode 10060: connection timed out, will try to reconnect 5 times and throw error when all fails
         /// </summary>
         /// <returns>libdebug.ProcessList</returns>
-        public static libdebug.ProcessList GetProcessList()
+        public static ProcessList GetProcessList()
         {
             int current = CurrentIdx2();
-            libdebug.ProcessList processList = null;
+            ProcessList processList = null;
             try
             {
                 mutexs[current].WaitOne();
@@ -170,10 +179,10 @@ namespace PS4CheaterNeo
         /// </summary>
         /// <param name="processID">specified process PID</param>
         /// <returns>libdebug.ProcessInfo</returns>
-        public static libdebug.ProcessInfo GetProcessInfo(int processID)
+        public static ProcessInfo GetProcessInfo(int processID)
         {
             int current = CurrentIdx2();
-            libdebug.ProcessInfo processInfo = new libdebug.ProcessInfo();
+            ProcessInfo processInfo = new ProcessInfo();
             try
             {
                 mutexs[current].WaitOne();
@@ -190,16 +199,16 @@ namespace PS4CheaterNeo
         /// </summary>
         /// <param name="processName">specified process name</param>
         /// <returns>libdebug.ProcessInfo</returns>
-        public static libdebug.ProcessInfo GetProcessInfo(string processName)
+        public static ProcessInfo GetProcessInfo(string processName)
         {
-            libdebug.ProcessInfo processInfo = new libdebug.ProcessInfo();
-            libdebug.ProcessList processList = GetProcessList();
+            ProcessInfo processInfo = new ProcessInfo();
+            ProcessList processList = GetProcessList();
 
             if (processList == null) return processInfo;
 
             for (int idx = 0; idx < processList.processes.Length; idx++)
             {
-                libdebug.Process process = processList.processes[idx];
+                Process process = processList.processes[idx];
                 if (process.name != processName) continue;
                 processInfo = GetProcessInfo(process.pid);
                 break;
@@ -213,9 +222,9 @@ namespace PS4CheaterNeo
         /// </summary>
         /// <param name="processName">specified process name</param>
         /// <returns>libdebug.ProcessMap</returns>
-        public static libdebug.ProcessMap GetProcessMaps(string processName)
+        public static ProcessMap GetProcessMaps(string processName)
         {
-            libdebug.ProcessInfo processInfo = GetProcessInfo(processName);
+            ProcessInfo processInfo = GetProcessInfo(processName);
 
             if (processInfo.pid == 0) return null;
 
@@ -227,10 +236,10 @@ namespace PS4CheaterNeo
         /// </summary>
         /// <param name="processID">specified process PID</param>
         /// <returns>libdebug.ProcessMap</returns>
-        public static libdebug.ProcessMap GetProcessMaps(int processID)
+        public static ProcessMap GetProcessMaps(int processID)
         {
             int current = CurrentIdx2();
-            libdebug.ProcessMap processMap = null;
+            ProcessMap processMap = null;
             try
             {
                 mutexs[current].WaitOne();
@@ -426,13 +435,13 @@ namespace PS4CheaterNeo
         /// <param name="isPause">pause or resume process</param>
         public static bool AttachDebugger(int processID, string processName, ProcessStatus newStatus)
         {
-            if (ps4s[0].IsConnected && ps4s[0].ExtFWVersion > 0)
+            if (ps4s[0].IsConnected && ps4s[0] is PS4DBG ps4dbg && ps4dbg.ExtFWVersion > 0)
             {
                 if (processStatus != newStatus)
                 {
                     processStatus = newStatus;
-                    if (newStatus == ProcessStatus.Pause) ps4s[0].ProcessExtStop(processID);
-                    else ps4s[0].ProcessExtResume(processID);
+                    if (newStatus == ProcessStatus.Pause) ps4dbg.ProcessExtStop(processID);
+                    else ps4dbg.ProcessExtResume(processID);
                 }
             }
             else if (ps4s[0].IsConnected && ps4s[0].IsDebugging)
@@ -469,7 +478,7 @@ namespace PS4CheaterNeo
         {
             if (ps4s[0] == null) return;
             
-            if (ps4s[0].IsConnected && ps4s[0].ExtFWVersion > 0 && processStatus == ProcessStatus.Pause) ps4s[0].ProcessExtResume(processID);
+            if (ps4s[0].IsConnected && ps4s[0] is PS4DBG ps4dbg && ps4dbg.ExtFWVersion > 0 && processStatus == ProcessStatus.Pause) ps4dbg.ProcessExtResume(processID);
 
             if (!ps4s[0].IsDebugging) return;
 

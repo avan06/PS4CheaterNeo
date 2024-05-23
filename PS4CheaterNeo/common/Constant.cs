@@ -2,6 +2,11 @@
 
 namespace PS4CheaterNeo
 {
+    public enum PS4DebugLibType
+    {
+        ps4debug,
+        Frame4,
+    }
     public enum LanguageCodes
     {
         English,

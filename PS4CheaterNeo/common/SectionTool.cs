@@ -202,7 +202,7 @@ namespace PS4CheaterNeo
         /// 4. Start address is from small to large,
         /// 5. Finally, it is sorted by name
         /// </summary>
-        private int CompareMemoryEntry(libdebug.MemoryEntry e1, libdebug.MemoryEntry e2)
+        private int CompareMemoryEntry(MemoryEntry e1, MemoryEntry e2)
         {
             int result = 0;
             if (e1.name == "" || e2.name == "") result = e1.name.CompareTo(e2.name);
@@ -228,7 +228,7 @@ namespace PS4CheaterNeo
         /// <exception cref="Exception"></exception>
         public void InitSections(string processName)
         {
-            libdebug.ProcessInfo processInfo = PS4Tool.GetProcessInfo(processName);
+            ProcessInfo processInfo = PS4Tool.GetProcessInfo(processName);
 
             if (processInfo.pid == 0) throw new Exception(string.Format("{0}: ProcessInfo is null.", processName));
 
@@ -243,7 +243,7 @@ namespace PS4CheaterNeo
         /// <exception cref="Exception"></exception>
         public void InitSections(int processID, string processName)
         {
-            libdebug.ProcessMap pMap = PS4Tool.GetProcessMaps(processID);
+            ProcessMap pMap = PS4Tool.GetProcessMaps(processID);
 
             if (pMap == null || pMap.entries == null || pMap.entries.Length == 0) throw new Exception(string.Format("{0}: Process({1}) Map is null.", processName, processID));
 
@@ -255,11 +255,11 @@ namespace PS4CheaterNeo
         /// Retrieve all MemoryEntry objects from ProcessMap, calculate a unique ID (SID) for each, 
         /// and then generate Section objects and store them in SectionDict.
         /// </summary>
-        /// <param name="pMap">libdebug.ProcessMap</param>
+        /// <param name="pMap">ProcessMap</param>
         /// <param name="processID">specified process id</param>
         /// <param name="processName">specified process name</param>
         /// <exception cref="Exception"></exception>
-        public void InitSections(libdebug.ProcessMap pMap, int processID, string processName)
+        public void InitSections(ProcessMap pMap, int processID, string processName)
         {
             if (pMap == null || pMap.entries == null || pMap.entries.Length == 0) throw new Exception(string.Format("{0}: Process({1}) Map is null.", processName, processID));
 
@@ -278,11 +278,11 @@ namespace PS4CheaterNeo
                 (uint sIdx, uint ProtCnt) v1 = (0, 0);
                 (uint sIdx, uint ProtCnt) v2 = (0, 0);
                 (uint HighBits, uint TypeCode, uint Prot) tmp = (0, 0, 0);
-                libdebug.MemoryEntry tmpEntry = null;
+                MemoryEntry tmpEntry = null;
                 Array.Sort(pMap.entries, CompareMemoryEntry); //Sort MemoryEntry in order to calculate SID
                 for (int eIdx = 0; eIdx < pMap.entries.Length; eIdx++)
                 {
-                    libdebug.MemoryEntry entry = pMap.entries[eIdx];
+                    MemoryEntry entry = pMap.entries[eIdx];
                     if ((entry.prot & 0x1) != 0x1) continue;
                     if (tmpEntry != null && tmpEntry.start == entry.start && tmpEntry.end == entry.end) continue;
                     ulong start = entry.start;

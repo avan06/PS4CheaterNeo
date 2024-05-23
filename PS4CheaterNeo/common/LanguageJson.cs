@@ -570,6 +570,9 @@ namespace PS4CheaterNeo
         public string PS4FWVersion;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
+        public string PS4DBGType;
+
+        [System.Runtime.Serialization.DataMemberAttribute()]
         public string CollapsibleContainer;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
@@ -805,6 +808,9 @@ namespace PS4CheaterNeo
 
         [System.Runtime.Serialization.DataMemberAttribute()]
         public string description_PS4FWVersion;
+
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string description_PS4DBGType;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
         public string description_UILanguage;

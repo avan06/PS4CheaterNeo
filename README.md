@@ -2,7 +2,7 @@
 
 PS4CheaterNeo is a program to find game cheat codes, and it is based on [`ps4debug`](https://github.com/jogolden/ps4debug) and [`.Net Framework 4.8`](https://support.microsoft.com/en-us/topic/microsoft-net-framework-4-8-offline-installer-for-windows-9d23f658-3b97-68ab-d013-aa3c3e7495e0).
 
-Currently in `version 1.0.2.9`
+Currently in `version 1.0.3.0`
 
 
 ## Table of Contents
@@ -85,6 +85,7 @@ Currently in `version 1.0.2.9`
 ### Payload
 
 - `ps4debug` or `ps5debug` can be directly placed in the payloads folder, no longer needing to be placed in the specified path for the FW version. (1.0.1.2)
+- Now it also supports the `Frame4` version made by `DeathRGH`, with the same path placed in the payloads folder, applicable firmware versions are 5.05, 9.00, and 11.00. (1.0.3.0)
 - You must manually place the downloaded payload in the `\Path\to\PS4CheaterNeo\payloads\` or `\Path\to\PS4CheaterNeo\payloads\\[FW version]\` folder.
 
 > ex. Paths without FW will be prioritized for loading.  
@@ -101,6 +102,8 @@ Currently in `version 1.0.2.9`
 > [ps4debug 9.00 by Karo](https://twitter.com/i/web/status/1471590847707856905)  
 > [ps4debug all firmware (5.0X, 6.72, 7.02, 7.5X, 9.00) by ctn123](https://github.com/ctn123/PS4_Cheater/releases/)  
 > [ps5debug Coded by ctn123 & SiSTRo](https://github.com/GoldHEN/ps5debug/releases)  
+> [ps4debug 11.00 by Karo, requires launching from web online](https://x.com/karo_sharifi/status/1793323280557838386)  
+> [Frame4 for 5.05, 9.00, and 11.00 firmware by DeathRGH.](https://github.com/DeathRGH/frame4)
 
 
 ## Cheat window	[🔼](#table-of-contents)
@@ -618,6 +621,8 @@ Enter PS4 IP location.
 Enter PS4 Port.  
 - `PS4FWVersion`:  
 Enter PS4 FW Version (Confirm the fw version only when perform sendpayload).  
+- `PS4DBGType`:
+Decide the type of PS4 debugger library: the original ps4debug(and ps5) or DeathRGH/frame4, Changes may require a restart to take effect. Default is ps4debug. (1.0.3.0)  
 - `UILanguage`:  
 Determine the language displayed. Default english. (1.0.2.0)  
 - `UIFont`:  

@@ -58,9 +58,6 @@
     <Reference Include="GroupGridView">
       <HintPath>lib\GroupGridView.dll</HintPath>
     </Reference>
-    <Reference Include="libdebug">
-      <HintPath>lib\libdebug.dll</HintPath>
-    </Reference>
     <Reference Include="OptionTreeView">
       <HintPath>lib\OptionTreeView.dll</HintPath>
     </Reference>
@@ -93,7 +90,19 @@
     </Compile>
     <Compile Include="common\Constant.cs" />
     <Compile Include="common\LanguageJson.cs" />
-    <Compile Include="common\PS4Tool.cs" />
+    <Compile Include="common\ps4dbg\IPS4DBG.cs" />
+    <Compile Include="common\ps4dbg\libdebug\PS4DBG.Console.cs" />
+    <Compile Include="common\ps4dbg\libdebug\PS4DBG.cs" />
+    <Compile Include="common\ps4dbg\libdebug\PS4DBG.Debug.cs" />
+    <Compile Include="common\ps4dbg\libdebug\PS4DBG.Proc.cs" />
+    <Compile Include="common\ps4dbg\libframe4\FRAME4.Console.cs" />
+    <Compile Include="common\ps4dbg\libframe4\FRAME4.cs" />
+    <Compile Include="common\ps4dbg\libframe4\FRAME4.Debug.cs" />
+    <Compile Include="common\ps4dbg\libframe4\FRAME4.Kernel.cs" />
+    <Compile Include="common\ps4dbg\libframe4\FRAME4.Proc.cs" />
+    <Compile Include="common\ps4dbg\Process.cs" />
+    <Compile Include="common\ps4dbg\Registers.cs" />
+    <Compile Include="common\ps4dbg\PS4Tool.cs" />
     <Compile Include="common\BitsDictionary.cs" />
     <Compile Include="common\SectionTool.cs" />
     <Compile Include="common\Self.cs" />

@@ -16,6 +16,8 @@ namespace PS4CheaterNeo
             InitializeComponent();
             ApplyUI(mainForm.langJson);
             VersionComboBox.Items.AddRange(Constant.Versions);
+            PS4DBGTypeComboBox.DataSource = Enum.GetValues(typeof(PS4DebugLibType));
+            PS4DBGTypeComboBox.SelectedItem = Properties.Settings.Default.PS4DBGType.Value;
         }
 
         public void ApplyUI(LanguageJson langJson)
@@ -102,10 +104,10 @@ namespace PS4CheaterNeo
                 string patchName = "ps5debug.elf";
                 if (!File.Exists(patchPath + patchName))
                 {
-                    patchName = "ps4debug.bin";
+                    patchName = ((PS4DebugLibType)PS4DBGTypeComboBox.SelectedItem).ToString() + ".bin"; // ps4debug.bin or Frame4.bin
                     if (!File.Exists(patchPath + patchName)) patchPath = string.Format(@"{0}\payloads\{1}\", Application.StartupPath, VersionComboBox.SelectedItem);
                     if (!File.Exists(patchPath + patchName)) throw new ArgumentException(string.Format("payload not found! ({0})\n" +
-                        "You must manually place the downloaded ps4debug.bin or ps5debug.elf in the folder \n\\Path\\to\\PS4CheaterNeo\\payloads\\", payloadsPath));
+                        "You must manually place the downloaded ps4debug.bin or ps5debug.elf or Frame4.bin in the folder \n\\Path\\to\\PS4CheaterNeo\\payloads\\", payloadsPath));
                 }
                 SendPayLoad(IpBox.Text, Convert.ToInt32(PortBox.Text), patchPath + patchName);
                 Thread.Sleep(1000);
@@ -149,6 +151,7 @@ namespace PS4CheaterNeo
                 if ((VersionBox.Text ?? "") != "") Properties.Settings.Default.PS4FWVersion.Value = VersionBox.Text;
                 if ((IpBox.Text ?? "") != "") Properties.Settings.Default.PS4IP.Value = IpBox.Text;
                 if ((PortBox.Text ?? "") != "") Properties.Settings.Default.PS4Port.Value = Convert.ToUInt16(PortBox.Text);
+                Properties.Settings.Default.PS4DBGType.Value = (PS4DebugLibType)PS4DBGTypeComboBox.SelectedItem;
                 Properties.Settings.Default.Save();
             }
             catch (Exception ex)

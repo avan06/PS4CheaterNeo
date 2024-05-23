@@ -313,10 +313,10 @@ namespace PS4CheaterNeo
                 int selectedIdx = 0;
                 string DefaultProcess = Properties.Settings.Default.DefaultProcess.Value;
                 ProcessesBox.Items.Clear();
-                libdebug.ProcessList procList = PS4Tool.GetProcessList();
+                ProcessList procList = PS4Tool.GetProcessList();
                 for (int pIdx = 0; pIdx < procList.processes.Length; pIdx++)
                 {
-                    libdebug.Process process = procList.processes[pIdx];
+                    Process process = procList.processes[pIdx];
                     int idx = ProcessesBox.Items.Add(new ComboItem(process.name, process.pid));
                     if (process.name == DefaultProcess) selectedIdx = idx;
                 }
@@ -1358,7 +1358,7 @@ namespace PS4CheaterNeo
                 {
                     ComboItem process = (ComboItem)ProcessesBox.SelectedItem;
                     int pid = (int)process.Value;
-                    libdebug.ProcessMap pMap = PS4Tool.GetProcessMaps(pid);
+                    ProcessMap pMap = PS4Tool.GetProcessMaps(pid);
                     if (pMap.entries == null) return;
                 }
 

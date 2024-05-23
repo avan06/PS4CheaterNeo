@@ -11,6 +11,9 @@
     <Setting Name="PS4FWVersion" Type="OptionTreeView.Option&lt;string&gt;" Scope="User">
       <Value Profile="(Default)">|1_General|1_SendPayload|Enter PS4 FW Version (Confirm the fw version only when perform sendpayload)</Value>
     </Setting>
+    <Setting Name="PS4DBGType" Type="OptionTreeView.Option&lt;PS4CheaterNeo.PS4DebugLibType&gt;" Scope="User">
+      <Value Profile="(Default)">0|1_General|1_SendPayload|Decide the type of PS4 debugger library: the original ps4debug(and ps5) or DeathRGH/frame4, \nChanges may require a restart to take effect. \nDefault is ps4debug.</Value>
+    </Setting>
     <Setting Name="UILanguage" Type="OptionTreeView.Option&lt;PS4CheaterNeo.LanguageCodes&gt;" Scope="User">
       <Value Profile="(Default)">0|1_General|2_UI|Determine the language displayed. Default english.</Value>
     </Setting>

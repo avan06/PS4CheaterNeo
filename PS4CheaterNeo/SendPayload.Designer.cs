@@ -37,6 +37,7 @@ namespace PS4CheaterNeo
             this.ToolStripMsg = new System.Windows.Forms.ToolStripStatusLabel();
             this.OKBtn = new System.Windows.Forms.Button();
             this.VersionBox = new System.Windows.Forms.TextBox();
+            this.PS4DBGTypeComboBox = new System.Windows.Forms.ComboBox();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -77,7 +78,7 @@ namespace PS4CheaterNeo
             this.SendPayloadBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(36)))), ((int)(((byte)(36)))));
             this.SendPayloadBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.SendPayloadBtn.ForeColor = System.Drawing.Color.White;
-            this.SendPayloadBtn.Location = new System.Drawing.Point(12, 58);
+            this.SendPayloadBtn.Location = new System.Drawing.Point(12, 85);
             this.SendPayloadBtn.Name = "SendPayloadBtn";
             this.SendPayloadBtn.Size = new System.Drawing.Size(171, 23);
             this.SendPayloadBtn.TabIndex = 3;
@@ -91,7 +92,7 @@ namespace PS4CheaterNeo
             this.statusStrip1.ImageScalingSize = new System.Drawing.Size(24, 24);
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.ToolStripMsg});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 91);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 118);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Size = new System.Drawing.Size(277, 22);
             this.statusStrip1.SizingGrip = false;
@@ -104,7 +105,7 @@ namespace PS4CheaterNeo
             this.ToolStripMsg.BackColor = System.Drawing.Color.Transparent;
             this.ToolStripMsg.ForeColor = System.Drawing.Color.White;
             this.ToolStripMsg.Name = "ToolStripMsg";
-            this.ToolStripMsg.Size = new System.Drawing.Size(231, 17);
+            this.ToolStripMsg.Size = new System.Drawing.Size(262, 17);
             this.ToolStripMsg.Spring = true;
             this.ToolStripMsg.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
@@ -115,7 +116,7 @@ namespace PS4CheaterNeo
             this.OKBtn.ForeColor = System.Drawing.Color.White;
             this.OKBtn.Location = new System.Drawing.Point(189, 9);
             this.OKBtn.Name = "OKBtn";
-            this.OKBtn.Size = new System.Drawing.Size(76, 72);
+            this.OKBtn.Size = new System.Drawing.Size(76, 99);
             this.OKBtn.TabIndex = 5;
             this.OKBtn.Text = "Save";
             this.OKBtn.UseVisualStyleBackColor = false;
@@ -130,12 +131,25 @@ namespace PS4CheaterNeo
             this.VersionBox.Size = new System.Drawing.Size(120, 22);
             this.VersionBox.TabIndex = 6;
             // 
+            // PS4DBGTypeComboBox
+            // 
+            this.PS4DBGTypeComboBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(36)))), ((int)(((byte)(36)))));
+            this.PS4DBGTypeComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.PS4DBGTypeComboBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.PS4DBGTypeComboBox.ForeColor = System.Drawing.Color.White;
+            this.PS4DBGTypeComboBox.FormattingEnabled = true;
+            this.PS4DBGTypeComboBox.Location = new System.Drawing.Point(12, 59);
+            this.PS4DBGTypeComboBox.Name = "PS4DBGTypeComboBox";
+            this.PS4DBGTypeComboBox.Size = new System.Drawing.Size(171, 20);
+            this.PS4DBGTypeComboBox.TabIndex = 7;
+            // 
             // SendPayload
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(36)))), ((int)(((byte)(36)))));
-            this.ClientSize = new System.Drawing.Size(277, 113);
+            this.ClientSize = new System.Drawing.Size(277, 140);
+            this.Controls.Add(this.PS4DBGTypeComboBox);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.VersionBox);
             this.Controls.Add(this.SendPayloadBtn);
@@ -165,5 +179,6 @@ namespace PS4CheaterNeo
         private System.Windows.Forms.ToolStripStatusLabel ToolStripMsg;
         private System.Windows.Forms.Button OKBtn;
         private System.Windows.Forms.TextBox VersionBox;
+        private System.Windows.Forms.ComboBox PS4DBGTypeComboBox;
     }
 }

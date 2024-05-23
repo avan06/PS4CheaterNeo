@@ -2105,8 +2105,8 @@ namespace PS4CheaterNeo
         /// <returns>return whether the initialization was successful</returns>
         public bool InitSections(string processName, bool force = false)
         {
-            libdebug.ProcessMap pMap = null;
-            libdebug.ProcessInfo processInfo = PS4Tool.GetProcessInfo(processName);
+            ProcessMap pMap = null;
+            ProcessInfo processInfo = PS4Tool.GetProcessInfo(processName);
 
             if (processInfo.pid == 0 || processInfo.name != processName)
             {

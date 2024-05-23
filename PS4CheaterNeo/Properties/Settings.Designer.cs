@@ -12,7 +12,7 @@ namespace PS4CheaterNeo.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.8.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.10.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -57,6 +57,20 @@ namespace PS4CheaterNeo.Properties {
             }
             set {
                 this["PS4FWVersion"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0|1_General|1_SendPayload|Decide the type of PS4 debugger library: the original p" +
+            "s4debug(and ps5) or DeathRGH/frame4, \\nChanges may require a restart to take eff" +
+            "ect. \\nDefault is ps4debug.")]
+        public global::OptionTreeView.Option<PS4CheaterNeo.PS4DebugLibType> PS4DBGType {
+            get {
+                return ((global::OptionTreeView.Option<PS4CheaterNeo.PS4DebugLibType>)(this["PS4DBGType"]));
+            }
+            set {
+                this["PS4DBGType"] = value;
             }
         }
         

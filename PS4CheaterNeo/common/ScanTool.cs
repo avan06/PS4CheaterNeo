@@ -1028,12 +1028,12 @@ namespace PS4CheaterNeo
             string gameVer = null;
             (string processName, string sectionName, uint sectionProt, ulong idOffset, ulong versionOffset) = SectionGameInfo(FWVer);
 
-            libdebug.ProcessMap pMap = PS4Tool.GetProcessMaps(processName);
-            if (pMap == null || pMap.entries == null || pMap.entries.Length == 0) throw new Exception(string.Format("{0}: Process({1}) Map is null.", processName, pMap.pid));
+            ProcessMap pMap = PS4Tool.GetProcessMaps(processName);
+            if (pMap == null || pMap.entries == null || pMap.entries.Length == 0) throw new Exception(string.Format("{0}: Process({1}) Map is null.", processName, pMap != null ? pMap.pid.ToString() : ""));
 
             for (int eIdx = 0; eIdx < pMap.entries.Length; eIdx++)
             {
-                libdebug.MemoryEntry entry = pMap.entries[eIdx];
+                MemoryEntry entry = pMap.entries[eIdx];
                 if ((entry.prot & 0x1) != 0x1) continue;
                 if (entry.name != sectionName && entry.name != sectionName + "[0]" || entry.prot != sectionProt) continue;
                 gameID = Encoding.Default.GetString(PS4Tool.ReadMemory(pMap.pid, entry.start + idOffset, 16));
