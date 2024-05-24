@@ -43,7 +43,7 @@ namespace PS4CheaterNeo
             mutex = new Mutex(false, mutexId, out _, mSec);
 
             mutexs = new Mutex[mutexFactor*2];
-            ps4s = new PS4DBG[mutexs.Length];
+            ps4s = new IPS4DBG[mutexs.Length];
         }
 
         /// <summary>
@@ -118,7 +118,10 @@ namespace PS4CheaterNeo
                         {
                             ps4s[idx].Disconnect();
                             ps4s[idx] = null;
-                            ps4s[idx] = new PS4DBG(ip);
+                            if (ps4DBGType == PS4DebugLibType.ps4debug)
+                                ps4s[idx] = new PS4DBG(ip);
+                            else
+                                ps4s[idx] = new FRAME4(ip);
                             result = ps4s[idx].Connect(connectTimeout, sendTimeout, receiveTimeout);
                         }
                     }

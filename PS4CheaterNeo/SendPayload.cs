@@ -151,7 +151,6 @@ namespace PS4CheaterNeo
                 if ((VersionBox.Text ?? "") != "") Properties.Settings.Default.PS4FWVersion.Value = VersionBox.Text;
                 if ((IpBox.Text ?? "") != "") Properties.Settings.Default.PS4IP.Value = IpBox.Text;
                 if ((PortBox.Text ?? "") != "") Properties.Settings.Default.PS4Port.Value = Convert.ToUInt16(PortBox.Text);
-                Properties.Settings.Default.PS4DBGType.Value = (PS4DebugLibType)PS4DBGTypeComboBox.SelectedItem;
                 Properties.Settings.Default.Save();
             }
             catch (Exception ex)
@@ -163,5 +162,11 @@ namespace PS4CheaterNeo
         }
 
         private void VersionComboBox_SelectedIndexChanged(object sender, EventArgs e) => VersionBox.Text = (string)VersionComboBox.SelectedItem;
+
+        private void PS4DBGTypeComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            Properties.Settings.Default.PS4DBGType.Value = (PS4DebugLibType)PS4DBGTypeComboBox.SelectedItem;
+            Properties.Settings.Default.Save();
+        }
     }
 }

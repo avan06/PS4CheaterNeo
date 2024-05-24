@@ -142,6 +142,7 @@ namespace PS4CheaterNeo
             this.PS4DBGTypeComboBox.Name = "PS4DBGTypeComboBox";
             this.PS4DBGTypeComboBox.Size = new System.Drawing.Size(171, 20);
             this.PS4DBGTypeComboBox.TabIndex = 7;
+            this.PS4DBGTypeComboBox.SelectedIndexChanged += new System.EventHandler(this.PS4DBGTypeComboBox_SelectedIndexChanged);
             // 
             // SendPayload
             // 

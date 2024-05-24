@@ -72,6 +72,7 @@ namespace PS4CheaterNeo
             "4.55",
             "4.05",
             "PS5",
+            "11.00",
         };
 
         public static readonly Dictionary<string, Dictionary<string, object>> GameInfos = new Dictionary<string, Dictionary<string, object>>()
