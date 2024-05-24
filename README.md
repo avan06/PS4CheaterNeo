@@ -85,7 +85,7 @@ Currently in `version 1.0.3.0`
 ### Payload
 
 - `ps4debug` or `ps5debug` can be directly placed in the payloads folder, no longer needing to be placed in the specified path for the FW version. (1.0.1.2)
-- Now it also supports the `Frame4` version made by `DeathRGH`, with the same path placed in the payloads folder, applicable firmware versions are 5.05, 9.00, and 11.00. (1.0.3.0)
+- Now it also supports the `Frame4` version made by `DeathRGH`, with the same path placed in the payloads folder, applicable firmware versions are 5.05, 6.72, 9.00, and 11.00. (1.0.3.0)
 - You must manually place the downloaded payload in the `\Path\to\PS4CheaterNeo\payloads\` or `\Path\to\PS4CheaterNeo\payloads\\[FW version]\` folder.
 
 > ex. Paths without FW will be prioritized for loading.  
