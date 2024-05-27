@@ -100,10 +100,11 @@ Currently in `version 1.0.3.1`
 > [ps4debug 7.02 by ChendoChap](https://github.com/ChendoChap/ps4debug/tags)  
 > [ps4debug 7.55 by Joonie86](https://github.com/Joonie86/ps4debug/releases)  
 > [ps4debug 9.00 by Karo](https://twitter.com/i/web/status/1471590847707856905)  
-> [ps4debug all firmware (5.0X, 6.72, 7.02, 7.5X, 9.00) by ctn123](https://github.com/ctn123/PS4_Cheater/releases/)  
-> [ps5debug Coded by ctn123 & SiSTRo](https://github.com/GoldHEN/ps5debug/releases)  
+> [ps4debug by ctn123 (5.0X, 6.72, 7.02, 7.5X, 9.00)](https://github.com/ctn123/PS4_Cheater/releases/)  
+> [ps5debug by ctn123 & SiSTRo](https://github.com/GoldHEN/ps5debug/releases)  
+> [ps4debug by ctn123 & SiSTRo (5.05, 6.72, 7.02, 9.00, 11.00, etc.)](https://github.com/GoldHEN/ps4debug)  
 > [ps4debug 11.00 by Karo, requires launching from web online](https://x.com/karo_sharifi/status/1793323280557838386)  
-> [Frame4 for 5.05, 6.72, 9.00, and 11.00 firmware by DeathRGH.](https://github.com/DeathRGH/frame4)
+> [Frame4 by DeathRGH (5.05, 6.72, 7.02, 9.00, 11.00)](https://github.com/DeathRGH/frame4)  
 
 
 ## Cheat window	[🔼](#table-of-contents)
