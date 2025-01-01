@@ -50,7 +50,7 @@ Currently in `version 1.0.4`
       + [main window hotkey](#main-window-hotkey)
       + [query window hotkey](#query-window-hotkey)
       + [HexEditor window hotkey](#hexeditor-window-hotkey)
-      + [ExoprtImport](#exoprtimport)
+    + [ExoprtImport](#exoprtimport)
   * [Credits & Reference](#credits--reference)
 
 
