@@ -51,6 +51,18 @@ namespace PS4CheaterNeo
         public string ProcessName;
         public string ProcessContentid;
         public int ProcessPid;
+
+        bool KeyMain;
+        Keys KeyPerformOpen;
+        Keys KeyPerformSave;
+        Keys KeyOpenNewQuery;
+        Keys KeyOpenHexView;
+        Keys KeyOpenSettings;
+        Keys KeyPerformAdd;
+        Keys KeyPerformRefreshCheat;
+        Keys KeyCollapseExpandAll;
+        Keys KeySetLockEnable;
+        Keys KeySetAutoRefresh;
         public Main()
         {
             Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture; //Avoid the case where CurrentCulture.NumberFormatInfo.NumberDecimalSeparator is not "."
@@ -58,14 +70,7 @@ namespace PS4CheaterNeo
             InitializeComponent();
             ParseLanguageJson();
             ApplyUI();
-            ToolStripLockEnable.Checked = Properties.Settings.Default.CheatLock.Value;
-            ToolStripAutoRefresh.Checked = Properties.Settings.Default.CheatAutoRefresh.Value;
-            CheatAutoRefreshShowStatus = Properties.Settings.Default.CheatAutoRefreshShowStatus.Value;
-            AutoRefreshTimer.Interval = (int)Properties.Settings.Default.CheatAutoRefreshTimerInterval.Value;
-            VerifySectionWhenLock = Properties.Settings.Default.VerifySectionWhenLock.Value;
-            VerifySectionWhenRefresh = Properties.Settings.Default.VerifySectionWhenRefresh.Value;
-            CheatGridGroupRefreshThreshold = Properties.Settings.Default.CheatGridGroupRefreshThreshold.Value;
-            CheatGridView.GroupByEnabled = Properties.Settings.Default.CheatGridViewGroupByEnabled.Value;
+
 
             Text += " " + Application.ProductVersion; //Assembly.GetExecutingAssembly().GetName().Version.ToString(); // Assembly.GetEntryAssembly().GetName().Version.ToString();
             sectionTool = new SectionTool(this);
@@ -76,41 +81,31 @@ namespace PS4CheaterNeo
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
-            switch (keyData)
-            {
-                case Keys.Control | Keys.O:
-                    ToolStripOpen.PerformClick();
-                    break;
-                case Keys.Control | Keys.S:
-                    ToolStripSave.PerformClick();
-                    break;
-                case Keys.Control | Keys.Q:
-                    ToolStripNewQuery.PerformClick();
-                    break;
-                case Keys.Control | Keys.A:
-                    ToolStripAdd.PerformClick();
-                    break;
-                case Keys.Control | Keys.H:
-                    ToolStripHexView.PerformClick();
-                    break;
-                case Keys.Control | Keys.R:
-                    ToolStripRefreshCheat.PerformClick();
-                    break;
-                case Keys.Alt | Keys.E:
-                    CheatGridView.CollapseExpandAll();
-                    break;
-                case Keys.Alt | Keys.L:
-                    ToolStripLockEnable.PerformClick();
-                    break;
-                case Keys.Alt | Keys.R:
-                    ToolStripAutoRefresh.PerformClick();
-                    break;
-                case Keys.Alt | Keys.S:
-                    ToolStripSettings.PerformClick();
-                    break;
-                default:
-                    return base.ProcessCmdKey(ref msg, keyData);
-            }
+            if (!KeyMain) return base.ProcessCmdKey(ref msg, keyData);
+
+            if (keyData == KeyPerformOpen)
+                ToolStripOpen.PerformClick();
+            else if (keyData == KeyPerformSave)
+                ToolStripSave.PerformClick();
+            else if (keyData == KeyOpenNewQuery)
+                ToolStripNewQuery.PerformClick();
+            else if (keyData == KeyOpenHexView)
+                ToolStripHexView.PerformClick();
+            else if (keyData == KeyOpenSettings)
+                ToolStripSettings.PerformClick();
+            else if (keyData == KeyPerformAdd)
+                ToolStripAdd.PerformClick();
+            else if (keyData == KeyPerformRefreshCheat)
+                ToolStripRefreshCheat.PerformClick();
+            else if (keyData == KeyCollapseExpandAll)
+                CheatGridView.CollapseExpandAll();
+            else if (keyData == KeySetLockEnable)
+                ToolStripLockEnable.PerformClick();
+            else if (keyData == KeySetAutoRefresh)
+                ToolStripAutoRefresh.PerformClick();
+            else
+                return base.ProcessCmdKey(ref msg, keyData);
+
             return true;
         }
 
@@ -177,6 +172,27 @@ namespace PS4CheaterNeo
                 }
                 UIFont = Properties.Settings.Default.UIFont.Value;
                 Font = new Font(UIFont, Font.Size);
+
+                ToolStripLockEnable.Checked    = Properties.Settings.Default.CheatLock.Value;
+                ToolStripAutoRefresh.Checked   = Properties.Settings.Default.CheatAutoRefresh.Value;
+                CheatAutoRefreshShowStatus     = Properties.Settings.Default.CheatAutoRefreshShowStatus.Value;
+                AutoRefreshTimer.Interval      = (int)Properties.Settings.Default.CheatAutoRefreshTimerInterval.Value;
+                VerifySectionWhenLock          = Properties.Settings.Default.VerifySectionWhenLock.Value;
+                VerifySectionWhenRefresh       = Properties.Settings.Default.VerifySectionWhenRefresh.Value;
+                CheatGridGroupRefreshThreshold = Properties.Settings.Default.CheatGridGroupRefreshThreshold.Value;
+                CheatGridView.GroupByEnabled   = Properties.Settings.Default.CheatGridViewGroupByEnabled.Value;
+
+                KeyMain                = Properties.Settings.Default.KeyMain.Value;
+                KeyPerformOpen         = Properties.Settings.Default.KeyMainPerformOpen.Value;
+                KeyPerformSave         = Properties.Settings.Default.KeyMainPerformSave.Value;
+                KeyOpenNewQuery        = Properties.Settings.Default.KeyMainOpenNewQuery.Value;
+                KeyOpenHexView         = Properties.Settings.Default.KeyMainOpenHexView.Value;
+                KeyOpenSettings        = Properties.Settings.Default.KeyMainOpenSettings.Value;
+                KeyPerformAdd          = Properties.Settings.Default.KeyMainPerformAdd.Value;
+                KeyPerformRefreshCheat = Properties.Settings.Default.KeyMainPerformRefreshCheat.Value;
+                KeyCollapseExpandAll   = Properties.Settings.Default.KeyMainCheatGridViewCollapseExpandAll.Value;
+                KeySetLockEnable       = Properties.Settings.Default.KeyMainSetLockEnable.Value;
+                KeySetAutoRefresh      = Properties.Settings.Default.KeyMainSetAutoRefresh.Value;
             }
             catch (Exception ex)
             {

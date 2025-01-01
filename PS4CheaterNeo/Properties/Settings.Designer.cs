@@ -12,7 +12,7 @@ namespace PS4CheaterNeo.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.10.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.12.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -1051,6 +1051,437 @@ namespace PS4CheaterNeo.Properties {
             }
             set {
                 this["SendPayloadStatusStrip1BackColor"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True|6_Hot Key|1_Main|Determine whether to enable the hotkeys for the Main window" +
+            "")]
+        public global::OptionTreeView.Option<bool> KeyMain {
+            get {
+                return ((global::OptionTreeView.Option<bool>)(this["KeyMain"]));
+            }
+            set {
+                this["KeyMain"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Ctrl + O|6_Hot Key|1_Main|[Main] Perform open file")]
+        public global::OptionTreeView.Option<System.Windows.Forms.Keys> KeyMainPerformOpen {
+            get {
+                return ((global::OptionTreeView.Option<System.Windows.Forms.Keys>)(this["KeyMainPerformOpen"]));
+            }
+            set {
+                this["KeyMainPerformOpen"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Ctrl + S|6_Hot Key|1_Main|[Main] Perform save file")]
+        public global::OptionTreeView.Option<System.Windows.Forms.Keys> KeyMainPerformSave {
+            get {
+                return ((global::OptionTreeView.Option<System.Windows.Forms.Keys>)(this["KeyMainPerformSave"]));
+            }
+            set {
+                this["KeyMainPerformSave"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Ctrl + Q|6_Hot Key|1_Main|[Main] Open Query window")]
+        public global::OptionTreeView.Option<System.Windows.Forms.Keys> KeyMainOpenNewQuery {
+            get {
+                return ((global::OptionTreeView.Option<System.Windows.Forms.Keys>)(this["KeyMainOpenNewQuery"]));
+            }
+            set {
+                this["KeyMainOpenNewQuery"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Ctrl + H|6_Hot Key|1_Main|[Main] Open HexView window")]
+        public global::OptionTreeView.Option<System.Windows.Forms.Keys> KeyMainOpenHexView {
+            get {
+                return ((global::OptionTreeView.Option<System.Windows.Forms.Keys>)(this["KeyMainOpenHexView"]));
+            }
+            set {
+                this["KeyMainOpenHexView"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Alt + S|6_Hot Key|1_Main|[Main] Open Settings window")]
+        public global::OptionTreeView.Option<System.Windows.Forms.Keys> KeyMainOpenSettings {
+            get {
+                return ((global::OptionTreeView.Option<System.Windows.Forms.Keys>)(this["KeyMainOpenSettings"]));
+            }
+            set {
+                this["KeyMainOpenSettings"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Alt + A|6_Hot Key|1_Main|[Main] Perform add address")]
+        public global::OptionTreeView.Option<System.Windows.Forms.Keys> KeyMainPerformAdd {
+            get {
+                return ((global::OptionTreeView.Option<System.Windows.Forms.Keys>)(this["KeyMainPerformAdd"]));
+            }
+            set {
+                this["KeyMainPerformAdd"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Ctrl + R|6_Hot Key|1_Main|[Main] Perform refresh cheat list")]
+        public global::OptionTreeView.Option<System.Windows.Forms.Keys> KeyMainPerformRefreshCheat {
+            get {
+                return ((global::OptionTreeView.Option<System.Windows.Forms.Keys>)(this["KeyMainPerformRefreshCheat"]));
+            }
+            set {
+                this["KeyMainPerformRefreshCheat"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Alt + E|6_Hot Key|1_Main|[Main] Perform Collapse or ExpandAll in the CheatGridVie" +
+            "w, automatically determining the current status")]
+        public global::OptionTreeView.Option<System.Windows.Forms.Keys> KeyMainCheatGridViewCollapseExpandAll {
+            get {
+                return ((global::OptionTreeView.Option<System.Windows.Forms.Keys>)(this["KeyMainCheatGridViewCollapseExpandAll"]));
+            }
+            set {
+                this["KeyMainCheatGridViewCollapseExpandAll"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Alt + L|6_Hot Key|1_Main|[Main] Set LockEnable to enable or disable, depending on" +
+            " the current button activation status")]
+        public global::OptionTreeView.Option<System.Windows.Forms.Keys> KeyMainSetLockEnable {
+            get {
+                return ((global::OptionTreeView.Option<System.Windows.Forms.Keys>)(this["KeyMainSetLockEnable"]));
+            }
+            set {
+                this["KeyMainSetLockEnable"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Alt + R|6_Hot Key|1_Main|[Main] Set AutoRefresh to enable or disable, depending o" +
+            "n the current button activation status")]
+        public global::OptionTreeView.Option<System.Windows.Forms.Keys> KeyMainSetAutoRefresh {
+            get {
+                return ((global::OptionTreeView.Option<System.Windows.Forms.Keys>)(this["KeyMainSetAutoRefresh"]));
+            }
+            set {
+                this["KeyMainSetAutoRefresh"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True|6_Hot Key|2_Query|Determine whether to enable the hotkeys for the Query wind" +
+            "ow")]
+        public global::OptionTreeView.Option<bool> KeyQuery {
+            get {
+                return ((global::OptionTreeView.Option<bool>)(this["KeyQuery"]));
+            }
+            set {
+                this["KeyQuery"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Ctrl + G|6_Hot Key|2_Query|[Query] Perform get processes(retrieve all program lis" +
+            "ts again)")]
+        public global::OptionTreeView.Option<System.Windows.Forms.Keys> KeyQueryPerformGetProcessesBtn {
+            get {
+                return ((global::OptionTreeView.Option<System.Windows.Forms.Keys>)(this["KeyQueryPerformGetProcessesBtn"]));
+            }
+            set {
+                this["KeyQueryPerformGetProcessesBtn"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Ctrl + P|6_Hot Key|2_Query|[Query] Perform pause or resume. If the current status" +
+            " is paused, execute resume; otherwise, do the opposite")]
+        public global::OptionTreeView.Option<System.Windows.Forms.Keys> KeyQueryPerformPauseResume {
+            get {
+                return ((global::OptionTreeView.Option<System.Windows.Forms.Keys>)(this["KeyQueryPerformPauseResume"]));
+            }
+            set {
+                this["KeyQueryPerformPauseResume"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Alt + S|6_Hot Key|2_Query|[Query] Perform the first or next scan")]
+        public global::OptionTreeView.Option<System.Windows.Forms.Keys> KeyQueryPerformScanBtn {
+            get {
+                return ((global::OptionTreeView.Option<System.Windows.Forms.Keys>)(this["KeyQueryPerformScanBtn"]));
+            }
+            set {
+                this["KeyQueryPerformScanBtn"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Alt + U|6_Hot Key|2_Query|[Query] Perform undo scan")]
+        public global::OptionTreeView.Option<System.Windows.Forms.Keys> KeyQueryPerformUndoBtn {
+            get {
+                return ((global::OptionTreeView.Option<System.Windows.Forms.Keys>)(this["KeyQueryPerformUndoBtn"]));
+            }
+            set {
+                this["KeyQueryPerformUndoBtn"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Alt + R|6_Hot Key|2_Query|[Query] Perform redo scan")]
+        public global::OptionTreeView.Option<System.Windows.Forms.Keys> KeyQueryPerformRedoBtn {
+            get {
+                return ((global::OptionTreeView.Option<System.Windows.Forms.Keys>)(this["KeyQueryPerformRedoBtn"]));
+            }
+            set {
+                this["KeyQueryPerformRedoBtn"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Ctrl + R|6_Hot Key|2_Query|[Query] Perform refresh result list")]
+        public global::OptionTreeView.Option<System.Windows.Forms.Keys> KeyQueryPerformRefreshBtn {
+            get {
+                return ((global::OptionTreeView.Option<System.Windows.Forms.Keys>)(this["KeyQueryPerformRefreshBtn"]));
+            }
+            set {
+                this["KeyQueryPerformRefreshBtn"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Ctrl + N|6_Hot Key|2_Query|[Query] Create a new scan, clearing the current scan r" +
+            "esults")]
+        public global::OptionTreeView.Option<System.Windows.Forms.Keys> KeyQueryPerformNewBtn {
+            get {
+                return ((global::OptionTreeView.Option<System.Windows.Forms.Keys>)(this["KeyQueryPerformNewBtn"]));
+            }
+            set {
+                this["KeyQueryPerformNewBtn"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Alt + C|6_Hot Key|2_Query|[Query] Clone the current scan results into a new Query" +
+            " window")]
+        public global::OptionTreeView.Option<System.Windows.Forms.Keys> KeyQueryPerformCloneScanBtn {
+            get {
+                return ((global::OptionTreeView.Option<System.Windows.Forms.Keys>)(this["KeyQueryPerformCloneScanBtn"]));
+            }
+            set {
+                this["KeyQueryPerformCloneScanBtn"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Ctrl + Left|6_Hot Key|2_Query|[Query] Collapse the left Split panel")]
+        public global::OptionTreeView.Option<System.Windows.Forms.Keys> KeyQueryCollapseLeftSplitPanel {
+            get {
+                return ((global::OptionTreeView.Option<System.Windows.Forms.Keys>)(this["KeyQueryCollapseLeftSplitPanel"]));
+            }
+            set {
+                this["KeyQueryCollapseLeftSplitPanel"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Ctrl + Right|6_Hot Key|2_Query|[Query] Expand the left Split panel")]
+        public global::OptionTreeView.Option<System.Windows.Forms.Keys> KeyQueryExpandLeftSplitPanel {
+            get {
+                return ((global::OptionTreeView.Option<System.Windows.Forms.Keys>)(this["KeyQueryExpandLeftSplitPanel"]));
+            }
+            set {
+                this["KeyQueryExpandLeftSplitPanel"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Ctrl + Up|6_Hot Key|2_Query|[Query] Collapse the upper right Split panel")]
+        public global::OptionTreeView.Option<System.Windows.Forms.Keys> KeyQueryCollapseUpperRightSplitPanel {
+            get {
+                return ((global::OptionTreeView.Option<System.Windows.Forms.Keys>)(this["KeyQueryCollapseUpperRightSplitPanel"]));
+            }
+            set {
+                this["KeyQueryCollapseUpperRightSplitPanel"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Ctrl + Down|6_Hot Key|2_Query|[Query] Expand the upper right Split panel")]
+        public global::OptionTreeView.Option<System.Windows.Forms.Keys> KeyQueryExpandUpperRightSplitPanel {
+            get {
+                return ((global::OptionTreeView.Option<System.Windows.Forms.Keys>)(this["KeyQueryExpandUpperRightSplitPanel"]));
+            }
+            set {
+                this["KeyQueryExpandUpperRightSplitPanel"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True|6_Hot Key|3_HexEditor|Determine whether to enable the hotkeys for the HexEdi" +
+            "tor window")]
+        public global::OptionTreeView.Option<bool> KeyHexEditor {
+            get {
+                return ((global::OptionTreeView.Option<bool>)(this["KeyHexEditor"]));
+            }
+            set {
+                this["KeyHexEditor"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Ctrl + P|6_Hot Key|3_HexEditor|[HexEditor] Go to Previous Page")]
+        public global::OptionTreeView.Option<System.Windows.Forms.Keys> KeyHexEditorGoPreviousBtn {
+            get {
+                return ((global::OptionTreeView.Option<System.Windows.Forms.Keys>)(this["KeyHexEditorGoPreviousBtn"]));
+            }
+            set {
+                this["KeyHexEditorGoPreviousBtn"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Ctrl + N|6_Hot Key|3_HexEditor|[HexEditor] Go to Next Page")]
+        public global::OptionTreeView.Option<System.Windows.Forms.Keys> KeyHexEditorGoNextBtn {
+            get {
+                return ((global::OptionTreeView.Option<System.Windows.Forms.Keys>)(this["KeyHexEditorGoNextBtn"]));
+            }
+            set {
+                this["KeyHexEditorGoNextBtn"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Ctrl + R|6_Hot Key|3_HexEditor|[HexEditor] Refresh HexBox")]
+        public global::OptionTreeView.Option<System.Windows.Forms.Keys> KeyHexEditorPerformRefreshBtn {
+            get {
+                return ((global::OptionTreeView.Option<System.Windows.Forms.Keys>)(this["KeyHexEditorPerformRefreshBtn"]));
+            }
+            set {
+                this["KeyHexEditorPerformRefreshBtn"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Ctrl + S|6_Hot Key|3_HexEditor|[HexEditor] Write Modifications to PS4")]
+        public global::OptionTreeView.Option<System.Windows.Forms.Keys> KeyHexEditorPerformCommitBtn {
+            get {
+                return ((global::OptionTreeView.Option<System.Windows.Forms.Keys>)(this["KeyHexEditorPerformCommitBtn"]));
+            }
+            set {
+                this["KeyHexEditorPerformCommitBtn"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Alt + A|6_Hot Key|3_HexEditor|[HexEditor] Add to Cheat Grid")]
+        public global::OptionTreeView.Option<System.Windows.Forms.Keys> KeyHexEditorPerformAddToCheatGridBtn {
+            get {
+                return ((global::OptionTreeView.Option<System.Windows.Forms.Keys>)(this["KeyHexEditorPerformAddToCheatGridBtn"]));
+            }
+            set {
+                this["KeyHexEditorPerformAddToCheatGridBtn"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("F3|6_Hot Key|3_HexEditor|[HexEditor] Perform Find, forward or backward depending " +
+            "on whether \"Forward\" is checked")]
+        public global::OptionTreeView.Option<System.Windows.Forms.Keys> KeyHexEditorPerformFindBtn {
+            get {
+                return ((global::OptionTreeView.Option<System.Windows.Forms.Keys>)(this["KeyHexEditorPerformFindBtn"]));
+            }
+            set {
+                this["KeyHexEditorPerformFindBtn"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Ctrl + Left|6_Hot Key|3_HexEditor|[HexEditor] Collapse the left Split panel")]
+        public global::OptionTreeView.Option<System.Windows.Forms.Keys> KeyHexEditorCollapseLeftSplitPanel {
+            get {
+                return ((global::OptionTreeView.Option<System.Windows.Forms.Keys>)(this["KeyHexEditorCollapseLeftSplitPanel"]));
+            }
+            set {
+                this["KeyHexEditorCollapseLeftSplitPanel"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Ctrl + Right|6_Hot Key|3_HexEditor|[HexEditor] Expand the left Split panel")]
+        public global::OptionTreeView.Option<System.Windows.Forms.Keys> KeyHexEditorExpandLeftSplitPanel {
+            get {
+                return ((global::OptionTreeView.Option<System.Windows.Forms.Keys>)(this["KeyHexEditorExpandLeftSplitPanel"]));
+            }
+            set {
+                this["KeyHexEditorExpandLeftSplitPanel"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Ctrl + Up|6_Hot Key|3_HexEditor|[HexEditor] Collapse the upper right Split panel")]
+        public global::OptionTreeView.Option<System.Windows.Forms.Keys> KeyHexEditorCollapseUpperRightSplitPanel {
+            get {
+                return ((global::OptionTreeView.Option<System.Windows.Forms.Keys>)(this["KeyHexEditorCollapseUpperRightSplitPanel"]));
+            }
+            set {
+                this["KeyHexEditorCollapseUpperRightSplitPanel"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Ctrl + Down|6_Hot Key|3_HexEditor|[HexEditor] Expand the upper right Split panel")]
+        public global::OptionTreeView.Option<System.Windows.Forms.Keys> KeyHexEditorExpandUpperRightSplitPanel {
+            get {
+                return ((global::OptionTreeView.Option<System.Windows.Forms.Keys>)(this["KeyHexEditorExpandUpperRightSplitPanel"]));
+            }
+            set {
+                this["KeyHexEditorExpandUpperRightSplitPanel"] = value;
             }
         }
     }

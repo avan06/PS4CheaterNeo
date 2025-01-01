@@ -2,7 +2,7 @@
 
 PS4CheaterNeo is a program to find game cheat codes, and it is based on [`ps4debug`](https://github.com/jogolden/ps4debug) and [`.Net Framework 4.8`](https://support.microsoft.com/en-us/topic/microsoft-net-framework-4-8-offline-installer-for-windows-9d23f658-3b97-68ab-d013-aa3c3e7495e0).
 
-Currently in `version 1.0.3.1`
+Currently in `version 1.0.4`
 
 
 ## Table of Contents
@@ -40,17 +40,17 @@ Currently in `version 1.0.3.1`
   * [Pointer finder](#pointer-finder)
   * [Section](#section)
     + [Section ID](#section-id)
-  * [Hotkey](#hotkey)
-    + [main window hotkey](#main-window-hotkey)
-    + [query window hotkey](#query-window-hotkey)
-    + [HexEditor window hotkey](#hexeditor-window-hotkey)
   * [Option](#option)
     + [General](#general)
     + [Cheat](#cheat)
     + [Query](#query)
     + [HexEditor](#hexeditor)
     + [UI](#ui)
-    + [ExoprtImport](#exoprtimport)
+    + [Hotkey](#hotkey)
+      + [main window hotkey](#main-window-hotkey)
+      + [query window hotkey](#query-window-hotkey)
+      + [HexEditor window hotkey](#hexeditor-window-hotkey)
+      + [ExoprtImport](#exoprtimport)
   * [Credits & Reference](#credits--reference)
 
 
@@ -95,16 +95,19 @@ Currently in `version 1.0.3.1`
 
 - It can be downloaded at the following URL(`Only ps4debug 6.72 and ctn123 version has been tested`).
 
+> [ps5debug by ctn123 & SiSTRo](https://github.com/GoldHEN/ps5debug/releases)  
+> [ps4debug by ctn123 & SiSTRo (5.05, 6.72, 7.02, 9.00, 11.00, etc.)](https://github.com/GoldHEN/ps4debug)  
+> [Frame4 by DeathRGH (5.05, 6.72, 7.02, 9.00, 11.00)](https://github.com/DeathRGH/frame4)  
+
+> [legacy]  
 > [ps4debug 5.05 by jogolden](https://github.com/jogolden/ps4debug/releases)  
 > [ps4debug 6.72 by GiantPluto](https://github.com/GiantPluto/ps4debug/releases)  
 > [ps4debug 7.02 by ChendoChap](https://github.com/ChendoChap/ps4debug/tags)  
 > [ps4debug 7.55 by Joonie86](https://github.com/Joonie86/ps4debug/releases)  
 > [ps4debug 9.00 by Karo](https://twitter.com/i/web/status/1471590847707856905)  
 > [ps4debug by ctn123 (5.0X, 6.72, 7.02, 7.5X, 9.00)](https://github.com/ctn123/PS4_Cheater/releases/)  
-> [ps5debug by ctn123 & SiSTRo](https://github.com/GoldHEN/ps5debug/releases)  
-> [ps4debug by ctn123 & SiSTRo (5.05, 6.72, 7.02, 9.00, 11.00, etc.)](https://github.com/GoldHEN/ps4debug)  
 > [ps4debug 11.00 by Karo, requires launching from web online](https://x.com/karo_sharifi/status/1793323280557838386)  
-> [Frame4 by DeathRGH (5.05, 6.72, 7.02, 9.00, 11.00)](https://github.com/DeathRGH/frame4)  
+
 
 
 ## Cheat window	[🔼](#table-of-contents)
@@ -534,88 +537,13 @@ AddrStart　　Prot　count　　　SIDv1　　　　　SID
 ```
 
 
-## Hotkey	[🔼](#table-of-contents)
-
-- Currently, the hotkeys are hardcoded in the program...(1.0.2.9)  
-
-### main window hotkey  
-- Control + O  
-Perform open file  
-- Control + S  
-Perform save file  
-- Control + Q  
-Open Query window  
-- Control + H  
-Open HexView window  
-- Alt + S  
-Open Settings window
-- Control + A  
-Perform add address  
-- Control + R  
-Perform refresh cheat list  
-- Alt + E  
-Perform Collapse or ExpandAll in the CheatGridView, automatically determining the current status  
-- Alt + L  
-Set LockEnable to enable or disable, depending on the current button activation status  
-- Alt + R  
-Set AutoRefresh to enable or disable, depending on the current button activation status  
-
-### query window hotkey  
-- Control + G  
-Perform get processes(retrieve all program lists again)  
-- Control + P  
-Perform pause or resume. If the current status is paused, execute resume; otherwise, do the opposite  
-- Alt + S  
-Perform the first or next scan  
-- Alt + U  
-Perform undo scan  
-- Alt + R  
-Perform redo scan  
-- Control + R  
-Perform refresh result list  
-- Control + N  
-Create a new scan, clearing the current scan results  
-- Alt + C  
-Clone the current scan results into a new Query window  
-- Control + Left:
-Collapse the left Split panel  
-- Control + Right:
-Expand the left Split panel  
-- Control + Up:
-Collapse the upper right Split panel  
-- Control + Down:
-Expand the upper right Split panel  
-
-### HexEditor window hotkey  
-- Control + P  
-Go to Previous Page  
-- Control + N  
-Go to Next Page  
-- Control + R  
-Refresh HexBox  
-- Control + S  
-Write Modifications to PS4  
-- Control + A  
-Add to Cheat Grid  
-- F3  
-Perform Find, forward or backward depending on whether "Forward" is checked  
-- Control + Left:
-Collapse the left Split panel  
-- Control + Right:
-Expand the left Split panel  
-- Control + Up:
-Collapse the upper right Split panel  
-- Control + Down:
-Expand the upper right Split panel  
-
-
 ## Option	[🔼](#table-of-contents)
 
 - Added option window, you can adjust some program settings. (0.9.4.0)  
 - Added support for light theme now, In the UI of the option window, you can choose the theme as dark or light. (0.9.7.8)  
 - Added support for export, import, restore settings feature in Option. (0.9.7.10)  
 
-### General  
+### General	[🔼](#table-of-contents)  
 - `PS4IP`:  
 Enter PS4 IP location.  
 - `PS4Port`:  
@@ -641,7 +569,7 @@ It is not recommended to adjust this value, and changes take effect only after a
 - `DisplayChangesListWhenSaving`:  
 Determines whether to display the list of change options when saving in Option windows. `Default enabled`. (1.0.1.3)  
 
-### Cheat  
+### Cheat	[🔼](#table-of-contents)  
 - `CheatLock`:  
 Determines whether to `enable cheat lock` in the `main` window. `Default enabled`. (0.9.7.3)  
 - `CheatCellDirtyValueCommit`:  
@@ -657,7 +585,7 @@ Determines whether to display its execution status in the main window when Cheat
 - `CheatAutoRefreshTimerInterval`:  
 Determines the Interval of AutoRefreshTimer when AutoRefresh is enabled, in milliseconds. `Default 2500`. (0.9.9.2)  
 
-### Query  
+### Query	[🔼](#table-of-contents)  
 - `AutoPerformGetProcesses`:  
 Determine whether to enable automatic perform get processes when opening the Query window, `Default enabled`. (0.9.4.1)  
 - `DefaultProcess`:  
@@ -707,7 +635,7 @@ Determine whether to enable the starting address of the Hidden Section to be the
 - `WriteHiddenSectionConf`:  
 Determine whether to enable writing detected hidden section configurations to the "`path to PS4CheaterNeo\sections\[GAME_ID].conf`" path. This option must be enabled when using the "`SCAN for Hidden Sections`" query window scan type. Note: Enabling this option will result in longer startup times for the Query window as it queries [GAME_ID] information every time the program starts. `Default disabled`. (0.9.9.10)  
 
-### HexEditor  
+### HexEditor	[🔼](#table-of-contents)  
 - `AutoRefresh`:  
 Determines whether to enable `Auto Refresh` in HexEditor. `Default disabled`. (0.9.7.3)  
 - `AutoRefreshTimerInterval`:  
@@ -721,7 +649,7 @@ Determines whether to enable the input format for searching as Hex in the HexEdi
 - `UsingLittleEndian`:  
 Determines whether to enable using LittleEndian endianness, when the input format for the search is Hex, in the HexEditor window, if this option is not checked, it will use BigEndian. Note: When LittleEndian is enabled, regardless of input length, the input Hex values will be completely reversed (using Array.Reverse). `Default disabled`. (0.9.9.0)  
 
-### UI  
+### UI	[🔼](#table-of-contents)  
 - `ColorTheme`:  
 Determine color theme.  
 - `UiForeColor`:  
@@ -785,7 +713,86 @@ Determine the PointerFinder ScanBtn background color.
 - `SendPayloadStatusStrip1BackColor`:  
 Determine the SendPayload statusStrip1 background color.  
 
-### ExoprtImport  
+### Hotkey	[🔼](#table-of-contents)
+- The hotkey values added in version 1.0.2.9 can now be modified in the Options window, and you can determine whether to enable them.(1.0.4)  
+
+### main window hotkey  
+- `KeyMain`:  
+Determine whether to enable the hotkeys for the Main window.
+- `KeyMainPerformOpen`:  
+Perform open file, `Default Ctrl + O`  
+- `KeyMainPerformSave`:  
+Perform save file, `Default Ctrl + S`  
+- `KeyMainOpenNewQuery`:  
+Open Query window, `Default Ctrl + Q`  
+- `KeyMainOpenHexView`:  
+Open HexView window, `Default Ctrl + H`  
+- `KeyMainOpenSettings`:  
+Open Settings window, `Default Alt + S`  
+- `KeyMainPerformAdd`:  
+Perform add address, `Default Alt + A`  
+- `KeyMainPerformRefreshCheat`:  
+Perform refresh cheat list, `Default Ctrl + R`  
+- `KeyMainCheatGridViewCollapseExpandAll`:  
+Perform Collapse or ExpandAll in the CheatGridView, automatically determining the current status, `Default Alt + E`  
+- `KeyMainSetLockEnable`:  
+Set LockEnable to enable or disable, depending on the current button activation status, `Default Alt + L`  
+- `KeyMainSetAutoRefresh`:  
+Set AutoRefresh to enable or disable, depending on the current button activation status, `Default Alt + R`  
+
+### query window hotkey  
+- `KeyQuery`:  
+Determine whether to enable the hotkeys for the Query window.
+- `KeyQueryPerformGetProcessesBtn`:  
+Perform get processes(retrieve all program lists again), `Default Ctrl + G`  
+- `KeyQueryPerformPauseResume`:  
+Perform pause or resume. If the current status is paused, execute resume; otherwise, do the opposite, `Default Ctrl + P`  
+- `KeyQueryPerformScanBtn`:  
+Perform the first or next scan, `Default Alt + S`  
+- `KeyQueryPerformUndoBtn`:  
+Perform undo scan, `Default Alt + U`  
+- `KeyQueryPerformRedoBtn`:  
+Perform redo scan, `Default Alt + R`  
+- `KeyQueryPerformRefreshBtn`:  
+Perform refresh result list, `Default Ctrl + R`  
+- `KeyQueryPerformNewBtn`:  
+Create a new scan, clearing the current scan results, `Default Ctrl + N`  
+- `KeyQueryPerformCloneScanBtn`:  
+Clone the current scan results into a new Query window, `Default Alt + C`  
+- `KeyQueryCollapseLeftSplitPanel`:  
+Collapse the left Split panel, `Default Ctrl + Left`  
+- `KeyQueryExpandLeftSplitPanel`:  
+Expand the left Split panel, `Default Ctrl + Right`  
+- `KeyQueryCollapseUpperRightSplitPanel`:  
+Collapse the upper right Split panel, `Default Ctrl + Up`  
+- `KeyQueryExpandUpperRightSplitPanel`:  
+Expand the upper right Split panel, `Default Ctrl + Down`  
+
+### HexEditor window hotkey  
+- `KeyHexEditor`:  
+Determine whether to enable the hotkeys for the HexEditor window.
+- `KeyHexEditorGoPreviousBtn`:  
+Go to Previous Page  , `Default Ctrl + P`  
+- `KeyHexEditorGoNextBtn`:  
+Go to Next Page, `Default Ctrl + N`  
+- `KeyHexEditorPerformRefreshBtn`:  
+Refresh HexBox, `Default Ctrl + R`  
+- `KeyHexEditorPerformCommitBtn`:  
+Write Modifications to PS4  , `Default Ctrl + S`  
+- `KeyHexEditorPerformAddToCheatGridBtn`:  
+Add to Cheat Grid, `Default Alt + A`  
+- `KeyHexEditorPerformFindBtn`:  
+Perform Find, forward or backward depending on whether "Forward" is checked  , `Default F3`  
+- `KeyHexEditorCollapseLeftSplitPanel`:  
+Collapse the left Split panel, `Default Ctrl + Left`  
+- `KeyHexEditorExpandLeftSplitPanel`:  
+Expand the left Split panel, `Default Ctrl + Right`  
+- `KeyHexEditorCollapseUpperRightSplitPanel`:  
+Collapse the upper right Split panel, `Default Ctrl + Up`  
+- `KeyHexEditorExpandUpperRightSplitPanel`:  
+Expand the upper right Split panel, `Default Ctrl + Down`  
+
+### ExoprtImport	[🔼](#table-of-contents)  
 - `Export`:  
 Export now.  
 - `Import`:  
@@ -814,4 +821,6 @@ Restore default.
 [GoldHEN_Cheat_Repository](https://github.com/GoldHEN/GoldHEN_Cheat_Repository)  
 [Reaper-Software-Suite](https://github.com/ScriptSK/Reaper-Software-Suite)  
 [save-decrypters](https://github.com/bucanero/save-decrypters)  
-[DeathRGH/frame4](https://github.com/DeathRGH/frame4)
+[DeathRGH/frame4](https://github.com/DeathRGH/frame4)  
+[ps5debug by ctn123 & SiSTRo](https://github.com/GoldHEN/ps5debug/releases)  
+[ps4debug by ctn123 & SiSTRo](https://github.com/GoldHEN/ps4debug)  

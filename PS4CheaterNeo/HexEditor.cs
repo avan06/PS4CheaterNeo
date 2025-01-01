@@ -35,6 +35,18 @@ namespace PS4CheaterNeo
         private readonly MutexSecurity mSec;
         private readonly Mutex mutex;
 
+        bool KeyHexEditor;
+        Keys KeyGoPreviousBtn;
+        Keys KeyGoNextBtn;
+        Keys KeyPerformRefreshBtn;
+        Keys KeyPerformCommitBtn;
+        Keys KeyPerformAddToCheatGridBtn;
+        Keys KeyPerformFindBtn;
+        Keys KeyCollapseLeftSplitPanel;
+        Keys KeyExpandLeftSplitPanel;
+        Keys KeyCollapseUpperRightSplitPanel;
+        Keys KeyExpandUpperRightSplitPanel;
+
         private HexEditor(Main mainForm)
         {
             this.Font = mainForm.Font;
@@ -81,10 +93,7 @@ namespace PS4CheaterNeo
             for (int idx = 0; idx <= 0x10; idx++) HexViewMenuGroupSize.Items.Add("GroupSize:" + idx);
             HexViewMenuGroupSize.SelectedIndex = HexView.GroupSize;
 
-            AutoRefreshBox.Checked = Properties.Settings.Default.AutoRefresh.Value;
-            AutoRefreshTimer.Interval = (int)Properties.Settings.Default.AutoRefreshTimerInterval.Value;
-            HexBox.Checked = Properties.Settings.Default.InputIsHexFormat.Value;
-            LittleEndianBox.Checked = Properties.Settings.Default.UsingLittleEndian.Value;
+
         }
 
         public HexEditor(Main mainForm, SectionTool sectionTool, Section section, int baseAddr) : this(mainForm)
@@ -106,41 +115,31 @@ namespace PS4CheaterNeo
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
-            switch (keyData)
-            {
-                case Keys.Control | Keys.P:
-                    PreviousBtn.PerformClick();
-                    break;
-                case Keys.Control | Keys.N:
-                    NextBtn.PerformClick();
-                    break;
-                case Keys.Control | Keys.R:
-                    RefreshBtn.PerformClick();
-                    break;
-                case Keys.Control | Keys.S:
-                    CommitBtn.PerformClick();
-                    break;
-                case Keys.Control | Keys.A:
-                    AddToCheatGridBtn.PerformClick();
-                    break;
-                case Keys.F3:
-                    FindBtn.PerformClick();
-                    break;
-                case Keys.Control | Keys.Left:
-                    SplitContainer1.SplitterPanelCollapseExpand(true);
-                    break;
-                case Keys.Control | Keys.Right:
-                    SplitContainer1.SplitterPanelCollapseExpand(false);
-                    break;
-                case Keys.Control | Keys.Up:
-                    SplitContainer2.SplitterPanelCollapseExpand(true);
-                    break;
-                case Keys.Control | Keys.Down:
-                    SplitContainer2.SplitterPanelCollapseExpand(false);
-                    break;
-                default:
-                    return base.ProcessCmdKey(ref msg, keyData);
-            }
+            if (!KeyHexEditor) return base.ProcessCmdKey(ref msg, keyData);
+
+            if (keyData == KeyGoPreviousBtn)
+                PreviousBtn.PerformClick();
+            else if (keyData == KeyGoNextBtn)
+                NextBtn.PerformClick();
+            else if (keyData == KeyPerformRefreshBtn)
+                RefreshBtn.PerformClick();
+            else if (keyData == KeyPerformCommitBtn)
+                CommitBtn.PerformClick();
+            else if (keyData == KeyPerformAddToCheatGridBtn)
+                AddToCheatGridBtn.PerformClick();
+            else if (keyData == KeyPerformFindBtn)
+                FindBtn.PerformClick();
+            else if (keyData == KeyCollapseLeftSplitPanel)
+                SplitContainer1.SplitterPanelCollapseExpand(true);
+            else if (keyData == KeyExpandLeftSplitPanel)
+                SplitContainer1.SplitterPanelCollapseExpand(false);
+            else if (keyData == KeyCollapseUpperRightSplitPanel)
+                SplitContainer2.SplitterPanelCollapseExpand(true);
+            else if (keyData == KeyExpandUpperRightSplitPanel)
+                SplitContainer2.SplitterPanelCollapseExpand(false);
+            else
+                return base.ProcessCmdKey(ref msg, keyData);
+
             return true;
         }
 
@@ -195,6 +194,23 @@ namespace PS4CheaterNeo
                     HexViewMenuJumpToAddress.Text = langJson.HexEditorForm.HexViewMenuJumpToAddress;
                     HexViewMenuJumpToOffset.Text = langJson.HexEditorForm.HexViewMenuJumpToOffset;
                 }
+
+                AutoRefreshBox.Checked    = Properties.Settings.Default.AutoRefresh.Value;
+                AutoRefreshTimer.Interval = (int)Properties.Settings.Default.AutoRefreshTimerInterval.Value;
+                HexBox.Checked            = Properties.Settings.Default.InputIsHexFormat.Value;
+                LittleEndianBox.Checked   = Properties.Settings.Default.UsingLittleEndian.Value;
+
+                KeyHexEditor                    = Properties.Settings.Default.KeyHexEditor.Value;
+                KeyGoPreviousBtn                = Properties.Settings.Default.KeyHexEditorGoPreviousBtn.Value;
+                KeyGoNextBtn                    = Properties.Settings.Default.KeyHexEditorGoNextBtn.Value;
+                KeyPerformRefreshBtn            = Properties.Settings.Default.KeyHexEditorPerformRefreshBtn.Value;
+                KeyPerformCommitBtn             = Properties.Settings.Default.KeyHexEditorPerformCommitBtn.Value;
+                KeyPerformAddToCheatGridBtn     = Properties.Settings.Default.KeyHexEditorPerformAddToCheatGridBtn.Value;
+                KeyPerformFindBtn               = Properties.Settings.Default.KeyHexEditorPerformFindBtn.Value;
+                KeyCollapseLeftSplitPanel       = Properties.Settings.Default.KeyHexEditorCollapseLeftSplitPanel.Value;
+                KeyExpandLeftSplitPanel         = Properties.Settings.Default.KeyHexEditorExpandLeftSplitPanel.Value;
+                KeyCollapseUpperRightSplitPanel = Properties.Settings.Default.KeyHexEditorCollapseUpperRightSplitPanel.Value;
+                KeyExpandUpperRightSplitPanel   = Properties.Settings.Default.KeyHexEditorExpandUpperRightSplitPanel.Value;
             }
             catch (Exception ex)
             {

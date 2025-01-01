@@ -39,6 +39,20 @@ namespace PS4CheaterNeo
         int bitsDictDictsIdx = 0;
         List<Dictionary<uint, BitsDictionary>> bitsDictDicts = new List<Dictionary<uint, BitsDictionary>>();
 
+        bool KeyQuery;
+        Keys KeyPerformGetProcessesBtn;
+        Keys KeyPerformPauseResume;
+        Keys KeyPerformScanBtn;
+        Keys KeyPerformUndoBtn;
+        Keys KeyPerformRedoBtn;
+        Keys KeyPerformRefreshBtn;
+        Keys KeyPerformNewBtn;
+        Keys KeyPerformCloneScanBtn;
+        Keys KeyCollapseLeftSplitPanel;
+        Keys KeyExpandLeftSplitPanel;
+        Keys KeyCollapseUpperRightSplitPanel;
+        Keys KeyExpandUpperRightSplitPanel;
+
         public Query(Main mainForm)
         {
             this.Font = mainForm.Font;
@@ -58,12 +72,7 @@ namespace PS4CheaterNeo
             this.mainForm = mainForm;
 
             sectionTool = new SectionTool(mainForm);
-            IsFilterBox.Checked       = Properties.Settings.Default.FilterQuery.Value;
-            IsFilterSizeBox.Checked   = Properties.Settings.Default.FilterSizeQuery.Value;
-            enableUndoScan            = Properties.Settings.Default.UndoScan.Value;
-            AutoPauseBox.Checked      = Properties.Settings.Default.ScanAutoPause.Value;
-            AutoResumeBox.Checked     = Properties.Settings.Default.ScanAutoResume.Value;
-            SectionView.FullRowSelect = Properties.Settings.Default.SectionViewFullRowSelect.Value;
+            enableUndoScan = Properties.Settings.Default.UndoScan.Value;
         }
 
         public Query(Main mainForm, ComparerTool comparerTool = null, int bitsDictDictsIdx = 0, List<Dictionary<uint, BitsDictionary>> bitsDictDicts = null) : this(mainForm)
@@ -78,47 +87,35 @@ namespace PS4CheaterNeo
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
-            switch (keyData)
-            {
-                case Keys.Control | Keys.G:
-                    GetProcessesBtn.PerformClick();
-                    break;
-                case Keys.Control | Keys.P:
-                    PauseResume();
-                    break;
-                case Keys.Alt | Keys.S:
-                    ScanBtn.PerformClick();
-                    break;
-                case Keys.Alt | Keys.U:
-                    UndoBtn.PerformClick();
-                    break;
-                case Keys.Alt | Keys.R:
-                    RedoBtn.PerformClick();
-                    break;
-                case Keys.Control | Keys.R:
-                    RefreshBtn.PerformClick();
-                    break;
-                case Keys.Control | Keys.N:
-                    NewBtn.PerformClick();
-                    break;
-                case Keys.Alt | Keys.C:
-                    CloneScanBtn.PerformClick();
-                    break;
-                case Keys.Control | Keys.Left:
-                    SplitContainer1.SplitterPanelCollapseExpand(true);
-                    break;
-                case Keys.Control | Keys.Right:
-                    SplitContainer1.SplitterPanelCollapseExpand(false);
-                    break;
-                case Keys.Control | Keys.Up:
-                    SplitContainer2.SplitterPanelCollapseExpand(true);
-                    break;
-                case Keys.Control | Keys.Down:
-                    SplitContainer2.SplitterPanelCollapseExpand(false);
-                    break;
-                default:
-                    return base.ProcessCmdKey(ref msg, keyData);
-            }
+            if (!KeyQuery) return base.ProcessCmdKey(ref msg, keyData);
+
+            if (keyData == KeyPerformGetProcessesBtn)
+                GetProcessesBtn.PerformClick();
+            else if (keyData == KeyPerformPauseResume)
+                PauseResume();
+            else if (keyData == KeyPerformScanBtn)
+                ScanBtn.PerformClick();
+            else if (keyData == KeyPerformUndoBtn)
+                UndoBtn.PerformClick();
+            else if (keyData == KeyPerformRedoBtn)
+                RedoBtn.PerformClick();
+            else if (keyData == KeyPerformRefreshBtn)
+                RefreshBtn.PerformClick();
+            else if (keyData == KeyPerformNewBtn)
+                NewBtn.PerformClick();
+            else if (keyData == KeyPerformCloneScanBtn)
+                CloneScanBtn.PerformClick();
+            else if (keyData == KeyCollapseLeftSplitPanel)
+                SplitContainer1.SplitterPanelCollapseExpand(true);
+            else if (keyData == KeyExpandLeftSplitPanel)
+                SplitContainer1.SplitterPanelCollapseExpand(false);
+            else if (keyData == KeyCollapseUpperRightSplitPanel)
+                SplitContainer2.SplitterPanelCollapseExpand(true);
+            else if (keyData == KeyExpandUpperRightSplitPanel)
+                SplitContainer2.SplitterPanelCollapseExpand(false);
+            else
+                return base.ProcessCmdKey(ref msg, keyData);
+
             return true;
         }
 
@@ -188,6 +185,26 @@ namespace PS4CheaterNeo
                     RefreshBtn.Text      = langJson.QueryForm.RefreshBtn;
                     scanInfo             = (langJson.QueryForm.ScanBtn, langJson.QueryForm.NextScan);
                     ScanBtn.Text         = scanInfo.first;
+
+                    IsFilterBox.Checked       = Properties.Settings.Default.FilterQuery.Value;
+                    IsFilterSizeBox.Checked   = Properties.Settings.Default.FilterSizeQuery.Value;
+                    AutoPauseBox.Checked      = Properties.Settings.Default.ScanAutoPause.Value;
+                    AutoResumeBox.Checked     = Properties.Settings.Default.ScanAutoResume.Value;
+                    SectionView.FullRowSelect = Properties.Settings.Default.SectionViewFullRowSelect.Value;
+
+                    KeyQuery                        = Properties.Settings.Default.KeyQuery.Value;
+                    KeyPerformGetProcessesBtn       = Properties.Settings.Default.KeyQueryPerformGetProcessesBtn.Value;
+                    KeyPerformPauseResume           = Properties.Settings.Default.KeyQueryPerformPauseResume.Value;
+                    KeyPerformScanBtn               = Properties.Settings.Default.KeyQueryPerformScanBtn.Value;
+                    KeyPerformUndoBtn               = Properties.Settings.Default.KeyQueryPerformUndoBtn.Value;
+                    KeyPerformRedoBtn               = Properties.Settings.Default.KeyQueryPerformRedoBtn.Value;
+                    KeyPerformRefreshBtn            = Properties.Settings.Default.KeyQueryPerformRefreshBtn.Value;
+                    KeyPerformNewBtn                = Properties.Settings.Default.KeyQueryPerformNewBtn.Value;
+                    KeyPerformCloneScanBtn          = Properties.Settings.Default.KeyQueryPerformCloneScanBtn.Value;
+                    KeyCollapseLeftSplitPanel       = Properties.Settings.Default.KeyQueryCollapseLeftSplitPanel.Value;
+                    KeyExpandLeftSplitPanel         = Properties.Settings.Default.KeyQueryExpandLeftSplitPanel.Value;
+                    KeyCollapseUpperRightSplitPanel = Properties.Settings.Default.KeyQueryCollapseUpperRightSplitPanel.Value;
+                    KeyExpandUpperRightSplitPanel   = Properties.Settings.Default.KeyQueryExpandUpperRightSplitPanel.Value;
                 }
             }
             catch (Exception ex)

@@ -242,5 +242,113 @@
     <Setting Name="SendPayloadStatusStrip1BackColor" Type="OptionTreeView.Option&lt;System.Drawing.Color&gt;" Scope="User">
       <Value Profile="(Default)">Silver|5_UI|6_Color SendPayload|Determine the SendPayload statusStrip1 background color</Value>
     </Setting>
+
+    <Setting Name="KeyMain" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
+      <Value Profile="(Default)">True|6_Hot Key|1_Main|Determine whether to enable the hotkeys for the Main window</Value>
+    </Setting>
+    <Setting Name="KeyMainPerformOpen" Type="OptionTreeView.Option&lt;System.Windows.Forms.Keys&gt;" Scope="User">
+      <Value Profile="(Default)">Ctrl + O|6_Hot Key|1_Main|[Main] Perform open file</Value>
+    </Setting>
+    <Setting Name="KeyMainPerformSave" Type="OptionTreeView.Option&lt;System.Windows.Forms.Keys&gt;" Scope="User">
+      <Value Profile="(Default)">Ctrl + S|6_Hot Key|1_Main|[Main] Perform save file</Value>
+    </Setting>
+    <Setting Name="KeyMainOpenNewQuery" Type="OptionTreeView.Option&lt;System.Windows.Forms.Keys&gt;" Scope="User">
+      <Value Profile="(Default)">Ctrl + Q|6_Hot Key|1_Main|[Main] Open Query window</Value>
+    </Setting>
+    <Setting Name="KeyMainOpenHexView" Type="OptionTreeView.Option&lt;System.Windows.Forms.Keys&gt;" Scope="User">
+      <Value Profile="(Default)">Ctrl + H|6_Hot Key|1_Main|[Main] Open HexView window</Value>
+    </Setting>
+    <Setting Name="KeyMainOpenSettings" Type="OptionTreeView.Option&lt;System.Windows.Forms.Keys&gt;" Scope="User">
+      <Value Profile="(Default)">Alt + S|6_Hot Key|1_Main|[Main] Open Settings window</Value>
+    </Setting>
+    <Setting Name="KeyMainPerformAdd" Type="OptionTreeView.Option&lt;System.Windows.Forms.Keys&gt;" Scope="User">
+      <Value Profile="(Default)">Alt + A|6_Hot Key|1_Main|[Main] Perform add address</Value>
+    </Setting>
+    <Setting Name="KeyMainPerformRefreshCheat" Type="OptionTreeView.Option&lt;System.Windows.Forms.Keys&gt;" Scope="User">
+      <Value Profile="(Default)">Ctrl + R|6_Hot Key|1_Main|[Main] Perform refresh cheat list</Value>
+    </Setting>
+    <Setting Name="KeyMainCheatGridViewCollapseExpandAll" Type="OptionTreeView.Option&lt;System.Windows.Forms.Keys&gt;" Scope="User">
+      <Value Profile="(Default)">Alt + E|6_Hot Key|1_Main|[Main] Perform Collapse or ExpandAll in the CheatGridView, automatically determining the current status</Value>
+    </Setting>
+    <Setting Name="KeyMainSetLockEnable" Type="OptionTreeView.Option&lt;System.Windows.Forms.Keys&gt;" Scope="User">
+      <Value Profile="(Default)">Alt + L|6_Hot Key|1_Main|[Main] Set LockEnable to enable or disable, depending on the current button activation status</Value>
+    </Setting>
+    <Setting Name="KeyMainSetAutoRefresh" Type="OptionTreeView.Option&lt;System.Windows.Forms.Keys&gt;" Scope="User">
+      <Value Profile="(Default)">Alt + R|6_Hot Key|1_Main|[Main] Set AutoRefresh to enable or disable, depending on the current button activation status</Value>
+    </Setting>
+
+    <Setting Name="KeyQuery" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
+      <Value Profile="(Default)">True|6_Hot Key|2_Query|Determine whether to enable the hotkeys for the Query window</Value>
+    </Setting>
+    <Setting Name="KeyQueryPerformGetProcessesBtn" Type="OptionTreeView.Option&lt;System.Windows.Forms.Keys&gt;" Scope="User">
+      <Value Profile="(Default)">Ctrl + G|6_Hot Key|2_Query|[Query] Perform get processes(retrieve all program lists again)</Value>
+    </Setting>
+    <Setting Name="KeyQueryPerformPauseResume" Type="OptionTreeView.Option&lt;System.Windows.Forms.Keys&gt;" Scope="User">
+      <Value Profile="(Default)">Ctrl + P|6_Hot Key|2_Query|[Query] Perform pause or resume. If the current status is paused, execute resume; otherwise, do the opposite</Value>
+    </Setting>
+    <Setting Name="KeyQueryPerformScanBtn" Type="OptionTreeView.Option&lt;System.Windows.Forms.Keys&gt;" Scope="User">
+      <Value Profile="(Default)">Alt + S|6_Hot Key|2_Query|[Query] Perform the first or next scan</Value>
+    </Setting>
+    <Setting Name="KeyQueryPerformUndoBtn" Type="OptionTreeView.Option&lt;System.Windows.Forms.Keys&gt;" Scope="User">
+      <Value Profile="(Default)">Alt + U|6_Hot Key|2_Query|[Query] Perform undo scan</Value>
+    </Setting>
+    <Setting Name="KeyQueryPerformRedoBtn" Type="OptionTreeView.Option&lt;System.Windows.Forms.Keys&gt;" Scope="User">
+      <Value Profile="(Default)">Alt + R|6_Hot Key|2_Query|[Query] Perform redo scan</Value>
+    </Setting>
+    <Setting Name="KeyQueryPerformRefreshBtn" Type="OptionTreeView.Option&lt;System.Windows.Forms.Keys&gt;" Scope="User">
+      <Value Profile="(Default)">Ctrl + R|6_Hot Key|2_Query|[Query] Perform refresh result list</Value>
+    </Setting>
+    <Setting Name="KeyQueryPerformNewBtn" Type="OptionTreeView.Option&lt;System.Windows.Forms.Keys&gt;" Scope="User">
+      <Value Profile="(Default)">Ctrl + N|6_Hot Key|2_Query|[Query] Create a new scan, clearing the current scan results</Value>
+    </Setting>
+    <Setting Name="KeyQueryPerformCloneScanBtn" Type="OptionTreeView.Option&lt;System.Windows.Forms.Keys&gt;" Scope="User">
+      <Value Profile="(Default)">Alt + C|6_Hot Key|2_Query|[Query] Clone the current scan results into a new Query window</Value>
+    </Setting>
+    <Setting Name="KeyQueryCollapseLeftSplitPanel" Type="OptionTreeView.Option&lt;System.Windows.Forms.Keys&gt;" Scope="User">
+      <Value Profile="(Default)">Ctrl + Left|6_Hot Key|2_Query|[Query] Collapse the left Split panel</Value>
+    </Setting>
+    <Setting Name="KeyQueryExpandLeftSplitPanel" Type="OptionTreeView.Option&lt;System.Windows.Forms.Keys&gt;" Scope="User">
+      <Value Profile="(Default)">Ctrl + Right|6_Hot Key|2_Query|[Query] Expand the left Split panel</Value>
+    </Setting>
+    <Setting Name="KeyQueryCollapseUpperRightSplitPanel" Type="OptionTreeView.Option&lt;System.Windows.Forms.Keys&gt;" Scope="User">
+      <Value Profile="(Default)">Ctrl + Up|6_Hot Key|2_Query|[Query] Collapse the upper right Split panel</Value>
+    </Setting>
+    <Setting Name="KeyQueryExpandUpperRightSplitPanel" Type="OptionTreeView.Option&lt;System.Windows.Forms.Keys&gt;" Scope="User">
+      <Value Profile="(Default)">Ctrl + Down|6_Hot Key|2_Query|[Query] Expand the upper right Split panel</Value>
+    </Setting>
+
+    <Setting Name="KeyHexEditor" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
+      <Value Profile="(Default)">True|6_Hot Key|3_HexEditor|Determine whether to enable the hotkeys for the HexEditor window</Value>
+    </Setting>
+    <Setting Name="KeyHexEditorGoPreviousBtn" Type="OptionTreeView.Option&lt;System.Windows.Forms.Keys&gt;" Scope="User">
+      <Value Profile="(Default)">Ctrl + P|6_Hot Key|3_HexEditor|[HexEditor] Go to Previous Page</Value>
+    </Setting>
+    <Setting Name="KeyHexEditorGoNextBtn" Type="OptionTreeView.Option&lt;System.Windows.Forms.Keys&gt;" Scope="User">
+      <Value Profile="(Default)">Ctrl + N|6_Hot Key|3_HexEditor|[HexEditor] Go to Next Page</Value>
+    </Setting>
+    <Setting Name="KeyHexEditorPerformRefreshBtn" Type="OptionTreeView.Option&lt;System.Windows.Forms.Keys&gt;" Scope="User">
+      <Value Profile="(Default)">Ctrl + R|6_Hot Key|3_HexEditor|[HexEditor] Refresh HexBox</Value>
+    </Setting>
+    <Setting Name="KeyHexEditorPerformCommitBtn" Type="OptionTreeView.Option&lt;System.Windows.Forms.Keys&gt;" Scope="User">
+      <Value Profile="(Default)">Ctrl + S|6_Hot Key|3_HexEditor|[HexEditor] Write Modifications to PS4</Value>
+    </Setting>
+    <Setting Name="KeyHexEditorPerformAddToCheatGridBtn" Type="OptionTreeView.Option&lt;System.Windows.Forms.Keys&gt;" Scope="User">
+      <Value Profile="(Default)">Alt + A|6_Hot Key|3_HexEditor|[HexEditor] Add to Cheat Grid</Value>
+    </Setting>
+    <Setting Name="KeyHexEditorPerformFindBtn" Type="OptionTreeView.Option&lt;System.Windows.Forms.Keys&gt;" Scope="User">
+      <Value Profile="(Default)">F3|6_Hot Key|3_HexEditor|[HexEditor] Perform Find, forward or backward depending on whether "Forward" is checked</Value>
+    </Setting>
+    <Setting Name="KeyHexEditorCollapseLeftSplitPanel" Type="OptionTreeView.Option&lt;System.Windows.Forms.Keys&gt;" Scope="User">
+      <Value Profile="(Default)">Ctrl + Left|6_Hot Key|3_HexEditor|[HexEditor] Collapse the left Split panel</Value>
+    </Setting>
+    <Setting Name="KeyHexEditorExpandLeftSplitPanel" Type="OptionTreeView.Option&lt;System.Windows.Forms.Keys&gt;" Scope="User">
+      <Value Profile="(Default)">Ctrl + Right|6_Hot Key|3_HexEditor|[HexEditor] Expand the left Split panel</Value>
+    </Setting>
+    <Setting Name="KeyHexEditorCollapseUpperRightSplitPanel" Type="OptionTreeView.Option&lt;System.Windows.Forms.Keys&gt;" Scope="User">
+      <Value Profile="(Default)">Ctrl + Up|6_Hot Key|3_HexEditor|[HexEditor] Collapse the upper right Split panel</Value>
+    </Setting>
+    <Setting Name="KeyHexEditorExpandUpperRightSplitPanel" Type="OptionTreeView.Option&lt;System.Windows.Forms.Keys&gt;" Scope="User">
+      <Value Profile="(Default)">Ctrl + Down|6_Hot Key|3_HexEditor|[HexEditor] Expand the upper right Split panel</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
