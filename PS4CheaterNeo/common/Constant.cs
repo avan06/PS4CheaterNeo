@@ -85,6 +85,14 @@ namespace PS4CheaterNeo
                 ["IdOffset"] = 0XA0,
                 ["VersionOffset"] = 0XC8
             },
+            ["PS5"] = new Dictionary<string, object>() //PS5 version by. JeymyAV
+            {
+                ["ProcessName"] = "SceCdlgApp",
+                ["SectionName"] = "libSceCdlgUtilServer.sprx",
+                ["SectionProt"] = 3,
+                ["IdOffset"] = 0X30,
+                ["VersionOffset"] = 0X58
+            },
             //["6.72"] = new Dictionary<string, object>() //custom version
             //{
             //    ["ProcessName"] = "SceCdlgApp",
