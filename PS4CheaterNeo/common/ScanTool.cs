@@ -1318,18 +1318,27 @@ namespace PS4CheaterNeo
             {
                 case ScanType.Bytes_8:
                 case ScanType.HiddenSections:
+                    // Resize array if length is insufficient for UInt64 (8 bytes)
+                    if (input0Data != null && input0Data.Length < 8) Array.Resize(ref input0Data, 8);
+                    if (input1Data != null && input1Data.Length < 8) Array.Resize(ref input1Data, 8);
                     Input0UInt64 = input0Data != default ? BitConverter.ToUInt64(input0Data, 0) : (IsValue0Signed ? (ulong)long.Parse(value0.Replace(",", "")) : ulong.Parse(value0.Replace(",", "")));
                     Input1UInt64 = input1Data != default ? BitConverter.ToUInt64(input1Data, 0) : (IsValue1Signed ? (ulong)long.Parse(value1.Replace(",", "")) : ulong.Parse(value1.Replace(",", "")));
                     //input0UInt64 = isHex ? ulong.Parse(value0, NumberStyles.HexNumber) : ulong.Parse(value0); //Big-Endian
                     //input1UInt64 = isHex ? ulong.Parse(value1, NumberStyles.HexNumber) : ulong.Parse(value1);
                     break;
                 case ScanType.Bytes_4:
+                    // Resize array if length is insufficient for UInt32 (4 bytes)
+                    if (input0Data != null && input0Data.Length < 4) Array.Resize(ref input0Data, 4);
+                    if (input1Data != null && input1Data.Length < 4) Array.Resize(ref input1Data, 4);
                     Input0UInt32 = input0Data != default ? BitConverter.ToUInt32(input0Data, 0) : (IsValue0Signed ? (uint)int.Parse(value0.Replace(",", "")) : uint.Parse(value0.Replace(",", "")));
                     Input1UInt32 = input1Data != default ? BitConverter.ToUInt32(input1Data, 0) : (IsValue1Signed ? (uint)int.Parse(value1.Replace(",", "")) : uint.Parse(value1.Replace(",", "")));
                     //input0UInt32 = isHex ? uint.Parse(value0, NumberStyles.HexNumber) : uint.Parse(value0);
                     //input1UInt32 = isHex ? uint.Parse(value1, NumberStyles.HexNumber) : uint.Parse(value1);
                     break;
                 case ScanType.Bytes_2:
+                    // Resize array if length is insufficient for UInt16 (2 bytes)
+                    if (input0Data != null && input0Data.Length < 2) Array.Resize(ref input0Data, 2);
+                    if (input1Data != null && input1Data.Length < 2) Array.Resize(ref input1Data, 2);
                     Input0UInt16 = input0Data != default ? BitConverter.ToUInt16(input0Data, 0) : (IsValue0Signed ? (ushort)short.Parse(value0.Replace(",", "")) : ushort.Parse(value0.Replace(",", "")));
                     Input1UInt16 = input1Data != default ? BitConverter.ToUInt16(input1Data, 0) : (IsValue1Signed ? (ushort)short.Parse(value1.Replace(",", "")) : ushort.Parse(value1.Replace(",", "")));
                     //input0UInt16 = isHex ? ushort.Parse(value0, NumberStyles.HexNumber) : ushort.Parse(value0);
@@ -1342,10 +1351,16 @@ namespace PS4CheaterNeo
                     //input1Byte = isHex ? byte.Parse(value1, NumberStyles.HexNumber) : byte.Parse(value1);
                     break;
                 case ScanType.Double_:
+                    // Resize array if length is insufficient for double (8 bytes)
+                    if (input0Data != null && input0Data.Length < 8) Array.Resize(ref input0Data, 8);
+                    if (input1Data != null && input1Data.Length < 8) Array.Resize(ref input1Data, 8);
                     Input0Double = input0Data != default ? BitConverter.ToDouble(input0Data, 0) : double.Parse(value0.Replace(",", ""));
                     Input1Double = input1Data != default ? BitConverter.ToDouble(input1Data, 0) : double.Parse(value1.Replace(",", ""));
                     break;
                 case ScanType.Float_:
+                    // Resize array if length is insufficient for float (4 bytes)
+                    if (input0Data != null && input0Data.Length < 4) Array.Resize(ref input0Data, 4);
+                    if (input1Data != null && input1Data.Length < 4) Array.Resize(ref input1Data, 4);
                     Input0Float = input0Data != default ? BitConverter.ToSingle(input0Data, 0) : float.Parse(value0.Replace(",", ""));
                     Input1Float = input1Data != default ? BitConverter.ToSingle(input1Data, 0) : float.Parse(value1.Replace(",", ""));
                     break;
