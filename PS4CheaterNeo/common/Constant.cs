@@ -61,6 +61,13 @@ namespace PS4CheaterNeo
         Light,
     }
 
+    public enum EndianType
+    {
+        None,
+        BigEndian,
+        LittleEndian,
+    }
+
     partial class Constant
     {
         public static string[] Versions = new string[] {

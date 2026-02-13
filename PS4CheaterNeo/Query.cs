@@ -29,9 +29,10 @@ namespace PS4CheaterNeo
 
         //Confirm whether the compare type starts with UnknownInitial
         bool isUnknownInitial = false;
-        bool UnknownInitialScanDoNotSkip0   = Properties.Settings.Default.UnknownInitialScanDoNotSkip0.Value;
-        bool SectionViewDetectHiddenSection = Properties.Settings.Default.SectionViewDetectHiddenSection.Value;
-        bool WriteHiddenSectionConf         = Properties.Settings.Default.WriteHiddenSectionConf.Value;
+        bool UnknownInitialScanDoNotSkip0    = Properties.Settings.Default.UnknownInitialScanDoNotSkip0.Value;
+        bool SectionViewDetectHiddenSection  = Properties.Settings.Default.SectionViewDetectHiddenSection.Value;
+        bool WriteHiddenSectionConf          = Properties.Settings.Default.WriteHiddenSectionConf.Value;
+        EndianType QueryHexNumericEndianType = Properties.Settings.Default.QueryHexNumericEndianType.Value;
         bool isCloneScan = false;
 
         List<ListViewItem> sectionItems = new List<ListViewItem>();
@@ -587,14 +588,16 @@ namespace PS4CheaterNeo
 
                     if (value0 == "") value0 = "0";
                     if (value1 == "") value1 = "0";
+                    EndianType queryHexNumericEndianType = EndianType.None;
                     if (isHex)
                     {
+                        queryHexNumericEndianType = QueryHexNumericEndianType.Equals(EndianType.None) ? EndianType.BigEndian : QueryHexNumericEndianType;
                         value0 = Regex.Replace(value0, "[^0-9a-fA-F]", "");
                         value1 = Regex.Replace(value1, "[^0-9a-fA-F]", "");
                     }
 
                     if (!isUnknownInitial) isUnknownInitial = compareType == CompareType.UnknownInitial;
-                    comparerTool = new ComparerTool(scanType, compareType, value0, value1, isHex, isNot, isFloatingSimpleValues, enableFloatingResultExact, floatingSimpleValueExponents, isUnknownInitial);
+                    comparerTool = new ComparerTool(scanType, compareType, value0, value1, queryHexNumericEndianType, isNot, isFloatingSimpleValues, enableFloatingResultExact, floatingSimpleValueExponents, isUnknownInitial);
 
                     if (scanType == ScanType.Hex && !isHex)
                     { //ComparerTool has converted decimal to hex

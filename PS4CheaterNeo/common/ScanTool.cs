@@ -1296,7 +1296,7 @@ namespace PS4CheaterNeo
 
         private (bool UInt, bool Double, bool Float) autoNumericValid = (false, false, false);
 
-        public ComparerTool(ScanType scanType, CompareType compareType, string value0, string value1, bool isHex, bool isNot, bool isFloatingSimpleValues, bool enableFloatingResultExact, byte floatingSimpleValueExponents, bool isUnknownInitial)
+        public ComparerTool(ScanType scanType, CompareType compareType, string value0, string value1, EndianType queryHexNumericEndianType, bool isNot, bool isFloatingSimpleValues, bool enableFloatingResultExact, byte floatingSimpleValueExponents, bool isUnknownInitial)
         {
             ScanType_ = scanType;
             CompareType_ = compareType;
@@ -1307,12 +1307,18 @@ namespace PS4CheaterNeo
             EnableFloatingResultExact = enableFloatingResultExact;
             FloatingSimpleValueExponents = floatingSimpleValueExponents;
             IsUnknownInitial = isUnknownInitial;
+            bool isHex = !queryHexNumericEndianType.Equals(EndianType.None);
 
             if (value0 != null && value0.StartsWith("-")) IsValue0Signed = true;
             if (value1 != null && value1.StartsWith("-")) IsValue1Signed = true;
 
             byte[] input0Data = isHex ? ScanTool.ValueStringToByte(ScanType.Hex, value0) : default; //Little-Endian
             byte[] input1Data = isHex ? ScanTool.ValueStringToByte(ScanType.Hex, value1) : default;
+            if (isHex && scanType != ScanType.Hex && queryHexNumericEndianType.Equals(EndianType.BigEndian))
+            {
+                if (input0Data != null) Array.Reverse(input0Data);
+                if (input1Data != null) Array.Reverse(input1Data);
+            }
 
             switch (scanType)
             {
