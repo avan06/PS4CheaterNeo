@@ -1,8 +1,8 @@
-﻿# Overview
+# Overview
 
 PS4CheaterNeo is a program to find game cheat codes, and it is based on [`ps4debug`](https://github.com/jogolden/ps4debug) and [`.Net Framework 4.8`](https://support.microsoft.com/en-us/topic/microsoft-net-framework-4-8-offline-installer-for-windows-9d23f658-3b97-68ab-d013-aa3c3e7495e0).
 
-Currently in `version 1.0.6`
+Currently in `version 1.0.6.1`
 
 
 ## Table of Contents
@@ -616,6 +616,8 @@ Determines whether to automatically pause the game when starting the scan in que
 Determines whether to automatically resume the game when the scan is complete in query. `Default disabled`. (0.9.7.0)  
 - `ShowSearchSizeFirstScan`:  
 Determines whether to show search size message when FirstScan. `Default enabled`. (0.9.7.6)  
+- `QueryHexNumericEndianType`:  
+Determine whether the EndianType should be `Big-Endian` or `Little-Endian` when the `scan type is numeric` and `HEX is enabled` in the Query window. `Default Big-Endian`. (1.0.6.1)  
 - `UnknownInitialScanDoNotSkip0`:  
 Determines whether to enable not skipping values with a byte of 0 when the Compare Type is UnknownInitial in the Query window. Note: Enabling this option will significantly increase the number of results. Restart the Query window for the setting to take effect. `Default disabled`. (0.9.9.5)  
 - `FloatingResultExact`:  
