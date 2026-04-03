@@ -2,7 +2,7 @@
 
 PS4CheaterNeo is a program to find game cheat codes, and it is based on [`ps4debug`](https://github.com/jogolden/ps4debug) and [`.Net Framework 4.8`](https://support.microsoft.com/en-us/topic/microsoft-net-framework-4-8-offline-installer-for-windows-9d23f658-3b97-68ab-d013-aa3c3e7495e0).
 
-Currently in `version 1.0.6.1`
+Currently in `version 1.0.7.0`
 
 
 ## Table of Contents
@@ -13,6 +13,7 @@ Currently in `version 1.0.6.1`
   * [Cheat window](#cheat-window)
     + [Cheat file support](#cheat-file-support)
     + [Add Address](#add-address)
+    + [Cheat window: multi-value editing](#cheat-window-multi-value-editing)
   * [Query window](#query-window)
     + [Query window: SlowMotion and Pause](#query-window-slowmotion-and-pause)
     + [Query window: Undo scan and auto pause](#query-window-undo-scan-and-auto-pause)
@@ -119,8 +120,6 @@ Currently in `version 1.0.6.1`
 - You can copy the memory address from the cheat or query list. (0.9.3.2)
 - You can also open the `Hex editor` in the main window and manually enter the address. (0.9.3.2)
 - The cheat list will show row number. (0.9.4.5)
-- Support using `keyboard up, down or mouse wheel` to adjust value when modifying cheat Value. (0.9.5.0)
-- Editing cheat values in UpDown can be automatically written to PS4 when CheatCellDirtyValueCommit is enabled. (0.9.5.3)
 - Added an "`Auto Refresh` Cheat" button in the main window. When enabled, it will automatically reload cheat values from the PS4 at intervals specified by the `CheatAutoRefreshTimerInterval` option. (0.9.9.2)
 - Added support for automatically removing non-Hex characters from input Hex text. When you select HexView from the ToolStrip in the main window, this prevents the program from encountering Hex conversion errors. (0.9.9.5)
 - Added the `CheatGridViewGroupByEnabled` option, which allows you to enable or disable the grouping feature in CheatGridView. (0.9.9.6)
@@ -162,6 +161,17 @@ The loaded "eboot.bin" here will be compared with the section memory content of 
 - You can manually add addresses to the `Cheat List`.
 
 ![add](assets/add.webp)
+
+
+### Cheat window: multi-value editing
+
+- Support using `keyboard up, down or mouse wheel` to adjust value when modifying cheat Value. (0.9.5.0)
+- Editing cheat values in UpDown can be automatically written to PS4 when `CheatCellDirtyValueCommit` is enabled. (0.9.5.3)
+- Added support for adjusting `multiple selected cheat values` simultaneously via keyboard Up/Down or mouse wheel. (1.0.7.0)
+- Values are updated dynamically relative to the current amount in each individual field. (1.0.7.0)
+- Enter simultaneous editing mode by `holding Ctrl/Shift and double-clicking or pressing F2` on the target value. (1.0.7.0)
+
+![add](assets/cheat_multiValueEditing.webp)
 
 
 ## Query window	[🔼](#table-of-contents)

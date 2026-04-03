@@ -1693,33 +1693,71 @@ namespace PS4CheaterNeo
 
         private void CheatGridView_EditingControlShowing(object sender, DataGridViewEditingControlShowingEventArgs e)
         {
-            bool CheatCellDirtyValueCommit = Properties.Settings.Default.CheatCellDirtyValueCommit.Value;
-            if (!CheatCellDirtyValueCommit) return;
-
             DataGridViewUpDownEditingControl upDownControl = CheatGridView.EditingControl as DataGridViewUpDownEditingControl;
             if (upDownControl == null) return;
 
-            upDownControl.UpDown -= UpDownControl_UpDown;
-            upDownControl.UpDown += UpDownControl_UpDown;
+            upDownControl.UpDownDelta -= UpDownControl_UpDownDelta;
+            upDownControl.UpDownDelta += UpDownControl_UpDownDelta;
         }
 
-        private void UpDownControl_UpDown(object sender, DataGridViewUpDownCellEventArgs e)
+        private bool isBulkUpdating = false; // Flag to prevent recursive triggering
+
+        private void UpDownControl_UpDownDelta(object sender, DataGridViewUpDownDeltaEventArgs e)
         {
-            bool CheatCellDirtyValueCommit = Properties.Settings.Default.CheatCellDirtyValueCommit.Value;
-            if (!CheatCellDirtyValueCommit) return;
+            if (isBulkUpdating) return;
 
-            if (CheatGridView.CurrentCell == null || e.RowIndex < 0 || e.ColumnIndex != (int)ChertCol.CheatListValue) return;
-            if (e.RowIndex > cheatGridRowList.Count - 1) return;
+            try
+            {
+                isBulkUpdating = true;
 
-            if (!Regex.IsMatch(e.Text, @"^-?[0-9][0-9,\.]*$")) return;
+                if (CheatGridView.CurrentCell == null || e.RowIndex < 0 || e.ColumnIndex != (int)ChertCol.CheatListValue) return;
+                if (e.RowIndex > cheatGridRowList.Count - 1) return;
 
-            CheatRow row = cheatGridRowList[e.RowIndex];
+                bool CheatCellDirtyValueCommit = Properties.Settings.Default.CheatCellDirtyValueCommit.Value;
 
-            (Section section, uint offsetAddr) = (row.Section_, row.OffsetAddr);
-            ScanType scanType = this.ParseFromDescription<ScanType>(row.Cells[(int)ChertCol.CheatListType].ToString());
+                // Use a HashSet to gather all unique target cells.
+                // This ensures the current editing cell is included even if it's not "selected".
+                HashSet<DataGridViewCell> targetCells = new HashSet<DataGridViewCell>();
 
-            byte[] newData = ScanTool.ValueStringToByte(scanType, e.Text);
-            PS4Tool.WriteMemory(section.PID, offsetAddr + section.Start, newData);
+                // 1. Add all currently selected cells
+                foreach (DataGridViewCell selectedCell in CheatGridView.SelectedCells)
+                {
+                    // only process cells within the specific column type
+                    if (!(selectedCell.OwningColumn is DataGridViewUpDownColumn)) continue;
+                    if (selectedCell.ColumnIndex != (int)ChertCol.CheatListValue) continue;
+
+                    targetCells.Add(selectedCell);
+                }
+
+                // 2. Explicitly add the cell being edited (e.RowIndex, CheatListValue)
+                // This acts as a safety net if the user's click deselected the active cell.
+                targetCells.Add(CheatGridView[(int)ChertCol.CheatListValue, e.RowIndex]);
+
+                // Iterate through all selected cells to perform broadcast updates
+                foreach (DataGridViewCell cell in targetCells)
+                {
+                    if (cell.Value == null || !decimal.TryParse(cell.Value.ToString(), out decimal val)) continue;
+
+                    // Calculate the new relative value
+                    string newValue = (val + e.Delta).ToString();
+
+                    // Sync GridView's underlying data
+                    cell.Value = newValue;
+
+                    if (!CheatCellDirtyValueCommit && e.IsRepeat) continue;
+
+                    CheatRow row = cheatGridRowList[cell.RowIndex];
+                    (Section section, uint offsetAddr) = (row.Section_, row.OffsetAddr);
+                    ScanType scanType = this.ParseFromDescription<ScanType>(row.Cells[(int)ChertCol.CheatListType].ToString());
+
+                    byte[] newData = ScanTool.ValueStringToByte(scanType, newValue);
+                    PS4Tool.WriteMemory(section.PID, offsetAddr + section.Start, newData);
+                }
+            }
+            finally
+            {
+                isBulkUpdating = false;
+            }
         }
         #endregion
 
