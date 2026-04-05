@@ -25,13 +25,12 @@ namespace PS4CheaterNeo.libframe4
 
         private Thread debugThread = null;
 
-        // some global values
-        private const string LIBRARY_VERSION = "0.2.2.1";
-        private const int PS4DBG_PORT        = 2811;
-        private const int PS4DBG_DEBUG_PORT  = 42069;
-        private const int NET_MAX_LENGTH     = 0x20000; // 128KB buffer
+        private const string LIBRARY_VERSION = "0.3.2";
+        private const int FRAME4_PORT = 2811;
+        private const int FRAME4_DEBUG_PORT = 42069;
+        private const int NET_MAX_LENGTH = 0x20000; // 128KB buffer
 
-        private const int BROADCAST_PORT   = 2813;
+        private const int BROADCAST_PORT = 2813;
         private const uint BROADCAST_MAGIC = 0xFFFFAAAA;
 
         // from protocol.h
@@ -47,7 +46,7 @@ namespace PS4CheaterNeo.libframe4
         //    uint64_t address;
         //    uint8_t original;
         //};
-        public static uint MAX_BREAKPOINTS = 10;
+        public static uint MAX_BREAKPOINTS = 30;
         public static uint MAX_WATCHPOINTS = 4;
 
         //  struct cmd_packet {
@@ -63,62 +62,69 @@ namespace PS4CheaterNeo.libframe4
         public enum CMDS : uint
         {
             CMD_VERSION = 0xBD000001,
-            CMD_UNLOAD  = 0xBD0000FF,
+            CMD_UNLOAD = 0xBD0000FF,
 
-            CMD_PROC_LIST               = 0xBDAA0001,
-            CMD_PROC_READ               = 0xBDAA0002,
-            CMD_PROC_WRITE              = 0xBDAA0003,
-            CMD_PROC_MAPS               = 0xBDAA0004,
-            CMD_PROC_INSTALL            = 0xBDAA0005,
-            CMD_PROC_CALL               = 0xBDAA0006,
-            CMD_PROC_ELF                = 0xBDAA0007,
-            CMD_PROC_PROTECT            = 0xBDAA0008,
-            CMD_PROC_SCAN               = 0xBDAA0009,
-            CMD_PROC_INFO               = 0xBDAA000A,
-            CMD_PROC_ALLOC              = 0xBDAA000B,
-            CMD_PROC_FREE               = 0xBDAA000C,
-            CMD_PROC_SCAN_GET_RESULTS   = 0xBDAA000D,
+            CMD_PROC_LIST = 0xBDAA0001,
+            CMD_PROC_READ = 0xBDAA0002,
+            CMD_PROC_WRITE = 0xBDAA0003,
+            CMD_PROC_MAPS = 0xBDAA0004,
+            CMD_PROC_INSTALL = 0xBDAA0005,
+            CMD_PROC_CALL = 0xBDAA0006,
+            CMD_PROC_ELF = 0xBDAA0007,
+            CMD_PROC_PROTECT = 0xBDAA0008,
+            CMD_PROC_SCAN = 0xBDAA0009,
+            CMD_PROC_INFO = 0xBDAA000A,
+            CMD_PROC_ALLOC = 0xBDAA000B,
+            CMD_PROC_FREE = 0xBDAA000C,
+            CMD_PROC_SCAN_GET_RESULTS = 0xBDAA000D,
             CMD_PROC_SCAN_COUNT_RESULTS = 0xBDAA000E,
-            CMD_PROC_PRX_LOAD           = 0xBDAA000F,
-            CMD_PROC_PRX_UNLOAD         = 0xBDAA0010,
+            CMD_PROC_PRX_LOAD = 0xBDAA000F,
+            CMD_PROC_PRX_UNLOAD = 0xBDAA0010,
+            CMD_PROC_PRX_LIST = 0xBDAA0011,
+            CMD_PROC_AOB = 0xBDAA0012,
 
-            CMD_DEBUG_ATTACH     = 0xBDBB0001,
-            CMD_DEBUG_DETACH     = 0xBDBB0002,
-            CMD_DEBUG_BREAKPT    = 0xBDBB0003,
-            CMD_DEBUG_WATCHPT    = 0xBDBB0004,
-            CMD_DEBUG_THREADS    = 0xBDBB0005,
-            CMD_DEBUG_STOPTHR    = 0xBDBB0006,
-            CMD_DEBUG_RESUMETHR  = 0xBDBB0007,
-            CMD_DEBUG_GETREGS    = 0xBDBB0008,
-            CMD_DEBUG_SETREGS    = 0xBDBB0009,
-            CMD_DEBUG_GETFPREGS  = 0xBDBB000A,
-            CMD_DEBUG_SETFPREGS  = 0xBDBB000B,
+            CMD_DEBUG_ATTACH = 0xBDBB0001,
+            CMD_DEBUG_DETACH = 0xBDBB0002,
+            CMD_DEBUG_BREAKPT = 0xBDBB0003,
+            CMD_DEBUG_WATCHPT = 0xBDBB0004,
+            CMD_DEBUG_THREADS = 0xBDBB0005,
+            CMD_DEBUG_STOPTHR = 0xBDBB0006,
+            CMD_DEBUG_RESUMETHR = 0xBDBB0007,
+            CMD_DEBUG_GETREGS = 0xBDBB0008,
+            CMD_DEBUG_SETREGS = 0xBDBB0009,
+            CMD_DEBUG_GETFPREGS = 0xBDBB000A,
+            CMD_DEBUG_SETFPREGS = 0xBDBB000B,
             CMD_DEBUG_GETDBGREGS = 0xBDBB000C,
             CMD_DEBUG_SETDBGREGS = 0xBDBB000D,
-            CMD_DEBUG_STOPGO     = 0xBDBB0010,
-            CMD_DEBUG_THRINFO    = 0xBDBB0011,
+            CMD_DEBUG_STOPGO = 0xBDBB0010,
+            CMD_DEBUG_THRINFO = 0xBDBB0011,
             CMD_DEBUG_SINGLESTEP = 0xBDBB0012,
+            CMD_DEBUG_EXT_STOPGO = 0xBDBB0500,
 
-            CMD_KERN_BASE  = 0xBDCC0001,
-            CMD_KERN_READ  = 0xBDCC0002,
+            CMD_KERN_BASE = 0xBDCC0001,
+            CMD_KERN_READ = 0xBDCC0002,
             CMD_KERN_WRITE = 0xBDCC0003,
+            CMD_KERN_VM_MAP = 0xBDCC0004,
+            CMD_KERN_RDMSR = 0xBDCC0005,
+            CMD_KERN_PHYS_READ = 0xBDCC0006,
+            CMD_KERN_PHYS_WRITE = 0xBDCC0007,
 
-            CMD_CONSOLE_REBOOT       = 0xBDDD0001,
-            CMD_CONSOLE_END          = 0xBDDD0002,
-            CMD_CONSOLE_PRINT        = 0xBDDD0003,
-            CMD_CONSOLE_NOTIFY       = 0xBDDD0004,
-            CMD_CONSOLE_INFO         = 0xBDDD0005,
+            CMD_CONSOLE_REBOOT = 0xBDDD0001,
+            CMD_CONSOLE_END = 0xBDDD0002,
+            CMD_CONSOLE_PRINT = 0xBDDD0003,
+            CMD_CONSOLE_NOTIFY = 0xBDDD0004,
+            CMD_CONSOLE_INFO = 0xBDDD0005,
             CMD_CONSOLE_FANTHRESHOLD = 0xBDDD0006
         };
 
         public enum CMD_STATUS : uint
         {
-            CMD_SUCCESS         = 0x80000000,
-            CMD_ERROR           = 0xF0000001,
-            CMD_TOO_MUCH_DATA   = 0xF0000002,
-            CMD_DATA_NULL       = 0xF0000003,
-            CMD_ALREADY_DEBUG   = 0xF0000004,
-            CMD_INVALID_INDEX   = 0xF0000005,
+            CMD_SUCCESS = 0x80000000,
+            CMD_ERROR = 0xF0000001,
+            CMD_TOO_MUCH_DATA = 0xF0000002,
+            CMD_DATA_NULL = 0xF0000003,
+            CMD_ALREADY_DEBUG = 0xF0000004,
+            CMD_INVALID_INDEX = 0xF0000005,
             CMD_SCAN_NOTSTARTED = 0xF0000006
         };
 
@@ -340,17 +346,17 @@ namespace PS4CheaterNeo.libframe4
         }
 
         /// <summary>
-        /// Initializes PS4DBG class
+        /// Initializes FRAME4 class
         /// </summary>
         /// <param name="addr">PlayStation 4 address</param>
         public FRAME4(IPAddress addr)
         {
-            enp = new IPEndPoint(addr, PS4DBG_PORT);
+            enp = new IPEndPoint(addr, FRAME4_PORT);
             sock = new Socket(enp.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
         }
 
         /// <summary>
-        /// Initializes PS4DBG class
+        /// Initializes FRAME4 class
         /// </summary>
         /// <param name="ip">PlayStation 4 ip address</param>
         public FRAME4(string ip)
@@ -365,7 +371,7 @@ namespace PS4CheaterNeo.libframe4
                 throw ex;
             }
 
-            enp = new IPEndPoint(addr, PS4DBG_PORT);
+            enp = new IPEndPoint(addr, FRAME4_PORT);
             sock = new Socket(enp.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
         }
 
@@ -430,9 +436,9 @@ namespace PS4CheaterNeo.libframe4
                         GetConsoleDebugVersion();
                     }
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
-                    throw ex;
+                    throw;
                 }
             }
             return IsConnected;
@@ -485,9 +491,13 @@ namespace PS4CheaterNeo.libframe4
             byte[] data = new byte[length];
             sock.Receive(data, length, SocketFlags.None);
 
-            return ConvertASCII(data, 0);
+            Version = ConvertASCII(data, 0);
+            return Version;
         }
 
+        /// <summary>
+        /// Unload the current frame4 running on the console
+        /// </summary>
         public void UnloadPayload()
         {
             SendCMDPacket(CMDS.CMD_UNLOAD, 0);

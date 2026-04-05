@@ -114,7 +114,7 @@ namespace PS4CheaterNeo
                     if (idx == 0)
                     {
                         result = ps4s[idx].IsConnected ? true : ps4s[idx].Connect(connectTimeout, sendTimeout, receiveTimeout, true);
-                        if (result && (ps4s[idx] is FRAME4 || ((PS4DBG)ps4s[idx]).ExtFWVersion == -1))
+                        if (result && (ps4s[idx] is PS4DBG && ((PS4DBG)ps4s[idx]).ExtFWVersion == -1))
                         {
                             ps4s[idx].Disconnect();
                             ps4s[idx] = null;
@@ -445,6 +445,17 @@ namespace PS4CheaterNeo
                     processStatus = newStatus;
                     if (newStatus == ProcessStatus.Pause) ps4dbg.ProcessExtStop(processID);
                     else ps4dbg.ProcessExtResume(processID);
+                }
+            }
+            else if (ps4s[0].IsConnected && ps4s[0] is FRAME4 fram4 && fram4.Version != "0" &&
+                Version.TryParse(fram4.Version, out Version current) && Version.TryParse("0.2.15", out Version target) &&
+                current >= target)
+            {
+                if (processStatus != newStatus)
+                {
+                    processStatus = newStatus;
+                    if (newStatus == ProcessStatus.Pause) fram4.ProcessExtStop(processID);
+                    else fram4.ProcessExtResume(processID);
                 }
             }
             else if (ps4s[0].IsConnected && ps4s[0].IsDebugging)

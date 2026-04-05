@@ -295,6 +295,10 @@ namespace PS4CheaterNeo.libdebug
             {
                 // adhere to length
                 recv = sock.Receive(b, Math.Min(left, NET_MAX_LENGTH), SocketFlags.None);
+
+                if (recv == 0)
+                    throw new SocketException((int)SocketError.ConnectionReset);
+
                 s.Write(b, 0, recv);
                 left -= recv;
             }
@@ -352,9 +356,9 @@ namespace PS4CheaterNeo.libdebug
             {
                 addr = IPAddress.Parse(ip);
             }
-            catch (FormatException ex)
+            catch (FormatException)
             {
-                throw ex;
+                throw;
             }
 
             enp = new IPEndPoint(addr, PS4DBG_PORT);
@@ -429,9 +433,9 @@ namespace PS4CheaterNeo.libdebug
                         GetExtFWVersion();
                     }
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
-                    throw ex;
+                    throw;
                 }
             }
             return IsConnected;

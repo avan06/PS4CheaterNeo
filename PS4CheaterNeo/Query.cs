@@ -802,7 +802,7 @@ namespace PS4CheaterNeo
                                 if (!(ex is OperationCanceledException))
                                 {
                                     errInfo += ex.ToString() + "\n\n";
-                                    throw ex;
+                                    throw;
                                 }
                             }
                             finally

@@ -26,6 +26,7 @@ namespace PS4CheaterNeo.libframe4
         private const int CMD_DEBUG_SETREGS_PACKET_SIZE = 8;
         private const int CMD_DEBUG_STOPGO_PACKET_SIZE = 4;
         private const int CMD_DEBUG_THRINFO_PACKET_SIZE = 4;
+        private const int CMD_DEBUG_EXT_STOPGO_PACKET_SIZE = 8;
 
         // receive size
         private const int DEBUG_INTERRUPT_SIZE = 0x4A0;
@@ -72,13 +73,14 @@ namespace PS4CheaterNeo.libframe4
 
         private Socket debuggerServer;
         private Socket debuggerClient;
+
         private void DebuggerThread(object obj)
         {
             DebuggerInterruptCallback callback = null;
             if (obj != null) callback = (DebuggerInterruptCallback)obj;
 
             IPAddress ip = IPAddress.Parse(GetLocalIPAddress());
-            IPEndPoint endpoint = new IPEndPoint(ip, PS4DBG_DEBUG_PORT);
+            IPEndPoint endpoint = new IPEndPoint(ip, FRAME4_DEBUG_PORT);
 
             using (debuggerServer = new Socket(ip.AddressFamily, SocketType.Stream, ProtocolType.Tcp))
             {
@@ -139,7 +141,10 @@ namespace PS4CheaterNeo.libframe4
             debugThread.Start(callback);
 
             // wait until server is started
-            while (!IsDebugging) Thread.Sleep(100);
+            while (!IsDebugging)
+            {
+                Thread.Sleep(100);
+            }
 
             SendCMDPacket(CMDS.CMD_DEBUG_ATTACH, CMD_DEBUG_ATTACH_PACKET_SIZE, pid);
             CheckStatus();
@@ -236,6 +241,45 @@ namespace PS4CheaterNeo.libframe4
             CheckDebugging();
 
             SendCMDPacket(CMDS.CMD_DEBUG_STOPGO, CMD_DEBUG_STOPGO_PACKET_SIZE, 0);
+            CheckStatus();
+        }
+
+        /// <summary>
+        /// Resume a process
+        /// </summary>
+        /// <param name="pid">Process ID</param>
+        /// <returns></returns>
+        public void ProcessExtResume(int pid)
+        {
+            CheckConnected();
+
+            SendCMDPacket(CMDS.CMD_DEBUG_EXT_STOPGO, CMD_DEBUG_EXT_STOPGO_PACKET_SIZE, pid, 0);
+            CheckStatus();
+        }
+
+        /// <summary>
+        /// Stop a process
+        /// </summary>
+        /// <param name="pid">Process ID</param>
+        /// <returns></returns>
+        public void ProcessExtStop(int pid)
+        {
+            CheckConnected();
+
+            SendCMDPacket(CMDS.CMD_DEBUG_EXT_STOPGO, CMD_DEBUG_EXT_STOPGO_PACKET_SIZE, pid, 1);
+            CheckStatus();
+        }
+
+        /// <summary>
+        /// Kill a process, it will detach before doing so
+        /// </summary>
+        /// <param name="pid">Process ID</param>
+        /// <returns></returns>
+        public void ProcessExtKill(int pid)
+        {
+            CheckConnected();
+
+            SendCMDPacket(CMDS.CMD_DEBUG_EXT_STOPGO, CMD_DEBUG_EXT_STOPGO_PACKET_SIZE, pid, 2);
             CheckStatus();
         }
 

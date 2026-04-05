@@ -167,7 +167,72 @@ namespace PS4CheaterNeo
 		}
 	}
 
-	[StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi, Pack = 1)]
+    /// <summary>
+    /// Copyright by DeathRGH/libframe4-cs
+	/// https://github.com/DeathRGH/libframe4-cs
+    /// </summary>
+    public class ModuleListEntry
+    {
+        public uint handle;
+        public string name;
+        public ulong text_address;
+        public uint text_size;
+        public ulong data_address;
+        public uint data_size;
+    }
+
+    /// <summary>
+    /// Copyright by DeathRGH/libframe4-cs
+    /// https://github.com/DeathRGH/libframe4-cs
+    /// </summary>
+    public class ModuleList
+    {
+        public int pid;
+        public ModuleListEntry[] entries;
+
+        /// <summary>
+        /// Initializes ModuleList class with module list entries and process ID
+        /// </summary>
+        /// <param name="pid">Process ID</param>
+        /// <param name="entries">Module list entries</param>
+        /// <returns></returns>
+        public ModuleList(int pid, ModuleListEntry[] entries)
+        {
+            this.pid = pid;
+            this.entries = entries;
+        }
+
+        /// <summary>
+        /// Finds a module list entry based off name
+        /// </summary>
+        /// <param name="name">Module name</param>
+        /// <param name="contains">Condition to check if module name contains name</param>
+        /// <returns></returns>
+        public ModuleListEntry FindEntry(string name, bool contains = false)
+        {
+            foreach (ModuleListEntry entry in entries)
+            {
+                if (contains)
+                {
+                    if (entry.name.Contains(name))
+                    {
+                        return entry;
+                    }
+                }
+                else
+                {
+                    if (entry.name == name)
+                    {
+                        return entry;
+                    }
+                }
+            }
+
+            return null;
+        }
+    }
+
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi, Pack = 1)]
 	public struct ProcessInfo
 	{
 		public int pid;

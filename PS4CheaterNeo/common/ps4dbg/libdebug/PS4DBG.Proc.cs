@@ -334,7 +334,7 @@ namespace PS4CheaterNeo.libdebug
         /// <param name="address">Memory address</param>
         public string ReadString(int pid, ulong address)
         {
-            string str = "";
+            List<byte> bytes = new List<byte>();
             ulong i = 0;
 
             while (true)
@@ -345,11 +345,11 @@ namespace PS4CheaterNeo.libdebug
                     break;
                 }
 
-                str += Convert.ToChar(value);
+                bytes.Add(value);
                 i++;
             }
 
-            return str;
+            return Encoding.ASCII.GetString(bytes.ToArray());
         }
 
         /// <summary>
