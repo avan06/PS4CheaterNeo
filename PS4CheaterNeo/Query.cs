@@ -606,7 +606,12 @@ namespace PS4CheaterNeo
                     }
 
                     ScanBtn.Text = "Stop";
-                    if (scanSource != null) scanSource.Dispose();
+                    if (scanSource != null)
+                    {
+                        if (!scanSource.IsCancellationRequested)
+                            scanSource.Cancel();
+                        scanSource.Dispose();
+                    }
                     scanSource = new CancellationTokenSource();
                     System.Diagnostics.Stopwatch tickerMajor = System.Diagnostics.Stopwatch.StartNew();
                     scanTask = ScanTask(alignment, isFilter, isFilterSize, AddrMin, AddrMax, CompareFirstBox.Checked, tickerMajor);
@@ -620,9 +625,9 @@ namespace PS4CheaterNeo
                         RedoBtn.Enabled = bitsDictDictsIdx < bitsDictDicts.Count - 1;
                     })))
                     .ContinueWith(t => {
-                        scanSource?.Dispose();
-                        scanSource = null;
-                        scanTask?.Dispose();
+                        //scanSource?.Dispose();
+                        //scanSource = null;
+                        //scanTask?.Dispose();
                         scanTask = null;
                     });
 
@@ -1382,15 +1387,21 @@ namespace PS4CheaterNeo
                     if (pMap.entries == null) return;
                 }
 
-                if (refreshSource != null) refreshSource.Dispose();
+                if (refreshSource != null)
+                {
+                    if (!refreshSource.IsCancellationRequested)
+                        refreshSource.Cancel();
+                    refreshSource.Dispose();
+                }
+
                 System.Diagnostics.Stopwatch tickerMajor = System.Diagnostics.Stopwatch.StartNew();
                 refreshSource = new CancellationTokenSource();
                 refreshTask = RefreshTask(IsFilterBox.Checked, IsFilterSizeBox.Checked, tickerMajor);
                 refreshTask.ContinueWith(t => TaskCompleted(tickerMajor))
                     .ContinueWith(t => {
-                        refreshSource?.Dispose();
-                        refreshSource = null;
-                        refreshTask?.Dispose();
+                        //refreshSource?.Dispose();
+                        //refreshSource = null;
+                        //refreshTask?.Dispose();
                         refreshTask = null;
                     }); ;
             }

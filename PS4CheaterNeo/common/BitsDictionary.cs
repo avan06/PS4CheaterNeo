@@ -77,10 +77,24 @@ namespace PS4CheaterNeo
         /// Buffers for storing data
         /// </summary>
         private readonly List<byte[]> bufferDatas = new List<byte[]>();
+
         /// <summary>
-        /// index for current status
-        /// status for add data
-        /// status for get data
+        /// Manages the internal operational state using nested tuples to track positioning and buffer metadata.
+        /// <para><b>Current:</b> Tracks logical positioning.</para>
+        /// <list type="bullet">
+        ///   <item><term>Index</term><description>The absolute global index of the current entry within the dictionary.</description></item>
+        ///   <item><term>IndexInBit</term><description>The local bit offset (rank) within the current 64-bit bitmap block.</description></item>
+        /// </list>
+        /// <para><b>Add / Get:</b> Stores contextual metadata for write and read operations respectively.</para>
+        /// <list type="bullet">
+        ///   <item><term>BitMapPos</term><description>The byte offset of the active bitmap header within the current bit buffer array.</description></item>
+        ///   <item><term>DataPos</term><description>The relative position of the value within the current data buffer chunk.</description></item>
+        ///   <item><term>BufBitsID</term><description>The index identifier of the active byte array in the bitmap buffer list.</description></item>
+        ///   <item><term>BufDatasID</term><description>The index identifier of the active byte array in the data buffer list.</description></item>
+        ///   <item><term>BaseKey</term><description>The reference memory address (key) used as the starting point for the current bitmap range.</description></item>
+        ///   <item><term>BufferBit</term><description>A direct reference to the byte array currently used for storing bitmap headers.</description></item>
+        ///   <item><term>BufferData</term><description>A direct reference to the byte array currently used for storing raw memory data.</description></item>
+        /// </list>
         /// </summary>
         private ((int Index, int IndexInBit) Current,
             (int BitMapPos, int DataPos, int BufBitsID, int BufDatasID, UInt32 BaseKey, byte[] BufferBit, byte[] BufferData) Add,
@@ -590,10 +604,10 @@ namespace PS4CheaterNeo
         /// <returns>the sum of bits that are set to 1 from the least-signficant bit upto the bit at the given position</returns>
         public int BitCountLSB(UInt64 bits, uint pos)
         {
-            //if (pos == 0) return 0;
-
-            UInt64 result = bits & ~((1ul << 63 << 1) - (1ul << (int)pos + 1));
-            return (int)(BitRawSum(result) >> 56); //(int)((sizeof(UInt64) - 1) * CHAR_BIT)
+            // Fix mask failure caused by bit-shift overflow when pos == 63
+            UInt64 mask = pos == 63 ? ~0ul : (1ul << ((int)pos + 1)) - 1;
+            UInt64 result = bits & mask;
+            return (int)(BitRawSum(result) >> 56);
         }
         #endregion
 
@@ -663,12 +677,13 @@ namespace PS4CheaterNeo
 
         public bool Contains(KeyValuePair<uint, byte[]> item) => ContainsKey(item.Key);
 
-        public void CopyTo(KeyValuePair<uint, byte[]>[] array, int arrayIndex) 
+        public void CopyTo(KeyValuePair<uint, byte[]>[] array, int arrayIndex)
         {
             if (array == null) throw new ArgumentNullException("array");
             if (arrayIndex < 0 || arrayIndex > array.Length) throw new ArgumentException("index must be non-negative and within array argument Length");
             if (array.Length - arrayIndex < Count) throw new ArgumentException("array argument plus index offset is too small");
 
+            Begin(); // Prevent unnecessary internal state backtracking calculations
             for (int i = 0; i < Count; i++)
             {
                 (uint key, byte[] data) = Get(i);
@@ -752,7 +767,9 @@ namespace PS4CheaterNeo
                     state.Get.BaseKey = BitConverter.ToUInt32(state.Get.BufferBit, state.Get.BitMapPos + bitMapSize);
                     long bitPosition = (key - state.Get.BaseKey) / KeyStep;
                     int bitCount = BitCount(bitMap);
-                    if (bitPosition >= bitMapBits)
+
+                    // Fix out-of-bounds error when bitPosition is negative and falls into the else block
+                    if (bitPosition >= bitMapBits || bitPosition < 0)
                     {
                         state.Current.Index -= bitCount == 0 ? 0 : bitCount;
                         state.Current.IndexInBit = 0;
@@ -779,6 +796,7 @@ namespace PS4CheaterNeo
                     ulong bitMap = BitConverter.ToUInt64(state.Get.BufferBit, state.Get.BitMapPos);
                     state.Get.BaseKey = BitConverter.ToUInt32(state.Get.BufferBit, state.Get.BitMapPos + bitMapSize);
                     long bitPosition = (key - state.Get.BaseKey) / KeyStep;
+
                     if (bitPosition >= bitMapBits)
                     {
                         int bitCount = BitCount(bitMap);
@@ -795,6 +813,9 @@ namespace PS4CheaterNeo
                     }
                     else
                     {
+                        // Fix negative out-of-bounds error when the Key falls within the gap between two chunks
+                        if (bitPosition < 0) return false;
+
                         bool result = (state.Get.BufferBit[state.Get.BitMapPos + bitPosition / 8] & (byte)(1 << ((int)bitPosition % 8))) != 0;
                         if (result)
                         {
@@ -834,15 +855,63 @@ namespace PS4CheaterNeo
 
         public void OnDeserialization(object sender) => throw new NotImplementedException();
 
-        public object Clone()
+        public object Clone() => Clone(false);
+
+        /// <summary>
+        /// Creates a new instance of the current object with the option to perform a deep or shallow copy of its data.
+        /// </summary>
+        /// <remarks>
+        /// When performing a deep copy, all internal byte arrays are duplicated, ensuring that
+        /// modifications to the clone do not affect the original object. A shallow copy shares references to the
+        /// internal arrays, so changes to the data in one instance will be reflected in the other.
+        ///
+        /// The Query window's Undo/Redo history is produced by this `Clone` method. In this usage the address (`key`)
+        /// is the important part; values are typically re-fetched and compared against the latest data. Therefore the
+        /// default behavior uses a shallow copy (`deepCopy = false`).
+        /// </remarks>
+        /// <param name="deepCopy">true to create a deep copy of all internal data arrays; false to create a shallow copy that shares
+        /// references to the original arrays. The default is false.</param>
+        /// <returns>A new object that is a copy of the current instance. The copy is deep or shallow depending on the value of
+        /// the deepCopy parameter.</returns>
+        public object Clone(bool deepCopy = false)
         {
             BitsDictionary cloneBitsDict = new BitsDictionary(KeyStep, DataLengthSingle, DataAmount);
             cloneBitsDict.bufferBits.Clear();
             cloneBitsDict.bufferDatas.Clear();
-            cloneBitsDict.bufferBits.AddRange(bufferBits);
-            cloneBitsDict.bufferDatas.AddRange(bufferDatas);
+
+            if (deepCopy)
+            {
+                // Deep copy is required to prevent Set() from polluting historical records and overwriting existing data
+                foreach (byte[] b in bufferBits)
+                {
+                    cloneBitsDict.bufferBits.Add(b != null ? (byte[])b.Clone() : null);
+                }
+                foreach (byte[] d in bufferDatas)
+                {
+                    cloneBitsDict.bufferDatas.Add(d != null ? (byte[])d.Clone() : null);
+                }
+            }
+            else
+            {
+                cloneBitsDict.bufferBits.AddRange(bufferBits);
+                cloneBitsDict.bufferDatas.AddRange(bufferDatas);
+            }
+
             cloneBitsDict.state = state;
             cloneBitsDict.Count = Count;
+
+            if (deepCopy)
+            {
+                // Rebind internal state references to the newly cloned byte arrays
+                if (state.Add.BufferBit != null)
+                    cloneBitsDict.state.Add.BufferBit = cloneBitsDict.bufferBits[state.Add.BufBitsID];
+                if (state.Add.BufferData != null)
+                    cloneBitsDict.state.Add.BufferData = cloneBitsDict.bufferDatas[state.Add.BufDatasID];
+                if (state.Get.BufferBit != null)
+                    cloneBitsDict.state.Get.BufferBit = cloneBitsDict.bufferBits[state.Get.BufBitsID];
+                if (state.Get.BufferData != null)
+                    cloneBitsDict.state.Get.BufferData = cloneBitsDict.bufferDatas[state.Get.BufDatasID];
+            }
 
             return cloneBitsDict;
         }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
@@ -55,6 +56,15 @@ namespace PS4CheaterNeo
 
     public static class ScanTool
     {
+        [StructLayout(LayoutKind.Explicit)]
+        private struct IntFloatUnion
+        {
+            [FieldOffset(0)] public uint IntValue;
+            [FieldOffset(0)] public float FloatValue;
+        }
+
+        private static float UInt32ToSingle(uint value) => new IntFloatUnion { IntValue = value }.FloatValue;
+
         public static Dictionary<ScanType, int> ScanTypeLengthDict = new Dictionary<ScanType, int>()
         {
             [ScanType.Byte_]          = 1,
@@ -136,9 +146,15 @@ namespace PS4CheaterNeo
         /// <returns></returns>
         public static ulong BytesToULong(byte[] bytes)
         {
-            if (bytes.Length < 8) Array.Resize(ref bytes, 8);
-            ulong valueUlong = BitConverter.ToUInt64(bytes, 0);
-            return valueUlong;
+            int len = bytes.Length;
+            if (len >= 8) return BitConverter.ToUInt64(bytes, 0);
+            if (len == 4) return BitConverter.ToUInt32(bytes, 0);
+            if (len == 2) return BitConverter.ToUInt16(bytes, 0);
+            if (len == 1) return bytes[0];
+
+            byte[] padded = new byte[8];
+            Buffer.BlockCopy(bytes, 0, padded, 0, len);
+            return BitConverter.ToUInt64(padded, 0);
         }
 
         /// <summary>
@@ -281,9 +297,28 @@ namespace PS4CheaterNeo
                 case ScanType.Byte_:
                 case ScanType.String_:
                 case ScanType.Group:
-                    if (inputValue0.Length != newValue.Length) throw new ArgumentException("Comparer String length verification failed");
-                    for (int idx = 0; idx < inputValue0.Length; ++idx) if (inputValue0[idx] != newValue[idx]) return false;
-                    result = true;
+                    int len = inputValue0.Length;
+                    if (len != newValue.Length)
+                        throw new ArgumentException("Comparer String length verification failed");
+
+                    if (len == 4)
+                        result = inputValue0[0] == newValue[0] && inputValue0[1] == newValue[1] &&
+                                 inputValue0[2] == newValue[2] && inputValue0[3] == newValue[3];
+                    else if (len == 8)
+                        result = inputValue0[0] == newValue[0] && inputValue0[1] == newValue[1] &&
+                                 inputValue0[2] == newValue[2] && inputValue0[3] == newValue[3] &&
+                                 inputValue0[4] == newValue[4] && inputValue0[5] == newValue[5] &&
+                                 inputValue0[6] == newValue[6] && inputValue0[7] == newValue[7];
+                    else if (len == 2)
+                        result = inputValue0[0] == newValue[0] && inputValue0[1] == newValue[1];
+                    else if (len == 1)
+                        result = inputValue0[0] == newValue[0];
+                    else
+                    {
+                        for (int idx = 0; idx < len; ++idx)
+                            if (inputValue0[idx] != newValue[idx]) return false;
+                        result = true;
+                    }
                     break;
                 case ScanType.Hex:
                     if (inputValue0.Length != newValue.Length) throw new ArgumentException("Comparer String length verification failed");
@@ -380,28 +415,28 @@ namespace PS4CheaterNeo
                     oldUInt16 = (UInt16)oldData;
                     break;
                 case ScanType.Byte_:
-                    newByte = BitConverter.GetBytes(newData)[0];
-                    oldByte = BitConverter.GetBytes(oldData)[0];
+                    newByte = (byte)newData;
+                    oldByte = (byte)oldData;
                     break;
                 case ScanType.Double_:
-                    newDouble = BitConverter.ToDouble(BitConverter.GetBytes(newData), 0);
-                    oldDouble = BitConverter.ToDouble(BitConverter.GetBytes(oldData), 0);
+                    newDouble = BitConverter.Int64BitsToDouble((long)newData);
+                    oldDouble = BitConverter.Int64BitsToDouble((long)oldData);
                     break;
                 case ScanType.Float_:
-                    newFloat = BitConverter.ToSingle(BitConverter.GetBytes(newData), 0);
-                    oldFloat = BitConverter.ToSingle(BitConverter.GetBytes(oldData), 0);
+                    newFloat = UInt32ToSingle((uint)newData);
+                    oldFloat = UInt32ToSingle((uint)oldData);
                     break;
                 case ScanType.AutoNumeric:
                     if (comparerTool.AutoNumericValid.Float)
                     {
-                        newFloat = BitConverter.ToSingle(BitConverter.GetBytes((UInt32)newData), 0);
-                        oldFloat = BitConverter.ToSingle(BitConverter.GetBytes((UInt32)oldData), 0);
+                        newFloat = UInt32ToSingle((uint)newData);
+                        oldFloat = UInt32ToSingle((uint)oldData);
                         newFloatValid = (newFloat == 0 && comparerTool.Input0UInt64 == 0) || newFloat != 0;
                     }
                     if (comparerTool.AutoNumericValid.Double)
                     {
-                        newDouble = BitConverter.ToDouble(BitConverter.GetBytes(newData), 0);
-                        oldDouble = BitConverter.ToDouble(BitConverter.GetBytes(oldData), 0);
+                        newDouble = BitConverter.Int64BitsToDouble((long)newData);
+                        oldDouble = BitConverter.Int64BitsToDouble((long)oldData);
                         newDoubleValid = (newDouble == 0 && comparerTool.Input0UInt64 == 0) || newDouble != 0;
                     }
                     if (comparerTool.AutoNumericValid.UInt)
@@ -409,11 +444,11 @@ namespace PS4CheaterNeo
                         if (comparerTool.IsUnknownInitial)
                         {
                             if (oldData == 0) { }
-                            else if (oldData <= 0xFF) newDataTmp = BitConverter.GetBytes(newDataTmp)[0]; //255
+                            else if (oldData <= 0xFF) newDataTmp = (byte)newDataTmp; //255
                             else if (oldData <= 0xFFFF) newDataTmp = (UInt16)newDataTmp; //65535
                             else if (oldData <= 0xFFFFFFFF) newDataTmp = (UInt32)newDataTmp; //4294967295
                         }
-                        else if (comparerTool.Input0UInt64 <= 0xFF) newDataTmp = BitConverter.GetBytes(newDataTmp)[0]; //255
+                        else if (comparerTool.Input0UInt64 <= 0xFF) newDataTmp = (byte)newDataTmp; //255
                         else if (comparerTool.Input0UInt64 <= 0xFFFF) newDataTmp = (UInt16)newDataTmp; //65535
                         else if (comparerTool.Input0UInt64 <= 0xFFFFFFFF) newDataTmp = (UInt32)newDataTmp; //4294967295
                     }
