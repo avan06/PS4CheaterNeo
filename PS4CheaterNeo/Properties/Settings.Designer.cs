@@ -204,6 +204,19 @@ namespace PS4CheaterNeo.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("500|2_Cheat|CheatLock|Determines the Interval of RefreshLockTimer when Cheat Lock" +
+            " is enabled, in milliseconds. \\nDefault 500")]
+        public global::OptionTreeView.Option<uint> CheatLockTimerInterval {
+            get {
+                return ((global::OptionTreeView.Option<uint>)(this["CheatLockTimerInterval"]));
+            }
+            set {
+                this["CheatLockTimerInterval"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True|2_Cheat|CheatLock|Determine whether to enable verifying Section values when " +
             "locking cheat items. \\nDefault enabled")]
         public global::OptionTreeView.Option<bool> VerifySectionWhenLock {

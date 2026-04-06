@@ -609,6 +609,9 @@ namespace PS4CheaterNeo
         public string CheatLock;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
+        public string CheatLockTimerInterval;
+
+        [System.Runtime.Serialization.DataMemberAttribute()]
         public string VerifySectionWhenLock;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
@@ -850,6 +853,9 @@ namespace PS4CheaterNeo
 
         [System.Runtime.Serialization.DataMemberAttribute()]
         public string description_CheatLock;
+
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string description_CheatLockTimerInterval;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
         public string description_VerifySectionWhenLock;

@@ -44,6 +44,9 @@
     <Setting Name="CheatLock" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
       <Value Profile="(Default)">True|2_Cheat|CheatLock|Determines whether to enable cheat lock in the main window. \nDefault enabled</Value>
     </Setting>
+    <Setting Name="CheatLockTimerInterval" Type="OptionTreeView.Option&lt;uint&gt;" Scope="User">
+      <Value Profile="(Default)">500|2_Cheat|CheatLock|Determines the Interval of RefreshLockTimer when Cheat Lock is enabled, in milliseconds. \nDefault 500</Value>
+    </Setting>
     <Setting Name="VerifySectionWhenLock" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
       <Value Profile="(Default)">True|2_Cheat|CheatLock|Determine whether to enable verifying Section values when locking cheat items. \nDefault enabled</Value>
     </Setting>

@@ -38,6 +38,9 @@ namespace PS4CheaterNeo
             public Color ForeColor;
             public bool IsSign;
             public List<Object> Cells;
+
+            public byte[] LockDataCache;
+            public ScanType ScanTypeCache;
         }
 
         List<CheatRow> cheatGridRowList = new List<CheatRow>();
@@ -177,6 +180,7 @@ namespace PS4CheaterNeo
                 ToolStripAutoRefresh.Checked   = Properties.Settings.Default.CheatAutoRefresh.Value;
                 CheatAutoRefreshShowStatus     = Properties.Settings.Default.CheatAutoRefreshShowStatus.Value;
                 AutoRefreshTimer.Interval      = (int)Properties.Settings.Default.CheatAutoRefreshTimerInterval.Value;
+                RefreshLock.Interval           = (int)Properties.Settings.Default.CheatLockTimerInterval.Value;
                 VerifySectionWhenLock          = Properties.Settings.Default.VerifySectionWhenLock.Value;
                 VerifySectionWhenRefresh       = Properties.Settings.Default.VerifySectionWhenRefresh.Value;
                 CheatGridGroupRefreshThreshold = Properties.Settings.Default.CheatGridGroupRefreshThreshold.Value;
@@ -1405,6 +1409,10 @@ namespace PS4CheaterNeo
 
                 isInitSections = true;
                 VerifySectionWhenLock = Properties.Settings.Default.VerifySectionWhenLock.Value;
+
+                Invoke(new MethodInvoker(() => {
+                    RefreshLock.Interval = (int)Properties.Settings.Default.CheatLockTimerInterval.Value;
+                }));
             }
 
             (uint sid, string name, uint prot, uint offsetAddr) preData = (0, "", 0, 0);
@@ -1469,8 +1477,39 @@ namespace PS4CheaterNeo
                         row.Cells[(int)ChertCol.CheatListAddress] = hexAddr;
                     }
                     #endregion
-                    ScanType scanType = this.ParseFromDescription<ScanType>(row.Cells[(int)ChertCol.CheatListType].ToString());
-                    byte[] newData = ScanTool.ValueStringToByte(scanType, row.Cells[(int)ChertCol.CheatListValue].ToString());
+
+                    if (row.LockDataCache == null)
+                    {
+                        // If cache is missing, perform fail-safe parsing and store it in cache
+                        row.ScanTypeCache = this.ParseFromDescription<ScanType>(row.Cells[(int)ChertCol.CheatListType].ToString());
+                        try
+                        {
+                            row.LockDataCache = ScanTool.ValueStringToByte(row.ScanTypeCache, row.Cells[(int)ChertCol.CheatListValue].ToString());
+
+                            // If it returns null without throwing an exception, we throw one to trigger the fail-safe below
+                            if (row.LockDataCache == null) throw new Exception("Parsed byte array is null.");
+                        }
+                        catch
+                        {
+                            // If parsing fails, set the row color to red, uncheck the lock, and skip this row
+                            row.ForeColor = Color.Red;
+                            row.Cells[(int)ChertCol.CheatListLock] = false;
+                            preData = (0, "", 0, 0);
+
+                            // Update UI from the background thread
+                            Invoke(new MethodInvoker(() =>
+                            {
+                                ToolStripMsg.Text = string.Format("RefreshLock Failed (Invalid Value)...CheatGrid({0})", cIdx);
+                                CheatGridView.InvalidateRow(cIdx); // Force UI update for this specific row immediately
+                            }));
+
+                            continue;
+                        }
+                    }
+                    byte[] newData = row.LockDataCache;
+
+                    // If newData fails to parse and remains null, skip this write request to prevent underlying crashes
+                    if (newData == null) continue;
 
                     if (processID == -1) processID = section.PID;
                     writeData.Add((offsetAddr + section.Start, newData));
@@ -1481,6 +1520,8 @@ namespace PS4CheaterNeo
             if (ProcessPid == 0) return false;
 
             CheatBatchWriteMemory(10, processID, writeData, true);
+            //var mergedWriteData = MergeMemoryWrites(processID, writeData, maxGap: 0); // Recommended to use 0 for conservative merging initially
+            //CheatBatchWriteMemory(10, processID, mergedWriteData, true); // Send to parallel write (The chunkSize now refers to the number of large merged blocks processed simultaneously)
 
             return true;
         });
@@ -1550,6 +1591,133 @@ namespace PS4CheaterNeo
         }
 
         /// <summary>
+        /// Merges adjacent or nearby memory write requests into larger contiguous blocks to optimize memory operations.
+        /// </summary>
+        /// <remarks>If the gap between two write requests is less than or equal to maxGap, the method
+        /// calculates the total span of the merged block, performs a SINGLE ReadMemory call to fetch the original data 
+        /// (to avoid overwriting un-targeted memory), and then overlays the write requests. 
+        /// The input list is sorted in-place by address before merging.</remarks>
+        /// <param name="processID">The target process ID, required for reading original memory data when gaps exist.</param>
+        /// <param name="writeRequests">The list of memory write requests. The list must not be null.</param>
+        /// <param name="maxGap">The maximum allowed gap, in bytes, between adjacent memory regions to be merged. 
+        /// The default is 0.</param>
+        /// <returns>A new list of merged memory write requests.</returns>
+        private List<(ulong address, byte[] data)> MergeMemoryWrites(int processID, List<(ulong address, byte[] data)> writeRequests, int maxGap = 0)
+        {
+            if (writeRequests == null || writeRequests.Count == 0) return writeRequests;
+
+            // 1. Ensure requests are sorted by memory address in ascending order
+            writeRequests.Sort((a, b) => a.address.CompareTo(b.address));
+
+            // Lists to store the clustered requests
+            List<List<(ulong address, byte[] data)>> clusters = new List<List<(ulong address, byte[] data)>>();
+            List<(ulong address, byte[] data)> currentCluster = new List<(ulong address, byte[] data)>();
+
+            // Initialize the first cluster
+            currentCluster.Add(writeRequests[0]);
+            ulong currentEndAddr = writeRequests[0].address + (ulong)writeRequests[0].data.Length;
+
+            // 2. Phase 1: Grouping - Calculate which requests should be merged into the same cluster
+            for (int i = 1; i < writeRequests.Count; i++)
+            {
+                var request = writeRequests[i];
+
+                // If the current request address is within the allowed maxGap, add to the current cluster
+                if (request.address <= currentEndAddr + (ulong)maxGap)
+                {
+                    currentCluster.Add(request);
+                    ulong reqEnd = request.address + (ulong)request.data.Length;
+                    if (reqEnd > currentEndAddr)
+                        currentEndAddr = reqEnd; // Update the cluster's end address
+                }
+                else
+                {
+                    // Exceeds maxGap, finalize the current cluster and start a new one
+                    clusters.Add(currentCluster);
+                    currentCluster = new List<(ulong address, byte[] data)> { request };
+                    currentEndAddr = request.address + (ulong)request.data.Length;
+                }
+            }
+            clusters.Add(currentCluster); // Add the final cluster
+
+            List<(ulong address, byte[] data)> mergedList = new List<(ulong address, byte[] data)>();
+            int readFailureCount = 0; // Counter for ReadMemory failures
+
+            // 3. Phase 2: Process each cluster (Read & Overlay)
+            foreach (var cluster in clusters)
+            {
+                ulong clusterStart = cluster[0].address;
+                ulong clusterEnd = clusterStart;
+
+                // Find the exact end address of this cluster
+                foreach (var req in cluster)
+                {
+                    ulong end = req.address + (ulong)req.data.Length;
+                    if (end > clusterEnd) clusterEnd = end;
+                }
+
+                int totalSize = (int)(clusterEnd - clusterStart);
+
+                // Determine if there are actual gaps inside this cluster
+                // If the addresses are perfectly contiguous or overlapping, we don't need to call ReadMemory
+                bool hasGap = false;
+                ulong expectedNextAddr = clusterStart;
+                foreach (var req in cluster)
+                {
+                    if (req.address > expectedNextAddr)
+                    {
+                        hasGap = true;
+                        break;
+                    }
+                    expectedNextAddr = Math.Max(expectedNextAddr, req.address + (ulong)req.data.Length);
+                }
+
+                byte[] buffer;
+                if (hasGap)
+                {
+                    // Gap exists: Perform a SINGLE ReadMemory to fetch the entire memory block as a base
+                    // This prevents overwriting original game data in the gaps
+                    buffer = PS4Tool.ReadMemory(processID, clusterStart, totalSize);
+
+                    // Error handling: If reading fails or length mismatches
+                    if (buffer == null || buffer.Length != totalSize)
+                    {
+                        readFailureCount++;
+                        if (readFailureCount > 3)
+                        {
+                            // Safely uncheck the ToolStripLockEnable UI element from the background task
+                            Invoke(new MethodInvoker(() =>
+                            {
+                                ToolStripLockEnable.Checked = false;
+                                ToolStripMsg.Text = "Lock disabled: ReadMemory failed consecutively during memory merging.";
+                            }));
+                            throw new Exception("ReadMemory failed consecutively during memory merging.");
+                        }
+
+                        // Discard this buffer and skip this cluster to avoid data corruption
+                        continue;
+                    }
+                }
+                else
+                {
+                    // Perfectly contiguous without gaps: Create an empty array to save a network request
+                    buffer = new byte[totalSize];
+                }
+
+                // Overlay all write requests within the cluster onto the correct offset of the buffer
+                foreach (var req in cluster)
+                {
+                    int offset = (int)(req.address - clusterStart);
+                    Buffer.BlockCopy(req.data, 0, buffer, offset, req.data.Length);
+                }
+
+                mergedList.Add((clusterStart, buffer));
+            }
+
+            return mergedList;
+        }
+
+        /// <summary>
         /// Split the writeData containing memory locations and bytes into multiple chunks based on chunkSize and write them into PS4 memory in batches.
         /// </summary>
         /// <param name="chunkSize">Size of each chunk</param>
@@ -1559,16 +1727,20 @@ namespace PS4CheaterNeo
         {
             List<List<(ulong address, byte[] data)>> writeDataList = SplitList(writeData, chunkSize);
 
-            for (int idx = 0; idx < writeDataList.Count; idx++)
+            // Get user-defined connection pool size to limit maximum parallelism
+            int maxDegree = Properties.Settings.Default.PS4DBGMutexFactor.Value;
+
+            // Use Parallel.ForEach for concurrent sending to fully utilize multiple sockets within PS4Tool
+            Parallel.ForEach(writeDataList, new ParallelOptions { MaxDegreeOfParallelism = maxDegree }, subWriteData =>
             {
                 refreshLockSource.Token.ThrowIfCancellationRequested();
                 try
                 {
-                    List<(ulong address, byte[] data)> subWriteData = writeDataList[idx];
+                    // PS4Tool.WriteMemory uses an internal CurrentIdx2() mechanism to distribute requests across different connections
                     PS4Tool.WriteMemory(processID, subWriteData.ToArray());
                 }
                 catch (Exception) { if (isExceptionThrow) throw; }
-            }
+            });
         }
 
         /// <summary>
@@ -1616,8 +1788,22 @@ namespace PS4CheaterNeo
             CheatRow viewRow = cheatGridRowList[e.RowIndex];
 
             viewRow.Cells[e.ColumnIndex] = e.Value;
+
+            // When the user checks 'Lock', capture the currently displayed value as the lock cache
+            if (e.ColumnIndex == (int)ChertCol.CheatListLock && e.Value is bool isLocked && isLocked)
+            {
+                try
+                {
+                    ScanType scanType = this.ParseFromDescription<ScanType>(viewRow.Cells[(int)ChertCol.CheatListType].ToString());
+                    viewRow.ScanTypeCache = scanType;
+                    viewRow.LockDataCache = ScanTool.ValueStringToByte(scanType, viewRow.Cells[(int)ChertCol.CheatListValue].ToString());
+                }
+                catch { /* If the current string cannot be parsed (e.g., typing invalid chars), ignore it for now; RefreshLockTask will try to recover it. */  }
+            }
+
             cheatGridRowList[e.RowIndex] = viewRow;
         }
+
         private void CheatGridView_RowPostPaint(object sender, DataGridViewRowPostPaintEventArgs e)
         {
             var format = new StringFormat() { Alignment = StringAlignment.Near, LineAlignment = StringAlignment.Near };
@@ -1691,7 +1877,7 @@ namespace PS4CheaterNeo
                 ScanType scanType = this.ParseFromDescription<ScanType>(editedRow.Cells[(int)ChertCol.CheatListType].ToString());
                 byte[] data = ScanTool.ValueStringToByte(scanType, editedRow.Cells[(int)ChertCol.CheatListValue].ToString());
                 PS4Tool.WriteMemory(section.PID, offsetAddr + section.Start, data);
-                (editedRow.Section_, editedRow.OffsetAddr) = (section, offsetAddr);
+                (editedRow.Section_, editedRow.OffsetAddr, editedRow.ScanTypeCache, editedRow.LockDataCache) = (section, offsetAddr, scanType, data);
             }
             catch (Exception ex)
             {
@@ -1760,6 +1946,8 @@ namespace PS4CheaterNeo
 
                     byte[] newData = ScanTool.ValueStringToByte(scanType, newValue);
                     PS4Tool.WriteMemory(section.PID, offsetAddr + section.Start, newData);
+
+                    (row.ScanTypeCache, row.LockDataCache) = (scanType, newData);
                 }
             }
             finally
@@ -1854,6 +2042,8 @@ namespace PS4CheaterNeo
 
                 byte[] data = ScanTool.ValueStringToByte(scanType, value);
                 PS4Tool.WriteMemory(section.PID, offsetAddr + section.Start, data);
+
+                (row.ScanTypeCache, row.LockDataCache) = (scanType, data);
             }
             if (refresh) CheatGridView.Refresh();
         }
@@ -1884,6 +2074,10 @@ namespace PS4CheaterNeo
                             byte[] rowData = ScanTool.ValueStringToByte(rowScanType, inputValue);
                             PS4Tool.WriteMemory(checkRow.section.PID, checkRow.offsetAddr + checkRow.section.Start, rowData);
                             row.Cells[(int)ChertCol.CheatListValue] = ScanTool.BytesToString(rowScanType, rowData, false, inputValue.StartsWith("-"));
+
+                            // Synchronize the cache, otherwise the lock thread will keep writing the old values
+                            row.ScanTypeCache = rowScanType;
+                            row.LockDataCache = rowData;
                         }
                         catch (Exception ex)
                         {
@@ -1956,6 +2150,11 @@ namespace PS4CheaterNeo
                 row.Cells[(int)ChertCol.CheatListValue] = newAddress.Value;
                 row.Cells[(int)ChertCol.CheatListOn] = newAddress.OnValue;
                 row.Cells[(int)ChertCol.CheatListOff] = newAddress.OffValue;
+
+                // Synchronize the cache
+                row.ScanTypeCache = newAddress.CheatType;
+                row.LockDataCache = data;
+
                 CheatGridView.Refresh();
             }
             catch (Exception ex)
@@ -2130,8 +2329,11 @@ namespace PS4CheaterNeo
                 result.Cells[(int)ChertCol.CheatListDesc] = cheatDesc;
                 if (onValue != null) result.Cells[(int)ChertCol.CheatListOn] = onValue;
                 if (offValue != null) result.Cells[(int)ChertCol.CheatListOff] = offValue;
+                result.ScanTypeCache = scanType;
+                result.LockDataCache = ScanTool.ValueStringToByte(scanType, oldValue);
 
                 cheatGridRowList.Add(result);
+
                 if (isUpdateCheatGridViewRowCount) CheatGridView.RowCount = cheatGridRowList.Count;
             }
             catch (Exception ex)
