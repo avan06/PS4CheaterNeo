@@ -74,6 +74,8 @@
 
     "SectionViewHexEditor": "Editor Hexadecimal",
     "SectionViewCheck": "Marcar",
+    "SectionViewUnCheck": "Desmarcar",
+    "SectionViewInverseCheck": "Invertir selección",
     "SectionViewCheckAll": "Marcar Todo",
     "SectionViewUnCheckAll": "Desmarcar Todo",
     "SectionViewInvertChecked": "Invertir Marcados",

@@ -34,6 +34,7 @@ namespace PS4CheaterNeo
         bool WriteHiddenSectionConf          = Properties.Settings.Default.WriteHiddenSectionConf.Value;
         EndianType QueryHexNumericEndianType = Properties.Settings.Default.QueryHexNumericEndianType.Value;
         bool isCloneScan = false;
+        const int MaxComboBoxHistory = 20;
 
         List<ListViewItem> sectionItems = new List<ListViewItem>();
         List<ListViewItem> resultItems = new List<ListViewItem>();
@@ -86,6 +87,28 @@ namespace PS4CheaterNeo
             this.bitsDictDicts = new List<Dictionary<uint, BitsDictionary>>(bitsDictDicts);
         }
 
+        private void AddComboBoxHistory(ComboBox comboBox)
+        {
+            string text = comboBox.Text.Trim();
+            if (string.IsNullOrEmpty(text)) return;
+            int idx = comboBox.Items.IndexOf(text);
+            if (idx >= 0) comboBox.Items.RemoveAt(idx);
+            comboBox.Items.Insert(0, text);
+            while (comboBox.Items.Count > MaxComboBoxHistory)
+                comboBox.Items.RemoveAt(comboBox.Items.Count - 1);
+            comboBox.Text = text;
+        }
+
+        private void UpdateQueryTitle()
+        {
+            string title = $"Neo {Application.ProductVersion} | Query";
+            string payloadInfo = PS4Tool.ToString();
+            if (!string.IsNullOrEmpty(payloadInfo)) title += " - " + payloadInfo;
+            if (!string.IsNullOrEmpty(mainForm.GameID))
+                title += " | Game ID: " + mainForm.GameID + ", Version: " + (mainForm.GameVer ?? "");
+            Text = title;
+        }
+
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
             if (!KeyQuery) return base.ProcessCmdKey(ref msg, keyData);
@@ -114,6 +137,11 @@ namespace PS4CheaterNeo
                 SplitContainer2.SplitterPanelCollapseExpand(true);
             else if (keyData == KeyExpandUpperRightSplitPanel)
                 SplitContainer2.SplitterPanelCollapseExpand(false);
+            else if (keyData == Keys.Space && SectionView.Focused)
+            {
+                List<ListViewItem> selectedItems = ListViewLVITEM.GetSelectedItems(SectionView);
+                if (selectedItems.Count > 0) SectionViewSetSelected(selectedItems[0].Checked ? false : true);
+            }
             else
                 return base.ProcessCmdKey(ref msg, keyData);
 
@@ -150,6 +178,8 @@ namespace PS4CheaterNeo
 
                     SectionViewHexEditor.Text            = langJson.QueryForm.SectionViewHexEditor;
                     SectionViewCheck.Text                = langJson.QueryForm.SectionViewCheck;
+                    SectionViewUnCheck.Text              = langJson.QueryForm.SectionViewUnCheck;
+                    SectionViewInverseCheck.Text         = langJson.QueryForm.SectionViewInverseCheck;
                     SectionViewCheckAll.Text             = langJson.QueryForm.SectionViewCheckAll;
                     SectionViewUnCheckAll.Text           = langJson.QueryForm.SectionViewUnCheckAll;
                     SectionViewInvertChecked.Text        = langJson.QueryForm.SectionViewInvertChecked;
@@ -282,6 +312,7 @@ namespace PS4CheaterNeo
         #region Event
         private void Query_Load(object sender, EventArgs e)
         {
+            FormGeometryHelper.Restore(this, Properties.Settings.Default.QueryFormGeometry);
             foreach (ScanType filterEnum in (ScanType[])Enum.GetValues(typeof(ScanType)))
             {
                 if ((!SectionViewDetectHiddenSection || !WriteHiddenSectionConf) && filterEnum == ScanType.HiddenSections) continue;
@@ -319,7 +350,7 @@ namespace PS4CheaterNeo
             if (process != null) PS4Tool.DetachDebugger((int)process.Value);
             bitsDictDicts.Clear();
             GC.Collect();
-            Properties.Settings.Default.Save();
+            FormGeometryHelper.Save(this, Properties.Settings.Default.QueryFormGeometry);
         }
 
         private void GetProcessesBtn_Click(object sender, EventArgs e)
@@ -327,6 +358,11 @@ namespace PS4CheaterNeo
             try
             {
                 if (!PS4Tool.Connect(Properties.Settings.Default.PS4IP.Value, out string msg)) throw new Exception(msg);
+
+                string payloadInfo = PS4Tool.ToString();
+                Text = string.IsNullOrEmpty(payloadInfo) ? "Query" : "Query - " + payloadInfo;
+                try { mainForm.InitGameInfo(); } catch { }
+                UpdateQueryTitle();
 
                 int selectedIdx = 0;
                 string DefaultProcess = Properties.Settings.Default.DefaultProcess.Value;
@@ -561,6 +597,10 @@ namespace PS4CheaterNeo
                     floatingSimpleValueExponents = Properties.Settings.Default.FloatingSimpleValueExponents.Value;
                     floatingSimpleValueExponents = (floatingSimpleValueExponents > 1 && floatingSimpleValueExponents < 51) ? (byte)(floatingSimpleValueExponents - 1) : (byte)10;
 
+                    AddComboBoxHistory(ValueBox);
+                    AddComboBoxHistory(Value1Box);
+                    AddComboBoxHistory(AddrMinBox);
+                    AddComboBoxHistory(AddrMaxBox);
                     string value0 = ValueBox.Text.Trim();
                     string value1 = Value1Box.Text.Trim();
                     bool alignment = AlignmentBox.Checked;
@@ -574,6 +614,7 @@ namespace PS4CheaterNeo
                     if (scanType == ScanType.HiddenSections)
                     {
                         mainForm.InitGameInfo();
+                        UpdateQueryTitle();
                         mainForm.InitLocalHiddenSections();
                         if (mainForm.LocalHiddenSections.Count == 0)
                         {
@@ -2026,18 +2067,22 @@ namespace PS4CheaterNeo
             SectionView.EndUpdate();
         }
 
-        private void SectionViewCheck_Click(object sender, EventArgs e)
+        private void SectionViewCheck_Click(object sender, EventArgs e) => SectionViewSetSelected(true);
+
+        private void SectionViewUnCheck_Click(object sender, EventArgs e) => SectionViewSetSelected(false);
+
+        private void SectionViewInverseCheck_Click(object sender, EventArgs e) => SectionViewSetSelected(null);
+
+        private void SectionViewSetSelected(bool? isChecked)
         {
             List<ListViewItem> selectedItems = ListViewLVITEM.GetSelectedItems(SectionView);
             if (selectedItems.Count == 0) return;
 
-            bool? isChecked = null;
             SectionView.BeginUpdate();
             for (int idx = 0; idx < selectedItems.Count; ++idx)
             {
                 ListViewItem item = selectedItems[idx];
-                if (isChecked == null) isChecked = !item.Checked;
-                item.Checked = (bool)isChecked;
+                item.Checked = isChecked ?? !item.Checked;
                 uint sid = uint.Parse(item.SubItems[(int)SectionCol.SectionViewSID].Text);
                 SectionCheckUpdate(item.Checked, sid);
             }
@@ -2140,6 +2185,7 @@ namespace PS4CheaterNeo
             if (MessageBox.Show(mainForm.langJson != null ? mainForm.langJson.QueryForm.SectionViewDisableCheckedHiddenWarning : "Warning", "Disable checked Hidden", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) return;
 
             mainForm.InitGameInfo();
+            UpdateQueryTitle();
             mainForm.InitLocalHiddenSections();
             if (mainForm.LocalHiddenSections.Count == 0)
             {

@@ -74,6 +74,8 @@
 
     "SectionViewHexEditor": "Hex-Editor",
     "SectionViewCheck": "Überprüfen",
+    "SectionViewUnCheck": "Abwählen",
+    "SectionViewInverseCheck": "Auswahl umkehren",
     "SectionViewCheckAll": "Alle überprüfen",
     "SectionViewUnCheckAll": "Alle nicht überprüfen",
     "SectionViewInvertChecked": "Markierte umkehren",

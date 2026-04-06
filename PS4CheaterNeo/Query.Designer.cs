@@ -44,6 +44,8 @@ namespace PS4CheaterNeo
             this.SectionViewHexEditor = new System.Windows.Forms.ToolStripMenuItem();
             this.SectionViewMenu_ToolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.SectionViewCheck = new System.Windows.Forms.ToolStripMenuItem();
+            this.SectionViewUnCheck = new System.Windows.Forms.ToolStripMenuItem();
+            this.SectionViewInverseCheck = new System.Windows.Forms.ToolStripMenuItem();
             this.SectionViewMenu_ToolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.SectionViewItems = new System.Windows.Forms.ToolStripMenuItem();
             this.SectionViewCheckAll = new System.Windows.Forms.ToolStripMenuItem();
@@ -96,8 +98,8 @@ namespace PS4CheaterNeo
             this.AddrMinLabel = new System.Windows.Forms.Label();
             this.AddrIsFilterBox = new System.Windows.Forms.CheckBox();
             this.AddrMaxLabel = new System.Windows.Forms.Label();
-            this.AddrMaxBox = new System.Windows.Forms.TextBox();
-            this.AddrMinBox = new System.Windows.Forms.TextBox();
+            this.AddrMaxBox = new System.Windows.Forms.ComboBox();
+            this.AddrMinBox = new System.Windows.Forms.ComboBox();
             this.TableLayoutRightBottom = new System.Windows.Forms.TableLayoutPanel();
             this.TableLayoutRightBottom1 = new System.Windows.Forms.TableLayoutPanel();
             this.SimpleValuesBox = new System.Windows.Forms.CheckBox();
@@ -109,9 +111,9 @@ namespace PS4CheaterNeo
             this.IsFilterSizeBox = new System.Windows.Forms.CheckBox();
             this.AutoPauseBox = new System.Windows.Forms.CheckBox();
             this.TableLayoutRightBottom2 = new System.Windows.Forms.TableLayoutPanel();
-            this.ValueBox = new System.Windows.Forms.TextBox();
+            this.ValueBox = new System.Windows.Forms.ComboBox();
             this.ValueAndLabel = new System.Windows.Forms.Label();
-            this.Value1Box = new System.Windows.Forms.TextBox();
+            this.Value1Box = new System.Windows.Forms.ComboBox();
             this.Value0Label = new System.Windows.Forms.Label();
             this.Value1Label = new System.Windows.Forms.Label();
             this.HexBox = new System.Windows.Forms.CheckBox();
@@ -228,6 +230,8 @@ namespace PS4CheaterNeo
             this.SectionViewHexEditor,
             this.SectionViewMenu_ToolStripSeparator1,
             this.SectionViewCheck,
+            this.SectionViewUnCheck,
+            this.SectionViewInverseCheck,
             this.SectionViewMenu_ToolStripSeparator2,
             this.SectionViewItems,
             this.SectionViewHiddens,
@@ -235,7 +239,7 @@ namespace PS4CheaterNeo
             this.SectionViewDump,
             this.SectionViewImport});
             this.SectionViewMenu.Name = "SectionViewMenu";
-            this.SectionViewMenu.Size = new System.Drawing.Size(150, 154);
+            this.SectionViewMenu.Size = new System.Drawing.Size(151, 198);
             // 
             // SectionViewHexEditor
             // 
@@ -255,6 +259,20 @@ namespace PS4CheaterNeo
             this.SectionViewCheck.Size = new System.Drawing.Size(149, 22);
             this.SectionViewCheck.Text = "Check";
             this.SectionViewCheck.Click += new System.EventHandler(this.SectionViewCheck_Click);
+            // 
+            // SectionViewUnCheck
+            // 
+            this.SectionViewUnCheck.Name = "SectionViewUnCheck";
+            this.SectionViewUnCheck.Size = new System.Drawing.Size(147, 22);
+            this.SectionViewUnCheck.Text = "Uncheck";
+            this.SectionViewUnCheck.Click += new System.EventHandler(this.SectionViewUnCheck_Click);
+            // 
+            // SectionViewInverseCheck
+            // 
+            this.SectionViewInverseCheck.Name = "SectionViewInverseCheck";
+            this.SectionViewInverseCheck.Size = new System.Drawing.Size(147, 22);
+            this.SectionViewInverseCheck.Text = "Inverse Check";
+            this.SectionViewInverseCheck.Click += new System.EventHandler(this.SectionViewInverseCheck_Click);
             // 
             // SectionViewMenu_ToolStripSeparator2
             // 
@@ -600,9 +618,12 @@ namespace PS4CheaterNeo
             this.ProcessesBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ProcessesBox.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.ProcessesBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.ProcessesBox.DropDownWidth = 218;
             this.ProcessesBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.ProcessesBox.ForeColor = System.Drawing.Color.White;
             this.ProcessesBox.FormattingEnabled = true;
+            this.ProcessesBox.IntegralHeight = false;
+            this.ProcessesBox.ItemHeight = 17;
             this.ProcessesBox.Location = new System.Drawing.Point(3, 3);
             this.ProcessesBox.Margin = new System.Windows.Forms.Padding(3, 3, 0, 3);
             this.ProcessesBox.Name = "ProcessesBox";
@@ -675,6 +696,7 @@ namespace PS4CheaterNeo
             this.SectionView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.SectionView.ForeColor = System.Drawing.Color.White;
             this.SectionView.HideSelection = false;
+            this.SectionView.ImeMode = System.Windows.Forms.ImeMode.Disable;
             this.SectionView.Location = new System.Drawing.Point(0, 60);
             this.SectionView.Margin = new System.Windows.Forms.Padding(0);
             this.SectionView.Name = "SectionView";
@@ -789,6 +811,7 @@ namespace PS4CheaterNeo
             this.AddrMaxBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.AddrMaxBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(36)))), ((int)(((byte)(36)))));
+            this.AddrMaxBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.AddrMaxBox.ForeColor = System.Drawing.Color.White;
             this.AddrMaxBox.ImeMode = System.Windows.Forms.ImeMode.Off;
             this.AddrMaxBox.Location = new System.Drawing.Point(153, 3);
@@ -802,6 +825,7 @@ namespace PS4CheaterNeo
             this.AddrMinBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.AddrMinBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(36)))), ((int)(((byte)(36)))));
+            this.AddrMinBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.AddrMinBox.ForeColor = System.Drawing.Color.White;
             this.AddrMinBox.ImeMode = System.Windows.Forms.ImeMode.Off;
             this.AddrMinBox.Location = new System.Drawing.Point(36, 3);
@@ -1002,6 +1026,7 @@ namespace PS4CheaterNeo
             this.ValueBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.ValueBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(36)))), ((int)(((byte)(36)))));
+            this.ValueBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.ValueBox.ForeColor = System.Drawing.Color.White;
             this.ValueBox.ImeMode = System.Windows.Forms.ImeMode.Off;
             this.ValueBox.Location = new System.Drawing.Point(43, 19);
@@ -1026,6 +1051,7 @@ namespace PS4CheaterNeo
             this.Value1Box.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.Value1Box.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(36)))), ((int)(((byte)(36)))));
+            this.Value1Box.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.Value1Box.ForeColor = System.Drawing.Color.White;
             this.Value1Box.ImeMode = System.Windows.Forms.ImeMode.Off;
             this.Value1Box.Location = new System.Drawing.Point(175, 19);
@@ -1157,7 +1183,7 @@ namespace PS4CheaterNeo
             this.ScanBtn.Dock = System.Windows.Forms.DockStyle.Top;
             this.ScanBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.ScanBtn.Location = new System.Drawing.Point(0, 3);
-            this.ScanBtn.Margin = new System.Windows.Forms.Padding(0, 3, 0, 0);
+            this.ScanBtn.Margin = new System.Windows.Forms.Padding(0, 3, 3, 0);
             this.ScanBtn.Name = "ScanBtn";
             this.ScanBtn.Size = new System.Drawing.Size(238, 23);
             this.ScanBtn.TabIndex = 12;
@@ -1174,7 +1200,7 @@ namespace PS4CheaterNeo
             this.UndoBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.UndoBtn.Image = ((System.Drawing.Image)(resources.GetObject("UndoBtn.Image")));
             this.UndoBtn.Location = new System.Drawing.Point(238, 3);
-            this.UndoBtn.Margin = new System.Windows.Forms.Padding(0, 3, 0, 0);
+            this.UndoBtn.Margin = new System.Windows.Forms.Padding(0, 3, 1, 0);
             this.UndoBtn.Name = "UndoBtn";
             this.UndoBtn.Size = new System.Drawing.Size(23, 23);
             this.UndoBtn.TabIndex = 19;
@@ -1219,7 +1245,7 @@ namespace PS4CheaterNeo
             this.RefreshBtn.Dock = System.Windows.Forms.DockStyle.Top;
             this.RefreshBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.RefreshBtn.Location = new System.Drawing.Point(0, 3);
-            this.RefreshBtn.Margin = new System.Windows.Forms.Padding(0, 3, 0, 0);
+            this.RefreshBtn.Margin = new System.Windows.Forms.Padding(0, 3, 3, 0);
             this.RefreshBtn.Name = "RefreshBtn";
             this.RefreshBtn.Size = new System.Drawing.Size(238, 23);
             this.RefreshBtn.TabIndex = 13;
@@ -1339,12 +1365,14 @@ namespace PS4CheaterNeo
         private ComboItemBox ProcessesBox;
         private System.Windows.Forms.CheckBox SelectAllBox;
         private System.Windows.Forms.CheckBox AlignmentBox;
+        private System.Windows.Forms.ColumnHeader SectionViewID;
         private System.Windows.Forms.ColumnHeader SectionViewAddress;
         private System.Windows.Forms.ColumnHeader SectionViewName;
         private System.Windows.Forms.ColumnHeader SectionViewProt;
         private System.Windows.Forms.ColumnHeader SectionViewLength;
         private System.Windows.Forms.ColumnHeader SectionViewSID;
         private System.Windows.Forms.ColumnHeader SectionViewOffset;
+        private System.Windows.Forms.ColumnHeader SectionViewEnd;
         private System.Windows.Forms.Panel Panel1;
         private System.Windows.Forms.StatusStrip StatusStrip1;
         private System.Windows.Forms.ToolStripStatusLabel ToolStripMsg;
@@ -1363,14 +1391,15 @@ namespace PS4CheaterNeo
         private System.Windows.Forms.ToolStripMenuItem SectionViewDump;
         private System.Windows.Forms.ToolStripSeparator SectionViewMenu_ToolStripSeparator1;
         private System.Windows.Forms.ToolStripMenuItem SectionViewCheck;
-        private System.Windows.Forms.TextBox AddrMinBox;
-        private System.Windows.Forms.TextBox AddrMaxBox;
+        private System.Windows.Forms.ToolStripMenuItem SectionViewUnCheck;
+        private System.Windows.Forms.ToolStripMenuItem SectionViewInverseCheck;
+        private System.Windows.Forms.ComboBox AddrMinBox;
+        private System.Windows.Forms.ComboBox AddrMaxBox;
         private System.Windows.Forms.Label AddrMinLabel;
         private System.Windows.Forms.Label AddrMaxLabel;
         private System.Windows.Forms.TableLayoutPanel TableLayoutRightMiddle;
         private System.Windows.Forms.ToolStripMenuItem ResultViewCopyAddress;
         private System.Windows.Forms.CheckBox IsFilterSizeBox;
-        private System.Windows.Forms.ColumnHeader SectionViewEnd;
         private System.Windows.Forms.Button PauseBtn;
         private System.Windows.Forms.Button ResumeBtn;
         private System.Windows.Forms.Timer SlowMotionTimer;
@@ -1383,9 +1412,9 @@ namespace PS4CheaterNeo
         private System.Windows.Forms.Button UndoBtn;
         private System.Windows.Forms.ComboBox ScanTypeBox;
         private System.Windows.Forms.TableLayoutPanel TableLayoutRightBottom2;
-        private System.Windows.Forms.TextBox ValueBox;
+        private System.Windows.Forms.ComboBox ValueBox;
         private System.Windows.Forms.Label ValueAndLabel;
-        private System.Windows.Forms.TextBox Value1Box;
+        private System.Windows.Forms.ComboBox Value1Box;
         private System.Windows.Forms.Label Value0Label;
         private System.Windows.Forms.Label Value1Label;
         private System.Windows.Forms.CheckBox HexBox;
@@ -1396,7 +1425,6 @@ namespace PS4CheaterNeo
         private System.Windows.Forms.ComboBox CompareTypeBox;
         private System.Windows.Forms.CheckBox AutoResumeBox;
         private System.Windows.Forms.CheckBox SimpleValuesBox;
-        private System.Windows.Forms.ColumnHeader SectionViewID;
         private System.Windows.Forms.TableLayoutPanel TableLayoutRightTop;
         private System.Windows.Forms.TableLayoutPanel TableLayoutRightTop1;
         private System.Windows.Forms.Button SectionSearchBtn;

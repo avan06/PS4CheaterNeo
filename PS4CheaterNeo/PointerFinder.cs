@@ -25,10 +25,12 @@ namespace PS4CheaterNeo
         {
             this.Font = mainForm.Font;
             InitializeComponent();
+            Text = $"Neo {Application.ProductVersion} | {Text}";
             ApplyUI(mainForm.langJson);
             listViewItemComparer = new ListViewItemComparer();
             pointerItems = new List<ListViewItem>();
             if (!Properties.Settings.Default.CollapsibleContainer.Value) SplitContainer1.SplitterButtonStyle = ButtonStyle.None;
+            FormGeometryHelper.Restore(this, Properties.Settings.Default.PointerFinderFormGeometry);
             this.mainForm = mainForm;
             sectionTool = new SectionTool(mainForm);
             processName = mainForm.ProcessName;
@@ -128,6 +130,7 @@ namespace PS4CheaterNeo
 
             if (!e.Cancel)
             {
+                FormGeometryHelper.Save(this, Properties.Settings.Default.PointerFinderFormGeometry);
                 PointerListView.VirtualListSize = 0;
                 PointerListView.VirtualMode = false;
                 pointerItems.Clear();

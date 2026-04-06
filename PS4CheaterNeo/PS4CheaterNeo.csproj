@@ -89,6 +89,10 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="common\Constant.cs" />
+    <Compile Include="common\ClickThroughToolStrip.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="common\FormGeometryHelper.cs" />
     <Compile Include="common\LanguageJson.cs" />
     <Compile Include="common\ps4dbg\IPS4DBG.cs" />
     <Compile Include="common\ps4dbg\libdebug\PS4DBG.Console.cs" />

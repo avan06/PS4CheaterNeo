@@ -74,6 +74,8 @@
 
     "SectionViewHexEditor": "Hexエディタ",
     "SectionViewCheck": "チェック",
+    "SectionViewUnCheck": "チェック解除",
+    "SectionViewInverseCheck": "チェック反転",
     "SectionViewCheckAll": "すべてチェック",
     "SectionViewUnCheckAll": "すべてのチェックを解除",
     "SectionViewInvertChecked": "チェックを反転",

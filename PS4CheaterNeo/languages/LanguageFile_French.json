@@ -74,6 +74,8 @@
 
     "SectionViewHexEditor": "Éditeur Hex",
     "SectionViewCheck": "Vérifier",
+    "SectionViewUnCheck": "Décocher",
+    "SectionViewInverseCheck": "Inverser la sélection",
     "SectionViewCheckAll": "Tout cocher",
     "SectionViewUnCheckAll": "Tout décocher",
     "SectionViewInvertChecked": "Inverser la sélection",

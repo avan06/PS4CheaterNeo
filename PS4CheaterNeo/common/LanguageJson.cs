@@ -252,6 +252,12 @@ namespace PS4CheaterNeo
         public string SectionViewCheck;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
+        public string SectionViewUnCheck;
+
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string SectionViewInverseCheck;
+
+        [System.Runtime.Serialization.DataMemberAttribute()]
         public string SectionViewCheckAll;
 
         [System.Runtime.Serialization.DataMemberAttribute()]

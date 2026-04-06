@@ -74,6 +74,8 @@
 
     "SectionViewHexEditor": "Hex편집기",
     "SectionViewCheck": "확인",
+    "SectionViewUnCheck": "선택 해제",
+    "SectionViewInverseCheck": "선택 반전",
     "SectionViewCheckAll": "모두 확인",
     "SectionViewUnCheckAll": "모두 해제",
     "SectionViewInvertChecked": "확인 반전",

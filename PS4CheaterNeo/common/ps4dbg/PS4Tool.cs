@@ -494,9 +494,28 @@ namespace PS4CheaterNeo
             
             if (ps4s[0].IsConnected && ps4s[0] is PS4DBG ps4dbg && ps4dbg.ExtFWVersion > 0 && processStatus == ProcessStatus.Pause) ps4dbg.ProcessExtResume(processID);
 
+            if (ps4s[0].IsConnected && ps4s[0] is FRAME4 fram4 && fram4.Version != "0" &&
+                Version.TryParse(fram4.Version, out Version current) && Version.TryParse("0.2.15", out Version target) &&
+                current >= target && processStatus == ProcessStatus.Pause)
+            {
+                fram4.ProcessExtResume(processID);
+            }
+
             if (!ps4s[0].IsDebugging) return;
 
             ps4s[0].TryDetachDebugger();
+        }
+
+        public new static string ToString()
+        {
+            var result = "";
+
+            if (ps4s[0] != null && ps4s[0].IsConnected)
+            {
+                result = ps4s[0].ToString();
+            }
+
+            return result;
         }
     }
 

@@ -74,6 +74,8 @@
 
     "SectionViewHexEditor": "Hex Editor",
     "SectionViewCheck": "Выбрать",
+    "SectionViewUnCheck": "Снять выбор",
+    "SectionViewInverseCheck": "Инвертировать выбор",
     "SectionViewCheckAll": "Выбрать все",
     "SectionViewUnCheckAll": "Отменить выбор всех",
     "SectionViewInvertChecked": "Инвертировать выбранные",

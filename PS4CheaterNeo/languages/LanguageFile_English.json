@@ -74,6 +74,8 @@
 
     "SectionViewHexEditor": "Hex Editor",
     "SectionViewCheck": "Check",
+    "SectionViewUnCheck": "Uncheck",
+    "SectionViewInverseCheck": "Inverse Check",
     "SectionViewCheckAll": "Check all",
     "SectionViewUnCheckAll": "Un-Check all",
     "SectionViewInvertChecked": "Invert checked",
@@ -301,7 +303,7 @@
     "description_FilterSizeQuery": "Determine whether to enable filtering Sections by size when opening the query window. \nDefault disabled",
     "description_SectionFilterSize": "Filter out when section size is less than this value(unit is bytes)",
     "description_MaxResultShow": "Enter the maximum number of displayed query results. \nwill only affect the number of results displayed in the ResultView. \nDefault value is 8192",
-    "description_SectionViewFullRowSelect": "Determine whether to enable the FullRowSelect feature in the SectionView of the Query window. \nDefault disabled",
+    "description_SectionViewFullRowSelect": "Determine whether to enable the FullRowSelect feature in the SectionView of the Query window. \nDefault enabled",
     "description_SectionViewDetectHiddenSection": "Determine whether to enable automatic detection of hidden sections. \nThis is currently an experimental feature. \nDefault disabled",
     "description_DetectHiddenSectionStartFromTheEnd": "Determine whether to enable detecting hidden sections starting from the end address of the last section. \nDefault disabled",
     "description_LastHiddenSectionLengthHex": "Specify the Hex length of the last hidden section. \nThis only takes effect when SectionViewDetectHiddenSection is enabled. \nDefault value is 0x40000000.",

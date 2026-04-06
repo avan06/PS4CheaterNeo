@@ -74,6 +74,8 @@
 
     "SectionViewHexEditor": "Hex編輯器",
     "SectionViewCheck": "勾選",
+    "SectionViewUnCheck": "取消勾選",
+    "SectionViewInverseCheck": "反向勾選",
     "SectionViewCheckAll": "全選",
     "SectionViewUnCheckAll": "取消全選",
     "SectionViewInvertChecked": "反轉勾選",

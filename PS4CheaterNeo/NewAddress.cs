@@ -34,6 +34,7 @@ namespace PS4CheaterNeo
         {
             this.Font = mainForm.Font;
             InitializeComponent();
+            Text = $"Neo {Application.ProductVersion} | {Text}";
             ApplyUI(mainForm.langJson);
 
             if (mainForm.ProcessName == "") throw new Exception("No Process currently");
@@ -128,7 +129,7 @@ namespace PS4CheaterNeo
             }
             if (isEdit)
             {
-                this.Text = "EditAddress";
+                this.Text = $"Neo {Application.ProductVersion} | EditAddress";
                 AddressBox.ReadOnly = true;
                 if (!IsPointer) PointerBox.Enabled = false;
             }

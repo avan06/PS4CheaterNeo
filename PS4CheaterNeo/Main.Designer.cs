@@ -54,7 +54,7 @@ namespace PS4CheaterNeo
             this.CheatGridMenuFindPointer = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator8 = new System.Windows.Forms.ToolStripSeparator();
             this.CheatGridMenuDelete = new System.Windows.Forms.ToolStripMenuItem();
-            this.ToolStrip1 = new System.Windows.Forms.ToolStrip();
+            this.ToolStrip1 = new PS4CheaterNeo.ClickThroughToolStrip();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.ToolStripSend = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator9 = new System.Windows.Forms.ToolStripSeparator();
@@ -662,7 +662,7 @@ namespace PS4CheaterNeo
 
         #endregion
         private GroupGridView.GroupGridView CheatGridView;
-        private System.Windows.Forms.ToolStrip ToolStrip1;
+        private PS4CheaterNeo.ClickThroughToolStrip ToolStrip1;
         private System.Windows.Forms.ToolStripButton ToolStripSend;
         private System.Windows.Forms.ToolStripButton ToolStripNewQuery;
         private System.Windows.Forms.StatusStrip statusStrip1;

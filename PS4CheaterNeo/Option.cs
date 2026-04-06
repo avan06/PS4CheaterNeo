@@ -18,6 +18,7 @@ namespace PS4CheaterNeo
         {
             this.mainForm = mainForm;
             InitializeComponent();
+            Text = $"Neo {Application.ProductVersion} | {Text}";
             Font = new Font(mainForm.UIFont, Font.Size);
             optionTreeView1.Font = Font;
             optionTreeView1.FontLeftView = new Font(mainForm.UIFont, Font.Size, FontStyle.Bold);
@@ -38,6 +39,28 @@ namespace PS4CheaterNeo
                 optionTreeView1.AdditionalInfoDict = descriptionDict;
             }
             optionTreeView1.InitSettings(Properties.Settings.Default);
+            FormGeometryHelper.Restore(this, Properties.Settings.Default.OptionFormGeometry);
+
+            // Access the internal TreeView to add a selected node highlight
+            var treeView = optionTreeView1.Controls.OfType<SplitContainer>().FirstOrDefault()
+                ?.Panel1.Controls.OfType<TreeView>().FirstOrDefault();
+            if (treeView != null)
+            {
+                treeView.DrawMode = TreeViewDrawMode.OwnerDrawAll;
+                treeView.DrawNode += OptionLeftView_DrawNode;
+                treeView.HideSelection = false;
+            }
+        }
+
+        private void OptionLeftView_DrawNode(object sender, DrawTreeNodeEventArgs e)
+        {
+            bool selected = (e.State & TreeNodeStates.Selected) != 0;
+            Color backColor = selected ? Color.FromArgb(60, 80, 110) : optionTreeView1.BackColorLeftView;
+            Color foreColor = selected ? Color.White : optionTreeView1.ForeColorLeftView;
+
+            using (var brush = new SolidBrush(backColor))
+                e.Graphics.FillRectangle(brush, e.Bounds);
+            TextRenderer.DrawText(e.Graphics, e.Node.Text, e.Node.TreeView.Font, e.Bounds, foreColor, TextFormatFlags.VerticalCenter | TextFormatFlags.Left);
         }
 
         private readonly MethodInfo AddToDictionaryMethod = typeof(IDictionary<string, object>).GetMethod("Add");
@@ -153,6 +176,7 @@ namespace PS4CheaterNeo
             }
             if (Properties.Settings.Default.UILanguage.Value != UILanguage) mainForm.ParseLanguageJson();
 
+            FormGeometryHelper.Save(this, Properties.Settings.Default.OptionFormGeometry);
             mainForm.ApplyUI();
         }
     }

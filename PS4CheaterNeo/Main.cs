@@ -243,6 +243,7 @@ namespace PS4CheaterNeo
         #region Event
         private void Main_Shown(object sender, EventArgs e)
         {
+            FormGeometryHelper.Restore(this, Properties.Settings.Default.MainFormGeometry);
             ProcessName         = "";
             bool isConnected    = false;
             string PS4FWVersion = Properties.Settings.Default.PS4FWVersion.Value ?? "";
@@ -270,6 +271,7 @@ namespace PS4CheaterNeo
                 e.Cancel = true;
                 return;
             }
+            FormGeometryHelper.Save(this, Properties.Settings.Default.MainFormGeometry);
         }
 
         #region ToolStrip
@@ -1068,7 +1070,8 @@ namespace PS4CheaterNeo
         private void ToolStripSettings_Click(object sender, EventArgs e)
         {
             if (option == null || option.IsDisposed) option = new Option(this);
-            option.StartPosition = FormStartPosition.CenterParent;
+            if (string.IsNullOrEmpty(Properties.Settings.Default.OptionFormGeometry.Value))
+                option.StartPosition = FormStartPosition.CenterParent;
             option.Show();
         }
 
@@ -1090,7 +1093,7 @@ namespace PS4CheaterNeo
                 }
 
                 if ((ProcessName ?? "") == "") throw new Exception("No Process currently");
-                if (!InitSections(ProcessName)) throw new Exception(String.Format("Process({0}): InitSections failed", ProcessName));
+                if (!InitSections(ProcessName)) throw new Exception("Process not found");
 
                 if (InputBox.Show("Hex View", "Please enter the memory address(hex) you want to view", ref inputValue) != DialogResult.OK) return;
 
@@ -1110,6 +1113,11 @@ namespace PS4CheaterNeo
                 if (ex.Message == "No Process currently")
                 {
                     InputBox.MsgBox("ToolStripHexView_Click", ex.Message, "Process isn't connected. Please connect first");
+                    return;
+                }
+                if (ex.Message == "Process not found")
+                {
+                    InputBox.MsgBox("ToolStripHexView_Click", ex.Message, String.Format("Process({0}) could not be found. It may have been terminated.", ProcessName));
                     return;
                 }
                 MessageBox.Show(ex.ToString(), ex.Source + ":ToolStripHexView_Click", MessageBoxButtons.OK, MessageBoxIcon.Hand);

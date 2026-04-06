@@ -117,7 +117,7 @@
       <Value Profile="(Default)">0x2000|3_Query|4_Result|Enter the maximum number of displayed query results. \nwill only affect the number of results displayed in the ResultView. \nDefault value is 8192</Value>
     </Setting>
     <Setting Name="SectionViewFullRowSelect" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
-      <Value Profile="(Default)">False|3_Query|5_SectionView|Determine whether to enable the FullRowSelect feature in the SectionView of the Query window. \nDefault disabled</Value>
+      <Value Profile="(Default)">True|3_Query|5_SectionView|Determine whether to enable the FullRowSelect feature in the SectionView of the Query window. \nDefault enabled</Value>
     </Setting>
     <Setting Name="SectionViewDetectHiddenSection" Type="OptionTreeView.Option&lt;bool&gt;" Scope="User">
       <Value Profile="(Default)">False|3_Query|5_SectionView|Determine whether to enable automatic detection of hidden sections. \nThis is currently an experimental feature. \nDefault disabled</Value>
@@ -352,6 +352,21 @@
     </Setting>
     <Setting Name="KeyHexEditorExpandUpperRightSplitPanel" Type="OptionTreeView.Option&lt;System.Windows.Forms.Keys&gt;" Scope="User">
       <Value Profile="(Default)">Ctrl + Down|6_Hot Key|3_HexEditor|[HexEditor] Expand the upper right Split panel</Value>
+    </Setting>
+    <Setting Name="MainFormGeometry" Type="OptionTreeView.Option&lt;System.String&gt;" Scope="User">
+      <Value Profile="(Default)">|5_UI|9_FormGeometry</Value>
+    </Setting>
+    <Setting Name="QueryFormGeometry" Type="OptionTreeView.Option&lt;System.String&gt;" Scope="User">
+      <Value Profile="(Default)">|5_UI|9_FormGeometry</Value>
+    </Setting>
+    <Setting Name="HexEditorFormGeometry" Type="OptionTreeView.Option&lt;System.String&gt;" Scope="User">
+      <Value Profile="(Default)">|5_UI|9_FormGeometry</Value>
+    </Setting>
+    <Setting Name="OptionFormGeometry" Type="OptionTreeView.Option&lt;System.String&gt;" Scope="User">
+      <Value Profile="(Default)">|5_UI|9_FormGeometry</Value>
+    </Setting>
+    <Setting Name="PointerFinderFormGeometry" Type="OptionTreeView.Option&lt;System.String&gt;" Scope="User">
+      <Value Profile="(Default)">|5_UI|9_FormGeometry</Value>
     </Setting>
   </Settings>
 </SettingsFile>

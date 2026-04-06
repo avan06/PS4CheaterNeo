@@ -5,7 +5,7 @@ namespace PS4CheaterNeo.libframe4
 {
     /// <summary>
     /// Copyright by DeathRGH/libframe4-cs
-	/// https://github.com/DeathRGH/libframe4-cs
+	  /// https://github.com/DeathRGH/libframe4-cs
     /// </summary>
     public partial class FRAME4
     {

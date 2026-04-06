@@ -14,10 +14,13 @@ namespace PS4CheaterNeo
         {
             this.Font = mainForm.Font;
             InitializeComponent();
+            Text = $"Neo {Application.ProductVersion} | {Text}";
             ApplyUI(mainForm.langJson);
             VersionComboBox.Items.AddRange(Constant.Versions);
+            PS4DBGTypeComboBox.SelectedIndexChanged -= PS4DBGTypeComboBox_SelectedIndexChanged;
             PS4DBGTypeComboBox.DataSource = Enum.GetValues(typeof(PS4DebugLibType));
             PS4DBGTypeComboBox.SelectedItem = Properties.Settings.Default.PS4DBGType.Value;
+            PS4DBGTypeComboBox.SelectedIndexChanged += PS4DBGTypeComboBox_SelectedIndexChanged;
         }
 
         public void ApplyUI(LanguageJson langJson)

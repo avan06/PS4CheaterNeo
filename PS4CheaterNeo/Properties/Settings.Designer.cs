@@ -12,7 +12,7 @@ namespace PS4CheaterNeo.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.14.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "18.4.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -522,8 +522,8 @@ namespace PS4CheaterNeo.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False|3_Query|5_SectionView|Determine whether to enable the FullRowSelect feature" +
-            " in the SectionView of the Query window. \\nDefault disabled")]
+        [global::System.Configuration.DefaultSettingValueAttribute("True|3_Query|5_SectionView|Determine whether to enable the FullRowSelect feature " +
+            "in the SectionView of the Query window. \\nDefault enabled")]
         public global::OptionTreeView.Option<bool> SectionViewFullRowSelect {
             get {
                 return ((global::OptionTreeView.Option<bool>)(this["SectionViewFullRowSelect"]));
@@ -1495,6 +1495,66 @@ namespace PS4CheaterNeo.Properties {
             }
             set {
                 this["KeyHexEditorExpandUpperRightSplitPanel"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("|5_UI|9_FormGeometry")]
+        public global::OptionTreeView.Option<System.String> MainFormGeometry {
+            get {
+                return ((global::OptionTreeView.Option<System.String>)(this["MainFormGeometry"]));
+            }
+            set {
+                this["MainFormGeometry"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("|5_UI|9_FormGeometry")]
+        public global::OptionTreeView.Option<System.String> QueryFormGeometry {
+            get {
+                return ((global::OptionTreeView.Option<System.String>)(this["QueryFormGeometry"]));
+            }
+            set {
+                this["QueryFormGeometry"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("|5_UI|9_FormGeometry")]
+        public global::OptionTreeView.Option<System.String> HexEditorFormGeometry {
+            get {
+                return ((global::OptionTreeView.Option<System.String>)(this["HexEditorFormGeometry"]));
+            }
+            set {
+                this["HexEditorFormGeometry"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("|5_UI|9_FormGeometry")]
+        public global::OptionTreeView.Option<System.String> OptionFormGeometry {
+            get {
+                return ((global::OptionTreeView.Option<System.String>)(this["OptionFormGeometry"]));
+            }
+            set {
+                this["OptionFormGeometry"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("|5_UI|9_FormGeometry")]
+        public global::OptionTreeView.Option<System.String> PointerFinderFormGeometry {
+            get {
+                return ((global::OptionTreeView.Option<System.String>)(this["PointerFinderFormGeometry"]));
+            }
+            set {
+                this["PointerFinderFormGeometry"] = value;
             }
         }
     }

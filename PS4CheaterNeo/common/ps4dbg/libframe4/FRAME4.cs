@@ -505,5 +505,15 @@ namespace PS4CheaterNeo.libframe4
             sock.Close();
             IsConnected = false;
         }
+
+        public override string ToString()
+        {
+            var result = new StringBuilder("Frame4");
+            if (string.IsNullOrEmpty(Version))
+            {
+                result.Append(" v").Append(Version).Append(" by DeathRGH");
+            }
+            return result.ToString();
+        }
     }
 }

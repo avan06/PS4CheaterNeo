@@ -548,5 +548,30 @@ namespace PS4CheaterNeo.libdebug
             ExtPS4DBGVersion = ConvertASCII(data, 0);
             return ExtPS4DBGVersion;
         }
+
+        public override string ToString()
+        {
+            var result = new StringBuilder("PS4debug");
+            if (!string.IsNullOrEmpty(ExtPS4DBGVersion))
+            {
+                // ExtPS4DBGVersion format: "Author v1.2.3" or "Author1 & Author2 v1.2.3"
+                string ext = ExtPS4DBGVersion;
+                int vIdx = ext.LastIndexOf(" v");
+                if (vIdx >= 0)
+                    result.Append(string.Format(" {0} by {1}", ext.Substring(vIdx + 1), ext.Substring(0, vIdx)));
+                else
+                    result.Append(string.Format(" {0}", ext));
+
+                if (ExtFWVersion > 0)
+                {
+                    result.Append(string.Format(" | FW: {0}.{1:D2}", ExtFWVersion / 100, ExtFWVersion % 100));
+                }
+            }
+            else if (string.IsNullOrEmpty(Version))
+            {
+                result.Append(" ").Append(Version);
+            }
+            return result.ToString();
+        }
     }
 }

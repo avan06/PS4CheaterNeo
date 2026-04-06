@@ -59,6 +59,7 @@ namespace PS4CheaterNeo
             mutex = new Mutex(false, "HexEditor", out _, mSec);
 
             InitializeComponent();
+            Text = $"Neo {Application.ProductVersion} | {Text}";
             InfoBox0.Font  = new System.Drawing.Font(mainForm.UIFont, 8.25F);
             AsmBox1.Font   = new System.Drawing.Font(mainForm.UIFont, 8.25F);
 
@@ -93,7 +94,7 @@ namespace PS4CheaterNeo
             for (int idx = 0; idx <= 0x10; idx++) HexViewMenuGroupSize.Items.Add("GroupSize:" + idx);
             HexViewMenuGroupSize.SelectedIndex = HexView.GroupSize;
 
-
+            FormGeometryHelper.Restore(this, Properties.Settings.Default.HexEditorFormGeometry);
         }
 
         public HexEditor(Main mainForm, SectionTool sectionTool, Section section, int baseAddr) : this(mainForm)
@@ -286,8 +287,10 @@ namespace PS4CheaterNeo
         {
             DynamicByteProvider dynaBP = HexView.ByteProvider as DynamicByteProvider;
 
-            if (dynaBP != null && dynaBP.HasChanges() && MessageBox.Show("Byte data has changes, Do you want to close HexEditor?", "HexEditor", 
-                MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) e.Cancel = true;
+            if (dynaBP != null && dynaBP.HasChanges() && MessageBox.Show("Byte data has changes, Do you want to close HexEditor?", "HexEditor",
+                MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) { e.Cancel = true; return; }
+
+            FormGeometryHelper.Save(this, Properties.Settings.Default.HexEditorFormGeometry);
         }
 
         #region HexView
