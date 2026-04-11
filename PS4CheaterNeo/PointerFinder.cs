@@ -539,7 +539,12 @@ namespace PS4CheaterNeo
                                     }));
 
                                     ulong bufferSize = sectionEnd.Start + (ulong)sectionEnd.Length - sectionStart.Start;
-                                    byte[] buffer = PS4Tool.ReadMemory(sectionStart.PID, sectionStart.Start, (int)bufferSize);
+                                    byte[] buffer;
+                                    if (sectionStart.IsKernel)
+                                        buffer = PS4Tool.KernelReadMemory(sectionStart.Start, (int)bufferSize);
+                                    else
+                                        buffer = PS4Tool.ReadMemory(sectionStart.PID, sectionStart.Start, (int)bufferSize);
+
                                     processedMemoryLen += buffer.Length;
 
                                     for (int rIdx = range.start; rIdx <= range.end; rIdx++)

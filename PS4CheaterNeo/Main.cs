@@ -1418,7 +1418,9 @@ namespace PS4CheaterNeo
             (uint sid, string name, uint prot, uint offsetAddr) preData = (0, "", 0, 0);
             Dictionary<ulong, ulong> pointerCaches = new Dictionary<ulong, ulong>();
             int processID = -1;
+            // Separately collect Kernel and User-space write requests while iterating through the rows
             List<(ulong address, byte[] data)> writeData = new List<(ulong address, byte[] data)>();
+            List<(ulong address, byte[] data)> kernelWriteData = new List<(ulong address, byte[] data)>();
             for (int cIdx = 0; cIdx < cheatGridRowList.Count; cIdx++)
             {
                 refreshLockSource.Token.ThrowIfCancellationRequested();
@@ -1512,14 +1514,25 @@ namespace PS4CheaterNeo
                     if (newData == null) continue;
 
                     if (processID == -1) processID = section.PID;
-                    writeData.Add((offsetAddr + section.Start, newData));
+
+                    if (section.IsKernel)
+                        kernelWriteData.Add((offsetAddr + section.Start, newData));
+                    else
+                        writeData.Add((offsetAddr + section.Start, newData));
                 }
                 catch (Exception) { preData = (0, "", 0, 0); }
             }
 
             if (ProcessPid == 0) return false;
 
-            CheatBatchWriteMemory(10, processID, writeData, true);
+            // 1. Process standard User-space Batch Writes
+            if (writeData.Count > 0) CheatBatchWriteMemory(10, processID, writeData, true);
+            // 2. Process Kernel-space Writes (handled individually)
+            foreach (var kItem in kernelWriteData)
+            {
+                PS4Tool.KernelWriteMemory(kItem.address, kItem.data);
+            }
+
             //var mergedWriteData = MergeMemoryWrites(processID, writeData, maxGap: 0); // Recommended to use 0 for conservative merging initially
             //CheatBatchWriteMemory(10, processID, mergedWriteData, true); // Send to parallel write (The chunkSize now refers to the number of large merged blocks processed simultaneously)
 
@@ -1548,7 +1561,12 @@ namespace PS4CheaterNeo
                 foreach ((Section Section_, uint MinOffset, uint MaxOffset, List<(uint OffsetAddr, int Length, int CIDX, ScanType ScanType, bool IsSign)> CheatList) cheat in cheatsDict.Values)
                 {
                     refreshCheatSource.Token.ThrowIfCancellationRequested();
-                    byte[] newDatas = PS4Tool.ReadMemory(processID, cheat.Section_.Start + cheat.MinOffset, (int)cheat.MaxOffset - (int)cheat.MinOffset);
+                    byte[] newDatas;
+                    if (cheat.Section_.IsKernel)
+                        newDatas = PS4Tool.KernelReadMemory(cheat.Section_.Start + cheat.MinOffset, (int)cheat.MaxOffset - (int)cheat.MinOffset);
+                    else
+                        newDatas = PS4Tool.ReadMemory(processID, cheat.Section_.Start + cheat.MinOffset, (int)cheat.MaxOffset - (int)cheat.MinOffset);
+
                     for (int idx = 0; idx < cheat.CheatList.Count; idx++)
                     {
                         count++;
@@ -1826,7 +1844,10 @@ namespace PS4CheaterNeo
                         (Section section, uint offsetAddr) = (row.Section_, row.OffsetAddr);
                         ScanType scanType = this.ParseFromDescription<ScanType>(row.Cells[(int)ChertCol.CheatListType].ToString());
                         byte[] data = ScanTool.ValueStringToByte(scanType, row.Cells[(int)ChertCol.CheatListValue].ToString());
-                        PS4Tool.WriteMemory(section.PID, offsetAddr + section.Start, data);
+                        if (section.IsKernel)
+                            PS4Tool.KernelWriteMemory(offsetAddr + section.Start, data);
+                        else
+                            PS4Tool.WriteMemory(section.PID, offsetAddr + section.Start, data);
                         break;
                     case (int)ChertCol.CheatListDel:
                         CheatGridView.SuspendLayout();
@@ -1876,7 +1897,11 @@ namespace PS4CheaterNeo
                 (Section section, uint offsetAddr) = (editedRow.Section_, editedRow.OffsetAddr);
                 ScanType scanType = this.ParseFromDescription<ScanType>(editedRow.Cells[(int)ChertCol.CheatListType].ToString());
                 byte[] data = ScanTool.ValueStringToByte(scanType, editedRow.Cells[(int)ChertCol.CheatListValue].ToString());
-                PS4Tool.WriteMemory(section.PID, offsetAddr + section.Start, data);
+                if (section.IsKernel)
+                    PS4Tool.KernelWriteMemory(offsetAddr + section.Start, data);
+                else
+                    PS4Tool.WriteMemory(section.PID, offsetAddr + section.Start, data);
+
                 (editedRow.Section_, editedRow.OffsetAddr, editedRow.ScanTypeCache, editedRow.LockDataCache) = (section, offsetAddr, scanType, data);
             }
             catch (Exception ex)
@@ -1945,7 +1970,10 @@ namespace PS4CheaterNeo
                     ScanType scanType = this.ParseFromDescription<ScanType>(row.Cells[(int)ChertCol.CheatListType].ToString());
 
                     byte[] newData = ScanTool.ValueStringToByte(scanType, newValue);
-                    PS4Tool.WriteMemory(section.PID, offsetAddr + section.Start, newData);
+                    if (section.IsKernel)
+                        PS4Tool.KernelWriteMemory(offsetAddr + section.Start, newData);
+                    else
+                        PS4Tool.WriteMemory(section.PID, offsetAddr + section.Start, newData);
 
                     (row.ScanTypeCache, row.LockDataCache) = (scanType, newData);
                 }
@@ -2041,7 +2069,10 @@ namespace PS4CheaterNeo
                 }
 
                 byte[] data = ScanTool.ValueStringToByte(scanType, value);
-                PS4Tool.WriteMemory(section.PID, offsetAddr + section.Start, data);
+                if (section.IsKernel)
+                    PS4Tool.KernelWriteMemory(offsetAddr + section.Start, data);
+                else
+                    PS4Tool.WriteMemory(section.PID, offsetAddr + section.Start, data);
 
                 (row.ScanTypeCache, row.LockDataCache) = (scanType, data);
             }
@@ -2072,7 +2103,10 @@ namespace PS4CheaterNeo
                             (Section section, uint offsetAddr) checkRow = (row.Section_, row.OffsetAddr);
                             ScanType rowScanType = this.ParseFromDescription<ScanType>(row.Cells[(int)ChertCol.CheatListType].ToString());
                             byte[] rowData = ScanTool.ValueStringToByte(rowScanType, inputValue);
-                            PS4Tool.WriteMemory(checkRow.section.PID, checkRow.offsetAddr + checkRow.section.Start, rowData);
+                            if (checkRow.section.IsKernel)
+                                PS4Tool.KernelWriteMemory(checkRow.offsetAddr + checkRow.section.Start, rowData);
+                            else
+                                PS4Tool.WriteMemory(checkRow.section.PID, checkRow.offsetAddr + checkRow.section.Start, rowData);
                             row.Cells[(int)ChertCol.CheatListValue] = ScanTool.BytesToString(rowScanType, rowData, false, inputValue.StartsWith("-"));
 
                             // Synchronize the cache, otherwise the lock thread will keep writing the old values
@@ -2146,7 +2180,10 @@ namespace PS4CheaterNeo
                 }
 
                 byte[] data = ScanTool.ValueStringToByte(newAddress.CheatType, newAddress.Value);
-                PS4Tool.WriteMemory(section.PID, offsetAddr + section.Start, data);
+                if (newAddress.AddrSection.IsKernel)
+                    PS4Tool.KernelWriteMemory(offsetAddr + section.Start, data);
+                else
+                    PS4Tool.WriteMemory(section.PID, offsetAddr + section.Start, data);
                 row.Cells[(int)ChertCol.CheatListValue] = newAddress.Value;
                 row.Cells[(int)ChertCol.CheatListOn] = newAddress.OnValue;
                 row.Cells[(int)ChertCol.CheatListOff] = newAddress.OffValue;
@@ -2268,7 +2305,13 @@ namespace PS4CheaterNeo
                         if (idx != pointerOffsets.Count - 1)
                         {
                             if (pointerCaches != null && pointerCaches.TryGetValue(queryAddress, out baseAddress)) continue;
-                            baseAddress = BitConverter.ToUInt64(PS4Tool.ReadMemory(section.PID, queryAddress, 8), 0);
+                            byte[] nextAddrBuffer;
+                            if (section.IsKernel)
+                                nextAddrBuffer = PS4Tool.KernelReadMemory(queryAddress, 8);
+                            else
+                                nextAddrBuffer = PS4Tool.ReadMemory(section.PID, queryAddress, 8);
+
+                            baseAddress = BitConverter.ToUInt64(nextAddrBuffer, 0);
                             if (pointerCaches != null) pointerCaches.Add(queryAddress, baseAddress);
                             if (baseAddress == 0)
                             {

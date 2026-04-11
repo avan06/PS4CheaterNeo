@@ -93,6 +93,7 @@
             this.GroupBoxAsm = new System.Windows.Forms.GroupBox();
             this.AsmBox1 = new System.Windows.Forms.RichTextBox();
             this.AutoRefreshTimer = new System.Windows.Forms.Timer(this.components);
+            this.HexViewMenuJumpToSectionOffset = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.SplitContainer1)).BeginInit();
             this.SplitContainer1.Panel1.SuspendLayout();
             this.SplitContainer1.Panel2.SuspendLayout();
@@ -175,9 +176,10 @@
             this.HexViewMenuSeparator1,
             this.HexViewMenuCopyAddress,
             this.HexViewMenuJumpToAddress,
-            this.HexViewMenuJumpToOffset});
+            this.HexViewMenuJumpToOffset,
+            this.HexViewMenuJumpToSectionOffset});
             this.HexViewMenu.Name = "HexViewMenu";
-            this.HexViewMenu.Size = new System.Drawing.Size(211, 130);
+            this.HexViewMenu.Size = new System.Drawing.Size(211, 174);
             // 
             // HexViewMenuByteGroup
             // 
@@ -328,7 +330,7 @@
             this.InfoBox0.Margin = new System.Windows.Forms.Padding(0);
             this.InfoBox0.Name = "InfoBox0";
             this.InfoBox0.ReadOnly = true;
-            this.InfoBox0.Size = new System.Drawing.Size(176, 20);
+            this.InfoBox0.Size = new System.Drawing.Size(176, 22);
             this.InfoBox0.TabIndex = 2;
             // 
             // TableLayoutPanel4
@@ -980,6 +982,13 @@
             this.AutoRefreshTimer.Interval = 2500;
             this.AutoRefreshTimer.Tick += new System.EventHandler(this.AutoRefreshTimer_Tick);
             // 
+            // HexViewMenuJumpToSectionOffset
+            // 
+            this.HexViewMenuJumpToSectionOffset.Name = "HexViewMenuJumpToSectionOffset";
+            this.HexViewMenuJumpToSectionOffset.Size = new System.Drawing.Size(210, 22);
+            this.HexViewMenuJumpToSectionOffset.Text = "Jump to Section Offset";
+            this.HexViewMenuJumpToSectionOffset.Click += new System.EventHandler(this.HexViewMenuJumpToSectionOffset_Click);
+            // 
             // HexEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -1088,5 +1097,6 @@
         private System.Windows.Forms.ToolStripMenuItem HexViewMenuCopyAddress;
         private System.Windows.Forms.ToolStripMenuItem HexViewMenuJumpToAddress;
         private System.Windows.Forms.ToolStripMenuItem HexViewMenuJumpToOffset;
+        private System.Windows.Forms.ToolStripMenuItem HexViewMenuJumpToSectionOffset;
     }
 }

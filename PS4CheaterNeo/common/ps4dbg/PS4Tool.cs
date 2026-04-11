@@ -29,6 +29,8 @@ namespace PS4CheaterNeo
         private static readonly Mutex[] mutexs;
         private static readonly IPS4DBG[] ps4s; //libdebug.PS4DBG
         private static System.Diagnostics.Stopwatch tickerMajor = System.Diagnostics.Stopwatch.StartNew();
+        // Mutex dedicated to Kernel operations to ensure thread safety
+        private static readonly Mutex kernelMutex;
 
         static PS4Tool()
         {
@@ -44,6 +46,8 @@ namespace PS4CheaterNeo
 
             mutexs = new Mutex[mutexFactor*2];
             ps4s = new IPS4DBG[mutexs.Length];
+            // Initialize a global named Mutex for Kernel access to prevent simultaneous operations from multiple instances
+            kernelMutex = new Mutex(false, mutexId + "Kernel", out _, mSec);
         }
 
         /// <summary>
@@ -143,6 +147,7 @@ namespace PS4CheaterNeo
             if (!ps4s[idx].IsConnected && !Connect(Properties.Settings.Default.PS4IP.Value, out msg, 2000, true)) throw new Exception("PS4DBG is not connected. error: " + msg);
         }
 
+        #region Process
         /// <summary>
         /// get process list
         /// Socket errorCode 10054: connection closed by peer, this situation means that ps4debug has been abnormal, ps4 may wake up from sleep, no solution.
@@ -266,7 +271,9 @@ namespace PS4CheaterNeo
             finally { try { mutexs[current].ReleaseMutex(); } catch (Exception) { } }
             return processMap;
         }
+        #endregion
 
+        #region Read
         /// <summary>
         /// Read the destination address from the pointer offsetList
         /// </summary>
@@ -318,33 +325,7 @@ namespace PS4CheaterNeo
         /// <param name="address">destination address</param>
         /// <param name="length">length of data to be read</param>
         /// <returns>value of the specified address</returns>
-        public static byte[] ReadMemory(int processID, ulong address, int length)
-        {
-            int current = CurrentIdx1();
-            try
-            {
-                mutexs[current].WaitOne();
-                ConnectedCheck(current);
-                byte[] buf = ps4s[current].ReadMemory(processID, address, length);
-                return buf;
-            }
-            catch (SocketException ex)
-            {
-                if (tickerMajor.Elapsed.TotalSeconds >= 1.5)
-                {
-                    if (ex.ErrorCode == 10054 || ex.ErrorCode == 10060)
-                    {
-                        reTrySocket = tickerMajor.Elapsed.TotalSeconds < 10 ? reTrySocket + 1 : 0;
-                        tickerMajor = System.Diagnostics.Stopwatch.StartNew();
-                        if (reTrySocket > 5) throw;
-                        Connect(Properties.Settings.Default.PS4IP.Value, out string msg, 1000, true);
-                    }
-                    else throw;
-                }
-            }
-            finally { try { mutexs[current].ReleaseMutex(); } catch (Exception) { } }
-            return new byte[length];
-        }
+        public static byte[] ReadMemory(int processID, ulong address, int length) => ReadMemoryInternal(processID, address, length, false);
 
         /// <summary>
         /// Read the value of the address to the specified process
@@ -387,23 +368,51 @@ namespace PS4CheaterNeo
         }
 
         /// <summary>
+        /// Read the value of the address to the specified process
+        /// </summary>
+        /// <param name="processID">specified process PID</param>
+        /// <param name="address">destination address</param>
+        /// <param name="length">length of data to be read</param>
+        /// <param name="isKernel">indicates whether the read is from kernel memory</param>
+        /// <returns>value of the specified address</returns>
+        private static byte[] ReadMemoryInternal(int processID, ulong address, int length, bool isKernel = false)
+        {
+            int current = CurrentIdx1();
+            try
+            {
+                mutexs[current].WaitOne();
+                ConnectedCheck(current);
+
+                if (isKernel) return ps4s[current].KernelReadMemory(address, length);
+                else return ps4s[current].ReadMemory(processID, address, length);
+            }
+            catch (SocketException ex)
+            {
+                if (tickerMajor.Elapsed.TotalSeconds >= 1.5)
+                {
+                    if (ex.ErrorCode == 10054 || ex.ErrorCode == 10060)
+                    {
+                        reTrySocket = tickerMajor.Elapsed.TotalSeconds < 10 ? reTrySocket + 1 : 0;
+                        tickerMajor = System.Diagnostics.Stopwatch.StartNew();
+                        if (reTrySocket > 5) throw;
+                        Connect(Properties.Settings.Default.PS4IP.Value, out string msg, 1000, true);
+                    }
+                    else throw;
+                }
+            }
+            finally { try { mutexs[current].ReleaseMutex(); } catch (Exception) { } }
+            return new byte[length];
+        }
+        #endregion
+
+        #region Write
+        /// <summary>
         /// Writes the new value of the address to the specified process
         /// </summary>
         /// <param name="processID">specified process PID</param>
         /// <param name="address">destination address</param>
         /// <param name="data">new value of destination address</param>
-        public static void WriteMemory(int processID, ulong address, byte[] data)
-        {
-            int current = CurrentIdx2();
-            try
-            {
-                mutexs[current].WaitOne();
-                ConnectedCheck(current);
-                ps4s[current].WriteMemory(processID, address, data);
-            }
-            catch (Exception) {}
-            finally { try { mutexs[current].ReleaseMutex(); } catch (Exception) { } }
-        }
+        public static void WriteMemory(int processID, ulong address, byte[] data) => WriteMemoryInternal(processID, address, data, false);
 
         /// <summary>
         /// Writes the new value of the address to the specified process
@@ -428,6 +437,119 @@ namespace PS4CheaterNeo
             finally { try { mutexs[current].ReleaseMutex(); } catch (Exception) { } }
         }
 
+        /// <summary>
+        /// Writes the specified data to the memory of a process or kernel at the given address.
+        /// </summary>
+        /// <remarks>This method acquires a mutex to ensure thread safety during the write operation. If
+        /// isKernel is true, the write is performed in kernel mode and processID is not used.</remarks>
+        /// <param name="processID">The identifier of the target process. This parameter is ignored if writing to kernel memory.</param>
+        /// <param name="address">The memory address at which to write the data.</param>
+        /// <param name="data">The byte array containing the data to write.</param>
+        /// <param name="isKernel">true to write to kernel memory; otherwise, false to write to the specified process memory.</param>
+        private static void WriteMemoryInternal(int processID, ulong address, byte[] data, bool isKernel = false)
+        {
+            int current = CurrentIdx2();
+            try
+            {
+                mutexs[current].WaitOne();
+                ConnectedCheck(current);
+
+                if (isKernel) ps4s[current].KernelWriteMemory(address, data);
+                else ps4s[current].WriteMemory(processID, address, data);
+            }
+            catch (Exception) { }
+            finally { try { mutexs[current].ReleaseMutex(); } catch (Exception) { } }
+        }
+        #endregion
+
+        #region Kernel
+        /// <summary>
+        /// Retrieves the base address of the kernel for the currently selected PS4 connection.
+        /// </summary>
+        /// <remarks>This method acquires a mutex to ensure thread safety when accessing the kernel base
+        /// address. The caller should ensure that a valid connection to a PS4 system exists before invoking this
+        /// method.</remarks>
+        /// <returns>A 64-bit unsigned integer representing the kernel base address of the connected PS4 system.</returns>
+        public static ulong GetKernelBase()
+        {
+            try
+            {
+                kernelMutex.WaitOne(); // Acquire inter-process Kernel lock to enforce serialized (single-threaded) execution
+                int current = CurrentIdx2();
+                try
+                {
+                    mutexs[current].WaitOne();
+                    ConnectedCheck(current);
+                    return ps4s[current].KernelBase();
+                }
+                finally { try { mutexs[current].ReleaseMutex(); } catch { } }
+            }
+            finally { kernelMutex.ReleaseMutex(); }
+        }
+
+        /// <summary>
+        /// Reads a specified number of bytes from kernel memory at the given address.
+        /// </summary>
+        /// <remarks>This method acquires a global kernel lock to ensure serialized access when reading
+        /// memory. The operation is performed in 8 MB pages to match the expected page size. Callers should ensure
+        /// appropriate permissions and handle sensitive data securely.</remarks>
+        /// <param name="address">The starting address in kernel memory from which to begin reading.</param>
+        /// <param name="length">The number of bytes to read from the specified address. Must be non-negative.</param>
+        /// <returns>A byte array containing the data read from kernel memory. The length of the array is equal to the specified
+        /// length.</returns>
+        /// <exception cref="Exception">Thrown if the read operation fails or if the number of bytes read does not match the requested length.</exception>
+        public static byte[] KernelReadMemory(ulong address, int length)
+        {
+            try
+            {
+                kernelMutex.WaitOne(); // Acquire inter-process Kernel lock to enforce serialized (single-threaded) execution
+
+                byte[] result = new byte[length];
+                int pageSize = 8 * 1024 * 1024;
+                int offset = 0;
+
+                while (offset < length)
+                {
+                    // Calculate the size for the current page
+                    int currentReadSize = Math.Min(pageSize, length - offset);
+
+                    // Execute partial read
+                    byte[] buffer = ReadMemoryInternal(-1, address + (ulong)offset, currentReadSize, true);
+
+                    if (buffer == null || buffer.Length != currentReadSize)
+                    {
+                        // If a partial read fails, we shouldn't return incomplete data to the scanner
+                        throw new Exception($"Kernel read failed at offset {offset:X}. Expected {currentReadSize} bytes, but received {buffer?.Length ?? 0}.");
+                    }
+
+                    // Copy chunk to the final result array
+                    Buffer.BlockCopy(buffer, 0, result, offset, currentReadSize);
+
+                    offset += currentReadSize;
+                }
+
+                return result;
+            }
+            finally { kernelMutex.ReleaseMutex(); }
+        }
+
+        /// <summary>
+        /// Writes the specified data to the given kernel memory address.
+        /// </summary>
+        /// <param name="address">The kernel memory address at which to begin writing the data.</param>
+        /// <param name="data">The byte array containing the data to write to kernel memory. Cannot be null.</param>
+        public static void KernelWriteMemory(ulong address, byte[] data)
+        {
+            try
+            {
+                kernelMutex.WaitOne(); // Acquire inter-process Kernel lock to enforce serialized (single-threaded) execution
+                WriteMemoryInternal(-1, address, data, true);
+            }
+            finally { kernelMutex.ReleaseMutex(); }
+        }
+        #endregion
+
+        #region Debug
         private static ProcessStatus processStatus;
 
         /// <summary>
@@ -505,6 +627,7 @@ namespace PS4CheaterNeo
 
             ps4s[0].TryDetachDebugger();
         }
+        #endregion
 
         public new static string ToString()
         {

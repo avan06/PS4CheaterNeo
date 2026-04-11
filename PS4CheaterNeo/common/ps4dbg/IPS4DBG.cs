@@ -125,6 +125,12 @@
         void TryDetachDebugger();
         #endregion
 
+        #region Kernel
+        ulong KernelBase();
+        byte[] KernelReadMemory(ulong address, int length);
+        void KernelWriteMemory(ulong address, byte[] data);
+        #endregion
+
         //========================================================================================================================================================
         #region libdebug
         //PS4DBG.cs
@@ -164,11 +170,6 @@
         //string GetPSID()
         //void SetFanThresholdCelsius(byte temperature)
         //void SetFanThresholdFahrenheit(byte temperature)
-
-        //FRAME4.Kernel.cs
-        //ulong KernelBase();
-        //byte[] KernelReadMemory(ulong address, int length);
-        //void KernelWriteMemory(ulong address, byte[] data);
         #endregion
     }
 }

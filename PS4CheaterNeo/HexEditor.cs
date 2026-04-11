@@ -335,7 +335,27 @@ namespace PS4CheaterNeo
             if (inputValue.StartsWith("-")) isNegative = true;
             inputValue = Regex.Replace(inputValue, "[^0-9a-fA-F]", "");
             ulong offset = ulong.Parse(inputValue, NumberStyles.HexNumber);
-            ulong address = section.Start + (ulong)HexView.SelectionStart;
+            ulong address = (ulong)HexView.LineInfoOffset + (ulong)HexView.SelectionStart;
+            address = isNegative ? address - offset : address + offset;
+
+            HexViewJumpToAddress(address);
+        }
+
+
+        private void HexViewMenuJumpToSectionOffset_Click(object sender, EventArgs e)
+        {
+            string inputValue = "";
+            if (PS4CheaterNeo.InputBox.Show("Hex View", "Please enter the offset(hex) you'd like to jump to from the START of current Section:", ref inputValue) != DialogResult.OK) return;
+
+            bool isNegative = false;
+            inputValue = Regex.Replace(inputValue, "[^-0-9a-fA-F]", "");
+            if (inputValue.StartsWith("-")) isNegative = true;
+            inputValue = Regex.Replace(inputValue, "[^0-9a-fA-F]", "");
+
+            if (string.IsNullOrWhiteSpace(inputValue)) return;
+
+            ulong offset = ulong.Parse(inputValue, NumberStyles.HexNumber);
+            ulong address = section.Start;
             address = isNegative ? address - offset : address + offset;
 
             HexViewJumpToAddress(address);
@@ -343,7 +363,8 @@ namespace PS4CheaterNeo
 
         private void HexViewJumpToAddress(ulong address)
         {
-            if (address < section.Start || address > section.Start + (uint)section.Length)
+            // Case 1: The target address is outside the current Section (Switching between Sections)
+            if (address < section.Start || address >= section.Start + (uint)section.Length)
             {
                 (int index, Section sectionNew) = sectionTool.GetIndexInSectionSortByAddr(address, sections);
                 if (index == -1) return;
@@ -353,9 +374,31 @@ namespace PS4CheaterNeo
                 SectionBox.SelectedIndex = index;
                 InitPageData(sectionNew, (int)(address - sectionNew.Start));
                 SectionBox.SelectedIndexChanged += new EventHandler(SectionBox_SelectedIndexChanged);
+                return;
             }
+
+            // Case 2: The target is in the same Section, but outside the current Page (8MB) range (Switching Pages)
+            ulong currentPageStart = section.Start + (ulong)(Page * PageSize);
+            ulong currentPageEnd = currentPageStart + (ulong)PageSize;
+
+            if (address < currentPageStart || address >= currentPageEnd)
+            {
+                int newPage = (int)((address - section.Start) / (ulong)PageSize);
+                HexView.SelectionStart = 0;
+
+                // This triggers PageBox_SelectedIndexChanged to load the new page data
+                PageBox.SelectedIndex = newPage;
+
+                // Relocate to the relative address within the new page
+                HexView.SelectionLength = 4;
+                HexView.SelectionStart = (long)(address - (section.Start + (ulong)(newPage * PageSize)));
+                HexView.SelectionLength = 4;
+                return;
+            }
+
+            // Case 3: The target is within the current page; simply move the cursor
             HexView.SelectionLength = 4;
-            HexView.SelectionStart = (long)(address - section.Start);
+            HexView.SelectionStart = (long)(address - (ulong)HexView.LineInfoOffset);
             HexView.SelectionLength = 4;
         }
 
@@ -543,6 +586,21 @@ namespace PS4CheaterNeo
             DynamicByteProvider dynaBP = HexView.ByteProvider as DynamicByteProvider;
             if (!dynaBP.HasChanges()) return;
 
+            // Security Check: Prompt user before writing to Kernel space
+            if (section.IsKernel)
+            {
+                string warnMsg = "CRITICAL WARNING: You are about to modify KERNEL memory.\n\n" +
+                                 "Writing to the Kernel is extremely dangerous. An incorrect value can cause an immediate " +
+                                 "system crash (Kernel Panic), data corruption, or force the console to shut down.\n\n" +
+                                 "If you are not absolutely sure about the consequences of this modification, please do NOT proceed.\n\n" +
+                                 "Are you certain you want to perform this Kernel write?";
+
+                DialogResult result = MessageBox.Show(warnMsg, "Kernel Write Danger",
+                    MessageBoxButtons.YesNo, MessageBoxIcon.Error, MessageBoxDefaultButton.Button2);
+
+                if (result != DialogResult.Yes) return;
+            }
+
             byte[] buffer = dynaBP.Bytes.ToArray();
             foreach (long address in changedPosDic.Keys)
             {
@@ -556,7 +614,9 @@ namespace PS4CheaterNeo
                     data = new byte[endPos - startPos];
                     Array.Copy(buffer, startPos, data, 0, endPos - startPos);
                 }
-                PS4Tool.WriteMemory(mainForm.ProcessPid, (ulong)(address + HexView.LineInfoOffset), data);
+
+                if (section.IsKernel) PS4Tool.KernelWriteMemory((ulong)(address + HexView.LineInfoOffset), data);
+                else PS4Tool.WriteMemory(section.PID, (ulong)(address + HexView.LineInfoOffset), data);
             }
             changedPosDic.Clear();
             HexView.ChangedPosSetFinish();
@@ -565,6 +625,19 @@ namespace PS4CheaterNeo
         private void AddToCheatGridBtn_Click(object sender, EventArgs e)
         {
             if (HexView.SelectionStart <= 0) return;
+
+            // Security Check: Prompt user before adding Kernel address to the Cheat Grid
+            if (section.IsKernel)
+            {
+                string warnMsg = "WARNING: You are adding a KERNEL memory address to the Cheat Grid.\n\n" +
+                                 "This is an experimental feature. Please be aware that modifying or locking " +
+                                 "kernel addresses is extremely risky and can lead to an immediate system crash.\n\n" +
+                                 "Do you want to proceed?";
+
+                if (MessageBox.Show(warnMsg, "Kernel Address Warning",
+                    MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) != DialogResult.Yes)
+                    return;
+            }
 
             DynamicByteProvider dynaBP = HexView.ByteProvider as DynamicByteProvider;
             ulong address = (ulong)(HexView.SelectionStart + HexView.LineInfoOffset);
@@ -743,7 +816,11 @@ namespace PS4CheaterNeo
             HexView.LineInfoOffset = (long)section.Start + (long)(PageSize * page);
             if (section.Length - PageSize * page < memSize) memSize = section.Length - PageSize * page;
 
-            byte[] dst = PS4Tool.ReadMemory(mainForm.ProcessPid, section.Start + (ulong)page * PageSize, (int)memSize);
+            byte[] dst;
+            if (section.IsKernel)
+                dst = PS4Tool.KernelReadMemory(section.Start + (ulong)page * PageSize, (int)memSize);
+            else
+                dst = PS4Tool.ReadMemory(section.PID, section.Start + (ulong)page * PageSize, (int)memSize);
 
             HashSet<long> changedPosSet = new HashSet<long>();
             if (HexView.ByteProvider != null)

@@ -693,25 +693,41 @@ namespace PS4CheaterNeo
         /// <returns>ulong</returns>
         private ulong ParseHexAddrText(string text)
         {
-            ulong addr;
-            if (text == null || text.Trim() == "") return 0;
-            else if (text.Contains("+"))
-            {
-                var texts = text.Split('+');
-                addr = ulong.Parse(texts[0].ToLower().Replace("0x", "").Trim(), NumberStyles.HexNumber);
-                ulong offset = ulong.Parse(texts[1].ToLower().Replace("0x", "").Trim(), NumberStyles.HexNumber);
-                addr += offset;
-            }
-            else if (text.Contains("-"))
-            {
-                var texts = text.Split('-');
-                addr = ulong.Parse(texts[0].ToLower().Replace("0x", "").Trim(), NumberStyles.HexNumber);
-                ulong offset = ulong.Parse(texts[1].ToLower().Replace("0x", "").Trim(), NumberStyles.HexNumber);
-                addr -= offset;
-            }
-            else addr = ulong.Parse(text.ToLower().Replace("0x", "").Trim(), NumberStyles.HexNumber);
+            if (string.IsNullOrWhiteSpace(text)) return 0;
 
-            return addr;
+            // Helper function to remove hex prefixes and whitespace
+            string CleanHex(string s) => s.Replace("0x", "").Replace("0X", "").Trim();
+
+            try
+            {
+                if (text.Contains("+"))
+                {
+                    string[] parts = text.Split('+');
+                    if (parts.Length < 2) return 0;
+
+                    ulong baseAddr = ulong.Parse(CleanHex(parts[0]), NumberStyles.HexNumber);
+                    ulong offset = ulong.Parse(CleanHex(parts[1]), NumberStyles.HexNumber);
+                    return baseAddr + offset;
+                }
+                else if (text.Contains("-"))
+                {
+                    string[] parts = text.Split('-');
+                    if (parts.Length < 2) return 0;
+
+                    ulong baseAddr = ulong.Parse(CleanHex(parts[0]), NumberStyles.HexNumber);
+                    ulong offset = ulong.Parse(CleanHex(parts[1]), NumberStyles.HexNumber);
+                    return baseAddr - offset;
+                }
+                else
+                {
+                    return ulong.Parse(CleanHex(text), NumberStyles.HexNumber);
+                }
+            }
+            catch (Exception)
+            {
+                // Return 0 if the input string contains invalid hex characters or format
+                return 0;
+            }
         }
 
         #region ScanTask
@@ -791,13 +807,25 @@ namespace PS4CheaterNeo
                                 if (sectionStart != null)
                                 {
                                     ulong bufferSize = sectionEnd.Start + (ulong)sectionEnd.Length - sectionStart.Start;
-                                    if (!isCompareFirst) buffer = PS4Tool.ReadMemory(sectionStart.PID, sectionStart.Start, (int)bufferSize);
+                                    if (!isCompareFirst)
+                                    {
+                                        if (sectionStart.IsKernel)
+                                            buffer = PS4Tool.KernelReadMemory(sectionStart.Start, (int)bufferSize);
+                                        else
+                                            buffer = PS4Tool.ReadMemory(sectionStart.PID, sectionStart.Start, (int)bufferSize);
+                                    }
                                 }
                                 if (range.start == -1)
                                 {
                                     range.start = range.end;
                                     sectionStart = sectionEnd;
-                                    if (!isCompareFirst) buffer = PS4Tool.ReadMemory(sectionEnd.PID, sectionEnd.Start, (int)sectionEnd.Length);
+                                    if (!isCompareFirst)
+                                    {
+                                        if (sectionEnd.IsKernel)
+                                            buffer = PS4Tool.KernelReadMemory(sectionEnd.Start, (int)sectionEnd.Length);
+                                        else
+                                            buffer = PS4Tool.ReadMemory(sectionEnd.PID, sectionEnd.Start, (int)sectionEnd.Length);
+                                    }
                                 }
 
                                 for (int rIdx = range.start; rIdx <= range.end; rIdx++)
@@ -1049,7 +1077,13 @@ namespace PS4CheaterNeo
                         newValue = new byte[comparerTool.ScanTypeLength];
                         Buffer.BlockCopy(buffer, (int)offsetAddr, newValue, 0, comparerTool.ScanTypeLength);
                     }
-                    else newValue = PS4Tool.ReadMemory(section.PID, address, comparerTool.ScanTypeLength);
+                    else
+                    {
+                        if (section.IsKernel)
+                            newValue = PS4Tool.KernelReadMemory(address, comparerTool.ScanTypeLength);
+                        else
+                            newValue = PS4Tool.ReadMemory(section.PID, address, comparerTool.ScanTypeLength);
+                    }
 
                     if (comparerTool.Value0Byte == null)
                     {
@@ -1179,7 +1213,13 @@ namespace PS4CheaterNeo
                         newBytes = new byte[comparerTool.ScanTypeLength];
                         Buffer.BlockCopy(buffer, (int)offsetAddr, newBytes, 0, comparerTool.ScanTypeLength);
                     }
-                    else newBytes = PS4Tool.ReadMemory(section.PID, offsetAddr + section.Start, comparerTool.ScanTypeLength);
+                    else
+                    {
+                        if (section.IsKernel)
+                            newBytes = PS4Tool.KernelReadMemory(offsetAddr + section.Start, comparerTool.ScanTypeLength);
+                        else
+                            newBytes = PS4Tool.ReadMemory(section.PID, offsetAddr + section.Start, comparerTool.ScanTypeLength);
+                    }
 
                     int scanOffset = 0;
                     for (int gIdx = 0; gIdx < comparerTool.GroupTypes.Count; gIdx++)
@@ -1340,7 +1380,9 @@ namespace PS4CheaterNeo
                                 valueStr = ScanTool.BytesToString(comparerTool.ScanType_, oldBytes, false, comparerTool.IsValue0Signed);
                                 valueHex = ScanTool.BytesToString(comparerTool.ScanType_, oldBytes, true, false);
                             }
-                            ListViewItem resultItem = new ListViewItem((offsetAddr + section.Start).ToString("X8"), 0)
+                            // Automatically determine the address length
+                            string addrFormat = section.IsKernel ? "X" : "X8"; // Kernel uses full length display
+                            ListViewItem resultItem = new ListViewItem((offsetAddr + section.Start).ToString(addrFormat), 0)
                             {
                                 Name = offsetAddr.ToString("X8"),
                                 Tag = (section.SID, bitsDict.Index)
@@ -1499,13 +1541,19 @@ namespace PS4CheaterNeo
                             if (sectionStart != null)
                             {
                                 ulong bufferSize = sectionEnd.Start + (ulong)sectionEnd.Length - sectionStart.Start;
-                                buffer = PS4Tool.ReadMemory(sectionStart.PID, sectionStart.Start, (int)bufferSize);
+                                if (sectionStart.IsKernel)
+                                    buffer = PS4Tool.KernelReadMemory(sectionStart.Start, (int)bufferSize);
+                                else
+                                    buffer = PS4Tool.ReadMemory(sectionStart.PID, sectionStart.Start, (int)bufferSize);
                             }
                             if (range.start == -1)
                             {
                                 range.start = range.end;
                                 sectionStart = sectionEnd;
-                                buffer = PS4Tool.ReadMemory(sectionEnd.PID, sectionEnd.Start, (int)sectionEnd.Length);
+                                if (sectionEnd.IsKernel)
+                                    buffer = PS4Tool.KernelReadMemory(sectionEnd.Start, (int)sectionEnd.Length);
+                                else
+                                    buffer = PS4Tool.ReadMemory(sectionEnd.PID, sectionEnd.Start, (int)sectionEnd.Length);
                             }
 
                             for (int rIdx = range.start; rIdx <= range.end; rIdx++)
@@ -1954,7 +2002,11 @@ namespace PS4CheaterNeo
 
                     uint sid = uint.Parse(selectedItems[idx].SubItems[(int)SectionCol.SectionViewSID].Text);
                     Section section = sectionTool.GetSection(sid);
-                    byte[] subBuffer = PS4Tool.ReadMemory(section.PID, section.Start, section.Length);
+                    byte[] subBuffer;
+                    if (section.IsKernel)
+                        subBuffer = PS4Tool.KernelReadMemory(section.Start, section.Length);
+                    else
+                        subBuffer = PS4Tool.ReadMemory(section.PID, section.Start, section.Length);
 
                     string path = string.Format("{0}{1}{2}_{3}_{4}_{5}.bin", savePath, Path.DirectorySeparatorChar, processName, sid, sectionAddr, sectionName);
                     File.WriteAllBytes(path, subBuffer);
@@ -1990,7 +2042,10 @@ namespace PS4CheaterNeo
                     Section section = sectionTool.GetSection(sid);
                     if (section == null || section.Length != bin.Length) continue;
 
-                    PS4Tool.WriteMemory(section.PID, section.Start, bin);
+                    if (section.IsKernel)
+                        PS4Tool.KernelWriteMemory(section.Start, bin);
+                    else
+                        PS4Tool.WriteMemory(section.PID, section.Start, bin);
                     importSize += bin.Length;
                 }
 
@@ -2228,6 +2283,18 @@ namespace PS4CheaterNeo
 
             (uint sid, _) = ((uint sid, int resultIdx))resultItem.Tag;
             Section section = sectionTool.GetSection(sid);
+
+            if (section != null && section.IsKernel)
+            {
+                string warnMsg = "WARNING: This result belongs to KERNEL memory.\n\n" +
+                                 "Adding it to the Cheat Grid may lead to system instability if locked or modified.\n\n" +
+                                 "Proceed?";
+
+                if (MessageBox.Show(warnMsg, "Kernel Address Warning",
+                    MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) != DialogResult.Yes)
+                    return;
+            }
+
             ScanType scanType = this.ParseFromDescription<ScanType>(resultItem.SubItems[(int)ResultCol.ResultListType].Text);
             ulong address = ulong.Parse(resultItem.SubItems[(int)ResultCol.ResultListAddress].Text, NumberStyles.HexNumber);
             if (address < section.Start) return;
@@ -2243,6 +2310,31 @@ namespace PS4CheaterNeo
         {
             List<ListViewItem> selectedItems = ListViewLVITEM.GetSelectedItems(ResultView);
             if (selectedItems.Count == 0) return;
+
+            bool containsKernel = false;
+            foreach (ListViewItem item in selectedItems)
+            {
+                (uint sid, _) = ((uint sid, int resultIdx))item.Tag;
+                Section section = sectionTool.GetSection(sid);
+                if (section != null && section.IsKernel)
+                {
+                    containsKernel = true;
+                    break;
+                }
+            }
+
+            if (containsKernel)
+            {
+                string warnMsg = "WARNING: You are adding KERNEL memory addresses to the Cheat Grid.\n\n" +
+                                 "Modifying or locking kernel addresses is extremely risky and can " +
+                                 "cause an immediate system crash (Kernel Panic).\n\n" +
+                                 "Do you want to proceed?";
+
+                if (MessageBox.Show(warnMsg, "Kernel Address Warning",
+                    MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) != DialogResult.Yes)
+                    return;
+            }
+
 
             mainForm.CheatGridViewRowCountUpdate(false);
             for (int i = 0; i < selectedItems.Count; ++i)

@@ -98,6 +98,7 @@
     <Compile Include="common\ps4dbg\libdebug\PS4DBG.Console.cs" />
     <Compile Include="common\ps4dbg\libdebug\PS4DBG.cs" />
     <Compile Include="common\ps4dbg\libdebug\PS4DBG.Debug.cs" />
+    <Compile Include="common\ps4dbg\libdebug\PS4DBG.Kernel.cs" />
     <Compile Include="common\ps4dbg\libdebug\PS4DBG.Proc.cs" />
     <Compile Include="common\ps4dbg\libframe4\FRAME4.Console.cs" />
     <Compile Include="common\ps4dbg\libframe4\FRAME4.cs" />

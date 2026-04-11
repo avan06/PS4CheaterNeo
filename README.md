@@ -2,7 +2,7 @@
 
 PS4CheaterNeo is a program to find game cheat codes, and it is based on [`ps4debug`](https://github.com/jogolden/ps4debug) and [`.Net Framework 4.8`](https://support.microsoft.com/en-us/topic/microsoft-net-framework-4-8-offline-installer-for-windows-9d23f658-3b97-68ab-d013-aa3c3e7495e0).
 
-Currently in `version 1.0.9.0`
+Currently in `version 1.0.10.0`
 
 
 ## Table of Contents
@@ -69,6 +69,7 @@ Currently in `version 1.0.9.0`
 - `Hex Editor` can be opened from the `cheat` or `query` window.
 - `Pointer finder` can be executed from the `cheat` or `query` lists.
 - Added support for attempting to re-establish the connection when PS4Tool's ConnectedCheck detects that PS4DBG is not connected. (0.9.9.1)
+- All major windows (Main, Query, HexEditor, Option, PointerFinder) now automatically save and restore their last position and size. (1.0.8.0)
 
 
 ## SendPayload	[🔼](#table-of-contents)
@@ -87,6 +88,7 @@ Currently in `version 1.0.9.0`
 
 - `ps4debug` or `ps5debug` can be directly placed in the payloads folder, no longer needing to be placed in the specified path for the FW version. (1.0.1.2)
 - Now it also supports the `Frame4` version made by `DeathRGH`, with the same path placed in the payloads folder, applicable firmware versions are 5.05, 6.72, 9.00, and 11.00. (1.0.3.0)
+- Pausing and resuming games via the `frame4` Payload no longer requires attaching PS4 Debugging mode. (1.0.8.0)
 - You must manually place the downloaded payload in the `\Path\to\PS4CheaterNeo\payloads\` or `\Path\to\PS4CheaterNeo\payloads\\[FW version]\` folder.
 
 > ex. Paths without FW will be prioritized for loading.  
@@ -127,6 +129,7 @@ Currently in `version 1.0.9.0`
 - When `unchecked LockEnable` in the Cheat window, it will `immediately stop the Task` that locks cheats. (0.9.9.14)
 - When `unchecked AutoRefresh` in the Cheat window, it will `immediately stop the Task` that refreshes cheats. (0.9.9.14)
 - When `double-clicking the Refresh button` in the Cheat window, it will `immediately stop the Task` that refreshes cheats. (0.9.9.14)
+- Added `CheatLockTimerInterval` setting to allow users to customize the locking frequency. (1.0.9.0)
 
 ![cheat_1](assets/cheat_1.webp)
 ![cheat_2](assets/cheat_2.webp)
@@ -223,6 +226,15 @@ Note: The Query window needs to Refresh Processes to incorporate the new Hidden 
 
 ![query_AddrIsFilterBox](assets/query_AddrIsFilterBox.webp)
 
+- Search History: The Value, Address, and Range fields in the Query window have been converted to ComboBoxes that remember the last 20 entries. (1.0.8.0)
+- Section View Improvements: 
+    - Added "Uncheck" and "Inverse Check" to the context menu. (1.0.8.0)
+    - Supports using the `Spacebar` to toggle the check state of selected sections. (1.0.8.0)
+- Experimental Kernel Support: (1.0.10.0)
+    - Added `IsKernel` field to the Section class.
+    - Automatically injects a `kernel_base` section during process initialization for memory viewing.
+    - Set as hidden by default (IsFilter = true) until filters are disabled in Query window.
+    - Note: Writing to kernel memory is highly experimental and may trigger a system crash.
 
 ### Query window: SlowMotion and Pause
 
@@ -425,6 +437,9 @@ Range: -0x8000000000000000 to 0x7FFFFFFFFFFFFFFF (-9,223,372,036,854,775,808 to 
 - Added support for find forward or backward feature in Hex editor, Default is find forward. (0.9.7.10)
 - Added support for automatic selection of the value change (`red` and `green` value) position closest to the current location when there is no input value for the find value, when the option "AutoFindClosestChangedPosition" is enabled (enabled by default). (0.9.8.5)
 - Added support for searching memory using LittleEndian endianness when the option "UsingLittleEndian" is enabled. Note: When LittleEndian is enabled, regardless of input length, the input Hex values will be completely reversed (using Array.Reverse). (0.9.9.0)
+- Added a new jump option in the context menu to jump relative to the start address of the current Section. (1.0.10.0)
+    * `JumpToOffset`: Jump relative to the current cursor position.
+    * `JumpToSectionOffset`: Jump relative to the start address of the current Section.
 
 ![hexeditor](assets/hexeditor5.webp)
 ![hexeditor](assets/hexeditor1.webp)

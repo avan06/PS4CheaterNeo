@@ -442,7 +442,11 @@ namespace PS4CheaterNeo
                     if (idx != TableLayoutBottomBox.Controls.Count - 1)
                     {
                         if (AddrSection == null || AddrSection.SID == 0) AddrSection = mainForm.sectionTool.GetSection(mainForm.sectionTool.GetSectionID((ulong)(address + baseAddress)));
-                        byte[] nextAddress = PS4Tool.ReadMemory(AddrSection.PID, (ulong)(address + baseAddress), 8);
+                        byte[] nextAddress;
+                        if (AddrSection.IsKernel)
+                            nextAddress = PS4Tool.KernelReadMemory((ulong)(address + baseAddress), 8);
+                        else
+                            nextAddress = PS4Tool.ReadMemory(AddrSection.PID, (ulong)(address + baseAddress), 8);
                         baseAddress = BitConverter.ToInt64(nextAddress, 0);
                         TableLayoutBottomLabel.Controls[idx].Text = string.Format("=> {0:X2} +", baseAddress);
                     }
@@ -453,7 +457,13 @@ namespace PS4CheaterNeo
                         if (CheatType != ScanType.Hex) length = ScanTool.ScanTypeLengthDict[CheatType];
                         else if (ValueBox.Text.Length > 1) length = ValueBox.Text.Length / 2;
                         else length = 8;
-                        byte[] data = PS4Tool.ReadMemory(BaseSection.PID, (ulong)(address + baseAddress), length);
+
+                        byte[] data;
+                        if (BaseSection.IsKernel)
+                            data = PS4Tool.KernelReadMemory((ulong)(address + baseAddress), length);
+                        else
+                            data = PS4Tool.ReadMemory(BaseSection.PID, (ulong)(address + baseAddress), length);
+
                         string value = ScanTool.BytesToString(CheatType, data);
                         TableLayoutBottomLabel.Controls[idx].Text = string.Format("=> {0}", value);
                         AddressBox.Text = (address + baseAddress).ToString("X");

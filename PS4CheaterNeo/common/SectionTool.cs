@@ -116,6 +116,11 @@ namespace PS4CheaterNeo
         /// </summary>
         public int SN = -1;
 
+        /// <summary>
+        /// Indicates whether the section is a kernel section.
+        /// </summary>
+        public bool IsKernel = false;
+
         public Section Clone()
         {
             Section section = new Section
@@ -132,6 +137,7 @@ namespace PS4CheaterNeo
                 IsFilter     = IsFilter,
                 IsFilterSize = IsFilterSize,
                 SN           = SN,
+                IsKernel     = IsKernel,
             };
             return section;
         }
@@ -261,7 +267,8 @@ namespace PS4CheaterNeo
         /// <exception cref="Exception"></exception>
         public void InitSections(ProcessMap pMap, int processID, string processName)
         {
-            if (pMap == null || pMap.entries == null || pMap.entries.Length == 0) throw new Exception(string.Format("{0}: Process({1}) Map is null.", processName, processID));
+            if (pMap == null || pMap.entries == null || pMap.entries.Length == 0)
+                throw new Exception(string.Format("{0}: Process({1}) Map is null.", processName, processID));
 
             mutex.WaitOne();
             try
@@ -269,9 +276,11 @@ namespace PS4CheaterNeo
                 string SectionFilterKeys = Properties.Settings.Default.SectionFilterKeys.Value;
                 uint SectionFilterSize = Properties.Settings.Default.SectionFilterSize.Value;
                 SectionFilterKeys = Regex.Replace(SectionFilterKeys, " *[,;] *", "|");
-                if (SectionDict != null) SectionDict.Clear();
-                SectionDict = new Dictionary<uint, Section>();
-                SectionList = new List<(uint SID, ulong start, ulong end)>();
+
+                // Create local tempDict and tempList to avoid modifying the active instance during processing
+                var tempDict = new Dictionary<uint, Section>();
+                var tempList = new List<(uint SID, ulong start, ulong end)>();
+
                 TotalSelected = 0;
                 TotalMemorySize = 0;
                 PID = pMap.pid;
@@ -279,7 +288,7 @@ namespace PS4CheaterNeo
                 (uint sIdx, uint ProtCnt) v2 = (0, 0);
                 (uint HighBits, uint TypeCode, uint Prot) tmp = (0, 0, 0);
                 MemoryEntry tmpEntry = null;
-                Array.Sort(pMap.entries, CompareMemoryEntry); //Sort MemoryEntry in order to calculate SID
+                Array.Sort(pMap.entries, CompareMemoryEntry); // Sort MemoryEntry in order to calculate SID
                 for (int eIdx = 0; eIdx < pMap.entries.Length; eIdx++)
                 {
                     MemoryEntry entry = pMap.entries[eIdx];
@@ -287,20 +296,33 @@ namespace PS4CheaterNeo
                     if (tmpEntry != null && tmpEntry.start == entry.start && tmpEntry.end == entry.end) continue;
                     ulong start = entry.start;
                     ulong end = entry.end;
+
+                    // Prevent underflow caused by start being greater than end (which results in a massive ulong value)
+                    if (start >= end) continue;
+
                     ulong length = end - start;
+
+                    // Filter out invalid massive memory blocks to avoid infinite loops.
+                    // Set a reasonable upper limit, such as 64GB (0x1000000000) or 32GB.
+                    if (length > 0x1000000000UL)
+                    {
+                        // Skip abnormally large sections
+                        continue;
+                    }
+
                     bool isFilter = SectionIsFilter(entry.name, SectionFilterKeys);
                     uint idx = 0;
-                    uint highBits = (uint)((start & 0xffffffff00000000) >> 32); //get higher bits value, parse higher bits into lower bits
-                    uint typeCode = !string.IsNullOrWhiteSpace(entry.name) ? 1u : 2u; //first code of SID, unnamed 1, named 2
+                    uint highBits = (uint)((start & 0xffffffff00000000) >> 32); // get higher bits value, parse higher bits into lower bits
+                    uint typeCode = string.IsNullOrWhiteSpace(entry.name) ? 2u : 1u; // first code of SID, named 1, unnamed 2
 
-                    ulong bufferLength = 1024 * 1024 * 128; //128M
-                    if ((entry.prot & 0x5) == 0x5) bufferLength = length; //Executable section
+                    ulong bufferLength = 1024 * 1024 * 128; // 128M
+                    if ((entry.prot & 0x5) == 0x5) bufferLength = length; // Executable section
                     if (MemoryStart == 0 || start < MemoryStart) MemoryStart = start;
                     if (MemoryEnd == 0 || end > MemoryEnd) MemoryEnd = end;
-                    if (tmp.HighBits > 0 && tmp.HighBits != highBits) v2.sIdx = 0; //Calculate SID value: reset v2.sIdx to zero when the highVal has changed
-                    if (tmp.TypeCode > 0 && tmp.TypeCode != typeCode) v2 = (0, 0); //Calculate SID value: reset v2 when the firstId has changed
+                    if (tmp.HighBits > 0 && tmp.HighBits != highBits) v2.sIdx = 0; // Calculate SID value: reset v2.sIdx to zero when the highVal has changed
+                    if (tmp.TypeCode > 0 && tmp.TypeCode != typeCode) v2 = (0, 0); // Calculate SID value: reset v2 when the firstId has changed
                     if (tmp.Prot > 0 && tmp.Prot != entry.prot)
-                    { //Calculate SID value: Increase the prot count and reset sIdx to zero when the prot has changed
+                    { // Calculate SID value: Increase the prot count and reset sIdx to zero when the prot has changed
                         v1 = (0, ++v1.ProtCnt);
                         v2 = (0, ++v2.ProtCnt);
                     }
@@ -315,11 +337,22 @@ namespace PS4CheaterNeo
                             length = 0;
                         }
 
+                        uint newSidV1 = idx + v1.sIdx * 100 + v1.ProtCnt * 1000000 + typeCode * 100000000;
+                        // Handle uint overflow collisions if the high address is too large
+                        uint newSid = unchecked(idx + v2.sIdx * 100 + v2.ProtCnt * 100000 + typeCode * 1000000 + highBits * 10000000);
+
+                        // Ensure the SID is absolutely unique in the Dictionary to prevent crashes
+                        while (tempDict.ContainsKey(newSid))
+                        {
+                            newSid++;
+                            newSidV1++;
+                        }
+
                         Section section = new Section
                         {
                             PID    = pMap.pid,
-                            SIDv1  = idx + v1.sIdx * 100 + v1.ProtCnt * 1000000 + typeCode * 100000000,
-                            SID    = idx + v2.sIdx * 100 + v2.ProtCnt * 100000  + typeCode * 1000000 + highBits * 10000000,
+                            SIDv1  = newSidV1,
+                            SID    = newSid,
                             Start  = start,
                             Length = (int)curLength,
                             Name   = entry.name + (length == 0 && idx == 0 ? "" : "[" + idx + "]"),
@@ -330,18 +363,19 @@ namespace PS4CheaterNeo
                         if (isFilter) section.IsFilter = true;
                         else if (section.Length < SectionFilterSize) section.IsFilterSize = true;
 
-                        SectionDict.Add(section.SID, section);
+                        tempDict.Add(section.SID, section);
 
                         start += curLength;
                         idx++;
                     }
+
                     if (idx > 99)
                     {
                         v1.sIdx += idx / 100;
                         v2.sIdx += idx / 100;
                     }
                     v1.sIdx++;
-                    if (++v2.sIdx > 999) //v2.sIdx++;
+                    if (++v2.sIdx > 999) // v2.sIdx++;
                     {
                         v2.ProtCnt++;
                         v2.sIdx = 0;
@@ -349,8 +383,50 @@ namespace PS4CheaterNeo
                     tmp = (highBits, typeCode, entry.prot);
                     tmpEntry = entry;
                 }
+
+                // ==========================================
+                //  Manually inject Kernel Base section
+                // ==========================================
+                try
+                {
+                    ulong kernelBaseAddr = PS4Tool.GetKernelBase();
+                    if (kernelBaseAddr > 0)
+                    {
+                        // Calculate a unique SID to avoid collisions with the game's sections
+                        uint kHighBits = (uint)((kernelBaseAddr & 0xffffffff00000000) >> 32);
+                        uint kSid = unchecked(99999 + v2.sIdx * 100 + v2.ProtCnt * 100000 + 1 * 1000000 + kHighBits * 10000000);
+
+                        while (tempDict.ContainsKey(kSid)) kSid++;
+
+                        Section kernelSection = new Section
+                        {
+                            PID = 0,               // Set to 0 as a placeholder
+                            IsKernel = true,       // Mark as a Kernel Section
+                            SID = kSid,
+                            SIDv1 = kSid,
+                            Start = kernelBaseAddr,
+                            // Kernel does not have a defined End address; we provide a reasonable size (e.g., 32MB = 0x2000000)
+                            Length = 0x2000000,
+                            Name = "kernel_base",
+                            Check = false,
+                            Prot = 5,              // Read (1) + Execute (4)
+                            Offset = 0,
+                            IsFilter = true        // Filtered and hidden by default to prevent a Kernel Panic if the user scans using "Check All"
+                        };
+
+                        tempDict.Add(kernelSection.SID, kernelSection);
+                    }
+                }
+                catch { /* Ignore if obtaining Kernel Base fails or is unsupported; does not affect game section loading */ }
+
+
+                // Replace original properties with the completed local variables
+                SectionDict = tempDict;
+                SectionList = tempList;
+
                 bool SectionViewDetectHiddenSection = Properties.Settings.Default.SectionViewDetectHiddenSection.Value;
-                if (SectionViewDetectHiddenSection) DetectHiddenSection(Properties.Settings.Default.LastHiddenSectionLengthHex.Value, Properties.Settings.Default.DetectHiddenSectionStartFromTheEnd.Value);
+                if (SectionViewDetectHiddenSection)
+                    DetectHiddenSection(Properties.Settings.Default.LastHiddenSectionLengthHex.Value, Properties.Settings.Default.DetectHiddenSectionStartFromTheEnd.Value);
             }
             catch (Exception) { throw; }
             finally { mutex.ReleaseMutex(); }
@@ -427,9 +503,12 @@ namespace PS4CheaterNeo
                                 }
                                 if (valid)
                                 {
-                                    if (SectionDict.ContainsKey(section1.SID))
-                                        Console.WriteLine(section1);
-                                    else SectionDict.Add(section1.SID, section1);
+                                    while (SectionDict.ContainsKey(section1.SID))
+                                    {
+                                        section1.SID++;
+                                        section1.SIDv1++;
+                                    }
+                                    SectionDict.Add(section1.SID, section1);
                                 }
                                 sectionNewStart += curLength;
                             }
@@ -535,10 +614,10 @@ namespace PS4CheaterNeo
         /// <returns></returns>
         public bool SectionIsFilter(string name, string sectionFilterKeys)
         {
-            bool result = false;
-            if (Regex.IsMatch(name, sectionFilterKeys)) result = true;
+            if (string.IsNullOrWhiteSpace(sectionFilterKeys))
+                return false;
 
-            return result;
+            return Regex.IsMatch(name, sectionFilterKeys);
         }
 
         /// <summary>
